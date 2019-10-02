@@ -1,0 +1,142 @@
+\section{Chords}
+\label{appchords}
+
+Module \texttt{chords.py} is Python code that exports class \texttt{chord}.  There are thirty chords in a dodecahedron.  They are assigned vertices according to Table~\ref{Tablechordae} that index according to Fig.~\ref{figDodecahedron}.  They are created within the \texttt{dodecahedron} constructor.  (The user does not call the \texttt{chord} constructor.)  This class has the following interface:
+
+\bigskip\noindent
+\textbf{class} \texttt{chord}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{c = chord(number, vertex1, vertex2, h)} \\
+\indent \texttt{number\phantom{1}} \; an immutable value unique to this chord \\
+\indent \texttt{vertex1} \; an end point of the chord, an object of class \texttt{vertex} \\
+\indent \texttt{vertex2} \; an end point of the chord, an object of class \texttt{vertex} \\
+\indent \texttt{h} \qquad\quad\;\; timestep size between two neighboring configurations
+
+\medskip\noindent
+Vertices \texttt{vertex1} and \texttt{vertex2} must be different.  The chordal numbering scheme is specified in Table~\ref{Tablechordae}, given the vertex numbering scheme for the dodecahedron listed in Table~\ref{TableDodecahedron} that is visible in Fig.~\ref{figDodecahedron}.
+
+\medskip\noindent
+\textit{methods}
+
+\medskip\noindent
+\texttt{s = c.toString(state)}
+
+\medskip\noindent
+Returns a formatted string representation for this chord in configuration \texttt{state} of its dodecahedron.
+
+\medskip\noindent
+\texttt{n = c.number()}
+
+\medskip\noindent
+Returns the unique number affiliated with this chord.
+
+\medskip\noindent
+\texttt{v1, v2 = c.vertexNumbers()}
+
+\medskip\noindent
+Returns the vertex numbers assigned to the two vertices of this chord.
+
+\medskip\noindent
+\texttt{truth = c.hasVertex(number)}
+
+\medskip\noindent
+Returns \texttt{True} if one of the two vertices has this vertex number; otherwise, it returns \texttt{False}.
+
+\medskip\noindent
+\texttt{v = c.getVertex(number)}
+
+\medskip\noindent
+Returns the vertex with identifier \texttt{number}.  Typically, it is to be called inside a \texttt{c.hasVertex if} clause.
+
+\medskip\noindent
+\texttt{c.update()}
+
+\medskip\noindent
+Establishes the fields that pertain to this instance of \texttt{chord} which affiliate with the next configuration.  It is to be called after all vertices
+have had their co-ordinates updated.  This method does \textbf{not} call the \texttt{update} method for the two vertices at its end points.  This method may be called multiple times before freezing its values with a call to \texttt{advance}.  (This method is called internally by \texttt{dodecahedron} objects.)
+
+\newpage
+\medskip\noindent
+\texttt{c.advance()}
+
+\medskip\noindent
+Assigns all of the object's data associated with the current configuration into their affiliated data associated with the previous configuration, and then assigns all of the object's data associated with the next configuration into their affiliated data associated with the current configuration, thereby freezing these data from external change.  This method does \textbf{not} call the \texttt{advance} method for the two vertices at its end points. (This method is called internally by \texttt{dodecahedron} objects.)
+
+\medskip\noindent
+\textit{The geometric fields associated with a chord in 3 space.}
+
+\medskip\noindent
+\texttt{ell = c.length(state)}
+
+\medskip\noindent
+Returns the chordal length in configuration \texttt{state} of its dodecahedron.
+
+\medskip\noindent
+\texttt{lambda = c.stretch(state)}
+
+\medskip\noindent
+Returns the stretch of this chord in configuration \texttt{state} of its dodecahedron.
+
+\medskip\noindent
+\textit{The kinematic fields associated with the centroid of a chord in 3 space.}
+
+\medskip\noindent
+\texttt{[x, y, z] = c.centroid(state)}
+
+\medskip\noindent
+Returns the position vector for this chord locating its mid-point in configuration \texttt{state} of its dodecahedron, i.e., it is the $\boldsymbol{\chi}$ vector of Fig.~\ref{figchord}.
+
+\medskip\noindent
+\texttt{[ux, uy, uz] = c.displacement(state)}
+
+\medskip\noindent
+Returns the displacement vector of the centroid for this chord in configuration \texttt{state} of its dodecahedron.
+
+\medskip\noindent
+\texttt{[vx, vy, vz] = c.velocity(state)}
+
+\medskip\noindent
+Returns the velocity vector of the centroid for this chord in configuration \texttt{state} of its dodecahedron.
+
+\medskip\noindent
+\texttt{[ax, ay, az] = c.acceleration(state)}
+
+\medskip\noindent
+Returns the acceleration vector of the centroid for this chord in configuration \texttt{state} of its dodecahedron.
+
+\medskip\noindent
+\textit{The rotation and spin matrices for this chord, as measured relative to its dodecahedron's co-ordinate system.}
+
+\medskip\noindent
+\texttt{pMtx = c.rotation(state)}
+
+\medskip\noindent
+Returns a 3$\times$3 orthogonal matrix $\mathbfsf{P}$ that rotates the base vectors from its dodecahedral frame of reference into a set of local base vectors where the 1~direction is tangent to the chordal axis, the 2~direction is the normal for this curve in 3~space, and the 3~direction is its binormal.  The returned matrix associates with configuration \texttt{state} of its dodecahedron.
+
+\medskip\noindent
+\texttt{omegaMtx = c.spin(state)}
+
+\medskip\noindent
+Returns a 3$\times$3 skew symmetric matrix $\boldsymbol{\Omega} \defeq \dot{\mathbfsf{P}} \mathbfsf{P}^{\mathsf{T}}$ that describes the time rate of
+rotation, i.e., the spin of the local chordal co-ordinate system about the
+fixed   system of its dodecahedron.  The returned matrix
+associates with configuration \texttt{state} of its dodecahedron.
+
+\medskip\noindent
+\textit{The thermodynamic strain and strain-rate fields associated with a chord.}
+
+\medskip\noindent
+\texttt{strain = c.strain(state)}
+
+\medskip\noindent
+Returns the logarithmic strain for this chord in configuration \texttt{state} of its dodecahedron, i.e., $e = \ln (L / L_0)$.
+
+\medskip\noindent
+\texttt{dStrain = c.dStrain(state)}
+
+\medskip\noindent
+Returns the logarithmic strain-rate for this chord in configuration \texttt{state} of its dodecahedron, viz., $\mathrm{d} e = L^{-1} \, \mathrm{d}L$.

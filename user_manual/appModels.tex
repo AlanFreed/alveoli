@@ -1,0 +1,261 @@
+\section{Constitutive Models}
+\label{appModels}
+
+There are elastic constitutive models for 1D fibers, chordal fibers, 2D membranes, and 3D volumes.  These are provided for in module \texttt{constitutiveEqns.py}.
+
+\subsection{Elastic Fibers}
+\label{appElasticFibers}
+
+Five constitutive models are considered for 1D elastic fibers.  Their mathematical representations are summarized in Eqn.~(\ref{elasticModuli}).  All five inherit the base class \texttt{elasticFibers} whose interface is:
+
+\medskip\noindent
+\textbf{class} \texttt{elasticFiber}
+
+\bigskip\noindent
+\textit{implemented mmethods}
+
+\bigskip\noindent
+These methods are intended to be called via a super call from all classes that extend class \texttt{elasticFiber}.  
+
+\bigskip\noindent
+\texttt{<object>.\_\_init\_\_()}
+    
+\medskip\noindent
+This is the constructor, but it is not to be called externally, only internally from those classes that extend this base class.
+
+\bigskip\noindent
+\texttt{name = <object>.fiberType()}
+
+\medskip\noindent
+Returns a string that contains the name of the fiber model.
+
+\medskip\noindent
+\texttt{E = <object>.modulus(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent modulus at the specified \texttt{stress, strain} and \texttt{temperature}.  It is the inverse of its elastic compliance.
+
+\bigskip\noindent
+\textit{virtual method}
+
+\bigskip\noindent
+This method must be overridden by every fiber model that extends this base type.  Virtual methods only provide an interface; their implementation is empty. 
+
+\medskip\noindent
+\texttt{C = <object>.compliance(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent compliance at the specified \texttt{stress, strain} and \texttt{temperature}.
+
+
+\subsubsection{Hookean Fibers}
+
+This class provides the elastic compliance and modulus for a Hookean fiber per Eqn.~(\ref{HookeanModulus}).
+
+\bigskip\noindent
+\textbf{class} \texttt{hooke(elasticFiber)}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{elasFiber = hooke(E)} \\
+\indent \texttt{E} \;\; the elastic modulus of the fiber, i.e., Young's modulus
+
+\bigskip\noindent
+\texttt{name = elasFiber.fiberType()}
+
+\medskip\noindent
+Returns a string that contains the name of the fiber model, viz., \texttt{`Hooke'}.
+
+\medskip\noindent
+\texttt{C = elasFiber.compliance(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic compliance at a specified \texttt{stress, strain} and \texttt{temperature}.  None of these arguments are required.
+
+\medskip\noindent
+\texttt{E = elasFiber.modulus(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic modulus at a specified \texttt{stress, strain} and \texttt{temperature}, which is the inverse of its elastic compliance.  None of these arguments are required.
+
+
+\subsubsection{Fungean Fibers}
+
+This class provides the elastic compliance and modulus for a Fungean fiber per Eqn.~(\ref{FungeanModulus}).
+
+\bigskip\noindent
+\textbf{class} \texttt{fung1(elasticFiber)}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{elasFiber = fung1(E, beta)} \\
+\indent \texttt{E} \qquad the elastic tangent modulus at zero stress and zero strain \\
+\indent \texttt{beta} \: strength of the exponential response
+
+\bigskip\noindent
+\texttt{name = elasFiber.fiberType()}
+
+\medskip\noindent
+Returns a string that contains the name of the fiber model, viz., \texttt{`Fung'}.
+
+\medskip\noindent
+\texttt{C = elasFiber.compliance(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent compliance at a specified \texttt{stress, strain} and \texttt{temperature}.  Only argument \texttt{stress} is required.
+
+\medskip\noindent
+\texttt{E = elasFiber.modulus(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent modulus at a specified \texttt{stress, strain} and \texttt{temperature}, which is the inverse of its elastic compliance.  Only argument \texttt{stress} is required.
+
+
+\subsubsection{Fungean\slash Hookean Fibers}
+
+This class provides the elastic response functions for Fungean and Hookean fibers whose compliances sum, per Eqn.~(\ref{FungLikeModulus}).
+
+\bigskip\noindent
+\textbf{class} \texttt{fung2(elasticFiber)}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{elasFiber = fung2(E1, E2, beta)} \\
+\indent \texttt{E1} \quad\: the elastic tangent modulus at zero stress and zero strain \\
+\indent \texttt{E2} \quad\: the elastic tangent modulus at terminal stress \\
+\indent \texttt{beta} \: strength of the exponential response
+
+\newpage
+\bigskip\noindent
+\texttt{name = elasFiber.fiberType()}
+
+\medskip\noindent
+Returns a string that contains the name of the fiber model, viz., \texttt{`Fung/Hooke'}.
+
+\medskip\noindent
+\texttt{C = elasFiber.compliance(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent compliance at a specified \texttt{stress, strain} and \texttt{temperature}.  Only argument \texttt{stress} is required.
+
+\medskip\noindent
+\texttt{E = elasFiber.modulus(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent modulus at a specified \texttt{stress, strain} and \texttt{temperature}, which is the inverse of its elastic compliance.  Only argument \texttt{stress} is required.
+
+
+\subsubsection{Freed-Rajagopal Fibers}
+
+This class provides the elastic compliance and modulus for a Freed-Rajagopalean fiber per Eqn.~(\ref{FRmodulus}).
+
+\bigskip\noindent
+\textbf{class} \texttt{freed1(elasticFiber)}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{elasFiber = freed1(E, e\_t)} \\
+\indent \texttt{E} \quad\, the elastic tangent modulus at zero stress and zero strain \\
+\indent \texttt{e\_t} \: the limit strain, i.e., the maximum strain allowed
+
+\bigskip\noindent
+\texttt{name = elasFiber.fiberType()}
+
+\medskip\noindent
+Returns a string that contains the name of the fiber model, viz., \texttt{`Freed-Rajagopal'}.
+
+\medskip\noindent
+\texttt{C = elasFiber.compliance(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent compliance at a specified \texttt{stress, strain} and \texttt{temperature}.  Argument \texttt{temperature} is not required, but \texttt{stress} and \texttt{strain} are.
+
+\medskip\noindent
+\texttt{E = elasFiber.modulus(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent modulus at a specified \texttt{stress, strain} and \texttt{temperature}, which is the inverse of its elastic compliance.  Argument \texttt{temperature} is not required, but \texttt{stress} and \texttt{strain} are.
+
+
+\subsubsection{Freed-Rajagopal\slash Hookean Fibers}
+
+This class provides the elastic response functions for Freed-Rajagopalean and Hookean fibers whose compliances sum, per Eqn.~(\ref{FRbiologicModulus}).  This version does not account for thermal straining.
+
+\bigskip\noindent
+\textbf{class} \texttt{freed2(elasticFiber)}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{elasFiber = freed2(E1, E2, e\_t)} \\
+\indent \texttt{E1} \quad\;\;\: the elastic tangent modulus at zero stress and strain \\
+\indent \texttt{E2} \quad\;\;\: the elastic tangent modulus at terminal stress \\
+\indent \texttt{e\_t} \quad\;\, the limit strain, i.e., the maximum strain allowed 
+
+\bigskip\noindent
+\texttt{name = elasFiber.fiberType()}
+
+\medskip\noindent
+Returns a string that contains the name of the fiber model, viz., \texttt{`Freed-Rajagopal/Hooke'}.
+
+\medskip\noindent
+\texttt{C = elasFiber.compliance(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent compliance at a specified \texttt{stress} and \texttt{strain}.    Argument \texttt{temperature} is not required, but \texttt{stress} and \texttt{strain} are.
+
+\medskip\noindent
+\texttt{E = elasFiber.modulus(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent modulus at a specified \texttt{stress} and \texttt{strain}; it is the inverse of its elastic compliance.  Argument \texttt{temperature} is not required, but \texttt{stress} and \texttt{strain} are.
+
+
+\subsubsection{Freed-Rajagopal\slash Kelvin\slash Hookean Fibers}
+
+This class provides the elastic response functions for Freed-Rajagopalean and Kelvin\slash Hookean fibers whose compliances sum, per Eqn.~(\ref{FRbiologicModulus}).  This version does account for thermal straining.
+
+\bigskip\noindent
+\textbf{class} \texttt{freed3(elasticFiber)}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{elasFiber = freed3(E1, E2, e\_t, alpha, T0)} \\
+\indent \texttt{E1} \quad\;\;\: the elastic tangent modulus at zero stress and strain \\
+\indent \texttt{E2} \quad\;\;\: the elastic tangent modulus at terminal stress \\
+\indent \texttt{e\_t} \quad\;\, the limit strain, i.e., the maximum strain allowed \\
+\indent \texttt{alpha} \; thermal strain coefficient \\
+\indent \texttt{T0} \quad\;\;\; the reference temperature for thermal strain, typically body temperature
+
+\bigskip\noindent
+\texttt{name = elasFiber.fiberType()}
+
+\medskip\noindent
+Returns a string that contains the name of the fiber model, viz., \texttt{`Freed-Rajagopal/Kelvin/ Hooke'}.
+
+\medskip\noindent
+\texttt{C = elasFiber.compliance(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent compliance at a specified \texttt{stress, strain} and \texttt{temperature}.  All arguments are required.
+
+\medskip\noindent
+\texttt{E = elasFiber.modulus(stress, strain, temperature)}
+
+\medskip\noindent
+Returns the elastic tangent modulus at a specified \texttt{stress, strain} and \texttt{temperature}, which is the inverse of its elastic compliance.  All arguments are required.
+
+
+\subsection{Chordal Fibers}
+

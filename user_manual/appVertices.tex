@@ -1,0 +1,88 @@
+\section{Vertices}
+\label{appVertices}
+
+Module \texttt{vertices.py} is Python code that exports class \texttt{vertex}.  There are twenty vertices in a dodecahedron.  Their normalized reference co-ordinates are presented in Table~\ref{TableDodecahedron}, which are indexed according to Fig.~\ref{figDodecahedron}.  These normalized co-ordinates are uniformly scaled by the factor \texttt{alveolarDiameter}/1.952400802898434 supplied to the \texttt{dodecahedron} constructor, and then transformed by the linear operator \texttt{F0} also supplied to the \texttt{dodecahedron} constructor; the vertices are created within the \texttt{dodecahedron} constructor.  (The user does not call the \texttt{vertex} constructor.)  This module has the following interface:
+
+\medskip\noindent
+\textit{function}
+
+\medskip\noindent
+\texttt{s = coordinatesToString(x, y, z)} \\
+\indent \texttt{x} \; the 1 co-ordinate \\
+\indent \texttt{y} \; the 2 co-ordiante \\
+\indent \texttt{z} \; the 3 co-ordiante 
+
+\medskip\noindent
+Returns a formatted string representation for the assigned set of co-ordinates.
+
+\bigskip\noindent
+\textbf{class} \texttt{vertex}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{v = vertex(number, x0, y0, z0, h)} \\
+\indent \texttt{number} \; an immutable value unique to this vertex \\
+\indent \texttt{x0} \qquad\;\, the initial $x$ co-ordinate at zero pleural pressure \\
+\indent \texttt{y0} \qquad\;\, the initial $y$ co-ordinate at zero pleural pressure \\
+\indent \texttt{z0} \qquad\;\, the initial $z$ co-ordinate at zero pleural pressure \\
+\indent \texttt{h\phantom{0}} \qquad\;\, the time-step size between two neighboring configurations
+
+\medskip\noindent
+co-ordinates \texttt{x0, y0, z0} have values assigned in the reference co-ordinate frame of a dodecahedron.  The natural co-ordinates for the vertices of a regular dodecahedron are listed in Table~\ref{TableDodecahedron}.
+
+\medskip\noindent
+\textit{methods}
+
+\medskip\noindent
+\texttt{s = v.toString(state)}
+
+\medskip\noindent 
+Returns a formatted string representation for this vertex in configuration \texttt{state} of its dodecahedron.
+
+\medskip\noindent
+\texttt{n = v.number()} 
+
+\medskip\noindent 
+Returns the unique number affiliated with this vertex.
+
+\medskip\noindent
+\texttt{x, y, z = v.coordinates(state)} 
+
+\medskip\noindent 
+Returns the co-ordinates for this vertex in configuration \texttt{state}, which are evaluated in the co-ordinate system of its dodecahedron.
+
+\newpage
+\medskip\noindent
+\texttt{v.update(x, y, z)} 
+
+\medskip\noindent 
+Assigns a new set of co-ordinate values to the vertex affiliated with the next configuration of its dodecahedron, as quantified in the co-ordinate system of its dodecahedron.  This method may be called multiple times before freezing its value with a call to \texttt{advance}.  (This method is called internally by \texttt{dodecahedron} objects.)
+
+\medskip\noindent
+\texttt{v.advance()} 
+
+\medskip\noindent 
+Assigns all of the object's data associated with the current configuration into their affiliated data associated with the previous configuration, and then assigns all of the object's data associated with the next configuration into their affiliated data associated with the current configuration, thereby freezing these data from external change. (This method is called internally by \texttt{dodecahedron} objects.)
+
+\medskip\noindent
+\textit{Kinematic fields associated with a point (vertex) in 3 space.}
+
+\medskip\noindent
+\texttt{[ux, uy, uz] = v.displacement(state)} 
+
+\medskip\noindent 
+Returns the displacement vector of this vertex for configuration \texttt{state} whose components are evaluated in the co-ordinate system of its dodecahedron.  Displacements interpolate quadraticly between consecutive states, because only three locations are maintained at any step $n$ along a solution path.
+
+\medskip\noindent
+\texttt{[vx, vy, vz] = v.velocity(state)} 
+
+\medskip\noindent 
+Returns the velocity vector of this vertex for configuration \texttt{state} whose components are evaluated in the co-ordinate system of its dodecahedron.  Velocities are calculated using second-order difference formul\ae. Velocities interpolate linearly between consecutive states, because only three locations are maintained at any step $n$ along a solution path.
+
+\medskip\noindent
+\texttt{[ax, ay, az] = v.acceleration(state)} 
+
+\medskip\noindent 
+Returns the acceleration vector of this vertex for configuration \texttt{state} whose components are evaluated in the co-ordinate system of its dodecahedron.  Accelerations are equivalent for the previous, current and next states, i.e., accelerations are constant over an interval $(n \! - \! 1, n \! + \! 1)$; consequently, accelerations are discontinuous along a solution path.  This is because only three locations are maintained at any step $n$ along a solution path.

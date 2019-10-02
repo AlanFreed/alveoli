@@ -1,0 +1,199 @@
+\section{Solvers}
+\label{appSolvers}
+
+Two ODE solvers are included in this software.  The first, \texttt{peceVtoX.py}, uses a two-step PECE (Predict, Evaluate, Correct, re-Evaluate) method to solve a first-order, ordinary differential equation $\dot{\mathbf{x}}(t) = \mathbf{v}(t) = \mathbf{f} (t, \mathbf{x})$ given an initial condition $\mathbf{x}_0 = \mathbf{x}(t_0)$ where, as an analogy, $\mathbf{x}$ denotes displacement and $\mathbf{v}$ denotes velocity.  The second, \texttt{peceAtoVandX.py}, uses another two-step PECE method to solve a second-order, ordinary, differential equation $\ddot{\mathbf{x}}(t) = \mathbf{a}(t) = \mathbf{f}(t, \mathbf{x}, \mathbf{v})$ given initial conditions $\mathbf{x}_0 = \mathbf{x}(t_0)$ and $\mathbf{v}_0 = \mathbf{v}(t_0) = \dot{\mathbf{x}}(t_0)$ where, as an analogy, $\mathbf{x}$ denotes displacement, $\mathbf{v}$ denotes velocity, and $\mathbf{a}$ denotes acceleration.
+
+\subsection{$\mathit{1}^{\text{st}}$ Order ODE Solver}
+\label{app1stOrderODEs}
+
+Module \texttt{peceVtoX.py} is a Python code that exports class \texttt{pece} which solves first-order, ordinary, differential equations using a two-step method; in particular, it solves
+\begin{displaymath}
+    \mathbf{v} = \mathbf{f}(t,\mathbf{x}) 
+    \quad \text{where} \quad
+    \mathbf{v} = \dot{\mathbf{x}}
+    \quad \text{satisfying IC} \quad
+    \mathbf{x}_0 = \mathbf{x}(t_0)  
+\end{displaymath}
+where the dependent variables of integration $\mathbf{x}$ are analogous to displacements, while the ODEs $\dot{\mathbf{x}} = \mathbf{f}(t, \mathbf{x})$ are analogous to velocities $\mathbf{v} = \dot{\mathbf{x}}$.
+
+\bigskip\noindent
+\textbf{class} \texttt{pece}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{solver = pece(ode, t0, x0, h, tol=0.0001)} \\
+\indent \texttt{ode} \; the differential equation to be solved, i.e., $\dot{\mathbf{x}} = \mathbf{v} = \mathbf{f} (t, \mathbf{x})$ where \texttt{ode} = $\mathbf{f}(t,\mathbf{x})$ \\
+\indent \texttt{t0} \;\;\; the initial time $t$, viz., time at the start of integration \\
+\indent \texttt{x0} \;\;\; the initial condition, viz., displacements at the start of integration $\mathbf{x}_0 = \mathbf{x}(t_0)$  \\
+\indent \texttt{h} \;\;\;\;\; the global time-step size separating two neighboring states \\
+\indent \texttt{tol} \;\hspace{1pt} the maximum allowed local truncation error, with a default set at $10^{-4}$
+
+\medskip\noindent
+\textit{methods}
+
+\medskip\noindent
+\texttt{solver.integrate()}
+
+\medskip\noindent
+A command that integrates the ODE from current time $t_n$ to the next time $t_{n+1} = t_n + h$.  This command may be called multiple times before committing a solution.  A local time stepper is used to integrate over the global time step.  The local time-step size is controlled by a PI controller that runs in the background.  This controller bounds the local truncation error from above.  If the error is too small then the controller increases the local step size.  If the error is too large then the controller decreases the local step size.
+
+\medskip\noindent
+\texttt{solver.advance()}
+
+\medskip\noindent
+A command that updates the internal data structure of the integrator by relabeling variables assigned to current time $t_n$ to their counterparts associated with previous time $t_{n-1}$, and then assigning the variables just solved for at time $t_{n+1}$ to their counterparts at time $t_n$.  This performs an incremental advancement of the solution along its trajectory, with $t_n + h$ now becoming the current time.
+
+\newpage
+\medskip\noindent
+\textit{The following methods are to be called after a solution has been advanced\slash committed, but before the next integration step is taken.}
+
+\medskip\noindent
+\texttt{n, nd, nh, nr = solver.getStatistics()} \\
+\indent \texttt{n} \;\;\;\: total number of local steps taken \\
+\indent \texttt{nd} \;\; total number of local steps taken where the step-size was doubled \\
+\indent \texttt{nh} \;\; total number of local steps taken where the step-size was halved \\
+\indent \texttt{nr} \;\; total number of local steps taken where the integrator was restarted 
+
+\medskip\noindent
+\texttt{t = solver.getT()}
+
+\medskip\noindent
+Returns the current time \texttt{t}, i.e., the independent variable of integration.
+
+\medskip\noindent
+\texttt{x = solver.getX()}
+
+\medskip\noindent
+Returns the solution vector \texttt{x} at current time, i.e., the dependent variables of integration.
+
+\medskip\noindent
+\texttt{v = solver.getV()} 
+
+\medskip\noindent
+Returns the time rate-of-change in the dependent variables at current time, i.e., the ODEs being solved, their analog being velocities.
+
+\medskip\noindent
+\texttt{err = solver.getError()} 
+
+\medskip\noindent
+Returns an estimate for the local truncation error \texttt{err} at current time.
+
+\medskip\noindent
+\texttt{x = solver.interpolate(atT)}
+
+\medskip\noindent
+Returns the solution \texttt{x(atT)} at time \texttt{atT} using cubic Hermite interpolation, where \texttt{atT} is located somewhere between the previous $t_{n-1}$ and current $t_n$ times of the integrator.
+
+\subsection{$\mathit{2}^{\text{nd}}$ Order ODE Solver}
+\label{app2ndOrderODEs}
+
+Module \texttt{peceAtoVandX.py} is a Python code that exports class \texttt{pece} which solves second-order, ordinary, differential equations using a two-step method; in particular, it solves
+\begin{displaymath}
+\mathbf{a} = \mathbf{f}(t,\mathbf{x},\mathbf{v}) 
+\quad \text{where} \quad
+\mathbf{a} = \ddot{\mathbf{x}}
+\quad \text{and} \quad
+\mathbf{v} = \dot{\mathbf{x}}
+\quad \text{with ICs} \quad
+\mathbf{x}_0 = \mathbf{x}(t_0)
+\quad \text{and} \quad 
+\mathbf{v}_0 = \mathbf{v}(t_0)
+\end{displaymath}
+where the dependent variables of integration $\mathbf{x}$ are analogous to displacements whose rates $\mathbf{v} = \dot{\mathbf{x}}$ are analogous to velocities, while the ODEs $\ddot{\mathbf{x}} = \mathbf{f}(t, \mathbf{x}, \mathbf{v})$ are analogous to accelerations $\mathbf{a} = \dot{\mathbf{v}} = \ddot{\mathbf{x}}$.  
+
+This solver is useful when solving dynamics problems, e.g.,
+\begin{displaymath}
+    \mathbf{M} \mathbf{a} + \mathbf{C} \mathbf{v} + \mathbf{K} \mathbf{x} =
+    \boldsymbol{\phi} (t, \mathbf{x}, \mathbf{v} )
+    \quad \text{or} \quad
+    \mathbf{a} = \mathbf{f} (t, \mathbf{x}, \mathbf{v}) 
+    \quad \text{with} \quad
+    \mathbf{f} = \mathbf{M}^{-1} \bigl( \boldsymbol{\phi}(t) - \mathbf{C} \mathbf{v} - \mathbf{K} \mathbf{x} \bigr)
+\end{displaymath}
+where $\mathbf{M}$ is a mass matrix, $\mathbf{C}$ is a damping matrix, $\mathbf{K}$ is a stiffness matrix, and $\boldsymbol{\phi}$ is a forcing function.  Typically $\mathbf{M}$ is diagonal so its inverse is trivial.
+
+\newpage
+\bigskip\noindent
+\textbf{class} \texttt{pece}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{solver = pece(aFn, t0, x0, v0, h, tol=0.0001)} \\
+\indent \texttt{aFn} \; the differential equation to be solved, i.e., $\ddot{\mathbf{x}} = \mathbf{a} = \mathbf{f} (t, \mathbf{x}, \dot{\mathbf{x}})$ where \texttt{aFn} = $\mathbf{f}(t,\mathbf{x},\mathbf{v})$ \\
+\indent \texttt{t0} \;\;\; the initial time $t$, viz., time at the start of integration \\
+\indent \texttt{x0} \;\;\; an initial condition, viz., displacements at the start of integration $\mathbf{x}_0 = \mathbf{x}(t_0)$  \\
+\indent \texttt{v0} \;\;\; an initial condition, viz., velocities at the start of integration $\mathbf{v}_0 = \mathbf{v}(t_0) = \dot{\mathbf{x}}(t_0)$  \\
+\indent \texttt{h} \;\;\;\;\; the global time-step size separating two neighboring states \\
+\indent \texttt{tol} \;\hspace{1pt} the maximum allowed local truncation error, with a default set at $10^{-4}$
+
+\medskip\noindent
+\textit{methods}
+
+\medskip\noindent
+\texttt{solver.integrate()}
+
+\medskip\noindent
+A command that integrates the ODE from current time $t_n$ to the next time $t_{n+1} = t_n + h$.  This command may be called multiple times before committing a solution.  A local time stepper is used to integrate over the global time step.  The local time-step size is controlled by a PI controller that runs in the background.  This controller bounds the local truncation error from above.  If the error is too small then the controller increases the local step size.  If the error is too large then the controller decreases the local step size.
+
+\medskip\noindent
+\texttt{solver.advance()}
+
+\medskip\noindent
+A command that updates the internal data structure of the integrator by relabeling variables assigned to current time $t_n$ to their counterparts associated with previous time $t_{n-1}$, and then assigning the variables just solved for at time $t_{n+1}$ to their counterparts at time $t_n$.  This performs an incremental advancement of the solution along its trajectory, with $t_n + h$ now becoming the current time.
+
+\medskip\noindent
+\textit{The following methods are to be called after a solution has been advanced\slash committed, but before the next integration step is taken.}
+
+\medskip\noindent
+\texttt{n, nd, nh, nr = solver.getStatistics()} \\
+\indent \texttt{n} \;\;\;\: total number of local steps taken \\
+\indent \texttt{nd} \;\; total number of local steps taken where the step-size was doubled \\
+\indent \texttt{nh} \;\; total number of local steps taken where the step-size was halved \\
+\indent \texttt{nr} \;\; total number of local steps taken where the integrator was restarted 
+
+\medskip\noindent
+\texttt{t = solver.getT()}
+
+\medskip\noindent
+Returns the current time \texttt{t}, i.e., the independent variable of integration.
+
+\medskip\noindent
+\texttt{x = solver.getX()}
+
+\medskip\noindent
+Returns the solution vector \texttt{x} at current time, i.e., first set of the dependent variables of integration.
+
+\newpage
+\medskip\noindent
+\texttt{v = solver.getV()}
+
+\medskip\noindent
+Returns the solution vector \texttt{v} at current time, i.e., second set of the dependent variables of integration.
+
+\medskip\noindent
+\texttt{a = solver.getA()} 
+
+\medskip\noindent
+Returns the time rate-of-change in the velocity variables at current time, i.e., the ODEs being solved, their analog being accelerations.
+
+\medskip\noindent
+\texttt{err = solver.getError()} 
+
+\medskip\noindent
+Returns an estimate for the local truncation error \texttt{err} at current time.
+
+\medskip\noindent
+\texttt{x = solver.interpolateX(atT)}
+
+\medskip\noindent
+Returns the solution \texttt{x(atT)} at time \texttt{atT} using cubic Hermite interpolation, where \texttt{atT} is located somewhere between the previous $t_{n-1}$ and current $t_n$ times of the integrator.
+
+\medskip\noindent
+\texttt{x = solver.interpolateV(atT)}
+
+\medskip\noindent
+Returns the solution \texttt{v(atT)} at time \texttt{atT} using cubic Hermite interpolation, where \texttt{atT} is located somewhere between the previous $t_{n-1}$ and current $t_n$ times of the integrator.

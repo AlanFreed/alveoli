@@ -1,0 +1,743 @@
+\part{Constitutive Theory}
+\label{partConstitutive}
+
+Roan \& Waters \cite{RoanWaters11} and Suki \textit{et~al}.\ \cite{Sukietal05,Sukietal11} have each written extensive review articles on the mechanics of parenchyma, have provided detailed information about the structural constituents of alveoli, and have discussed their influence on the overall mechanical response of parenchyma.  Of particular importance, from a mechanics perspective, are the constituent building blocks of alveolar tissue: collagen (types I and III, predominantly), elastin, proteoglycans and other proteins, surfactant and cells (epithelial and endothelial, predominantly).  These constituents are assembled in such a matter so as to produce a variety of alveolar sub-structures that are essentially 1D (alveolar chords), 2D (alveolar septa) or 3D (alveolar sacs) in their geometric construction.
+
+A dodecahedron is used here as a geometric model for an alveolus \cite{FrankusLee74}, cf.\ Figs.~\ref{figRatLung} \& \ref{figDodecahedron}.  It is comprised of: thirty 1D rods that represent alvolar chords, twelve 2D membranes that represent alveolar septa and that are considered to be pentagonal in shape, and one 3D cavity filled with air (or fluids in the case of a contusion caused by injury or an edema caused by disease) that is considered to be dodecahedral in shape.  Thermo\-elastic constitutive equations are derived for these three spatial geometries in this chapter.
+
+We recall from our kinematic study of a dodecahedron that the geometric strains of $e \defeq \ln ( L / L_0 )$ for the elongation of septal chords, $\xi \defeq \ln \sqrt{A / A_0}$ for the dilation of septal membranes, and $\Xi \defeq \ln \sqrt[3]{V / V_0}$ for the dilatation of alveolar volume are equivalent to one another under motions of uniform expansion.  These three, geometric, strain measures also exist as thermo\-dynamic strains, each associating with a distinct and unique conjugate stress.
+
+Constitutive equations are a derived consequence from physical laws governing thermo\-dynamic processes.  Here we derive constitutive equations applicable for 1D thermo\-elastic fibers (alveolar chords), 2D thermo\-elastic membranes (alveolar septa), and 3D thermo\-elastic volumes (alveolar sacs).  In \S\ref{secUniformCE}, we assume that the motions are uniform in their spatial dimension.  Later, in \S\ref{secNonuniform2D}, the non-uniform motions of shear associated with a membrane are included into this thermo\-dynamic framework.  Section~\ref{secAlveolus} pulls these results together, sufficient for the intended purpose of modeling the three structural facets that comprise an alveolous.
+
+\section{Green Thermoelastic Solids Subjected to Uniform Motions in 1D, 2D \& 3D}
+\label{secUniformCE}
+
+Combining the First and Second Laws of Thermo\-dynamics governing uniform, reversible, adiabatic processes results in the following three formul\ae, one per dimension; they are
+\begin{subequations}
+    \label{thermoelasticLaws}
+    \begin{align}
+    \mbox{} & \text{In 1 Dimension:} & 
+    \mathrm{d}\mathcal{U} & = \theta \, \mathrm{d} \eta +
+    \tfrac{1}{\rho_{1D}} F \, \mathrm{d}L / L
+    \label{thermoelastic1Dlaw} \\
+    \mbox{} & \text{In 2 Dimensions:} &
+    \mathrm{d}\mathcal{U} & = \theta \, \mathrm{d} \eta + 
+    \tfrac{1}{\rho_{2D}} T \, \mathrm{d}A / \! A
+    \label{thermoelastic2Dlaw} \\
+    \mbox{} & \text{In 3 Dimensions:} &
+    \mathrm{d}\mathcal{U} & = \theta \, \mathrm{d} \eta - 
+    \tfrac{1}{\rho_{3D}} P \, \mathrm{d}V \! / V \!
+    \label{thermoelastic3Dlaw}
+    \end{align}
+\end{subequations}
+wherein $\mathcal{U}$ is an internal energy density (erg/gr = dyne.cm/gr), which is a function of state, $\theta$ is a temperature in Kelvin ($273 + \mbox{}^{\circ}$C), $\eta$ is an entropy density (erg/gr.K), whereas the mass densities $\rho_{1D}$ ($\text{gr/cm}$), $\rho_{2D}$ ($\text{gr/cm}^2$) and $\rho_{3D}$ ($\text{gr/cm}^3$) associate with a reference state of per unit length, or per unit area, or per unit volume, as appropriate.  Pressure $P$ is assigned to be positive whenever a body undergoes a hydro\-static compression, per accepted practice.
+
+\subsection{Constitutive Equations}
+
+Because the internal energy density $\mathcal{U}$ is a state function, its total derivative produces a Pfaffian form \cite{Caratheodory09} out of which the following constitutive formul\ae\ are readily obtained
+\begin{subequations}
+    \label{GreenElasticCEs}
+    \begin{align}
+    \mbox{} & \text{In 1 Dimension:} & 
+    \theta & = \partial_{\eta} \mathcal{U} ( \eta , e) &
+    F & = \rho_{1D} \, \partial_e \mathcal{U} ( \eta , e) \\
+    \mbox{} & \text{In 2 Dimensions:} &
+    \theta & = \partial_{\eta} \mathcal{U} ( \eta , \xi) &
+    2T & = \rho_{2D} \, \partial_{\xi} \mathcal{U} ( \eta , \xi) \\
+    \mbox{} & \text{In 3 Dimensions:} &
+    \theta & = \partial_{\eta} \mathcal{U} ( \eta ,  \Xi) &
+    -3P & = \rho_{3D} \, \partial_{\Xi} \mathcal{U} ( \eta ,  \Xi)
+    \end{align}
+\end{subequations}
+where we have used the strain definitions $e \defeq \ln ( L / L_0 )$, $\xi \defeq \ln \sqrt{ A / \! A_0 }$ and $\Xi \defeq \sqrt[3]{V \! / V_0}$, in accordance with Part~\ref{partKinematics}. These constitutive equations govern Green thermo\-elastic solids undergoing uniform motions in adiabatic enclosures.  As a convenience, we employ the following notation $\partial_{\eta} \mathcal{U} \defeq \partial \mathcal{U} / \partial \eta$, etc.
+
+Considering the response variables for temperature and force\slash surface-tension\slash pressure to be $C^1$ functions of state (cf.\ Weinhold \cite{Weinhold75c} and Gilmore \cite{Gilmore84}) in a Green thermo\-elastic solid undergoing an uniform adiabatic motion, one can then differentiate Eqn.~(\ref{GreenElasticCEs}) thereby producing the following collection of coupled differential equations
+\begin{subequations}
+    \label{GreenElasticODEs}
+    \begin{align}
+    \mbox{} & \text{In 1 Dimension:} &
+    \left\{ \begin{matrix} \mathrm{d} \theta \\ 
+    \mathrm{d} F \end{matrix} \right\} & = \begin{bmatrix}
+    \partial_{\eta\eta} \mathcal{U} & \partial_{\eta e} \mathcal{U} \\
+    \rho_{1D} \, \partial_{e\eta} \mathcal{U} & \rho_{1D} \, \partial_{ee} \mathcal{U} \end{bmatrix} 
+    \left\{ \begin{matrix} \mathrm{d} \eta \\
+    \mathrm{d} e \end{matrix} \right\} \\
+    % second formula
+    \mbox{} & \text{In 2 Dimensions:} &
+    \left\{ \begin{matrix} \mathrm{d} \theta \\ 
+    2 \, \mathrm{d} T \end{matrix} \right\} & = \begin{bmatrix}
+    \partial_{\eta\eta} \mathcal{U} & \partial_{\eta \xi} \mathcal{U} \\
+    \rho_{2D} \, \partial_{\xi\eta} \mathcal{U} & \rho_{2D} \, \partial_{\xi\xi} \mathcal{U} \end{bmatrix} \left\{ \begin{matrix} \mathrm{d} \eta \\
+    \mathrm{d} \xi \end{matrix} \right\} \label{GreenMembrane} \\
+    % third formula
+    \mbox{} & \text{In 3 Dimensions:} &
+    \left\{ \begin{matrix} \mathrm{d} \theta \\ 
+    -3 \, \mathrm{d} P \end{matrix} \right\} & = \begin{bmatrix}
+    \partial_{\eta\eta} \mathcal{U} & \partial_{\eta \Xi} \mathcal{U} \\
+    \rho_{3D} \, \partial_{\Xi\eta} \mathcal{U} & \rho_{3D} \, \partial_{\Xi\Xi} \mathcal{U} \end{bmatrix} \left\{ \begin{matrix} \mathrm{d} \eta \\
+    \mathrm{d} \Xi \end{matrix} \right\}
+    \end{align}
+\end{subequations}
+where, from calculus, mixed partial derivatives satisfy $\partial_{e\eta} \mathcal{U} = \partial^2 \mathcal{U} / \partial e \partial \eta = \partial^2 \mathcal{U} / \partial \eta \partial e = \partial_{\eta e} \mathcal{U}$, etc., that in the thermo\-dynamics literature are known as Maxwell's relations.
+
+Changing cause and effect between entropy and temperature in Eqn.~(\ref{GreenElasticODEs}) leads to
+\begin{subequations}
+    \label{HelmholtzElasticODEs}
+    \begin{align}
+    \left\{ \begin{matrix} \mathrm{d} \eta \\ 
+    \mathrm{d} F \end{matrix} \right\} & = \begin{bmatrix}
+    1/\partial_{\eta\eta} \mathcal{U} & -\partial_{\eta e} \mathcal{U} / 
+    \partial_{\eta\eta} \mathcal{U} \\
+    \rho_{1D} \, \partial_{e\eta} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} & \rho_{1D} ( \partial_{ee} \mathcal{U} - \partial_{e\eta} \mathcal{U} \!\cdot\! \partial_{\eta e} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} ) \end{bmatrix} 
+    \left\{ \begin{matrix} \mathrm{d} \theta \\
+    \mathrm{d} e \end{matrix} \right\} \\
+    % second formula
+    \left\{ \begin{matrix} \mathrm{d} \eta \\ 
+    2 \, \mathrm{d} T \end{matrix} \right\} & = \begin{bmatrix}
+    1/\partial_{\eta\eta} \mathcal{U} & -\partial_{\eta \xi} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} \\
+    \rho_{2D} \, \partial_{\xi\eta} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} & \rho_{2D} ( \partial_{\xi\xi} \mathcal{U} - \partial_{\xi\eta} \mathcal{U} \!\cdot\! \partial_{\eta\xi} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} ) \end{bmatrix} \left\{ \begin{matrix} \mathrm{d} \theta \\
+    \mathrm{d} \xi \end{matrix} \right\} \label{HelmholtzMembrane} \\
+    % thrid formula
+    \left\{ \begin{matrix} \mathrm{d} \eta \\ 
+    -3 \, \mathrm{d} P \end{matrix} \right\} & = \begin{bmatrix}
+    1/\partial_{\eta\eta} \mathcal{U} & -\partial_{\eta \Xi} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} \\
+    \rho_{3D} \, \partial_{\Xi\eta} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} & \rho_{3D} ( \partial_{\Xi\Xi} \mathcal{U} - \partial_{\Xi\eta} \mathcal{U} \!\cdot\! \partial_{\eta\Xi} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} ) \end{bmatrix} \left\{ \begin{matrix} \mathrm{d} \theta \\
+    \mathrm{d} \Xi \end{matrix} \right\}
+    \end{align}
+\end{subequations}
+which are written above in a format that is more useful for our multi\-scale application.  In this process, a localization procedure pulls temperature and strain from the continuum scale down to the alveolar scale.  The alveolar entropy and stress are then determined via the above constitutive equations.  Afterwords, a homogenization procedure pushes this alveolar entropy and stress up to the continuum level.  We take on the independent variables of a Helmholtz free energy, but not his potential, preferring to use the internal energy potential to ensure a proper incorporation of Maxwell's constraint.  
+
+Constitutive equations (\ref{GreenElasticODEs} \& \ref{HelmholtzElasticODEs}) take on the form of hypo-elastic material models \cite{Truesdell55}, which are ideal for numerical implementation using numerical solution techniques like those presented in Part~\ref{partNumericalMethods}.
+
+\subsection{Material Constants}
+
+Experiments are performed for the purpose of characterizing material behavior.  In mechanics, we relate measured material constants to gradients and curvatures of thermo\-dynamic potentials out of which material models are created.  Experiments are typically done to quantify the following material constants, selected per a material's physical dimension:
+\begin{subequations}
+\label{materialConstants}
+\begin{align}
+C_f & \defeq \theta \, \partial_{\theta} \eta |_F & 
+\alpha_f & \defeq L^{-1} \, \partial_{\theta} L |_F = 
+\partial_{\theta} e |_F &
+E_{\theta} & \defeq L \, \partial_L F |_{\theta} = 
+\partial_e F |_{\theta} \\
+C_t & \defeq \theta \, \partial_{\theta} \eta |_T & 
+\alpha_t & \defeq A^{-1} \, \partial_{\theta} A |_T = 
+2 \, \partial_{\theta} \xi |_T &
+M_{\theta} & \defeq A \, \partial_A T |_{\theta} = 
+\tfrac{1}{2} \, \partial_{\xi} T |_{\theta} \\
+C_p & \defeq \theta \, \partial_{\theta} \eta |_P & 
+\alpha_p & \defeq V^{-1} \, \partial_{\theta} V |_P = 
+3 \, \partial_{\theta} \Xi |_P &
+-K_{\theta} & \defeq V \, \partial_V P |_{\theta} = 
+\tfrac{1}{3} \, \partial_{\Xi} P |_{\theta}
+\end{align}
+\end{subequations}
+Herein, the various specific heats $C_f$, $C_t$, $C_p$ (erg/gr.K) are, essentially,  all equivalent as they are all defined per unit mass, insensitive to dimension; however, the various thermal expansions $\alpha_f$, $\alpha_t$, $\alpha_p$ (1/K) are all distinct, as they are each defined with respect to their physical dimension, viz., $\alpha_f \defeq L^{-1} \, \partial L / \partial \theta |_F$, $\alpha_t \defeq A^{-1} \, \partial A / \partial \theta |_T$ and $\alpha_p \defeq V^{-1} \, \partial V / \partial \theta |_P$.  Parameter $E_{\theta}$ is a modulus of extension (dyne), parameter $M_{\theta}$ is a modulus of dilation (dyne/cm), and parameter $K_{\theta}$ is a modulus of dilatation ($\mathrm{dyne/cm}^2$), a.k.a.\ the bulk modulus, with each modulus being measured at fixed temperature.  Shear moduli are discussed later in \S\ref{secNonuniform2D}.  The above material constants are gradients; they constitute tangents to their associated physical response curves.  Consequently, they need not be of constant value throughout state space, like a Hookean material supposes them to be.  This is an important characteristic for our application.  Here we employ the commonly used notation $\partial_{\theta} \eta |_F \defeq ( \partial \eta / \partial \theta ) |_F$, etc.
+
+In terms of the material constants given in Eqn.~(\ref{materialConstants}), of which there are three per dimension, the internal energy density has the following three curvatures associated with it.  For 1D materials:
+\begin{subequations}
+    \label{internalEnergies}
+    \begin{align}
+    % for 1D materials
+    \partial_{\eta\eta} \mathcal{U} & = 
+    \frac{\rho_{1D}\theta}{\rho_{1D} C_f - E_{\theta} \alpha_f^2 \theta } \\
+    \partial_{ee} \mathcal{U} & = \frac{C_f E_{\theta}}
+    {\rho_{1D} C_f - E_{\theta} \alpha_f^2 \theta} \\
+    \partial_{\eta e} \mathcal{U} \equiv \partial_{e \eta} \mathcal{U} & = 
+    \frac{-E_{\theta} \alpha_f \theta}{\rho_{1D} C_f - E_{\theta} \alpha_f^2 \theta} \\
+    \intertext{For 2D materials:}
+    \partial_{\eta\eta} \mathcal{U} & = 
+    \frac{\rho_{2D} \theta}{\rho_{2D} C_t - M_{\theta} \alpha_t^2 \theta} \\
+    \partial_{\xi\xi} \mathcal{U} & = \frac{4 C_t M_{\theta}}
+    {\rho_{2D} C_t - M_{\theta} \alpha_t^2 \theta} \\
+    \partial_{\eta \xi} \mathcal{U} \equiv \partial_{\xi \eta} \mathcal{U} & = 
+    \frac{-2M_{\theta} \alpha_t \theta}
+    {\rho_{2D} C_t - M_{\theta} \alpha_t^2 \theta} \\
+    \intertext{For 3D materials (cf.\ Weinhold \cite{Weinhold75c} and Gilmore \cite{Gilmore84}):}
+    \partial_{\eta\eta} \mathcal{U} & = 
+    \frac{\rho_{3D} \theta}{\rho_{3D} C_p - K_{\theta} \alpha_p^2 \theta} \\
+    \partial_{\Xi\Xi} \mathcal{U} & = \frac{9 C_p K_{\theta}}
+    {\rho_{3D} C_p - K_{\theta} \alpha_p^2 \theta} \\
+    \partial_{\eta\Xi} \mathcal{U} \equiv 
+    \partial_{\Xi\eta} \mathcal{U} & = 
+    \frac{-3K_{\theta} \alpha_p \theta}{\rho_{3D} C_p - K_{\theta} \alpha_p^2 \theta}
+    \end{align}
+\end{subequations}
+These materials constants are constrained by thermo\-dynamics in that
+\begin{equation}
+    \label{thermodynamicConstraints}
+    0 < E_{\theta} < \frac{\rho_{1D} C_f}{\alpha_f^2 \, \theta} \qquad
+    0 < M_{\theta} < \frac{\rho_{2D} C_t}{\alpha_t^2 \, \theta} \qquad
+    0 < K_{\theta} < \frac{\rho_{3D} C_p}{\alpha_p^2 \, \theta}
+\end{equation} 
+which ensure that their respective thermo\-dynamic Jacobians cannot become singular. Singularities can and do occur, e.g., during a phase change in a crystal \cite{McLellan76,Gilmore84}, but such processes are not expected in our application.
+
+\subsection{Thermoelastic Models Suitable for Modeling Alveoli Subjected to Uniform Motions}
+
+We now write down our constitutive formul\ae\ for quantifying uniform responses in thermo\-elastic solids of 1, 2 or 3 dimensions.  They are the thermo\-elastic constitutive equations (\ref{HelmholtzElasticODEs}) with Helmholtz variables expressed in terms of the material constants defined in Eqn.~(\ref{materialConstants}) assigned to the internal energy density $\mathcal{U}$ according to Eqn.~(\ref{internalEnergies}), with outcomes of
+\begin{subequations}
+    \label{HelmholtzCEs}
+    \begin{align}\
+    \text{For 1D Materials:} & &
+    \left\{ \begin{matrix}
+    \mathrm{d} \eta \\ \mathrm{d} F
+    \end{matrix} \right\} & = \begin{bmatrix}
+    C_f / \theta - E_{\theta} \alpha_f^2 / \rho_{1D}& 
+    E_{\theta} \alpha_f / \rho_{1D} \\
+    -E_{\theta} \alpha_f & E_{\theta}
+    \end{bmatrix} \left\{ \begin{matrix}
+    \mathrm{d} \theta \\ \mathrm{d} e
+    \end{matrix} \right\} \label{Helmholtz1D} \\
+    % the second equation
+    \text{For 2D Materials:} & &
+    \left\{ \begin{matrix}
+    \mathrm{d} \eta \\ 2 \, \mathrm{d} T
+    \end{matrix} \right\} & = \begin{bmatrix}
+    C_t / \theta - M_{\theta} \alpha_t^2 / \rho_{2D} & 
+    2 M_{\theta} \alpha_t / \rho_{2D} \\
+    -2 M_{\theta} \alpha_t & 4 M_{\theta}
+    \end{bmatrix} \left\{ \begin{matrix}
+    \mathrm{d} \theta \\ \mathrm{d} \xi
+    \end{matrix} \right\} \label{Helmholtz2D} \\
+    % the third equation
+    \text{For 3D Materials:} & &
+    \left\{ \begin{matrix}
+    \mathrm{d} \eta \\ -3 \, \mathrm{d} P
+    \end{matrix} \right\} & = \begin{bmatrix}
+    C_p / \theta - K_{\theta} \alpha_p^2 / \rho_{3D} & 
+    3 K_{\theta} \alpha_p / \rho_{3D} \\
+    -3K_{\theta} \alpha_p & 9 K_{\theta}
+    \end{bmatrix} \left\{ \begin{matrix}
+    \mathrm{d} \theta \\ \mathrm{d} \Xi
+    \end{matrix} \right\} \label{Helmholtz3D}
+    \end{align}
+\end{subequations}
+These constitutive formul\ae, derived from the First and Second Laws of Thermo\-dynamics, describe thermo\-elastic materials undergoing uniform motions through adibatic processes.
+
+The whole upper-left component in each matrix of Eqn.~(\ref{HelmholtzCEs}) represents a specific heat evaluated at constant strain, divided by temperature---a material property not easily measured.  Whereas, the specific heat evaluated at constant pressure, viz., $C_p$ with $C_t \equiv C_p$ and $C_f \equiv C_p$, is more amenable to experiments, and is the property that one typically finds in published data tables.  
+
+There are four material constants for each dimension (e.g., for 1D materials they are $\rho_{1D}$, $C_f$, $\alpha_f$ and $E_{\theta}$) with the latter three being defined according to Eqn.~(\ref{materialConstants}).  The differential equations in Eqn.~(\ref{HelmholtzCEs}) have mathematical forms of hypo-elastic materials \cite{Truesdell55}, which are preferred for incorporating constitutive equations into finite element packages.
+
+\section{Green Thermoelastic Membranes Subjected to Non-Uniform Motions}
+\label{secNonuniform2D}
+
+For modeling alveolar geometry via a dodecahedron, only the septal membranes are considered as  being capable of supporting shears, and therefore, only they need to have their constitutive structure extended to include the non-uniform motions of shear, of which pure shears (squeeze) are likely to dominate over simple shears.
+
+The First and Second Laws of Thermo\-dynamics governing a reversible adiabatic process are described by the formula $\mathrm{d}\mathcal{U} = \theta \, \mathrm{d} \eta + \tfrac{1}{\rho} \, \mathrm{d}W$, where $\mathrm{d}W$ is the mechanical power expended by stressing a body of mass density $\rho$.  For the case of a 2D planar membrane, mass density $\rho \Leftarrow \rho_{2D}$ applies, with its change in mechanical work being expressed as \cite{Freedetal17,FreedZamani19}
+\begin{subequations}
+\begin{align}
+\mathrm{d} W & = \mathrm{tr} \left( 
+\begin{bmatrix}
+\mathcal{S}_{11} & \mathcal{S}_{12} \\
+\mathcal{S}_{21} & \mathcal{S}_{22}
+\end{bmatrix} \begin{bmatrix}
+\mathrm{d}a / a & a \, \mathrm{d} g / b \\
+0 & \mathrm{d}b / b 
+\end{bmatrix} \right) =  
+\pi \, \mathrm{d} \xi + \sigma \, \mathrm{d} \varepsilon + 
+\tau \, \mathrm{d} \gamma
+\label{convectedWorkRate} \\
+\intertext{wherein the $\mathcal{S}_{ij}$ are coefficients of Cauchy stress mapped into the co-ordinate frame of a membrane.  The First and Second Laws describe an exact differential equation of the form}
+\mathrm{d} \mathcal{U} & = \theta \, \mathrm{d} \eta + \tfrac{1}{\rho_{2D}} 
+\bigl( \pi \, \mathrm{d} \xi + \sigma \, \mathrm{d} \varepsilon + 
+\tau \, \mathrm{d} \gamma \bigr)
+\label{membraneThermo}
+\end{align}
+\end{subequations} 
+where $\{ \pi , \sigma , \tau \}$ describes a set of intensive scalar-valued stresses whose thermo\-dynamic conjugates $\{ \xi , \varepsilon , \gamma \}$ describe a set of extensive scalar-valued strains.  (This contrasts with the classic approach where the work done is decomposed into a scalar-valued isotropic part and a tensor-valued deviatoric part.)  Pair $( \xi , \pi )$ describes a dilation $\xi$ caused by a surface tension $\pi$; it is the uniform contribution to stress power discussed in \S\ref{secUniformCE} where $2 \, \mathrm{d} \xi \Leftarrow A^{-1} \, \mathrm{d} A$ and $\tfrac{1}{2} \pi \Leftarrow T$.  Pair $( \varepsilon , \sigma )$ describes a pure shear $\varepsilon$ or squeeze caused by a normal-stress difference $\sigma$.  And pair $( \gamma , \tau )$ describes an in-plane shear $\gamma$ caused by a shear stress $\tau$. Collectively, pairs $( \varepsilon , \sigma )$ and $( \gamma , \tau )$ account for any non-uniform contributions to stress power, i.e., contributions from other than uniform dilations.  These pairs are quantified in \S\ref{secConjugatePairs}.
+
+\subsection{Constitutive Equations}
+
+Because a change in the internal energy $\mathrm{d}\mathcal{U}$ governing a reversible adiabatic process is described by an exact differential \cite{Caratheodory09}, with $\mathcal{U}(\eta, \xi, \varepsilon, \gamma)$ in the case of a planar membrane, it follows that the constitutive response of a Green thermo\-elastic membrane is described by
+\begin{subequations}
+    \label{GreenThermoelasticity}
+    \begin{align}
+    \theta = \partial_{\eta} \mathcal{U}(\eta, \xi, \varepsilon, \gamma) , \;
+    \pi & = \rho \, \partial_{\xi} \mathcal{U}(\eta, \xi, \varepsilon, \gamma) , \;
+    \sigma = \rho \, \partial_{\varepsilon} \mathcal{U}(\eta, \xi, \varepsilon, \gamma) , \;
+    \tau = \rho \, \partial_{\gamma} \mathcal{U}(\eta, \xi, \varepsilon, \gamma)
+    \label{GreenThermoelasticMembrane} \\
+    \intertext{with strain symmetries requiring that}
+    \mathcal{U}(\eta, \xi, \varepsilon, \gamma) & =
+    \mathcal{U}(\eta, \xi, -\varepsilon, \gamma) = 
+    \mathcal{U}(\eta, \xi, \varepsilon, -\gamma) = 
+    \mathcal{U}(\eta, \xi, -\varepsilon, -\gamma) .
+    \label{internalEnergyInveriance}
+    \end{align}
+\end{subequations}
+Considering that each intensive variable, viz., $\theta$, $\pi$, $\sigma$ and $\tau$, is actually a $C^1$ function of the set of extensive variables ($\eta , \xi , \varepsilon , \gamma$), then the constitutive expressions in Eqn.~(\ref{GreenThermoelasticMembrane}) can be recast into the following system of differential equations
+\begin{equation}
+\label{energies2D}
+\left\{ \begin{matrix}
+\mathrm{d} \theta \\ \mathrm{d} \pi \\
+\mathrm{d} \sigma \\ \mathrm{d} \tau
+\end{matrix} \right\} = \begin{bmatrix}
+\partial_{\eta\eta} \mathcal{U} & 
+\partial_{\eta\xi} \mathcal{U} & 
+\partial_{\eta\varepsilon} \mathcal{U} & 
+\partial_{\eta\gamma} \mathcal{U} \\ 
+\rho \, \partial_{\xi\eta} \mathcal{U} & 
+\rho \, \partial_{\xi\xi} \mathcal{U} & 
+\rho \, \partial_{\xi\varepsilon} \mathcal{U} &
+\rho \, \partial_{\xi\gamma} \mathcal{U} \\
+\rho \, \partial_{\varepsilon\eta} \mathcal{U} & 
+\rho \, \partial_{\varepsilon\xi} \mathcal{U} & 
+\rho \, \partial_{\varepsilon\varepsilon} \mathcal{U} & 
+\rho \, \partial_{\varepsilon\gamma} \mathcal{U} \\
+\rho \, \partial_{\gamma\eta} \mathcal{U} & 
+\rho \, \partial_{\gamma\xi} \mathcal{U} & 
+\rho \, \partial_{\gamma\varepsilon} \mathcal{U} & 
+\rho \, \partial_{\gamma\gamma} \mathcal{U} 
+\end{bmatrix} 
+\left\{ \begin{matrix}
+\mathrm{d}\eta \\ \mathrm{d} \xi \\
+\mathrm{d} \varepsilon \\ \mathrm{d} \gamma
+\end{matrix} \right\}  
+\end{equation}
+whose upper-left $2\times 2$ sub-matrix also appears in Eqn.~(\ref{GreenMembrane}), which governs the uniform contribution of a response.  The above $4 \times 4$ matrix describes the full non-uniform response permissible by a Green thermo\-elastic membrane undergoing an adiabatic process.
+
+For our application, it is reasonable to assume that the presence of any non-uniform motion will not cause an uniform response.  Said differently, it is reasonable to assume that pure $\varepsilon$ and simple $\gamma$ shears will not effect a change in either temperature $\theta$ or surface tension $\pi$.  Consequently, $\partial_{\eta\varepsilon} \mathcal{U} = \partial_{\eta\gamma} \mathcal{U} = \partial_{\xi\varepsilon} \mathcal{U} = \partial_{\xi\gamma} \mathcal{U} = 0$, and Eqn.~(\ref{energies2D}) simplifies to
+\begin{displaymath}
+\left\{ \begin{matrix}
+\mathrm{d} \theta \\ \mathrm{d} \pi \\
+\mathrm{d} \sigma \\ \mathrm{d} \tau
+\end{matrix} \right\} = \begin{bmatrix}
+\partial_{\eta\eta} \mathcal{U} & 
+\partial_{\eta\xi} \mathcal{U} & 
+0 & 0 \\ 
+\rho \, \partial_{\xi\eta} \mathcal{U} & 
+\rho \, \partial_{\xi\xi} \mathcal{U} & 
+0 & 0 \\
+0 & 0 & 
+\rho \, \partial_{\varepsilon\varepsilon} \mathcal{U} & 
+\rho \, \partial_{\varepsilon\gamma} \mathcal{U} \\
+0 & 0 & 
+\rho \, \partial_{\gamma\varepsilon} \mathcal{U} & 
+\rho \, \partial_{\gamma\gamma} \mathcal{U} 
+\end{bmatrix} 
+\left\{ \begin{matrix}
+\mathrm{d}\eta \\ \mathrm{d} \xi \\
+\mathrm{d} \varepsilon \\ \mathrm{d} \gamma
+\end{matrix} \right\} 
+\end{displaymath}
+with $\partial_{\varepsilon\eta} \mathcal{U} = \partial_{\gamma\eta} \mathcal{U} = \partial_{\varepsilon\xi} \mathcal{U} = \partial_{\gamma\xi} \mathcal{U} = 0$
+because of Maxwell's relations.  Converting the above internal energy formulation into its Helmholtz equivalent produces
+\begin{equation}
+\left\{ \begin{matrix}
+\mathrm{d} \eta \\ \mathrm{d} \pi \\
+\mathrm{d} \sigma \\ \mathrm{d} \tau
+\end{matrix} \right\} = \begin{bmatrix}
+1 / \partial_{\eta\eta} \mathcal{U} & 
+-\partial_{\eta\xi} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} & 
+0 & 0 \\ 
+\rho \, \partial_{\xi\eta} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} & 
+\rho \bigl( \partial_{\xi\xi} \mathcal{U} - \partial_{\xi\eta} \mathcal{U} \!\cdot\! \partial_{\eta\xi} \mathcal{U} / \partial_{\eta\eta} \mathcal{U} \bigr) & 0 & 0 \\
+0 & 0 & \rho \, \partial_{\varepsilon\varepsilon} \mathcal{U} & 
+\rho \, \partial_{\varepsilon\gamma} \mathcal{U} \\
+0 & 0 & \rho \, \partial_{\gamma\varepsilon} \mathcal{U} & 
+\rho \, \partial_{\gamma\gamma} \mathcal{U} 
+\end{bmatrix} 
+\left\{ \begin{matrix}
+\mathrm{d}\theta \\ \mathrm{d} \xi \\
+\mathrm{d} \varepsilon \\ \mathrm{d} \gamma
+\end{matrix} \right\}  
+\label{Helmholtz2Duncoupled}
+\end{equation}
+which provides the general structure for a Green thermo\-elastic membrane appropriate for our application.  The uniform response (the upper-left $2 \times 2$ sub-matrix) and the non-uniform response (the lower-right $2 \times 2$ sub-matrix) are, by conjecture, decoupled in this constitutive construction.
+
+\subsection{Material Constants}
+\label{secMaterialConstants}
+
+The material model put forward here for a thermo\-elastic membrane has six material constants: a mass density $\rho$, a specific heat at constant surface tension $C_{\pi}$, a coefficient for areal thermal expansion at constant surface tension $\alpha_{\pi}$, an areal modulus at constant temperature $M_{\theta}$ (2D version of a bulk modulus), a squeeze modulus at constant shear $N_{\gamma}$, and a shear modulus at constant squeeze $G_{\varepsilon}$.  The specific heat $C_{\pi}$ is defined as
+\begin{subequations}
+    \label{defineMaterialConstants}
+    \begin{align}
+    C_{\pi} & \defeq \theta \, \partial_{\theta} \, \eta |_{\mathcal{S}_{11} + \mathcal{S}_{22}} \! = \theta \, \partial_{\theta} \eta |_{\pi}
+    \label{specificHeat2D} \\
+    \intertext{where $\theta$ is temperature, $\eta$ is entropy, and $\pi = \mathcal{S}_{11} + \mathcal{S}_{22} = 2T$ is surface tension.  $C_{\pi} = C_t \equiv C_p$ is commonly referred to in the literature as the specific heat at constant pressure.  The areal coefficient for thermal expansion $\alpha_{\pi} = \alpha_t$ is defined as}
+    \alpha_{\pi} & \defeq A^{-1} \, \partial_{\theta} A |_{\mathcal{S}_{11} + \mathcal{S}_{22}} \! = 2 \, \partial_{\theta} \xi |_{\pi}
+    \label{thermalExpansionCoef2D} \\
+    \intertext{where $A = ab$ is area and $\xi = \ln \sqrt{A / \! A_0}$ is dilation.  The areal modulus $M_{\theta}$ is defined as}
+    M_{\theta} & \defeq A \, \partial_A (\mathcal{S}_{11} + \mathcal{S}_{22}) |_{\theta} = \tfrac{1}{2} \, \partial_{\xi} \pi |_{\theta} .
+    \label{arealCompliance2D} \\
+    \intertext{The in-plane squeeze modulus $N_{\gamma}$ is defined as}
+    N_{\gamma} & \defeq \Gamma \, \partial_{\Gamma} (\mathcal{S}_{11} - \mathcal{S}_{22}) |_g = \tfrac{1}{2} \, \partial_{\varepsilon} \pi |_{\gamma} 
+    \label{arealSqueezeCompliance2D} \\
+    \intertext{where $\sigma = \mathcal{S}_{11} - \mathcal{S}_{22}$ is a normal-stress difference, and $\Gamma = a/b$ is the stretch of squeeze with $\varepsilon = \ln \sqrt{\Gamma \! / \Gamma_0}$ being the strain of squeeze.  And the in-plane shear modulus $G_{\varepsilon}$ is defined as}
+    G_{\varepsilon} & \defeq \Gamma \, \partial_g \mathcal{S}_{21} |_{\Gamma} = \partial_{\gamma} \tau |_{\varepsilon} 
+    \label{arealShearModulus2D}
+    \end{align}
+\end{subequations}
+where $\tau = \Gamma \mathcal{S}_{21}$ determines the shear stress with $\gamma = g - g_0$ being the shear strain.  
+
+Because $\ln (L/L_0) = \ln \sqrt{A / \! A_0}$ for uniform dilation (see Part~\ref{partKinematics}), it necessarily follows then that if an axial coefficient for thermal expansion $\alpha_{1D}$ is available, viz., $\alpha_{1D} = L^{-1} \, \partial_{\theta} L |_F$, then set $\alpha_{\pi} = 2 \alpha_{1D}$.  Furthermore, because $\ln \sqrt[3]{V \! / V_0} = \ln \sqrt{A / \! A_0}$ under uniform dilatation, it also follows that if a volumetric coefficient for thermal expansion $\alpha_{3D}$ is available, viz., $\alpha_{3D} = V^{-1} \, \partial_{\theta} V |_P$, then set $\alpha_{\pi} = \tfrac{2}{3} \alpha_{3D}$. 
+
+In terms of these material constants, the thermo\-elastic membrane model of Eqn.~(\ref{Helmholtz2Duncoupled}) takes on the form of 
+\begin{equation}
+    \left\{ \begin{matrix}
+    \mathrm{d} \eta \\ \mathrm{d} \pi \\
+    \mathrm{d} \sigma \\ \mathrm{d} \tau
+    \end{matrix} \right\} = \begin{bmatrix}
+    C_{\pi} / \theta - M_{\theta} \alpha_{\pi}^2 / \rho_{2D} & 
+    2 M_{\theta} \alpha_{\pi} / \rho_{2D} & 0 & 0 \\
+    -2 M_{\theta} \alpha_{\pi} & 4 M_{\theta} & 0 & 0 \\
+    0 & 0 & 2 N_{\gamma} & 2\tau \\
+    0 & 0 & 2\tau & G_{\varepsilon}
+    \end{bmatrix} \left\{ \begin{matrix}
+    \mathrm{d} \theta \\ \mathrm{d} \xi \\
+    \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
+    \end{matrix} \right\}
+    \label{HelmholtzMembraneODEs}
+\end{equation}
+where the upper-left $2 \times 2$ matrix comes from Eqn.~(\ref{Helmholtz2D}), which describes the uniform contribution to an overall planar response, while the lower-right $2 \times 2$ matrix comes from the following discussion:  Given that $\Gamma \defeq a/b$ denotes the stretch of squeeze with $\varepsilon \defeq \ln \sqrt{\Gamma \! / \hspace{0.5pt} \Gamma_0}$ defining the strain of squeeze, it follows that $\mathrm{d} \Gamma = 2 \Gamma \, \mathrm{d} \varepsilon$.  Squeeze $\varepsilon$, like dilation $\xi$, is logarithmic.  By definition, $\tau \defeq \Gamma \mathcal{S}_{21}$ whose differential change is $\mathrm{d} \tau = \mathcal{S}_{21} \, \mathrm{d} \Gamma + \Gamma \, \mathrm{d} \mathcal{S}_{21}$ that, upon defining a shear modulus as $G_{\varepsilon} \defeq \Gamma \, \partial_g \mathcal{S}_{21} |_{\Gamma}$, becomes $\mathrm{d} \tau = 2 \tau \, \mathrm{d} \varepsilon + G_{\varepsilon} \, \mathrm{d} \gamma$ because $\mathrm{d} g = \mathrm{d} \gamma$, with $\mathrm{d} \tau = 2 \tau \, \mathrm{d} \varepsilon + G_{\varepsilon} \, \mathrm{d} \gamma$ being the bottom formula in Eqn.~(\ref{HelmholtzMembraneODEs}).  Maxwell's relation $\partial_{\gamma\varepsilon} \mathcal{U} = \partial_{\varepsilon\gamma} \mathcal{U}$ assigns $2 \tau$ to $\partial_{\varepsilon\gamma} \mathcal{U}$, while $N_{\gamma} \defeq \Gamma \, \partial_{\Gamma} ( \mathcal{S}_{11} - \mathcal{S}_{22} ) |_g$ establishes the squeeze modulus.
+
+\subsubsection{The Poison Effect}
+
+The areal modulus $M$ is ideally determined from an equibiaxial experiment.  Assuming knowledge of its value, then given the following definition for Poisson's ratio
+\begin{displaymath}
+\nu \defeq - \frac{\mathrm{d}b / b}{\mathrm{d}a / a}
+\end{displaymath}
+it follows that the squeeze modulus $N$ can be determined from an uniaxial experiment where traction is applied along that axis from which elongation $a$ is measured; specifically,
+\begin{displaymath}
+N = \frac{1 - \nu}{1 + \nu} M
+\quad \text{provided that} \quad
+\mathcal{S}_{11} \neq 0 
+\quad \text{and} \quad
+\mathcal{S}_{21} = \mathcal{S}_{22} = 0 .
+\end{displaymath}
+Consequently, $\tfrac{1}{3} M \leq N \leq M$ given that $0 \leq \nu \leq \textfrac{1}{2}$, so the squeeze modulus $N$ plays an analogous role to the shear modulus $\mu$ of classical elasticity.  
+
+The conjugate pair approach presented here allows for a distinct shear modulus $G$ that can take on any positive value.  This is important because shear experiments done on soft tissues, which are few in number, tend to produce moduli that are many orders in magnitude smaller than their effective bulk modulus, e.g., in parenchyma their ratio is $K/G \approx 10^{4}$ (150~MPa vs.\ 10--54~kPa \cite{Sarafetal07}).  Classically, such a result is used to argue that the material can be modeled, to  good approximation, as being incompressible---a 3D notion.
+
+\subsection{Conjugate Pairs $\Longleftrightarrow$ Tensor Components}
+\label{secConjugatePairs}
+
+The above planar strains and their rates are defined accordingly \cite{Freedetal17}
+\begin{subequations}
+    \label{conjugatePairs3}
+    \begin{align}
+    \xi & \defeq \ln \sqrt{\frac{a}{a_0} \frac{b}{b_0}} = 
+    \ln \sqrt{\frac{A}{A_0}} &
+    \varepsilon & \defeq \ln \sqrt{\frac{b_0}{a_0} \frac{a}{b}} = 
+    \ln \sqrt{\frac{\Gamma}{\Gamma_0}} &
+    \gamma & \defeq g - g_0 \label{thermoStrains3} \\
+    \mathrm{d} \xi & \hspace{2.5pt} = \frac{1}{2} 
+    \left( \frac{\mathrm{d} a}{a} + \frac{\mathrm{d} b}{b} \right) = 
+    \frac{1}{2} \frac{\mathrm{d} A}{A} &
+    \mathrm{d} \varepsilon & \hspace{2.5pt} = \frac{1}{2} 
+    \left( \frac{\mathrm{d}a}{a} - \frac{\mathrm{d}b}{b} \right) = 
+    \frac{1}{2} \frac{\mathrm{d} \Gamma}{\Gamma} & 
+    \mathrm{d} \gamma & \hspace{2.5pt} = \mathrm{d} g
+    \label{thermoStrainRates3} \\
+    \intertext{where $a, b, g$ are the physical attributes illustrated in Fig.~\ref{figKinematics}, with $a_0 , b_0 , g_0$ being their reference values selected so that $\xi_0 = \varepsilon_0 = \gamma_0 = 0$, as established in Part~\ref{partKinematics} from a Gram-Schmidt factorization of the deformation gradient.  These strains are two-state fields, independent of path---a tacit requirement of thermo\-dynamics \cite{Caratheodory09}.  We point out that $\xi = \ln \sqrt{A / A_0}$ where $A = ab$ denotes area, and $\varepsilon = \ln \sqrt{\Gamma / \Gamma_0}$ where $\Gamma = a/b$ denotes the stretch of squeeze, i.e., the stretch of a pure shear deformation is in the sense of Becker \cite{Becker93} and Treloar \cite{Treloar75}. Thermo\-dynamic strains $\xi , \varepsilon , \gamma$ and their differential rates $\mathrm{d} \xi , \mathrm{d} \varepsilon , \mathrm{d} \gamma$ are exported by class \texttt{pentagon}, cf.\ \ref{appPentagons}.
+    \newline\indent The conjugate stresses to the above planar strains are determined to be}
+    \pi & \defeq \mathcal{S}_{11} + \mathcal{S}_{22} & 
+    \sigma & \defeq \mathcal{S}_{11} - \mathcal{S}_{22} & 
+    \tau & \defeq \Gamma \mathcal{S}_{21}
+    \label{thermoStresses3} \\
+    \intertext{which follow from Eqns.~(\ref{convectedWorkRate} \& \ref{thermoStrainRates3}) or, conversely, the physical components of surface tension $\mathcal{S}_{ij}$ are established through}
+    \mathcal{S}_{11} & = \tfrac{1}{2} (\pi+\sigma) &
+    \mathcal{S}_{22} & = \tfrac{1}{2} (\pi-\sigma) &
+    \mathcal{S}_{12} & = \mathcal{S}_{21} = \Gamma^{-1} \tau
+    \label{stresses3}
+    \end{align}
+\end{subequations} 
+when described in terms of their thermo\-dynamic attributes $\pi , \sigma$ and $\tau$, plus the squeeze stretch $\Gamma$ that must appear in $\tau$ so that $\mathrm{d} \gamma$ associates with an exact differential---a thermo\-dynamic requirement.  The coupling appearing in the definition of shear stress, viz., $\Gamma \mathcal{S}_{21}$, is the reason why a coupling exists between squeeze and shear in constitutive equation~(\ref{HelmholtzMembraneODEs}).
+
+The stress $\boldsymbol{\mathcal{S}}$ occurring in a septal plane, when evaluated in a pentagonal co-ordinate frame $( \vec{\mathbfit{e}}_{\hspace{0.5pt}1} , \vec{\mathbfit{e}}_{\hspace{0.5pt}2} , \vec{\mathbfit{e}}_{\hspace{0.5pt}3} )$, only has non-zero components in the plane, i.e., in the upper-left $2 \times 2$ sub-matrix.  These components map into a Cauchy stress $\boldsymbol{\sigma}$ expressed in the dodecahedral frame of reference $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\mathbfit{k}} )$ via a component transformation of $\sigma_{ij} = P_{ik} Q_{k\ell} \mathcal{R}_{\ell m} \mathcal{S}_{mn} \mathcal{R}_{on} Q_{po} P_{jp}$.   Because $\sigma_{12} = \sigma_{21}$, and because $\mathbf{P}$, $\mathbf{Q}$ and $\boldsymbol{\mathcal{R}}$ are each orthogonal tensors, it necessarily follows that $\mathcal{S}_{12} = \mathcal{S}_{21}$.  Matrix $\mathbf{P}$ is a rotation of the pentagonal frame of reference about that of the dodecahedron's axes, matrix $\mathbf{Q}$ is a rotation for re-indexing pentagonal co-ordinates, and matrix $\boldsymbol{\mathcal{R}}$ is a Gram-Schmidt rotation.
+
+\subsection{Continuity in Squeeze and Shear Responses in the Presence of a Re-Indexing}
+
+Whenever the pentagonal co-ordinate axes are re-indexed, in the sense that $\mathbfsf{Q}_1$ now describes the orthogonal re-indexing matrix $\mathbfsf{Q}$ instead of $\mathbfsf{Q}_0$ in Eq.~(\ref{membraneRelabling}), then continuity of fields across such a co-ordinate relabeling requires squeeze and its rate to be redefined as
+\begin{equation}
+\varepsilon = \ln \sqrt{\frac{a_0}{b_0} \frac{b}{a}} = 
+\ln \sqrt{\frac{\Gamma_0}{\Gamma}}
+\qquad \text{with} \qquad
+\mathrm{d} \varepsilon = \frac{1}{2} 
+\left( \frac{\mathrm{d}b}{b} - \frac{\mathrm{d}a}{a} \right)
+\label{reindexedSqueeze}
+\end{equation}
+while the conjugate stresses for squeeze and shear get redefined as
+\begin{equation}
+\sigma = \mathcal{S}_{22} -  \mathcal{S}_{11}
+\qquad \text{and} \qquad
+\tau = \Gamma^{-1} \mathcal{S}_{21}
+\label{reindexedStress}
+\end{equation}
+so that the work done by $\sigma \, \mathrm{d} \varepsilon$ and $\tau \, \mathrm{d} \gamma$ form contributions to the stress power that remain continuous across this co-ordinate switch.  Components $\mathcal{S}_{11}$, $\mathcal{S}_{21}$ and $\mathcal{S}_{22}$ in Eq.~(\ref{reindexedStress}) come from rotating the Cauchy stress $\boldsymbol{\sigma}$ according to the transformation $\boldsymbol{\mathcal{S}} = \boldsymbol{\mathcal{R}}^{\mathsf{T}} \mathbfsf{Q}^{\mathsf{T}} \mathbfsf{P}^{\mathsf{T}} \boldsymbol{\sigma} \mathbfsf{P} \mathbfsf{Q} \boldsymbol{\mathcal{R}}$.  
+
+This process is necessary because, although the conjugate pair ($\xi , \pi$) is invariant of frame, conjugate pairs ($\varepsilon , \sigma$) and ($\gamma , \tau$) are not.
+
+\section{Modeling an Alveolus}
+\label{secAlveolus}
+
+Only one-third of the cross-sectional area of an alveolar chord, and only one-half of the wall thickness of an alveolar septum associate with any given dodecahedron \cite{Kimmeletal87}.  Specifically, a third of the total force carried by a  septal fiber belongs with a given alveolus, with the remaining two-thirds of the transmitted force belonging to its two adjoining alveoli.  Likewise, only half of the surface traction carried along a septal membrane belongs with a given alveolus, with the other half of its surface traction belonging to its adjacent alveolus.  Like statements apply for their entropies.
+
+About 75\%\ of the acting transpulmonary pressure (the difference between pleural and alveolar pressures) is carried by the alveolar structure with the remaining 25\%\ being carried by the pleural membrane encasing the lung \cite{Hajjietal79}.
+
+\subsection{Constraints\slash Assumptions for Alveoli Subjected to Shock Waves}
+
+Because the purpose for the alveolar model being constructed is to better understand alveolar behavior as a shock wave passes over it, there are certain assumptions that we impose on our model that under normal or different physiologic conditions might otherwise not apply.  
+
+\textit{First\/}: An alveolus is considered to be an adiabatic pressure vessel in which air and heat cannot move into or out of as a shock wave passes over it, simply because the wave speed is too fast.  There is insufficient time for these transports to occur.
+
+\textit{Second\/}: Temperature remains constant across a shock wave front traveling through a compressible gas \cite{AmesStaff53}.  It is therefore assumed that alveolar temperature remains at body temperature whenever a lung is subjected to a shock wave.  All changes in alveolar entropy are therefore caused by changes in alveolar strain.
+
+\textit{Third\/}: The air\slash membrane interface of an alveolus is lined with a surfactant, which is a thin bi-lipid film that plays a substantial role in normal lung function.  This film reduces alveolar surface tension to advert total lung collapse at maximum exhale \cite{Stamenovic90}.  Even so, some alveoli still collapse, getting re-recruited during a later breath.  Models have been proposed for both surfactant \cite{Hills99} and alveolar recruitment \cite{Bates07}, but these effects are not included here as they are not thought to play a significant role in lung mechanics in the presence of a shock wave. 
+
+\subsection{Modeling a Septal Chord Subjected to a Shock Wave}
+
+Alveoli are biologic structures constructed of septal chords that circumscribe alveolar membranes that envelope an alveolar sac whereat gas exchange occurs.  These chords are comprised of individual collagen and elastin fibers loaded in parallel \cite{Matsudaetal87,Sobinetal88}.  The extent of elastic energy stored within a chord will depend upon the diameters $D^c$ and $D^e$ and length $L$ of these individual fibers.\footnote{
+	Sobin \textit{et~al}.\ \cite{Sobinetal88} considered that the stored energy of chords also depends upon their curvature, which they measured and quantified, i.e., they considered these chords to be beams.  However, with a slenderness ratio of $\bar{L}/\bar{D} = 102 \pm 12$, which we obtained from their data, it is reasonable to model them as rods, not beams.  Consequently, the dodecahedral truss to be considered is a pinned truss, not a rigid truss, thereby greatly simplifying the boundary value problem.
+}
+Let superscript `$\mbox{}^c$' denote collagen, and superscript `$\mbox{}^e$' denote elastin.  Sobin \textit{et~al}.\ \cite{Sobinetal88} determined that septal chord length $L$ distributes normally in human lungs, with a mean $\bar{L}$ and standard deviation $\sigma_L$ that depend upon age and transpulmonary pressure.  They also determined that the square root of their diameters $\sqrt{D}$ distribute normally, with a mean $\bar{D}^{1/2}$ and standard deviation $\sigma_{\sqrt{D}}$ that also depend upon age and transpulmonary pressure, as presented in Table~\ref{tab:alveolarProp}. 
+
+\begin{table}
+    \centering
+	\begin{tabular}{|r|ccc|} 
+		\hline 
+		transpulmonary pressure &
+		\multicolumn{3}{|c|}{$4 \, \mathrm{cm} \, \mathrm{H}_2^{\vphantom{|}} \mathrm{O}$} \\ 
+		\hline
+		Age & 15--35 & 36--45 & $>$ 65 $\vphantom{|}^{\vphantom{|}}$ \\ \hline 
+		collagen: $\sqrt{D}^{\vphantom{|}}, \; ( \mu \textrm{m} )^{1/2}$ & 
+		0.952 $\pm$ 0.242 & 0.958 $\pm$ 0.255 & 1.045 $\pm$ 0.270 \\
+		elastin: $\sqrt{D}, \; ( \mu \textrm{m} )^{1/2}$ & 
+		0.957 $\pm$ 0.239 & 0.970 $\pm$ 0.213 & 1.093 $\pm$ 0.274 \\
+		$L, \; \mu \textrm{m}$ & 
+		155.5 $\pm$ 62.8 & 179.2 $\pm$ 74.5 & 239.7 $\pm$ 123.0 \\ 
+		\hline\hline       
+		transpulmonary pressure &
+		\multicolumn{3}{|c|}{$14 \, \mathrm{cm} \, \mathrm{H}_2^{\vphantom{|}} \mathrm{O}$} \\ 
+		\hline
+		Age & 15--35 & 36--45 & $>$ 65 $\vphantom{|}^{\vphantom{|}}$ \\ \hline 
+		collagen: $\sqrt{D}^{\vphantom{|}}, \; ( \mu \textrm{m} )^{1/2}$ & 
+		0.955 $\pm$ 0.246 & 0.994 $\pm$ 0.237 & 1.054 $\pm$ 0.279 \\
+		elastin: $\sqrt{D}, \; ( \mu \textrm{m} )^{1/2}$ & 
+		0.956 $\pm$ 0.237 & 0.988 $\pm$ 0.263 & 1.079 $\pm$ 0.281 \\
+		$L, \; \mu \textrm{m}$ & 
+		176.9 $\pm$ 65.7 & 228.1 $\pm$ 97.0 & 298.4 $\pm$ 134.2 \\ 
+		\hline
+	\end{tabular}
+	\caption{\label{tab:alveolarProp}
+		Mean and standard deviations in variance for the square root of septal chord diameters $\sqrt{D}$ and for septal chord lengths $L$, as reported by \cite{Sobinetal88}.  These septal chords are comprised of collagen and elastin fibers, which act largely independently, and therefore are considered to be loaded in parallel with one another.}
+\end{table}
+
+The collagen and elastin fibers that make up a septal chord have the same length, they experience the same strain, and they exist at the same temperature; therefore, we employ Eqn.~(\ref{Helmholtz1D}) as the governing constitutive equation to describe their mechanical behavior
+\begin{displaymath}
+\left\{ \begin{matrix} 
+\mathrm{d} \eta \\ \mathrm{d} F
+\end{matrix} \right\} = \begin{bmatrix}
+C / \theta - E \alpha^2 / \rho & E \alpha / \rho \\
+-E \alpha & E
+\end{bmatrix} \left\{ \begin{matrix}
+\mathrm{d} \theta \\ \mathrm{d} e
+\end{matrix} \right\} 
+\end{displaymath}
+wherein $C$ is a specific heat at constant pressure, $\alpha$ is a linear coefficient of thermal expansion, $E$ is an elastic modulus with units of force, and $\rho$ is its mass density per unit length.  Because $\mathrm{d} \theta = 0$ across a wave front \cite{AmesStaff53}, this general system reduces to
+\begin{displaymath} 
+\mathrm{d} F = E \, \mathrm{d}e
+\quad \text{and} \quad
+\rho \, \mathrm{d} \eta = E \alpha \, \mathrm{d}e = \alpha \, \mathrm{d}F
+\end{displaymath} 
+wherein the first equation establishes a change in force carried by a chord, while the second equation establishes a change in entropy per unit length of chord.  Again, we emphasize that material constant $\rho$ has units of mass per unit length of line, while material constant $E$ has units of force in the above formul\ae.   Below we change the units of these material constants to better address our application.
+
+\subsubsection{Chordal Forces and Entropies}
+
+The constitutive equations that govern alveolar chords, suitable for studying shock waves in lungs, are described by the following system of differential equations
+\begin{subequations}
+    \label{septalChordCEs}
+    \begin{align}
+    F & = F^c + F^e &
+    \mathrm{d} F^c & = A_0^c \, \mathrm{e}^{-e} E^c ( e, F^c ) \, \mathrm{d}e & 
+    \mathrm{d} F^e & = A_0^e \, \mathrm{e}^{-e} E^e ( e, F^e ) \, \mathrm{d}e \\
+    S & = S^c + S^e & 
+    \mathrm{d} S^c & = \alpha^c \, \mathrm{d} F^c & 
+    \mathrm{d} S^e & = \alpha^e \, \mathrm{d} F^e
+    \end{align}
+\end{subequations}  
+where $F$ is the total force carried by a septal chord, with $F^c$ and $F^e$ being the forces carried by its collagen and elastin fiber constituents with cross-sectional areas of $A^c = A^c_0 \exp (-e)$ and $A^e = A^e_0 \exp (-e)$, while $S$ is the chord's entropy with $S^c$ and $S^e$ being the entropies of its two parts.  For initial conditions we use forces $F^c_0 = F^c |_{L = L_0} = 0$ and $F^e_0 = F^e |_{L = L_0} = 0$, and we use entropies $S_0^c = \rho^c V_0^c \eta_0^c$ and $S_0^e \defeq \rho^e V_0^e \eta_0^e$, wherein $\eta_0^c$ and $\eta_0^e$ are the initial entropy densities per unit volume, with $V_0^c$ and $V_0^e$ being the volumes of these fibers in their traction-free state.  It remains to establish the two tangent moduli $E^c (e, F^c)$ and $E^e (e, F^e)$ for collagen and elastin that, in these formul\ae, now have units of stress in that $A^cE^c$ and $A^eE^c$ have units of force.  These tangent moduli are functions of state, see e.g., Ref.~\cite{FreedRajagopal16}.
+
+Collagen is a fiber comprised of numerous, long, slender, wavy filaments whose waviness, known as crimp, straightens under sufficient deformation \cite{Kastelicetal'78,FreedDoehring05}.  Elastin is a linked fiber network, much like an elastomer, whose filaments between crosslinks rotate to align with an axis of loading under sufficient deformation \cite{AaronGosline81,Urry89}.  Consequently, collagen and elastin both recruit constituent filaments with increasing deformation into an overall, load-bearing, fiber response.  The internal energies of collagen and elastin may therefore be thought of as being comprised of a configurational energy and a strain energy.  As such, both collagen and elastin are modeled as Freed-Rajagopal biologic fibers, which are described in terms of two such energies.  Their model is derived from the theory of implicit elasticity in \ref{appImplicitElasticity}.  According to their model, tangent compliances for collagen and elastin are described by
+\begin{subequations}
+    \label{septalChordModuli}
+    \begin{align}
+	\frac{1}{E^c} & = \frac{e_t^c - e_1^c}{e_T^c E_1^c + 2s^c} + \frac{1}{E_2^c} &
+	e_1^c & = e - \alpha^c (\theta - \theta_0) - \frac{s^c}{E_2^c} &
+    s^c & = \frac{F^c}{A_0^c \, \mathrm{e}^{-e}} \\
+    \frac{1}{E^e} & = \frac{e_t^e - e_1^e}{e_T^e E_1^e + 2s^e} + \frac{1}{E_2^e} &
+    e_1^e & = e - \alpha^e (\theta - \theta_0) - \frac{s^e}{E_2^e} &
+    s^e & = \frac{F^e}{A_0^e \, \mathrm{e}^{-e}}
+    \end{align}
+\end{subequations}
+recalling that $\theta = \theta_0$ in our application, so the intermediate strains defined in the second column simplify.  Material constants $E_1^c$ and $E_2^c$ are asymptotic moduli for collagen such that $E_1^c \leq E^c \leq E^c_2$, while $E_1^e$ and $E_2^e$ are asymptotic moduli for elastin such that $E^e_1 \leq E^e \leq E^e_2$, all of which here have units of stress (barye = dyne/$\mathrm{cm}^2$), with $e_t^c$ and $e_t^e$ being their respective transition strains, cf.\ \ref{appImplicitElasticity}. The material properties needed to model septal chords are listed in Tables~\ref{tab:alveolarProp} \& \ref{tableCollagenElastin}.  From Eqn.~(\ref{thermodynamicConstraints}), these moduli are bound from above by $E^c_{\max} = 4.9 \times 10^9$~barye ($\text{dyne/cm}^2$) and $E^e_{\max} = 1.7 \times 10^9$~barye.  We therefore observe that $E^c_2$ and $E^e_2$ are about 100 times smaller than $E^c_{\max}$ and $E^e_{\max}$.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|l|l|l|}
+        \hline
+        \multicolumn{3}{|c|}{Collagen$\vphantom{|^{|^|}}$} \\ \hline
+        $\rho^c$ \hfill [$\textrm{gr/cm}^{3^{\phantom{|}}}$] & $1.34$ & 
+        Fels \cite{Fels64} \\
+        $\eta_0^c$ \hfill [erg/gr.K] & $3.7 \times 10^4$ &  \\
+        $C^c$ \hfill [erg/gr.K] & $1.7 \times 10^7$ & 
+        Kanagy \cite{Kanagy55} \\
+        $\alpha^c$ \hfill [1/C] & $1.8 \times 10^{-4}$ & 
+        Weir \cite{Weir48}  \\
+        $e^c_t$ & $0.09$ & estimated from TLC $\approx$ 30\% \\
+        $E_1^c$ \hfill [barye] & $5.0 \times 10^5$ &  \\
+        $E_2^c$ \hfill [barye] & $3.0 \times 10^7$ &  \\ \hline
+        \multicolumn{3}{|c|}{Elastin$\vphantom{|^{|^|}}$} \\ \hline 
+        Parameter & Value & Reference \\ \hline
+        $\rho^e$ \hfill [$\textrm{gr/cm}^{3^{\phantom{|}}}$] & $1.31$ & 
+        Lillie \& Gosline \cite{LillieGosline02a} \\
+        $\eta_0^e$ \hfill [erg/gr.K] & $3.4 \times 10^4$ & 
+        Shadwick \& Gosline \cite{ShadwickGosline85} \\
+        $C^e$ \hfill [$\textrm{erg/gr.K}$] & $4.2 \times 10^7$  & 
+        Kakivaya \& Hoeve \cite{KakivayaHoeve75} \\
+        $\alpha^e$ \hfill [1/C] & $3.2\times 10^{-4}$ & 
+        Lillie \& Gosline \cite{LillieGosline02a} \\ 
+        $e^e_t$ & 0.4 & Shadwick \& Gosline \cite{ShadwickGosline85} \\
+        $E^e_1$ \hfill [barye] & $2.3 \times 10^6$ & Urry \cite[Fig.~18]{Urry89} \\ 
+        $E^e_2$ \hfill [barye] & $1.0 \times 10^7$ & 
+        Lillie \& Gosline \cite[Fig.~5]{LillieGosline07} \\ \hline
+    \end{tabular}
+    \caption{Physical properties for hydrated collagen and elastin fibers.  Collagen denatures at around $60^\circ$C \cite{HoermannSchlebusch71}, i.e., above this temperature collagen will shrink rapidly---an effect not modeled here.}
+    \label{tableCollagenElastin}
+\end{table}
+
+The actual force and entropy carried by an individual septal chord in our alveolar model will be one third of their calculated values from Eqn.~(\ref{septalChordCEs}), because each chord is shared between three neighboring alveoli.
+
+
+\subsection{Modeling an Alveolar Membrane Subjected to a Shock Wave}
+  
+Membranes have elastic moduli, whose dimensions are appropriate for two space, plus a bending stiffness excited by curvature.  This bending energy is proportional to $(h/r)^2$, with $h$ being membrane thickness (height) and $r$ being its radius of curvature.  Consequently, bending stresses can be neglected when compared with their in-plane stresses whenever $h \ll r$, which is the supposition here.  This is in concert with our assumption that the septal chords are modeled as rods, not beams, because of their slenderness ratio.  Furthermore, these septa tend to be flat because there are roughly equal pressures acting on both sides of these membranes, eliminating bending effects and, we surmise, suppressing wrinkling, too.
+
+From a mechanics perspective, we know a great deal more about alveolar chords than we know about alveolar septa.  More judgment will therefore be required in our construction and parameterization of a material model for alveolar membranes.  
+
+A typical alveolar septum is 4-5 $\mu$m in width \cite{Sukietal11}.  They are comprised of an outside layer of epithelial cells that encase capillaries made of endothelial cells along with a basement membrane that is composed of unorganized collagen and elastin filaments, plus proteoglycans and other extracellular proteins.  This basement membrane, roughly at mid-plane in an alveolar septum, has a width of about $0.5 \, \mu$m \cite{RoanWaters11}.  Inertial forces generated by these membranes are to be based upon a membrane thickness of $\sim\!\!5$~$\mu$m with an approximate density of water, while the structural forces that they carry are to be based upon a basement membrane thickness of $\sim\!\! 0.5$~$\mu$m.  
+
+It is not known how much of the mechanical load is actually carried by the cells in an alveolar septum vs.\ the extracellular basement membrane they encase, but it is generally thought that this basement membrane carries the majority of the load \cite{Sukietal11}.  Therefore, by diminishing the moduli that are appropriate for describing a basement membrane with thickness $\sim\!\! 0.5$~$\mu$m by a factor of 10, we get an estimate for the effective septal moduli appropriate when modeling a whole septal membrane with thickness $\sim\!\! 5$~$\mu$m.  We use the model parameters obtained for a visceral pleura membrane \cite{Freedetal17} and the above conjecture to model the alveolar septa.
+
+From Eqn.~(\ref{HelmholtzMembraneODEs}), alveolar septa have a constitutive response that, in the presence of a shock wave, is governed by
+\begin{equation*}
+\left\{ \begin{matrix}
+\rho \, \mathrm{d} \eta \\
+\mathrm{d} \pi \\ \mathrm{d} \sigma \\ \mathrm{d} \tau
+\end{matrix} \right\} = \begin{bmatrix}
+2 M \alpha & 0 & 0 \\
+4 M & 0 & 0 \\
+0 & 2 N & 2\tau \\
+0 & 2\tau & G
+\end{bmatrix} \left\{ \begin{matrix}
+\mathrm{d} \xi \\ \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
+\end{matrix} \right\}
+\end{equation*}
+because $\mathrm{d} \theta = 0$.  Here $\alpha$ is the areal coefficient of thermal expansion, $M$ is the dilation modulus, $N$ is the squeeze modulus, $G$ is the shear modulus (all moduli have units of force per length of line), and $\rho$ is the mass density per unit area.  Below we change the units of these moduli, viz., from force per unit length to force per unit area, i.e., stress, so that they are in a form more familiar to the user.
+
+\subsubsection{Surface Stresses and Entropy}
+
+The intensive thermo\-dynamic variables $\pi$, $\sigma$ and $\tau$ have units of force per unit length of line.  We convert these into stresses by defining $s_{\pi} \defeq \pi / h$, $s_{\sigma} \defeq \sigma / h$ and $s_{\tau} \defeq \tau / h$, which have units of force per unit area.  Herein $h \defeq h_0 \mathrm{e}^{-2\xi}$ denotes membrane thickness established by assuming membrane volume is preserved, with $h_0$ being its reference value.  Adopting these definitions allows the above system of equations to be rewritten as
+\begin{equation}
+\left\{ \begin{matrix}
+\mathrm{d} S \\ \mathrm{d} s_{\pi} \\ 
+\mathrm{d} s_{\sigma} \\ \mathrm{d} s_{\tau}
+\end{matrix} \right\} = \begin{bmatrix}
+2 \rho V_0 M \alpha & 0 & 0 \\
+4 M + 2 s_{\pi} & 0 & 0 \\
+2 s_{\sigma} & 2 N & 2 s_{\tau} \\
+2 s_{\tau} & 2 s_{\tau} & G
+\end{bmatrix} \left\{ \begin{matrix}
+\mathrm{d} \xi \\ \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
+\end{matrix} \right\}
+\end{equation}
+wherein moduli $M$, $N$ and $G$ now all have units of stress.  Here $S$ is the entropy of a membrane with initial condition $S_0 = \rho V_0 \eta_0$ whose volume is $V_0$ and whose entropy density per unit mass is $\eta_0$ with $\rho$ now describing mass density per unit volume.
+
+Collagen and elastin appear as thin filaments randomly oriented and somewhat uniformly dispersed throughout a basement membrane, unlike the strongly aligned fibers that appear in septal chords.  Consequently, for our purposes, we model this collective ensemble of tissue and structure types as a homo\-geneous isotropic membrane modeled after the Freed-Rajagopal biologic fiber \cite{FreedRajagopal16} that we have extended to membranes in \ref{appImplicitElasticity}, specifically
+\begin{subequations}
+    \label{septalCompliances}
+    \begin{align}
+    \frac{1}{M} & = \frac{\xi_t - \xi_1}{M_1 \xi_t + s_{\pi} / 2} + \frac{1}{M_2} &
+    \xi_1 & = \xi - \tfrac{1}{2} \alpha ( \theta - \theta_0 ) - \frac{s_{\pi}}{4M_2} & s_{\pi} & \defeq \frac{\pi}{h_0 \mathrm{e}^{-2\xi}}
+    \label{septalDilationCompliance} \\
+    \frac{1}{N} & = 2 \left( \frac{ \varepsilon_t - | \varepsilon_1 |}{N_1 \varepsilon_t + 2 \gamma s_{\tau}} + \frac{1}{N_2} \right) & 
+    \varepsilon_1 & = \varepsilon - \frac{s_{\sigma} - 2 \gamma s_{\tau}}{N_2} & s_{\sigma} & \defeq \frac{\sigma}{h_0 \mathrm{e}^{-2\xi}}
+    \label{septalSqueezeCompliance} \\
+    \frac{1}{G} & = \Gamma \left( \frac{\gamma_t - 2\varepsilon \gamma - | \gamma_1 |}{G_1 \gamma_t + 2 \varepsilon s_{\tau}} + \frac{1-2\varepsilon}{G_2} \right) & 
+    \gamma_1 & = \gamma - \frac{(1 - 2\varepsilon) s_{\tau}}{G_2} & s_{\tau} & \defeq \frac{\tau}{h_0 \mathrm{e}^{-2\xi}}
+    \label{septalShearCompliance}
+    \end{align}
+\end{subequations}
+while recalling that $\theta = \theta_0$, which thereby simplifies $\xi_1$ because temperature across a shock wave front is constant \cite{AmesStaff53}.  The compliant tangent moduli of $M_1, N_1$ and $G_1$ and the stiff, terminal, tangent moduli of $M_2 , N_2$ and $G_2$ bound their responses in that $M_1 \leq M \leq M_2$, $N_1 \leq N \leq N_2$ and $G_1 \leq G \leq G_2$, with gradual transitions between their asymptotic bounds being centered around strains of $\xi_t , \varepsilon_t$ and $\gamma_t$.    Here $h_0 = 4.5 \pm 0.5\:\mu$m is the initial thickness of a membrane with $h = h_0 \exp (-2\xi)$ establishing its current thickness, obtained via an assumption of material incompressibility, remembering that $\xi = \ln \sqrt{A/A_0}$.
+
+Matsuda \textit{et~al}.\ \cite{Matsudaetal87} found the diameters of collagen and elastin fibers that circumscribe an alveolar mouth to be about 5-7 times larger than those of their septal chords.  The alveolar mouth, with its thicker fibers and open face that attach an alveolus to an alveolar duct, is modeled here as a phantom face, viz., with fibers sized like any of the other eleven pentagonal elements comprising a dodecahedron, and a twelfth face \cite{Freedetal12}.  Kimmel \& Budiansky addressed this point via a private communication they had with Prof.\ T.\ A.\ Wilson.  They wrote \cite{KimmelBudiansky90}:
+\small
+\begin{quote}
+	``Professor T.\ A.\ Wilson notes that the present model does not take explicit account of either alveolar openings or their fibrous boundaries.  Wilson suggests that the elastic resistance of the ring boundaries tends to make up for the missing surface tension in the holes, so that neglect of both effects may be self-compensating.''
+\end{quote}
+\normalsize
+This conjecture of Kimmel \& Budiansky, along with the experimental findings of Matsuda \textit{et~al}., will enable us to estimate the surface traction carried by a single alveolar membrane, relative to the tractions carried by its alveolar chords.  In other words, this provides an avenue for parameterizing the membrane model in an otherwise void of relevant experimental data needed to estimate these parameters.
+
+To convert these membrane stresses into nodal forces requires finite element technology, which is discussed in Part~\ref{partVariational}.  We recall that only half of their nodal tractions will apply to the alveolus being modeled, because each septum is shared between two alveoli.
+
+\subsection{Modeling an Alveolar Volume Subjected to a Shock Wave}
+\label{sec:IdealGasLaw}
+
+Alveoli are connected to bronchial trees via alveolar ducts.  Under normal conditions, air moves in and out of the alveoli via these ducts.  However, when subjected to a stress wave passing over an alveolus, there is no time for the transport of air to take place.  Hence, we can consider the air (and heat) within an alveolus to become `trapped', and the pressure to be uniform therein.  The governing process is therefore adiabatic.  It is under this condition that we model the volumetric response of alveolar sacs.
+
+If one considers the saturated air\slash fluid within an alveolus to be an ideal gas, then \cite{Davison08}
+\begin{equation}
+P V = n \! R \theta
+\quad \text{or} \quad
+\frac{P V}{\theta} = \frac{P_0 V_0}{\theta_0} = n \! R = \mathrm{constant}
+\label{idealGas}
+\end{equation}
+where, in our case, $P_0$ is taken to be atmospheric pressure at sea level (1~bar or $10^5$~Pa or $10^6$~barye), with $V_0$ being that alveolar volume whereat alveolar pressure and plural pressure are both atmospheric, while $\theta_0 = 37^{\circ}$C = 310~K is assigned as body temperature.  Parameter $n$ is the molar content of gas within an alveolus, with $R$  being the universal gas constant.  
+
+The material constants associated with an ideal gas contained within an adiabatic enclosure are
+\begin{equation}
+\alpha \defeq \frac{1}{V} \left. \frac{\partial V}{\partial \theta} \right|_P = 
+\frac{1}{\theta_0} \, \frac{P_0 V_0}{P V}
+\quad \text{and} \quad
+K \defeq -\frac{1}{V} \left. \frac{\partial P}{\partial V} \right|_{\theta} = 
+P_0 \, \frac{V_0 \hspace{0.5pt} \theta}{\theta_0 V}
+\label{idealGasConstants}
+\end{equation}
+with the other two material constants pertaining to moist air at body temperature\footnote{
+    The physical properties listed for air were taken from the website \texttt{www.peacesoftware.de} hosted by Berndt Wischnewski.
+}
+being its mass density $\rho$ of $1.125 \times 10^{-3} \; \text{gr/cm}^3$ and its specific heat $C$ at constant pressure of $1.007 \times 10^7$~erg/gr.K, constrained by the fact that $K < K_{\max} = \rho C / \alpha^2 \theta \approx \rho C \theta$.
+
+An alveolar sac is modeled as an adiabatic pressure vessel filled with an ideal gas whose Helmholtz formulation (\ref{Helmholtz3D}) is described by
+\begin{equation}
+\left\{ \begin{matrix}
+\rho \, \mathrm{d} \eta \\ -3 \, \mathrm{d} P
+\end{matrix} \right\} = \begin{bmatrix}
+\rho C / \theta - K \alpha^2 & 3 K \alpha \\ 
+-3K\alpha & 9K
+\end{bmatrix} \left\{ \begin{matrix}
+\mathrm{d} \theta \\ \mathrm{d} \Xi
+\end{matrix} \right\}
+\label{alveolarGas}
+\end{equation}
+that, again, because $\theta = \theta_0$ across a wave front \cite{AmesStaff53}, simplifies the governing system of differential equations (\ref{alveolarGas}) to
+\begin{displaymath}
+    \mathrm{d}P = -3K \, \mathrm{d} \Xi 
+    \quad \text{and} \quad
+    \rho \, \mathrm{d} \eta = 3 K \alpha \, \mathrm{d} \Xi = -\alpha \, \mathrm{d}P
+\end{displaymath}
+where we recall that $\mathrm{d}\Xi = \tfrac{1}{3} V^{-1} \, \mathrm{d} V$.  Like before, we do not want the entropy per unit mass or per unit volume; rather, we prefer to know what the entropy of its structural constituent is, in this case, the gas within an alveolar sac.  To find this, we multiply the right-hand expression through by volume $V_0$, after which we integrate both differential equations to get
+\begin{equation}
+    \frac{P}{P_0} = \frac{V_0}{V}
+    \quad \therefore \quad
+    \alpha = \frac{1}{\theta_0}
+    \quad \implies \quad
+    S = S_0 + \frac{V_0 ( P_0 - P )}{\theta_0}
+    \label{alveolarSacCE}
+\end{equation}
+where $S$ is the desired entropy of an alveolar volume with $S_0 = \rho \eta_0 V_0$ given that $\rho \eta_0$ is the entropy per unit volume of humid air at body temperature and atmospheric pressure, viz., $\rho \eta_0 = 7.770 \times 10^4 \: \text{erg/cm}^3\text{.K}$.  The above results are in agreement with the ideal gas law, as they should be, because $\alpha$ and $K$ in Eqn.~(\ref{idealGasConstants}) were both derived from this law.
+
+To convert pressure $P$ into nodal forces in our alveolar model requires finite element technology, which is discussed in Part~\ref{partVariational}.
+
+
+\section{Code Verification and Constitutive Parameterization}

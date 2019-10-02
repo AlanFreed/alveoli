@@ -1,0 +1,99 @@
+\section{Dodecahedra}
+\label{appDodecahedra}
+
+Module \texttt{dodecahedra.py} is Python code that exports class \texttt{dodecahedron}.  An object of type \texttt{dodecahedron} is comprised of twenty vertices labeled according to Table~\ref{TableDodecahedron}, as visualized in Fig.~\ref{figDodecahedron}, thirty chords assigned according to Table~\ref{Tablechordae}, and twelve pentagons assigned according to Table~\ref{TablePentagons}.  This class has the following interface:
+
+\noindent
+\textbf{class} \texttt{dodecahedron}
+
+\medskip\noindent
+\textit{constructor}
+
+\medskip\noindent
+\texttt{d = dodecahedron(F0, h, gaussPts=1, alveolarDiameter=1.952400802898434)} \\
+\indent \texttt{F0} \qquad\qquad a deformation gradient: distortion from regular shape in a reference state \\
+\indent \texttt{h} \qquad\qquad\; time step separating two neighboring configurations \\
+\indent \texttt{gaussPts} \quad number of Gauss points in each pentagonal surface: $\in \{ 1 , 4, 7 \}$ \\
+\indent \texttt{alveolarDiameter} \; mean diameter of an alveolar sac
+
+\medskip\noindent
+The default alveolar diameter results in vertices of the dodecahedron taking on co-ordinate values that associate with its natural configuration, i.e., all vertices touch the unit sphere from within.  Adopting the labeling scheme presented in Fig.~\ref{figDodecahedron}, the vertices are indexed according to Table~\ref{TableDodecahedron}, the chords are indexed according to Table~\ref{Tablechordae}, and the pentagons are indexed according to Table~\ref{TablePentagons}.  If \texttt{F0} is the identity matrix, then the shape will be that of a regular dodecahedron in its reference state; otherwise, the shape will be that of an irregular dodecahedron in its reference state.  The number of \texttt{gaussPts}, viz., 1, 4 or 7, establishes the quadrature scheme to be used for numeric integration, in accordance with Fig.~\ref{figQuadrature}.
+
+\medskip\noindent
+\textit{methods}
+
+\medskip\noindent
+\texttt{s = d.verticesToString(state)}
+
+\medskip\noindent
+Returns a formatted string description for this dodecahedron's vertices in configuration \texttt{state}.
+
+\medskip\noindent
+\texttt{s = d.chordsToString(state)}
+
+\medskip\noindent
+Returns a formatted string description for this dodecahedron's chords in configuration \texttt{state}.
+
+\medskip\noindent
+\texttt{s = d.pentagonsToString(state)}
+
+\medskip\noindent
+Returns a formatted string description for this dodecahedron's pentagons in configuration \texttt{state}.
+
+\medskip\noindent
+\texttt{v = d.getVertex(number)}
+
+\medskip\noindent
+Returns that vertex indexed with \texttt{number}, which must be in interval [1, 20].
+
+\medskip\noindent
+\texttt{c = d.getChord(number)}
+
+\medskip\noindent
+Returns that chord indexed with \texttt{number}, which must be in interval [1, 30].
+
+\medskip\noindent
+\texttt{p = d.getPentagon(number)}
+
+\medskip\noindent
+Returns that irregular pentagon indexed with \texttt{number}, which must be in interval [1, 12].
+
+\newpage
+\medskip\noindent
+\texttt{d.update(nextF)}
+
+\medskip\noindent
+Assuming that the deformation imposed on an alveolus is homogeneous, described by a deformation gradient '\texttt{nextF}', this procedure assigns new co-ordinate values to all vertices of the dodecahedron for its next configuration such that whenever \texttt{nextF} is the identity matrix the dodecahedron is in its reference state.  This method calls the \texttt{update} methods for all of its vertices, chords and pentagons, after which it updates the local fields of the dodecahedron object itself.  This method may be called multiple times before freezing its values with a call to \texttt{advance}.
+
+\medskip\noindent
+\texttt{d.advance()}
+
+\medskip\noindent
+Calls method \texttt{advance} for all of the vertices, chords and pentagons comprising this dodecahedron, where current fields are assigned to previous fields, and then next fields are assigned to current fields for these objects.  Afterwords, it assigns the current fields to the previous fields and then assigns the next fields to the current fields of the dodecahedron itself, thereby freezing the present next-fields in preparation for advancing the solution along its path.
+
+\medskip\noindent
+\textit{The geometric fields associated with a dodecahedron.}
+
+\medskip\noindent
+\texttt{v = d.volume(state)}
+
+\medskip\noindent
+Returns the volume of this dodecahedron in configuration \texttt{state}.
+
+\medskip\noindent
+\texttt{vLambda = d.volumetricStretch(state)}
+
+\medskip\noindent
+Returns the cube root of the volume at \texttt{state} divided by reference volume, i.e., $\sqrt[3]{V / V_0}$.
+
+\medskip\noindent
+\texttt{vStrain = d.volumetricStrain(state)}
+
+\medskip\noindent
+Returns the logarithm of volumetric stretch evaluated at \texttt{state}, i.e., $\Xi = \ln \sqrt[3]{V / V_0}$.
+
+\medskip\noindent
+\texttt{dvStrain = d.dVolumetricStrain(state)}
+
+\medskip\noindent
+Returns the rate of volumetric strain at \texttt{state}, viz., $\mathrm{d} \Xi = \tfrac{1}{3} V^{-1} \, \mathrm{d} V$.

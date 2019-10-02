@@ -1,0 +1,85 @@
+\setcounter{section}{0}
+\part{Variational Formulation}
+\label{partVariational}
+
+The problem we have set up to solve takes on the general form of 
+\begin{equation}
+\mathbf{M} \ddot{\mathbf{x}} + \mathbf{K} \mathbf{x} = \mathbf{f}(t)
+\end{equation}
+where $\mathbf{M}$ is a mass matrix, $\mathbf{K}$ is a stiffness matrix, $\mathbf{f}$ is a forcing function, and $\mathbf{x}$ is a displacement vector.  
+
+For our problem of interest, 
+\begin{subequations}
+	\begin{align}
+	\mathbf{x} & = \sum_{v=1}^{20} \{ x_v , y_v , z_v \}^{\mathsf{T}} \\
+	\intertext{are the co-ordinates of vertex $v$ located in the co-ordinate frame of the dodecahedron $(\boldsymbol{\imath} , \boldsymbol{\jmath} , \vec{\mathbfit{k}} )$ so that vectors $\mathbf{f}$ and $\mathbf{x}$ have length 60 while matrices $\mathbf{M}$ and $\mathbf{K}$ have dimension $60 \times 60$ with}
+	\mathbf{M} & = \mathbf{M}_{1D} + \mathbf{M}_{2D} + \mathbf{M}_{3D} \\
+	\mathbf{K} & = \mathbf{K}_{1D} + \mathbf{K}_{2D} + \mathbf{K}_{3D} \\
+	\mathbf{f} & = \mathbf{f}_{1D} + \mathbf{f}_{2D} + \mathbf{f}_{3D}
+	\end{align}
+\end{subequations}
+where subscript `$\mbox{}_{1D}$' applies to the alveolar chords, subscript `$\mbox{}_{2D}$' applies to the alveolar septa, and subscript `$\mbox{}_{3D}$' applies to the alveolar volume.
+
+A consistent mass matrix \cite{Archer65} established in its natural co-ordinate system is defined as
+\begin{equation}
+\mathbf{M} = \sum_m \int_{V_m} \rho_m \mathbf{N}_m^{\mathsf{T}} \mathbf{N}_m \,
+\mathrm{d} V_m
+\label{consistentMassMatrix}
+\end{equation}
+wherein $\mathbf{N}_m$ is the shape function matrix used to also construct the stiffness matrix for element $m$.
+
+For the alveolar chords, the shape functions for a two-node bar element are
+\begin{equation}
+\mathbf{N}_{1D} = \begin{bmatrix}
+\frac{1}{2} \, (1 - \xi_{1D}) &  \frac{1}{2} \, (1 + \xi_{1D})
+\end{bmatrix} 
+\end{equation}
+where $L$ is the length of bar. Substituting the above shape functions into the mass matrix 
+\begin{equation}
+\mathbf{M}_{1D} = \int_{V} \rho_{1D} \mathbf{N}_{1D}^{\mathsf{T}} \mathbf{N}_{1D} \, \mathrm{d} V  = \int_{-1}^{1} \rho_{1D} \mathbf{N}_{1D}^{\mathsf{T}} \mathbf{N}_{1D} \, A_c \,  \frac{L_{1D}}{2} \mathrm{d} \xi
+\end{equation}
+and evaluating the integral, the mass matrix for alveolar chords in its natural coordinate systme becomes
+\begin{equation}
+\mathbf{M}_{1D}  = \frac{\rho_{1D} \, A_{1D} \, L_{1D}}{6}\begin{bmatrix}
+2 & 1 \\
+1 & 2
+\end{bmatrix} 
+\label{MassMatrix1D}
+\end{equation}
+wherein $A_{1D}$ is the cross section area of alveolar chord.
+
+For the alveolar septa the matrix of shape functions $\mathbf{N}$ is arranged as
+\begin{equation}
+\mathbf{N}_{2D} = 
+\begin{bmatrix}
+N_1 & 0 & N_2 & 0 & N_3 & 0 & N_4 & 0 & N_5 & 0\\ 0 & N_1 & 0 & N_2 & 0 & N_3 & 0 & N_4 & 0 & N_5
+\end{bmatrix} 
+\label{shape2D}
+\end{equation}
+in which $\mathrm{N}_i (i = 1, 2, 3,4,5)$ are five shape functions corresponding to the five vertices of the pentagonthat are defined in Eq.~(\ref{shapeFunctions}).
+The mass matrix $\mathbf{M}_{2D}$ can also be obtained by substituting the above shape function matrix into 
+\begin{equation}
+\mathbf{M}_{2D} = \int_{V} \rho_{2D}  \mathbf{N}_{2D}^{\mathsf{T}} \mathbf{N}_{2D} \, \mathrm{d} V = \int_{-1}^{1} \int_{-1}^{1} \rho_{2D} \mathbf{N}_{2D}^{\mathsf{T}} \mathbf{N}_{2D} \,\mathbf{J}_{2D} \, h \, \mathrm{d} \xi \, \mathrm{d} \eta
+\end{equation}
+wherein $h_{2D}$ being membrane thickness, and $\mathbf{J}_{2D}$ being the Jacobian matrix of pentagon. The components of Jacobian matrix are calculated using derivatives of shape functions with respect to the local coordinates $(\xi, \eta)$, and the current global coordinates $(x_i, y_i)$ at the $i^{\mathrm{th}}$ vertex via
+\begin{equation}
+\mathbf{J}_{2D} = 
+\begin{bmatrix}
+\partial x / \partial\xi & \partial y / \partial\xi \\
+\partial x / \partial\eta & \partial y / \partial\eta 
+\end{bmatrix} = \begin{bmatrix}
+\sum\nolimits_{i=1}^5 N_{i,\xi} (\xi,\eta) \, x_i & \sum\nolimits_{i=1}^5 N_{i,\xi} (\xi,\eta) \, y_i \\
+\sum\nolimits_{i=1}^5 N_{i,\eta} (\xi,\eta) \, x_i & \sum\nolimits_{i=1}^5 N_{i,\eta} (\xi,\eta) \, y_i
+\end{bmatrix}
+\label{jacobian}
+\end{equation}
+
+
+
+
+
+
+
+
+
+
