@@ -136,15 +136,29 @@ methods
         irregular tetrahedron.  The returned matrix associates with
         configuration 'state'
 
-    omegaMtx = p.spin(state)
+    omegaMtx = t.spin(state)
         returns a 3x3 skew symmetric matrix that describes the time rate of
         rotation, i.e., spin, of the local tetrahedral coordinate system about
         the fixed dodecahedral coordinate system with reference base vectors.
         The returned matrix associates with configuration 'state'
 
+    The fundamental fields of kinematics
+
+    gMtx = t.G(gaussPt, state)
+        returns 3x3 matrix describing the displacement gradient for the
+        tetrahedron at 'gaussPt' in configuration 'state'
+
+    fMtx = t.F(gaussPt, state)
+        returns 3x3 matrix describing the deformation gradient for the
+        tetrahedron at 'gaussPt' in configuration 'state'
+
+    lMtx = t.L(gaussPt, state)
+        returns the velocity gradient at the specified Gauss point for the
+        specified configuration
+
     Fields needed to construct finite element representations
 
-    sf = p.shapeFunction(self, gaussPt):
+    sf = t.shapeFunction(self, gaussPt):
         returns the shape function associated with the specified Gauss point
 
     massM = t.massMatrix(rho)
@@ -152,15 +166,12 @@ methods
     returns
         massM    a 12x12 mass matrix for the tetrahedron
 
-    The fundamental fields of kinematics
+    kMtx = c.stiffnessMatrix()
+        returns a tangent stiffness matrix for the chosen number of Gauss
+        points.
 
-    gMtx = p.G(gaussPt, state)
-        returns 3x3 matrix describing the displacement gradient for the
-        tetrahedron at 'gaussPt' in configuration 'state'
-
-    fMtx = p.F(gaussPt, state)
-        returns 3x3 matrix describing the deformation gradient for the
-        tetrahedron at 'gaussPt' in configuration 'state'
+    fFn = c.forcingFunction()
+        returns a vector for the forcing function on the right hand side.
 
 Reference
     1) Guido Dhondt, "The Finite Element Method for Three-dimensional
@@ -804,6 +815,65 @@ class tetrahedron(object):
                                "tetrahedron.acceleration.".format(str(state)))
         return np.array([ax, ay, az])
 
+    # displacement gradient at a Gauss point
+    def G(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            if self._gaussPts == 1:
+                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
+                                   "tetrahedron.G and you sent {}."
+                                   .format(gaussPt))
+            else:
+                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
+                                   .format(self._gaussPts) +
+                                   "to tetrahedron.G and you sent {}."
+                                   .format(gaussPt))
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return np.copy(self._Gc[gaussPt])
+            elif state == 'n' or state == 'next':
+                return np.copy(self._Gn[gaussPt])
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return np.copy(self._Gp[gaussPt])
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return np.copy(self._G0[gaussPt])
+            else:
+                raise RuntimeError("Error: unknown state {} in call a to " +
+                                   "tetrahedron.G.".format(state))
+        else:
+            raise RuntimeError("Error: unknown state {} in a call to " +
+                               "tetrahedron.G.".format(str(state)))
+
+    # deformation gradient at a Gauss point
+    def F(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            if self._gaussPts == 1:
+                raise RuntimeError("Error: gaussPt can only be 1 in a call " +
+                                   "to tetrahedron.F and you sent {}."
+                                   .format(gaussPt))
+            else:
+                raise RuntimeError("Error: gaussPt must be in [1, {}] in a "
+                                   .format(self._gaussPts) +
+                                   "call to tetrahedron.F and you sent {}."
+                                   .format(gaussPt))
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return np.copy(self._Fc[gaussPt])
+            elif state == 'n' or state == 'next':
+                return np.copy(self._Fn[gaussPt])
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return np.copy(self._Fp[gaussPt])
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return np.copy(self._F0[gaussPt])
+            else:
+                raise RuntimeError("Error: unknown state {} in a call to " +
+                                   "tetrahedron.F.".format(state))
+        else:
+            raise RuntimeError("Error: unknown state {} in a call to " +
+                               "tetrahedron.F.".format(str(state)))
+
+    def L(self, gaussPt, state):
+        return
+
     def shapeFunction(self, gaussPt):
         if (gaussPt < 1) or (gaussPt > self._gaussPts):
             if self._gaussPts == 1:
@@ -893,58 +963,8 @@ class tetrahedron(object):
                            detJ5 * wel[4] * nn5))
         return mass
 
-    # displacement gradient at a Gauss point
-    def G(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "tetrahedron.G and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to tetrahedron.G and you sent {}."
-                                   .format(gaussPt))
-        if isinstance(state, str):
-            if state == 'c' or state == 'curr' or state == 'current':
-                return np.copy(self._Gc[gaussPt])
-            elif state == 'n' or state == 'next':
-                return np.copy(self._Gn[gaussPt])
-            elif state == 'p' or state == 'prev' or state == 'previous':
-                return np.copy(self._Gp[gaussPt])
-            elif state == 'r' or state == 'ref' or state == 'reference':
-                return np.copy(self._G0[gaussPt])
-            else:
-                raise RuntimeError("Error: unknown state {} in call a to " +
-                                   "tetrahedron.G.".format(state))
-        else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "tetrahedron.G.".format(str(state)))
+    def stiffnessMatrix(self):
+        return
 
-    # deformation gradient at a Gauss point
-    def F(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in a call " +
-                                   "to tetrahedron.F and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in a "
-                                   .format(self._gaussPts) +
-                                   "call to tetrahedron.F and you sent {}."
-                                   .format(gaussPt))
-        if isinstance(state, str):
-            if state == 'c' or state == 'curr' or state == 'current':
-                return np.copy(self._Fc[gaussPt])
-            elif state == 'n' or state == 'next':
-                return np.copy(self._Fn[gaussPt])
-            elif state == 'p' or state == 'prev' or state == 'previous':
-                return np.copy(self._Fp[gaussPt])
-            elif state == 'r' or state == 'ref' or state == 'reference':
-                return np.copy(self._F0[gaussPt])
-            else:
-                raise RuntimeError("Error: unknown state {} in a call to " +
-                                   "tetrahedron.F.".format(state))
-        else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "tetrahedron.F.".format(str(state)))
+    def forcingFunction(self):
+        return

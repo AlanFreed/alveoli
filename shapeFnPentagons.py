@@ -97,35 +97,35 @@ constructor
 methods
 
     y = sf.interpolate(y1, y2, y3, y4, y5)
-        y1   is the value of field  y  located at vertex 1
-        y2   is the value of field  y  located at vertex 2
-        y3   is the value of field  y  located at vertex 3
-        y4   is the value of field  y  located at vertex 4
-        y5   is the value of field  y  located at vertex 5
+        y1   is the value of field y located at vertex 1
+        y2   is the value of field y located at vertex 2
+        y3   is the value of field y located at vertex 3
+        y4   is the value of field y located at vertex 4
+        y5   is the value of field y located at vertex 5
     returns
         y    is its interpolated value for field y at location (xi, eta)
 
     det = sf.detJacobian(x1, x2, x3, x4, x5)
-        x1    is a tuple of physical coordinates  (x, y)  located at vertex 1
-        x2    is a tuple of physical coordinates  (x, y)  located at vertex 2
-        x3    is a tuple of physical coordinates  (x, y)  located at vertex 3
-        x4    is a tuple of physical coordinates  (x, y)  located at vertex 4
-        x5    is a tuple of physical coordinates  (x, y)  located at vertex 5
+        x1   is a tuple of physical coordinates (x, y) located at vertex 1
+        x2   is a tuple of physical coordinates (x, y) located at vertex 2
+        x3   is a tuple of physical coordinates (x, y) located at vertex 3
+        x4   is a tuple of physical coordinates (x, y) located at vertex 4
+        x5   is a tuple of physical coordinates (x, y) located at vertex 5
     returns
-        det   is the determinant of the Jacobian matrix
+        det  is the determinant of the Jacobian matrix
     inputs are tuples of coordinates evaluated in a global coordinate system
 
     Gmtx = sf.G(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-        x1   is a tuple of physical  coordinates  (x, y)  located at vertex 1
-        x2   is a tuple of physical  coordinates  (x, y)  located at vertex 2
-        x3   is a tuple of physical  coordinates  (x, y)  located at vertex 3
-        x4   is a tuple of physical  coordinates  (x, y)  located at vertex 4
-        x5   is a tuple of physical  coordinates  (x, y)  located at vertex 5
-        x01  is a tuple of reference coordinates  (x, y)  located at vertex 1
-        x02  is a tuple of reference coordinates  (x, y)  located at vertex 2
-        x03  is a tuple of reference coordinates  (x, y)  located at vertex 3
-        x04  is a tuple of reference coordinates  (x, y)  located at vertex 4
-        x05  is a tuple of reference coordinates  (x, y)  located at vertex 5
+        x1   is a tuple of physical  coordinates (x, y) located at vertex 1
+        x2   is a tuple of physical  coordinates (x, y) located at vertex 2
+        x3   is a tuple of physical  coordinates (x, y) located at vertex 3
+        x4   is a tuple of physical  coordinates (x, y) located at vertex 4
+        x5   is a tuple of physical  coordinates (x, y) located at vertex 5
+        x01  is a tuple of reference coordinates (x, y) located at vertex 1
+        x02  is a tuple of reference coordinates (x, y) located at vertex 2
+        x03  is a tuple of reference coordinates (x, y) located at vertex 3
+        x04  is a tuple of reference coordinates (x, y) located at vertex 4
+        x05  is a tuple of reference coordinates (x, y) located at vertex 5
     returns
         Gmtx is the displacement gradient (a 2x2 matrix) at location (xi, eta)
                     / du/dx  du/dy \             u = x - X  or  x - x0
@@ -134,16 +134,16 @@ methods
     inputs are tuples of coordinates evaluated in a global coordinate system
 
     Fmtx = sf.F(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-        x1   is a tuple of physical  coordinates  (x, y)  located at vertex 1
-        x2   is a tuple of physical  coordinates  (x, y)  located at vertex 2
-        x3   is a tuple of physical  coordinates  (x, y)  located at vertex 3
-        x4   is a tuple of physical  coordinates  (x, y)  located at vertex 4
-        x5   is a tuple of physical  coordinates  (x, y)  located at vertex 5
-        x01  is a tuple of reference coordinates  (x, y)  located at vertex 1
-        x02  is a tuple of reference coordinates  (x, y)  located at vertex 2
-        x03  is a tuple of reference coordinates  (x, y)  located at vertex 3
-        x04  is a tuple of reference coordinates  (x, y)  located at vertex 4
-        x05  is a tuple of reference coordinates  (x, y)  located at vertex 5
+        x1   is a tuple of physical  coordinates (x, y) located at vertex 1
+        x2   is a tuple of physical  coordinates (x, y) located at vertex 2
+        x3   is a tuple of physical  coordinates (x, y) located at vertex 3
+        x4   is a tuple of physical  coordinates (x, y) located at vertex 4
+        x5   is a tuple of physical  coordinates (x, y) located at vertex 5
+        x01  is a tuple of reference coordinates (x, y) located at vertex 1
+        x02  is a tuple of reference coordinates (x, y) located at vertex 2
+        x03  is a tuple of reference coordinates (x, y) located at vertex 3
+        x04  is a tuple of reference coordinates (x, y) located at vertex 4
+        x05  is a tuple of reference coordinates (x, y) located at vertex 5
     returns
         Fmtx is the deformation gradient (a 2x2 matrix) at location (xi, eta)
                     / dx/dX  dx/dY \             X = x0

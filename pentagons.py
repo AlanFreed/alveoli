@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from chords import chord
-from ridder import findRoot
+import materialProperties as mp
 import math as m
 from membranes import membrane
 import numpy as np
+from ridder import findRoot
 from shapeFnPentagons import shapeFunction
 import spin as spinMtx
 
@@ -32,7 +33,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.1"
 __date__ = "08-08-2019"
-__update__ = "09-27-2019"
+__update__ = "10-06-2019"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -42,18 +43,16 @@ Change in version "1.3.0":
 
 methods
 
-    detjac = p.detJ(gaussPt, state)
-        gaussPt  the  Gauss point  for which the Jacobian associates
-        state    the configuration for which the Jacobian associates
-    returns
-        detjac   the determinant of the Jacobian matrix
-
-    massM = p.massMatrix(gaussPt, rho, width)
+    massM = p.massMatrix(rho, width)
         gaussPt  the Gauss point for which the mass matrix is to be supplied
         rho      the mass density with units of mass per unit volume
         width    the membrane thickness
     returns
         massM    a 10x10 mass matrix for the pentagon associated with 'gaussPt'
+
+    stiffM = p.stiffnessMatrix()
+
+    fFn = p.forcingFunction()
 
 Overview of module pentagons.py:
 
@@ -155,6 +154,25 @@ methods
         the location of the present next-location in preparation to advance to
         the next step along a solution path
 
+    Material properties that associate with this septum.  Except for the mass
+    density, all are drawn randomly from a statistical distribution.
+
+    rho = p.massDensity()
+        returns the mass density of the chord (collagen and elastin fibers)
+
+    w = p.width(state)
+        returns the cross-sectional thickness or width of the membrane in
+        configuration 'state'
+
+    M1, M2, Me_t, N1, N2, Ne_t, G1, G2, Ge_t = c.matProp()
+        returns the constitutive properties for this septal membrane where
+            M1, M2, Me_t  pertain to the dilation response
+            N1, N2, Ne_t  pertain to the squeeze  response
+            G1, G2, Ge_t  pertain to the  shear   response
+        where the first in these sets describes the compliant response
+        the second in these sets describes the stiff response, and
+        the third in these sets establishes the strain of transition
+
     Geometric fields associated with a pentagonal surface in 3 space
 
     a = p.area(state)
@@ -202,17 +220,6 @@ methods
         the fixed dodecahedral coordinate system with reference base vectors.
         The returned matrix associates with configuration 'state'
 
-    Fields needed to construct finite element representations
-
-    sf = p.shapeFunction(self, gaussPt):
-        returns the shape function associated with the specified Gauss point
-
-    massM = p.massMatrix(rho, width)
-        rho      the mass density with units of mass per unit volume
-        width    the membrane thickness
-    returns
-        massM    a 10x10 mass matrix for the pentagon
-
     The fundamental fields of kinematics
 
     gMtx = p.G(gaussPt, state)
@@ -223,12 +230,18 @@ methods
         returns 2x2 matrix describing the deformation gradient (it is not
         relabeled) of the pentagon at 'gaussPt' in configuration 'state'
 
-    Gram-Schmidt factorization of the deformation gradient
+    lMtx = c.L(gaussPt, state)
+        returns the velocity gradient at the specified Gauss point for the
+        specified configuration
+
+    Reindexing of the coordinate used in the membrane analysis at a Gauss point
 
     qMtx = p.Q(gaussPt, state)
         returns 2x2 reindexing matrix applied to the deformation gradient
         prior to its Gram-Schmidt decomposition at 'gaussPt' in
         configuration 'state'
+
+    Gram-Schmidt factorization of a reindexed deformation gradient
 
     rMtx = p.R(gaussPt, state)
         returns 2x2 rotation matrix 'Q' derived from a QR decomposition of the
@@ -255,6 +268,7 @@ methods
         stretch at 'gaussPt' in configuration 'state'
 
     The extensive thermodynamic variables for a membrane and their rates
+    accuired from a reindexed deformation gradient of the membrane
 
     xi = p.dilation(gaussPt, state)
         returns the planar dilation derived from a QR decomposition of the
@@ -269,16 +283,37 @@ methods
         reindexed deformation gradient at 'gaussPt' in configuration 'state'
 
     dXi = p.dDilation(gaussPt, state)
-        returns the differential change in dilation at 'gaussPt' in
+        returns the differential change in dilation acquired from the reindexed
+        deformation gradient for the membrane model at 'gaussPt' in
         configuration 'state'
 
     dEpsilon = p.dSqueeze(gaussPt, state)
-        returns the differential change in squeeze at 'gaussPt' in
+        returns the differential change in squeeze acquired from the reindexed
+        deformation gradient for the membrane model at 'gaussPt' in
         configuration 'state'
 
     dGamma = p.dShear(gaussPt, state)
-        returns the differential change in shear at 'gaussPt' in configuration
-        'state'
+        returns the differential change in shear acquired from the reindexed
+        deformation gradient for the membrane model at 'gaussPt' in
+        configuration 'state'
+
+    Fields needed to construct finite element representations
+
+    sf = p.shapeFunction(gaussPt):
+        returns the shape function associated with the specified Gauss point.
+
+    mMtx = p.massMatrix(rho, width)
+        returns an average of the lumped and consistent mass matrices (ensures
+        the mass matrix is not singular) for the chosen number of Gauss points
+        for a pentagon whose mass density, rho, and whose thickness, width, are
+        specified.
+
+    kMtx = p.stiffnessMatrix()
+        returns a tangent stiffness matrix for the chosen number of Gauss
+        points.
+
+    fFn = p.forcingFunction()
+        returns a vector for the forcing function on the right hand side.
 
 References
     1) Freed, A. D., Erel, V., and Moreno, M. R. "Conjugate Stress/Strain Base
@@ -303,20 +338,20 @@ class pentagon(object):
 
         # verify the input
         if not isinstance(chord1, chord):
-            raise RuntimeError(
-                   'Error: chord1 passed to pentagon constructor was invalid.')
+            raise RuntimeError('chord1 passed to the pentagon constructor ' +
+                               'was invalid.')
         if not isinstance(chord2, chord):
-            raise RuntimeError(
-                   'Error: chord2 passed to pentagon constructor was invalid.')
+            raise RuntimeError('chord2 passed to the pentagon constructor ' +
+                               'was invalid.')
         if not isinstance(chord3, chord):
-            raise RuntimeError(
-                   'Error: chord3 passed to pentagon constructor was invalid.')
+            raise RuntimeError('chord3 passed to the pentagon constructor ' +
+                               'was invalid.')
         if not isinstance(chord4, chord):
-            raise RuntimeError(
-                   'Error: chord4 passed to pentagon constructor was invalid.')
+            raise RuntimeError('chord4 passed to the pentagon constructor ' +
+                               'was invalid.')
         if not isinstance(chord5, chord):
-            raise RuntimeError(
-                   'Error: chord5 passed to pentagon constructor was invalid.')
+            raise RuntimeError('chord5 passed to the pentagon constructor ' +
+                               'was invalid.')
 
         # verify that the chords connect to form a pentagon
         c1v1, c1v2 = chord1.vertexNumbers()
@@ -325,35 +360,30 @@ class pentagon(object):
         c4v1, c4v2 = chord4.vertexNumbers()
         c5v1, c5v2 = chord5.vertexNumbers()
         if not (c1v1 == c2v1 or c1v1 == c2v2 or c1v2 == c2v1 or c1v2 == c2v2):
-            raise RuntimeError(
-                       'Error: chord1 and chord2 do not have a common vertex.')
+            raise RuntimeError('chord1 & chord2 do not have a common vertex.')
         if not (c2v1 == c3v1 or c2v1 == c3v2 or c2v2 == c3v1 or c2v2 == c3v2):
-            raise RuntimeError(
-                       'Error: chord2 and chord3 do not have a common vertex.')
+            raise RuntimeError('chord2 & chord3 do not have a common vertex.')
         if not (c3v1 == c4v1 or c3v1 == c4v2 or c3v2 == c4v1 or c3v2 == c4v2):
-            raise RuntimeError(
-                       'Error: chord3 and chord4 do not have a common vertex.')
+            raise RuntimeError('chord3 & chord4 do not have a common vertex.')
         if not (c4v1 == c5v1 or c4v1 == c5v2 or c4v2 == c5v1 or c4v2 == c5v2):
-            raise RuntimeError(
-                       'Error: chord4 and chord5 do not have a common vertex.')
+            raise RuntimeError('chord4 & chord5 do not have a common vertex.')
         if not (c1v1 == c5v1 or c1v1 == c5v2 or c1v2 == c5v1 or c1v2 == c5v2):
-            raise RuntimeError(
-                       'Error: chord1 and chord5 do not have a common vertex.')
+            raise RuntimeError('chord1 & chord5 do not have a common vertex.')
 
         # check the stepsize
         if h > np.finfo(float).eps:
             self._h = float(h)
         else:
-            raise RuntimeError(
-                     "Error: stepsize in pentagon constructor isn't positive.")
+            raise RuntimeError("The stepsize in the pentagon constructor " +
+                               "wasn't positive.")
 
         # check the number of Gauss points to use
         if gaussPts == 1 or gaussPts == 4 or gaussPts == 7:
             self._gaussPts = gaussPts
         else:
-            raise RuntimeError('Error: {} Gauss points were specified in ' +
-                               'the pentagon constructor; must be 1, 4 or 7.'
-                               .format(gaussPts))
+            raise RuntimeError('{} Gauss points were '.format(gaussPts) +
+                               'specified in the pentagon constructor; ' +
+                               'it must be 1, 4 or 7.')
 
         # establish the set of chords
         self._chord = {
@@ -371,8 +401,7 @@ class pentagon(object):
             chord5.number()
         }
         if not len(self._setOfChords) == 5:
-            raise RuntimeError(
-                       'Error: there are not 5 unique chords in the pentagon.')
+            raise RuntimeError('There were not 5 unique chords in a pentagon.')
 
         # establish the set of vertices
         if chord1.hasVertex(c1v1) and chord5.hasVertex(c1v1):
@@ -411,8 +440,8 @@ class pentagon(object):
             v5.number()
         }
         if not len(self._setOfVertices) == 5:
-            raise RuntimeError(
-                     'Error: there are not 5 unique vertices in the pentagon.')
+            raise RuntimeError('There were not 5 unique vertices ' +
+                               'in this pentagon.')
 
         # establish the shape functions located at the Gauss points (xi, eta)
         if gaussPts == 1:
@@ -839,6 +868,24 @@ class pentagon(object):
                 7: mem7
             }
 
+        self._rho = mp.rhoSepta()
+
+        self._width = mp.septalWidth()
+
+        M1, M2, Me_t, N1, N2, Ne_t, G1, G2, Ge_t = mp.septalMembrane()
+        # the elastic moduli governing dilation
+        self._M1 = M1
+        self._M2 = M2
+        self._Me_t = Me_t
+        # the elastic moduli governing squeeze
+        self._N1 = N1
+        self._N2 = N2
+        self._Ne_t = Ne_t
+        # the elastic moduli governing shear
+        self._G1 = G1
+        self._G2 = G2
+        self._Ge_t = Ge_t
+
     def toString(self, state):
         if self._number < 10:
             s = 'pentagon[0'
@@ -853,9 +900,8 @@ class pentagon(object):
             s = s + '   4: ' + self._vertex[4].toString(state) + '\n'
             s = s + '   5: ' + self._vertex[5].toString(state)
         else:
-            raise RuntimeError(
-                        "Error: unknown state {} in call to pentagon.toString."
-                        .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.toString.")
         return s
 
     def number(self):
@@ -887,9 +933,8 @@ class pentagon(object):
         elif self._chord[5].number() == number:
             return self._chord[5]
         else:
-            raise RuntimeError(
-                         'Error: the requested chord {} is not in pentagon {}.'
-                         .format(number, self._number))
+            raise RuntimeError('The requested chord {} '.format(number) +
+                               'is not in pentagon {}.'.format(self._number))
 
     def getVertex(self, number):
         if self._vertex[1].number() == number:
@@ -903,9 +948,8 @@ class pentagon(object):
         elif self._vertex[5].number() == number:
             return self._vertex[5]
         else:
-            raise RuntimeError(
-                        'Error: the requested vertex {} is not in pentagon {}.'
-                        .format(number, self._number))
+            raise RuntimeError('The requested vertex {} '.format(number) +
+                               'is not in pentagon {}.'.format(self._number))
 
     def gaussPoints(self):
         return self._gaussPts
@@ -1134,6 +1178,49 @@ class pentagon(object):
         for i in range(1, self._gaussPts+1):
             self._septum[i].advance()
 
+    # Material properties that associate with this tetrahedron.  Except for the
+    # mass density, all are drawn randomly from a statistical distribution.
+
+    def massDensity(self):
+        # returns the mass density of the membrane
+        return self._rho
+
+    def width(self, state):
+        # returns the cross-sectional thickness or width of the membrane
+        # assuming volume is preserved
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return self._width * self._A0 / self._Ac
+            elif state == 'n' or state == 'next':
+                return self._width * self._A0 / self._An
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return self._width * self._A0 / self._Ap
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return self._width
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.width.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.width.")
+
+    def matProp(self):
+        # elastic properties describing planar dilation
+        M1 = self._M1
+        M2 = self._M2
+        Me_t = self._Me_t
+        # elastic properties describing planar squeeze
+        N1 = self._N1
+        N2 = self._N2
+        Ne_t = self._Ne_t
+        # elastic properties describing planar shear
+        G1 = self._G1
+        G2 = self._G2
+        Ge_t = self._Ge_t
+        return M1, M2, Me_t, N1, N2, Ne_t, G1, G2, Ge_t
+
+    # geometric properties of a pentagon
+
     def area(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -1145,13 +1232,11 @@ class pentagon(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return self._A0
             else:
-                raise RuntimeError(
-                            "Error: unknown state {} in call to pentagon.area."
-                            .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.area.")
         else:
-            raise RuntimeError(
-                            "Error: unknown state {} in call to pentagon.area."
-                            .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.area.")
 
     def arealStretch(self, state):
         if isinstance(state, str):
@@ -1164,13 +1249,11 @@ class pentagon(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 1.0
             else:
-                raise RuntimeError(
-                       "Error: unknown state {} in call pentagon.arealStretch."
-                       .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call pentagon.arealStretch.")
         else:
-            raise RuntimeError(
-                    "Error: unknown state {} in call to pentagon.arealStretch."
-                    .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.arealStretch.")
 
     def arealStrain(self, state):
         if isinstance(state, str):
@@ -1183,13 +1266,11 @@ class pentagon(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError(
-                        "Error: unknown state {} in call pentagon.arealStrain."
-                        .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call pentagon.arealStrain.")
         else:
-            raise RuntimeError(
-                     "Error: unknown state {} in call to pentagon.arealStrain."
-                     .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.arealStrain.")
 
     def dArealStrain(self, state):
         if isinstance(state, str):
@@ -1209,13 +1290,11 @@ class pentagon(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError(
-                            "Error: unknown state {} in pentagon.dArealStrain."
-                            .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.dArealStrain.")
         else:
-            raise RuntimeError(
-                            "Error: unknown state {} in pentagon.dArealStrain."
-                            .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.dArealStrain.")
 
     def normal(self, state):
         if isinstance(state, str):
@@ -1236,13 +1315,11 @@ class pentagon(object):
                 ny = self._Pr3D[1, 2]
                 nz = self._Pr3D[2, 2]
             else:
-                raise RuntimeError(
-                          "Error: unknown state {} in call to pentagon.normal."
-                          .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.normal.")
         else:
-            raise RuntimeError(
-                          "Error: unknown state {} in call to pentagon.normal."
-                          .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.normal.")
         return np.array([nx, ny, nz])
 
     def dNormal(self, state):
@@ -1274,14 +1351,14 @@ class pentagon(object):
                 dny = 0.0
                 dnz = 0.0
             else:
-                raise RuntimeError(
-                         "Error: unknown state {} in call to pentagon.dNormal."
-                         .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.dNormal.")
         else:
-            raise RuntimeError(
-                         "Error: unknown state {} in call to pentagon.dNormal."
-                         .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.dNormal.")
         return np.array([dnx, dny, dnz])
+
+    # properties that associate with the centroid of the pentagon
 
     def centroid(self, state):
         if isinstance(state, str):
@@ -1302,13 +1379,11 @@ class pentagon(object):
                 cy = self._centroidY0
                 cz = self._centroidZ0
             else:
-                raise RuntimeError(
-                        "Error: unknown state {} in call to pentagon.centroid."
-                        .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.centroid.")
         else:
-            raise RuntimeError(
-                        "Error: unknown state {} in call to pentagon.centroid."
-                        .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.centroid.")
         return np.array([cx, cy, cz])
 
     def displacement(self, state):
@@ -1345,13 +1420,11 @@ class pentagon(object):
                 vy = 0.0
                 vz = 0.0
             else:
-                raise RuntimeError(
-                        "Error: unknown state {} in call to pentagon.velocity."
-                        .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.velocity.")
         else:
-            raise RuntimeError(
-                        "Error: unknown state {} in call to pentagon.velocity."
-                        .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.velocity.")
         return np.array([vx, vy, vz])
 
     def acceleration(self, state):
@@ -1370,9 +1443,8 @@ class pentagon(object):
                 ay = (yn - 2.0 * yc + yp) / h2
                 az = (zn - 2.0 * zc + zp) / h2
         else:
-            raise RuntimeError(
-                    "Error: unknown state {} in call to pentagon.acceleration."
-                    .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.acceleration.")
         return np.array([ax, ay, az])
 
     def rotation(self, state):
@@ -1386,13 +1458,11 @@ class pentagon(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._Pr3D)
             else:
-                raise RuntimeError(
-                        "Error: unknown state {} in call to pentagon.rotation."
-                        .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.rotation.")
         else:
-            raise RuntimeError(
-                        "Error: unknown state {} in call to pentagon.rotation."
-                        .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.rotation.")
 
     def spin(self, state):
         if isinstance(state, str):
@@ -1408,36 +1478,221 @@ class pentagon(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.zeros((3, 3), dtype=float)
             else:
-                raise RuntimeError(
-                            "Error: unknown state {} in call to pentagon.spin."
-                            .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.spin.")
         else:
-            raise RuntimeError(
-                            "Error: unknown state {} in call to pentagon.spin."
-                            .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.spin.")
+
+    # fundamental fields from kinematics
+
+    # displacement gradient at a Gauss point
+    def G(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.G and you sent {}.".format(gaussPt))
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return np.copy(self._Gc[gaussPt])
+            elif state == 'n' or state == 'next':
+                return np.copy(self._Gn[gaussPt])
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return np.copy(self._Gp[gaussPt])
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return np.copy(self._G0[gaussPt])
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.G.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.G.")
+
+    # deformation gradient at a Gauss point
+    def F(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.F and you sent {}.".format(gaussPt))
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return np.copy(self._Fc[gaussPt])
+            elif state == 'n' or state == 'next':
+                return np.copy(self._Fn[gaussPt])
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return np.copy(self._Fp[gaussPt])
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return np.copy(self._F0[gaussPt])
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.F.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.F.")
+
+    # velocity gradient at a Gauss point
+    def L(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.L and you sent {}.".format(gaussPt))
+
+        def FInv(fMtx):
+            fInv = np.array((2, 2), dtype=float)
+            det = fMtx[0, 0] * fMtx[1, 1] - fMtx[1, 0] * fMtx[0, 1]
+            fInv[0, 0] = fMtx[1, 1] / det
+            fInv[0, 1] = -fMtx[0, 1] / det
+            fInv[1, 0] = -fMtx[1, 0] / det
+            fInv[1, 1] = fMtx[0, 0] / det
+            return fInv
+
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                # use central difference scheme
+                dF = ((self._Fn[gaussPt] - self._Fp[gaussPt])
+                      / (2.0 * self._h))
+                fInv = FInv(self._Fc[gaussPt])
+            elif state == 'n' or state == 'next':
+                # use backward difference scheme
+                dF = ((3.0 * self._Fn[gaussPt] - 4.0 * self._Fc[gaussPt] +
+                       self._Fp[gaussPt]) / (2.0 * self._h))
+                fInv = FInv(self._Fn[gaussPt])
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                # use forward difference scheme
+                dF = ((-self._Fn[gaussPt] + 4.0 * self._Fc[gaussPt] -
+                       3.0 * self._Fp[gaussPt]) / (2.0 * self._h))
+                fInv = FInv(self._Fp[gaussPt])
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                dF = np.zeros(2, dtype=float)
+                fInv = np.zeros(2, dtype=float)
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to pentagon.L.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.L.")
+        return np.dot(dF, fInv)
+
+    # methods that associate with a QR decomposition
+
+    # the orthogonal matrix that relabels the coordinate directions
+    def Q(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.Q and you sent {}.".format(gaussPt))
+        return self._septum[gaussPt].Q(state)
+
+    # the orthogonal matrix from a Gram-Schmidt factorization of (relabeled) F
+    def R(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.R and you sent {}.".format(gaussPt))
+        return self._septum[gaussPt].R(state)
+
+    # a skew-symmetric matrix for the spin associated with R
+    def Omega(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.Omega, you sent {}.".format(gaussPt))
+        return self._septum[gaussPt].spin(state)
+
+    # Laplace stretch from a Gram-Schmidt factorization of (relabeled) F
+    def U(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.U and you sent {}.".format(gaussPt))
+        return self._septum[gaussPt].U(state)
+
+    # inverse Laplace stretch from Gram-Schmidt factorization of (relabeled) F
+    def UInv(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.UInv, you sent {}.".format(gaussPt))
+        return self._septum[gaussPt].UInv(state)
+
+    # differential in the Laplace stretch from Gram-Schmidt factorization of F
+    def dU(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.dU and you sent {}.".format(gaussPt))
+        return self._septum[gaussPt].dU(state)
+
+    # inverse Laplace stretch from Gram-Schmidt factorization of (relabeled) F
+    def dUInv(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.dUInv, you sent {}.".format(gaussPt))
+        return self._septum[gaussPt].dUInv(state)
+
+    # physical kinematic attributes at a Gauss point in the pentagon
+
+    def dilation(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.dilation and you sent " +
+                               "{}.".format(gaussPt))
+        return self._septum[gaussPt].dilation(state)
+
+    def squeeze(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.squeeze and you sent " +
+                               "{}.".format(gaussPt))
+        return self._septum[gaussPt].squeeze(state)
+
+    def shear(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.shear and you sent " +
+                               "{}.".format(gaussPt))
+        return self._septum[gaussPt].shear(state)
+
+    def dDilation(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.dDilation and you sent " +
+                               "{}.".format(gaussPt))
+        return self._septum[gaussPt].dDilation(state)
+
+    def dSqueeze(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.dSqueeze and you sent " +
+                               "{}.".format(gaussPt))
+        return self._septum[gaussPt].dSqueeze(state)
+
+    def dShear(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "pentagon.dShear and you sent " +
+                               "{}.".format(gaussPt))
+        return self._septum[gaussPt].dShear(state)
+
+    # properties used in finite elements
 
     def shapeFunction(self, gaussPt):
         if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.shapeFunction and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.shapeFunction and you sent {}."
-                                   .format(gaussPt))
+            raise RuntimeError("gaussPt must be in the range of " +
+                               "[1, {}] in call ".format(self._gaussPts) +
+                               "to pentagon.shapeFunction and you sent " +
+                               "{}.".format(gaussPt))
             sf = self._shapeFns[gaussPt]
         return sf
 
-    def massMatrix(self, rho, width):
-        if rho <= 0.0:
-            raise RuntimeError("Mass density rho must be positive, you " +
-                               "sent {} to pentagon.massMatrix.".format(rho))
-        if width <= 0.0:
-            raise RuntimeError("The width sent to pentagon.massMatrix " +
-                               "{}; it must be positive.".format(width))
-
+    def massMatrix(self):
         # assign coordinates at the vertices in the reference configuration
         x01 = (self._v1x0, self._v1y0)
         x02 = (self._v2x0, self._v2y0)
@@ -1455,8 +1710,16 @@ class pentagon(object):
             nn1 = np.dot(np.transpose(self._shapeFns[1].Nmatx),
                          self._shapeFns[1].Nmatx)
 
-            # Integration to get the mass matrix for 1 Gauss point
-            mass = rho * width * (detJ * wel[0] * nn1)
+            # the consistent mass matrix for 1 Gauss point
+            massC = self._rho * self._width * (detJ * wel[0] * nn1)
+
+            # the lumped mass matrix for 1 Gauss point
+            massL = np.zeros((10, 10), dtype=float)
+            row, col = np.diag_indices_from(massC)
+            massL[row, col] = massC.sum(axis=1)
+
+            # the mass matrix is the average of the above two mass matrices
+            mass = 0.5 * (massC + massL)
         elif self._gaussPts == 4:
             # 'natural' weights of the element
             wel = np.array([0.5449124407446143, 0.6439082046243272,
@@ -1476,11 +1739,19 @@ class pentagon(object):
             nn4 = np.dot(np.transpose(self._shapeFns[4].Nmatx),
                          self._shapeFns[4].Nmatx)
 
-            # Integration to get the mass matrix for 4 Gauss points
-            mass = (rho * width * (detJ1 * wel[0] * nn1 +
-                                   detJ2 * wel[1] * nn2 +
-                                   detJ3 * wel[2] * nn3 +
-                                   detJ4 * wel[3] * nn4))
+            # the consistent mass matrix for 4 Gauss points
+            massC = (self._rho * self._width * (detJ1 * wel[0] * nn1 +
+                                                detJ2 * wel[1] * nn2 +
+                                                detJ3 * wel[2] * nn3 +
+                                                detJ4 * wel[3] * nn4))
+
+            # the lumped mass matrix for 4 Gauss points
+            massL = np.zeros((10, 10), dtype=float)
+            row, col = np.diag_indices_from(massC)
+            massL[row, col] = massC.sum(axis=1)
+
+            # the mass matrix is the average of the above two mass matrices
+            mass = 0.5 * (massC + massL)
         else:  # gaussPts = 7
             # 'natural' weights of the element
             wel = np.array([0.6257871064166934, 0.3016384608809768,
@@ -1511,248 +1782,26 @@ class pentagon(object):
             nn7 = np.dot(np.transpose(self._shapeFns[7].Nmatx),
                          self._shapeFns[7].Nmatx)
 
-            # Integration to get the mass Matrix for 7 Gauss points
-            mass = (rho * width * (detJ1 * wel[0] * nn1 +
-                                   detJ2 * wel[1] * nn2 +
-                                   detJ3 * wel[2] * nn3 +
-                                   detJ4 * wel[3] * nn4 +
-                                   detJ5 * wel[4] * nn5 +
-                                   detJ6 * wel[5] * nn6 +
-                                   detJ7 * wel[6] * nn7))
+            # the consistent mass matrix for 7 Gauss points
+            massC = (self._rho * self._width * (detJ1 * wel[0] * nn1 +
+                                                detJ2 * wel[1] * nn2 +
+                                                detJ3 * wel[2] * nn3 +
+                                                detJ4 * wel[3] * nn4 +
+                                                detJ5 * wel[4] * nn5 +
+                                                detJ6 * wel[5] * nn6 +
+                                                detJ7 * wel[6] * nn7))
+
+            # the lumped mass matrix for 7 Gauss points
+            massL = np.zeros((10, 10), dtype=float)
+            row, col = np.diag_indices_from(massC)
+            massL[row, col] = massC.sum(axis=1)
+
+            # the mass matrix is the average of the above two mass matrices
+            mass = 0.5 * (massC + massL)
         return mass
 
-    # displacement gradient at a Gauss point
-    def G(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.G and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.G and you sent {}."
-                                   .format(gaussPt))
-        if isinstance(state, str):
-            if state == 'c' or state == 'curr' or state == 'current':
-                return np.copy(self._Gc[gaussPt])
-            elif state == 'n' or state == 'next':
-                return np.copy(self._Gn[gaussPt])
-            elif state == 'p' or state == 'prev' or state == 'previous':
-                return np.copy(self._Gp[gaussPt])
-            elif state == 'r' or state == 'ref' or state == 'reference':
-                return np.copy(self._G0[gaussPt])
-            else:
-                raise RuntimeError(
-                               "Error: unknown state {} in call to pentagon.G."
-                               .format(state))
-        else:
-            raise RuntimeError("Error: unknown state {} in call to pentagon.G."
-                               .format(str(state)))
+    def stiffnessMatrix(self):
+        return
 
-    # deformation gradient at a Gauss point
-    def F(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.F and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.F and you sent {}."
-                                   .format(gaussPt))
-        if isinstance(state, str):
-            if state == 'c' or state == 'curr' or state == 'current':
-                return np.copy(self._Fc[gaussPt])
-            elif state == 'n' or state == 'next':
-                return np.copy(self._Fn[gaussPt])
-            elif state == 'p' or state == 'prev' or state == 'previous':
-                return np.copy(self._Fp[gaussPt])
-            elif state == 'r' or state == 'ref' or state == 'reference':
-                return np.copy(self._F0[gaussPt])
-            else:
-                raise RuntimeError(
-                               "Error: unknown state {} in call to pentagon.F."
-                               .format(state))
-        else:
-            raise RuntimeError("Error: unknown state {} in call to pentagon.F."
-                               .format(str(state)))
-
-    # the orthogonal matrix that relabels the coordinate directions
-    def Q(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.Q and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.Q and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].Q(state)
-
-    # the orthogonal matrix from a Gram-Schmidt factorization of (relabeled) F
-    def R(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.R and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.R and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].R(state)
-
-    # a skew-symmetric matrix for the spin associated with R
-    def Omega(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.Omega and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.Omega and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].spin(state)
-
-    # Laplace stretch from a Gram-Schmidt factorization of (relabeled) F
-    def U(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.U and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.U and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].U(state)
-
-    # inverse Laplace stretch from Gram-Schmidt factorization of (relabeled) F
-    def UInv(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.UInv and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.UInv and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].UInv(state)
-
-    # differential in the Laplace stretch from Gram-Schmidt factorization of F
-    def dU(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.dU and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.dU and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].dU(state)
-
-    # inverse Laplace stretch from Gram-Schmidt factorization of (relabeled) F
-    def dUInv(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.dUInv and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.dUInv and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].dUInv(state)
-
-    # physical kinematic attributes at a Gauss point in the pentagon
-
-    def dilation(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.dilation and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.dilation and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].dilation(state)
-
-    def squeeze(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.squeeze and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.squeeze and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].squeeze(state)
-
-    def shear(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.shear and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.shear and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].shear(state)
-
-    def dDilation(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.dDilation and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.dDilation and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].dDilation(state)
-
-    def dSqueeze(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.dSqueeze and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.dSqueeze and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].dSqueeze(state)
-
-    def dShear(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "pentagon.dShear and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to pentagon.dShear and you sent {}."
-                                   .format(gaussPt))
-        return self._septum[gaussPt].dShear(state)
+    def forcingFunction(self):
+        return

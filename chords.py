@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import materialProperties as mp
 import math as m
 import numpy as np
 from ridder import findRoot
@@ -30,30 +31,33 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "08-08-2019"
-__update__ = "09-27-2019"
-__author__ = "Alan D. Freed"
-__author_email__ = "afreed@tamu.edu"
+__update__ = "10-06-2019"
+__author__ = "Alan D. Freed, Shahla Zamani"
+__author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
 """
 Class chord in file chords.py allows for the creation of objects that are to
 be used to represent chords that connect vertices in a polyhedron.  A chord is
-assigned an unique number and two distinct vertices that serve as end points.
+assigned an unique number, two distinct vertices that serve as end points, the
+time step size used to approximate derivatives and integrals, and the number
+of Gauss points to be used for integration.
 
-Initial coordinates that locate a vertex in a dodecahedron used to model the
+Initial coordinates that locate vertices in a dodecahedron used to model the
 alveoli of lung are assigned according to a reference configuration where the
 pleural pressure (the pressure surrounding lung in the pleural cavity) and the
 transpulmonary pressure (the difference between aleolar and pleural pressures)
 are both at zero gauge pressure, i.e., all pressures are atmospheric pressure.
 The pleural pressure is normally negative, sucking the pleural membrane against
 the wall of the chest.  During expiration, the diaphragm is pushed up, reducing
-the pleural pressure.  The pleural pressure remains negative during breating at
-rest, but it can become positive during active expiration.  The surface tension
-created by surfactant keeps most alveoli open during excursions into positive
-pleural pressures, but not all will remain open.  Alveoli are their smallest at
-max expiration.  Alveolar size is determined by the transpulmonary pressure.
-The greater the transpulmonary pressure the greater the alveolar size will be.
+the pleural pressure.  The pleural pressure remains negative during breathing
+at rest, but it can become positive during active expiration.  The surface
+tension created by surfactant keeps most alveoli open during excursions into
+the range of positive pleural pressures, but not all will remain open.  Alveoli
+are their smallest at max expiration.  Alveolar size is determined by the
+transpulmonary pressure.  The greater the transpulmonary pressure the greater
+the alveolar size will be.
 
-Numerous methods have a string argument that is denoted as  state  which can
+Numerous methods have a string argument that is denoted as  'state'  which can
 take on any of the following values:
     'c', 'curr', 'current'       gets the value for a current configuration
     'n', 'next'                  gets the value for a next configuration
@@ -77,32 +81,58 @@ methods
         returns a string representation for this chord in configuration 'state'
 
     n = c.number()
-        returns the unique number affiated with this chord
+        returns the unique indexing number affiated with this chord
 
     v1, v2 = c.vertexNumbers()
         returns the unique numbers assigned to the two vertices of this chord
 
     truth = c.hasVertex(number)
-        returns True if one of the two vertices has this vertex number
+        returns 'True' if one of the two vertices has this vertex number
 
     v = c.getVertex(number)
         returns a vertex; to be called inside, e.g., a c.hasVertex if clause
 
     n = c.gaussPoints()
-        returns the number of Gauss points assigned to the chord
+        returns the number of Gauss points assigned to this chord
 
     c.update()
         assigns new coordinate values to the chord for its next location and
         updates all effected fields.  It is to be called after all vertices
         have had their coordinates updated.  This may be called multiple times
-        before freezing its values with a call to advance
+        before freezing its values with a call to 'advance'
 
     c.advance()
         assigns the current fields to the previous fields, and then it assigns
         the next fields to the current fields, thereby freezing the present
-        next-fields in preparation to advance the solution along its path
+        next-fields in preparation for an advancment of the solution along its
+        path
 
-    The geometric fields associated with a chord in 3 space
+    Material properties that associate with this chord.  Except for the mass
+    density, all are drawn randomly from a statistical distribution.
+
+    rho = c.massDensity()
+        returns the mass density of the chord (collagen and elastin fibers)
+
+    a = c.areaCollagen(state)
+        returns the cross-sectional area of the collagen fiber in
+        configuration 'state'
+
+    a = c.areaElastin(state)
+        returns the cross-sectional area of the elastin fiber in
+        configuration 'state'
+
+    E1, E2, e_t = c.matPropCollagen()
+        returns the constitutive properties for the collagen fiber
+
+    E1, E2, e_t = c.matPropElastin()
+        returns the constitutive properties for the elastin fiber
+
+    Geometric fields associated with a chord in 3 space are:
+
+    a = c.area(state)
+        returns the cross-sectional area of the chord, i.e., both the collagen
+        and elastin fibers in configuration 'state' under the assumption that
+        volume is preserved
 
     ell = c.length(state)
         returns the chordal length in configuration 'state'
@@ -110,61 +140,75 @@ methods
     lambda = c.stretch(state)
         returns the chordal stretch in configuration 'state'
 
-    The kinematic fields associated with the centroid of a chord in 3 space
+    Kinematic fields associated with the centroid of a chord in 3 space are:
 
     [x, y, z] = c.centroid(state)
         returns coordinates for the chordal mid-point in configuration 'state'
 
     [ux, uy, uz] = c.displacement(state)
-        returns the displacement at the centroid in configuration 'state'
+        returns the displacement of the centroid in configuration 'state'
 
     [vx, vy, vz] = c.velocity(state)
-        returns the velocity at the centroid in configuration 'state'
+        returns the velocity of the centroid in configuration 'state'
 
     [ax, ay, az] = c.acceleration(state)
-        returns the acceleration at the centroid in configuration 'state'
+        returns the acceleration of the centroid in configuration 'state'
 
-    The rotation and spin of a chord wrt the dodecahedral coordinate system
+    Rotation and spin of a chord wrt the dodecahedral coordinate system are:
 
     pMtx = c.rotation(state)
         returns a 3x3 orthogonal matrix that rotates the reference base vectors
         into the set of local base vectors pertaining to a chord whose axis
-        aligns with the 1 direction while the 2 direction passes through the
+        aligns with the 1 direction, while the 2 direction passes through the
         origin of the dodecahedral reference coordinate system.  The returned
         matrix associates with configuration 'state'
 
     omegaMtx = c.spin(state)
         returns a 3x3 skew symmetric matrix that describes the time rate of
-        rotation, i.e., spin, of the local chordal coordinate system about the
-        fixed coordinate system of the dodecahedron.  The returned matrix
-        associates with configuration 'state'
+        change in rotation, i.e., the spin of the local chordal coordinate
+        system about the fixed coordinate system of the dodecahedron.  The
+        returned matrix associates with configuration 'state'
 
-    The thermodynamic strain and strain-rate fields associated with a chord
+    Thermodynamic strain and strain-rate fields associated with a chord are:
 
     epsilon = c.strain(state)
-        returns the logarithmic strain in configuration 'state'
+        returns the logarithmic strain of the chord in configuration 'state'
 
     dEpsilon = c.dStrain(state)
-        returns the logarithmic strain rate in configuration 'state'
+        returns the logarithmic strain rate of the chord in 'state'
 
-    Fields needed to construct finite element representations
-
-    sf = c.shapeFunction(self, gaussPt):
-        returns the shape function associated with the specified Gauss point
-
-    mMtx = c.massMatrix(rho, diameter)
-        returns a consistent mass matrix for the chosen number of Gauss points
-        for a chord whose mass density is rho and whose diameter is specified
-
-    The fundamental fields of kinematics
+    The fundamental kinematic fields are:
 
     gMtx = c.G(gaussPt, state)
         returns the displacement gradient at the specified Gauss point for the
-        specified configuration
+        specified configuration.  gMtx is scalar valued for a chord.
 
     fMtx = c.F(gaussPt, state)
         returns the deformation gradient at the specified Gauss point for the
-        specified configuration
+        specified configuration.  fMtx is scalar valued for a chord.
+
+    lMtx = c.L(gaussPt, state)
+        returns the velocity gradient at the specified Gauss point for the
+        specified configuration.  lMtx is scalar valued for a chord.
+
+    Fields needed to construct a finite element solution strategy are:
+
+    sf = c.shapeFunction(gaussPt):
+        returns the shape function associated with the specified Gauss point.
+
+    mMtx = c.massMatrix()
+        returns an average of the lumped and consistent mass matrices (ensures
+        the mass matrix is not singular) for the chosen number of Gauss points
+        for a chord whose mass density, rho, and whose cross-sectional area
+        are specified.
+
+    kMtx = c.stiffnessMatrix()
+        returns a tangent stiffness matrix for the chosen number of Gauss
+        points belonging to the current state.
+
+    fVec = c.forcingFunction()
+        returns a vector for the forcing function on the right-hand side
+        belonging to the current state.
 """
 
 
@@ -175,11 +219,12 @@ class chord(object):
 
         # verify the input
         if not isinstance(vertex1, vertex):
-            raise RuntimeError('Error: vertex1 sent to the chord ' +
+            raise RuntimeError('vertex1 sent to the chord ' +
                                'constructor was not of type vertex.')
         if not isinstance(vertex2, vertex):
-            raise RuntimeError('Error: vertex2 sent to the chord ' +
+            raise RuntimeError('vertex2 sent to the chord ' +
                                'constructor was not of type vertex.')
+        # save the vertices in a dictionary
         if vertex1.number() < vertex2.number():
             self._vertex = {
                 1: vertex1,
@@ -191,30 +236,29 @@ class chord(object):
                 2: vertex1
             }
         else:
-            raise RuntimeError('Error: a chord must have ' +
-                               'two distinct vertices.')
+            raise RuntimeError('A chord must have two distinct vertices.')
         if h > np.finfo(float).eps:
             self._h = float(h)
         else:
-            raise RuntimeError("Error: the stepsize sent to the chord " +
-                               "constructor wasn't positive.")
+            raise RuntimeError("The stepsize sent to the chord " +
+                               "constructor must exceed machine precision.")
         # check the number of Gauss points to use
         if gaussPts == 1 or gaussPts == 2 or gaussPts == 3:
             self._gaussPts = gaussPts
         else:
-            raise RuntimeError('Error: {} Gauss points specified in ' +
-                               'the chord constructor must be 1, 2 or 3.'
-                               .format(gaussPts))
+            raise RuntimeError('{} Gauss points were '.format(gaussPts) +
+                               'specified in a call to the chord ' +
+                               'constructor; it must be 1, 2 or 3.')
 
-        # create the three rotation matrices
+        # create the four rotation matrices
         self._Pr3D = np.identity(3, dtype=float)
         self._Pp3D = np.identity(3, dtype=float)
         self._Pc3D = np.identity(3, dtype=float)
         self._Pn3D = np.identity(3, dtype=float)
 
         # initialize the chordal lengths for all configurations
-        x1, y1, z1 = self._vertex[1].coordinates('r')
-        x2, y2, z2 = self._vertex[2].coordinates('r')
+        x1, y1, z1 = self._vertex[1].coordinates('ref')
+        x2, y2, z2 = self._vertex[2].coordinates('ref')
         L0 = m.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
         self._L0 = L0
         self._Lp = L0
@@ -293,11 +337,9 @@ class chord(object):
         self._Pr3D[2, 0] = n1z
         self._Pr3D[2, 1] = n2z
         self._Pr3D[2, 2] = n3z
-        for i in range(3):
-            for j in range(3):
-                self._Pp3D[i, j] = self._Pr3D[i, j]
-                self._Pc3D[i, j] = self._Pr3D[i, j]
-                self._Pn3D[i, j] = self._Pr3D[i, j]
+        self._Pp3D[:, :] = self._Pr3D[:, :]
+        self._Pc3D[:, :] = self._Pr3D[:, :]
+        self._Pn3D[:, :] = self._Pr3D[:, :]
 
         # establish the shape functions located at the various Gauss points
         if gaussPts == 1:
@@ -322,14 +364,14 @@ class chord(object):
             }
         else:  # gaussPts = 3
             # Gauss points 1 & 3 have weights of 5/9
-            xi1 = -0.774596669241
+            xi1 = -0.7745966692414834
             sf1 = shapeFunction(xi1)
 
             # Gauss point 2 (the centroid) has a weight of 8/9
             xi2 = 0.0
             sf2 = shapeFunction(xi2)
 
-            xi3 = 0.774596669241
+            xi3 = 0.7745966692414834
             sf3 = shapeFunction(xi3)
 
             self._shapeFns = {
@@ -339,7 +381,7 @@ class chord(object):
             }
 
         # create chord gradients at their Gauss points via dictionaries
-        # p implies previous, c implies current, n implies next
+        # 'p' implies previous, 'c' implies current, 'n' implies next
         if gaussPts == 1:
             # displacement gradients located at the Gauss points of a chord
             self._G0 = {
@@ -446,6 +488,17 @@ class chord(object):
                 3: 1.0
             }
 
+        # establish the material properties for this chord
+        dia = mp.chordDiaCollagen()
+        self._areaC = np.pi * dia**2 / 4.0
+        dia = mp.chordDiaElastin()
+        self._areaE = np.pi * dia**2 / 4.0
+        self._rho = ((self._areaC * mp.rhoCollagen() +
+                      self._areaE * mp.rhoElastin()) /
+                     (self._areaC + self._areaE))
+        self._E1c, self._E2c, self._e_tc = mp.collagenChord()
+        self._E1e, self._E2e, self._e_te = mp.elastinChord()
+
     def toString(self, state):
         if self._number < 10:
             s = 'chord[0'
@@ -457,9 +510,8 @@ class chord(object):
             s = s + '   ' + self._vertex[1].toString(state) + '\n'
             s = s + '   ' + self._vertex[2].toString(state)
         else:
-            raise RuntimeError(
-                           "Error: unknown state {} in call to chord.toString."
-                           .format(str(state)))
+            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
+                               "in a call to chord.toString.")
         return s
 
     def number(self):
@@ -482,16 +534,16 @@ class chord(object):
         elif self._vertex[2].number() == number:
             return self._vertex[2]
         else:
-            raise RuntimeError('Error: vertex {} does not belong to chord {}.'
-                               .format(number, self._number))
+            raise RuntimeError('Vertex {} '.format(number) + "does not " +
+                               'belong to chord {}.'.format(self._number))
 
     def gaussPoints(self):
         return self._gaussPts
 
     def update(self):
         # determine length of the chord in the next configuration
-        x1, y1, z1 = self._vertex[1].coordinates('n')
-        x2, y2, z2 = self._vertex[2].coordinates('n')
+        x1, y1, z1 = self._vertex[1].coordinates('next')
+        x2, y2, z2 = self._vertex[2].coordinates('next')
         self._Ln = m.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
 
         # determine the centroid of this chord
@@ -561,33 +613,33 @@ class chord(object):
         # chordal coordinates for the chords
         x10 = -self._L0 / 2.0
         x20 = self._L0 / 2.0
-        x1 = -self._Ln / 2.0
-        x2 = self._Ln / 2.0
+        x1n = -self._Ln / 2.0
+        x2n = self._Ln / 2.0
 
-        # establish the deformation and displacement gradients as dictionaries
+        # quantify the displacement and deformation gradients of the chord
         if self._gaussPts == 1:
-            # displacement gradients located at the Gauss points of the chord
-            self._Gn[1] = self._shapeFns[1].G(x1, x2, x10, x20)
-            # deformation gradients located at the Gauss points of the chord
-            self._Fn[1] = self._shapeFns[1].F(x1, x2, x10, x20)
+            # displacement gradient located at the Gauss point of the chord
+            self._Gn[1] = self._shapeFns[1].G(x1n, x2n, x10, x20)
+            # deformation gradient located at the Gauss point of the chord
+            self._Fn[1] = self._shapeFns[1].F(x1n, x2n, x10, x20)
         elif self._gaussPts == 2:
             # displacement gradients located at the Gauss points of a chord
-            self._Gn[1] = self._shapeFns[1].G(x1, x2, x10, x20)
-            self._Gn[2] = self._shapeFns[2].G(x1, x2, x10, x20)
+            self._Gn[1] = self._shapeFns[1].G(x1n, x2n, x10, x20)
+            self._Gn[2] = self._shapeFns[2].G(x1n, x2n, x10, x20)
             # deformation gradients located at the Gauss points of a chord
-            self._Fn[1] = self._shapeFns[1].F(x1, x2, x10, x20)
-            self._Fn[2] = self._shapeFns[2].F(x1, x2, x10, x20)
+            self._Fn[1] = self._shapeFns[1].F(x1n, x2n, x10, x20)
+            self._Fn[2] = self._shapeFns[2].F(x1n, x2n, x10, x20)
         else:  # gaussPts = 3
             # displacement gradients located at the Gauss points of a chord
-            self._Gn[1] = self._shapeFns[1].G(x1, x2, x10, x20)
-            self._Gn[2] = self._shapeFns[2].G(x1, x2, x10, x20)
-            self._Gn[3] = self._shapeFns[3].G(x1, x2, x10, x20)
+            self._Gn[1] = self._shapeFns[1].G(x1n, x2n, x10, x20)
+            self._Gn[2] = self._shapeFns[2].G(x1n, x2n, x10, x20)
+            self._Gn[3] = self._shapeFns[3].G(x1n, x2n, x10, x20)
             # deformation gradients located at the Gauss points of a chord
-            self._Fn[1] = self._shapeFns[1].F(x1, x2, x10, x20)
-            self._Fn[2] = self._shapeFns[2].F(x1, x2, x10, x20)
-            self._Fn[3] = self._shapeFns[3].F(x1, x2, x10, x20)
+            self._Fn[1] = self._shapeFns[1].F(x1n, x2n, x10, x20)
+            self._Fn[2] = self._shapeFns[2].F(x1n, x2n, x10, x20)
+            self._Fn[3] = self._shapeFns[3].F(x1n, x2n, x10, x20)
 
-        return  # nothing
+        return  # nothing, the data structure has been updated
 
     def advance(self):
         # assign current to previous values, and then next to current values
@@ -609,6 +661,78 @@ class chord(object):
             self._Gp[i] = self._Gc[i]
             self._Gc[i] = self._Gn[i]
 
+    # Material properties that associate with this chord.  Except for the mass
+    # density, all are drawn randomly from a statistical distribution.
+
+    def massDensity(self):
+        # returns the mass density of the chord (collagen and elastin fibers)
+        return self._rho
+
+    def areaCollagen(self, state):
+        # returns the cross-sectional area of the collagen fiber assuming
+        # volume is preserved
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return self._areaC * self._L0 / self._Lc
+            elif state == 'n' or state == 'next':
+                return self._areaC * self._L0 / self._Ln
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return self._areaC * self._L0 / self._Lp
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return self._areaC
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.areaCollagen.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in call a to chord.areaCollagen.")
+
+    def areaElastin(self, state):
+        # returns the cross-sectional area of the elastin fiber assuming
+        # volume is preserved
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return self._areaE * self._L0 / self._Lc
+            elif state == 'n' or state == 'next':
+                return self._areaE * self._L0 / self._Ln
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return self._areaE * self._L0 / self._Lp
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return self._areaE
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.areaElastin.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in call a to chord.areaElastin.")
+
+    def matPropCollagen(self):
+        # returns the constitutive properties for the collagen fiber
+        return self._E1c, self._E2c, self._e_tc
+
+    def matPropElastin(self):
+        # returns the constitutive properties for the elastin fiber
+        return self._E1e, self._E2e, self._e_te
+
+    # geometric properties of the chord
+
+    def area(self, state):
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return (self._areaC + self._areaE) * self._L0 / self._Lc
+            elif state == 'n' or state == 'next':
+                return (self._areaC + self._areaE) * self._L0 / self._Ln
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return (self._areaC + self._areaE) * self._L0 / self._Lp
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return self._areaC + self._areaE
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.area.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in call a to chord.area.")
+
     def length(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -620,11 +744,11 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return self._L0
             else:
-                raise RuntimeError("Error: unknown state {} ".format(state) +
-                                   "in call to chord.length.")
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.length.")
         else:
-            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
-                               "in call to chord.length.")
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in call a to chord.length.")
 
     def stretch(self, state):
         if isinstance(state, str):
@@ -637,11 +761,11 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 1.0
             else:
-                raise RuntimeError("Error: unknown state {} ".format(state) +
-                                   "in call to chord.stretch.")
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.stretch.")
         else:
-            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
-                               "in call to chord.stretch.")
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.stretch.")
 
     def centroid(self, state):
         if isinstance(state, str):
@@ -662,11 +786,11 @@ class chord(object):
                 cy = self._centroidY0
                 cz = self._centroidZ0
             else:
-                raise RuntimeError("Error: unknown state {} ".format(state) +
-                                   "in call to chord.centroid.")
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.centroid.")
         else:
-            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
-                               "in call to chord.centroid.")
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.centroid.")
         return np.array([cx, cy, cz])
 
     def displacement(self, state):
@@ -700,11 +824,11 @@ class chord(object):
                 vy = 0.0
                 vz = 0.0
             else:
-                raise RuntimeError("Error: unknown state {} ".format(state) +
-                                   "in call to chord.velocity.")
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.velocity.")
         else:
-            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
-                               "in call to chord.velocity.")
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in call a to chord.velocity.")
         return np.array([vx, vy, vz])
 
     def acceleration(self, state):
@@ -715,16 +839,16 @@ class chord(object):
                 az = 0.0
             else:
                 h2 = self._h**2
-                xp, yp, zp = self.centroid('p')
-                xc, yc, zc = self.centroid('c')
-                xn, yn, zn = self.centroid('n')
+                xp, yp, zp = self.centroid('prev')
+                xc, yc, zc = self.centroid('curr')
+                xn, yn, zn = self.centroid('next')
                 # use second-order central differenc formula
                 ax = (xn - 2.0 * xc + xp) / h2
                 ay = (yn - 2.0 * yc + yp) / h2
                 az = (zn - 2.0 * zc + zp) / h2
         else:
-            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
-                               "in call to chord.acceleration.")
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.acceleration.")
         return np.array([ax, ay, az])
 
     def rotation(self, state):
@@ -738,11 +862,11 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._Pr3D)
             else:
-                raise RuntimeError("Error: unknown state {} ".format(state) +
-                                   "in call to chord.rotation.")
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.rotation.")
         else:
-            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
-                               "in call to chord.rotation.")
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.rotation.")
 
     def spin(self, state):
         if isinstance(state, str):
@@ -758,11 +882,11 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.zeros((3, 3), dtype=float)
             else:
-                raise RuntimeError("Error: unknown state {} ".format(state) +
-                                   "in call to chord.spin.")
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.spin.")
         else:
-            raise RuntimeError("Error: unknown state {} in call to chord.spin."
-                               .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.spin.")
 
     def strain(self, state):
         if isinstance(state, str):
@@ -775,121 +899,43 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError("Error: unknown state {} ".format(state) +
-                                   "in call to chord.strain.")
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.strain.")
         else:
-            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
-                               "in call to chord.strain.")
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.strain.")
 
     def dStrain(self, state):
         if isinstance(state, str):
-            lamP = self._Lp / self._L0
-            lamC = self._Lc / self._L0
-            lamN = self._Ln / self._L0
             if state == 'c' or state == 'curr' or state == 'current':
-                return (lamN - lamP) / (self._h * lamC)
+                return (self._Ln - self._Lp) / (2.0 * self._h * self._Lc)
             elif state == 'n' or state == 'next':
-                return (3.0 * lamN - 4.0 * lamC + lamP) / (self._h * lamN)
+                return ((3.0 * self._Ln - 4.0 * self._Lc + self._Lp) /
+                        (2.0 * self._h * self._Ln))
             elif state == 'p' or state == 'prev' or state == 'previous':
-                return (-lamN + 4.0 * lamC - 3.0 * lamP) / (self._h * lamP)
+                return ((-self._Ln + 4.0 * self._Lc - 3.0 * self._Lp) /
+                        (2.0 * self._h * self._Lp))
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError("Error: unknown state {} ".format(state) +
-                                   "in call to chord.dStrain.")
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.dStrain.")
         else:
-            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
-                               "in call to chord.dStrain.")
-
-    def shapeFunction(self, gaussPt):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "chord.shapeFunction and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to chord.shapeFunction and you sent {}."
-                                   .format(gaussPt))
-            sf = self._shapeFns[gaussPt]
-        return sf
-
-    def massMatrix(self, rho, diameter):
-        if rho <= 0.0:
-            raise RuntimeError("Mass density rho must be positive, you " +
-                               "sent {} to chord.massMatrix.".format(rho))
-        if diameter <= 0.0:
-            raise RuntimeError("The diameter sent to chord.massMatrix " +
-                               "{}; it must be positive.".format(diameter))
-
-        # initial natural coordinates for a chord
-        x01 = -self._L0 / 2.0
-        x02 = -self._L0 / 2.0
-
-        # determine the mass matrix
-        if self._gaussPts == 1:
-            # 'natural' weight of the element
-            wgt = 2.0
-            wel = np.array([wgt])
-
-            nn1 = np.dot(np.transpose(self._shapeFns[1].Nmatx),
-                         self._shapeFns[1].Nmatx)
-
-            detJ = self._shapeFns[1].detJacobian(x01, x02)
-
-            # Integration to get the mass matrix for 1 Gauss point
-            mass = rho * diameter * (detJ * wel[0] * nn1)
-        elif self._gaussPts == 2:
-            # 'natural' weights of the element
-            wgt = 1.0
-            wel = np.array([wgt, wgt])
-
-            nn1 = np.dot(np.transpose(self._shapeFns[1].Nmatx),
-                         self._shapeFns[1].Nmatx)
-            nn2 = np.dot(np.transpose(self._shapeFns[2].Nmatx),
-                         self._shapeFns[2].Nmatx)
-
-            detJ1 = self._shapeFns[1].detJacobian(x01, x02)
-            detJ2 = self._shapeFns[2].detJacobian(x01, x02)
-
-            # Integration to get the mass matrix for 2 Gauss points
-            mass = rho * diameter * (detJ1 * wel[0] * nn1 +
-                                     detJ2 * wel[1] * nn2)
-        else:  # gaussPts = 3
-            # 'natural' weights of the element
-            wgt1 = 5.0 / 9.0
-            wgt2 = 8.0 / 9.0
-            wel = np.array([wgt1, wgt2, wgt1])
-
-            nn1 = np.dot(np.transpose(self._shapeFns[1].Nmatx),
-                         self._shapeFns[1].Nmatx)
-            nn2 = np.dot(np.transpose(self._shapeFns[2].Nmatx),
-                         self._shapeFns[2].Nmatx)
-            nn3 = np.dot(np.transpose(self._shapeFns[3].Nmatx),
-                         self._shapeFns[3].Nmatx)
-
-            detJ1 = self._shapeFns[1].detJacobian(x01, x02)
-            detJ2 = self._shapeFns[2].detJacobian(x01, x02)
-            detJ3 = self._shapeFns[3].detJacobian(x01, x02)
-
-            # Integration to get the mass Matrix for 3 Gauss points
-            mass = rho * diameter * (detJ1 * wel[0] * nn1 +
-                                     detJ2 * wel[1] * nn2 +
-                                     detJ3 * wel[2] * nn3)
-        return mass
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.dStrain.")
 
     # displacement gradient at a Gauss point
     def G(self, gaussPt, state):
         if (gaussPt < 1) or (gaussPt > self._gaussPts):
             if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "chord.G and you sent {}.".format(gaussPt))
+                raise RuntimeError("gaussPt can only be 1 in a call to " +
+                                   "chord.G and you sent " +
+                                   "{}.".format(gaussPt))
             else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to chord.G and you sent {}."
-                                   .format(gaussPt))
+                raise RuntimeError("gaussPt must be in the range of " +
+                                   "[1, {}] ".format(self._gaussPts) +
+                                   "in a call to chord.G and you sent " +
+                                   "{}.".format(gaussPt))
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
                 return self._Gc[gaussPt]
@@ -900,24 +946,24 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return self._G0[gaussPt]
             else:
-                raise RuntimeError("Error: unknown state {} in call a to " +
-                                   "chord.G.".format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.G.")
         else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "chord.G.".format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.G.")
 
     # deformation gradient at a Gauss point
     def F(self, gaussPt, state):
         if (gaussPt < 1) or (gaussPt > self._gaussPts):
             if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in a call " +
-                                   "to chord.F and you sent {}."
-                                   .format(gaussPt))
+                raise RuntimeError("gaussPt can only be 1 in a call to " +
+                                   "chord.F and you sent " +
+                                   "{}.".format(gaussPt))
             else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in a "
-                                   .format(self._gaussPts) +
-                                   "call to chord.F and you sent {}."
-                                   .format(gaussPt))
+                raise RuntimeError("gaussPt must be in the range of " +
+                                   "[1, {}] ".format(self._gaussPts) +
+                                   "in a call to chord.F and you sent " +
+                                   "{}.".format(gaussPt))
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
                 return self._Fc[gaussPt]
@@ -928,8 +974,169 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return self._F0[gaussPt]
             else:
-                raise RuntimeError("Error: unknown state {} in a call to " +
-                                   "chord.F.".format(state))
+                raise RuntimeError("Error: unknown state {} ".format(state) +
+                                   "in a call to chord.F.")
         else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "chord.F.".format(str(state)))
+            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
+                               "in a call to chord.F.")
+
+    # velocity gradient at a Gauss point in a specified state
+    def L(self, gaussPt, state):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            if self._gaussPts == 1:
+                raise RuntimeError("gaussPt can only be 1 in a call to " +
+                                   "chord.L and you sent " +
+                                   "{}.".format(gaussPt))
+            else:
+                raise RuntimeError("gaussPt must be in the range of " +
+                                   "[1, {}] ".format(self._gaussPts) +
+                                   "in a call to chord.L and you sent " +
+                                   "{}.".format(gaussPt))
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                # use central difference scheme
+                velGrad = ((self._Fn[gaussPt] - self._Fp[gaussPt])
+                           / (2.0 * self._h * self._Fc[gaussPt]))
+            elif state == 'n' or state == 'next':
+                # use backward difference scheme
+                velGrad = ((3.0 * self._Fn[gaussPt] - 4.0 * self._Fc[gaussPt] +
+                            self._Fp[gaussPt])
+                           / (2.0 * self._h * self._Fn[gaussPt]))
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                # use forward difference scheme
+                velGrad = ((-self._Fn[gaussPt] + 4.0 * self._Fc[gaussPt] -
+                            3.0 * self._Fp[gaussPt])
+                           / (2.0 * self._h * self._Fp[gaussPt]))
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                velGrad = 0.0
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to chord.L.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to chord.L.")
+        return velGrad
+
+    def shapeFunction(self, gaussPt):
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            if self._gaussPts == 1:
+                raise RuntimeError("gaussPt can only be 1 in a call to " +
+                                   "chord.shapeFunction and you sent " +
+                                   "{}.".format(gaussPt))
+            else:
+                raise RuntimeError("gaussPt must be in the range of " +
+                                   "[1, {}] ".format(self._gaussPts) +
+                                   "in a call to chord.shapeFunction " +
+                                   "and you sent {}.".format(gaussPt))
+            sf = self._shapeFns[gaussPt]
+        return sf
+
+    def massMatrix(self):
+        # cross-sectional area of the chord (both collagen and elastin fibers)
+        area = self._areaC + self._areaE
+
+        # initial natural coordinates for a chord
+        x01 = -self._L0 / 2.0
+        x02 = self._L0 / 2.0
+
+        # determine the mass matrix
+        if self._gaussPts == 1:
+            # 'natural' weight of the element
+            wgt = 2.0
+            wel = np.array([wgt])
+
+            N1 = self._shapeFns[1].N1
+            N2 = self._shapeFns[1].N2
+            nn1 = np.array([[N1*N1, N1*N2],
+                            [N2*N1, N2*N2]])
+
+            detJ = self._shapeFns[1].detJacobian(x01, x02)
+
+            # the consistent mass matrix for 1 Gauss point
+            massC = self._rho * area * (detJ * wel[0] * nn1)
+
+            # the lumped mass matrix for 1 Gauss point
+            massL = np.zeros((2, 2), dtype=float)
+            row, col = np.diag_indices_from(massC)
+            massL[row, col] = massC.sum(axis=1)
+
+            # the mass matrix is the average of the above two mass matrices
+            mass = 0.5 * (massC + massL)
+        elif self._gaussPts == 2:
+            # 'natural' weights of the element
+            wgt = 1.0
+            wel = np.array([wgt, wgt])
+
+            # at Gauss point 1
+            N1 = self._shapeFns[1].N1
+            N2 = self._shapeFns[1].N2
+            nn1 = np.array([[N1*N1, N1*N2],
+                            [N2*N1, N2*N2]])
+
+            # at Gauss point 2
+            N1 = self._shapeFns[2].N1
+            N2 = self._shapeFns[2].N2
+            nn2 = np.array([[N1*N1, N1*N2],
+                            [N2*N1, N2*N2]])
+
+            detJ1 = self._shapeFns[1].detJacobian(x01, x02)
+            detJ2 = self._shapeFns[2].detJacobian(x01, x02)
+
+            # the consistent mass matrix for 2 Gauss points
+            massC = self._rho * area * (detJ1 * wel[0] * nn1 +
+                                        detJ2 * wel[1] * nn2)
+
+            # the lumped mass matrix for 2 Gauss points
+            massL = np.zeros((2, 2), dtype=float)
+            row, col = np.diag_indices_from(massC)
+            massL[row, col] = massC.sum(axis=1)
+
+            # the mass matrix is the average of the above two mass matrices
+            mass = 0.5 * (massC + massL)
+        else:  # gaussPts = 3
+            # 'natural' weights of the element
+            wgt1 = 5.0 / 9.0
+            wgt2 = 8.0 / 9.0
+            wel = np.array([wgt1, wgt2, wgt1])
+
+            # at Gauss point 1
+            N1 = self._shapeFns[1].N1
+            N2 = self._shapeFns[1].N2
+            nn1 = np.array([[N1*N1, N1*N2],
+                            [N2*N1, N2*N2]])
+
+            # at Gauss point 2
+            N1 = self._shapeFns[2].N1
+            N2 = self._shapeFns[2].N2
+            nn2 = np.array([[N1*N1, N1*N2],
+                            [N2*N1, N2*N2]])
+
+            # at Gauss point 3
+            N1 = self._shapeFns[3].N1
+            N2 = self._shapeFns[3].N2
+            nn3 = np.array([[N1*N1, N1*N2],
+                            [N2*N1, N2*N2]])
+
+            detJ1 = self._shapeFns[1].detJacobian(x01, x02)
+            detJ2 = self._shapeFns[2].detJacobian(x01, x02)
+            detJ3 = self._shapeFns[3].detJacobian(x01, x02)
+
+            # the consistent mass matrix for 3 Gauss points
+            massC = self._rho * area * (detJ1 * wel[0] * nn1 +
+                                        detJ2 * wel[1] * nn2 +
+                                        detJ3 * wel[2] * nn3)
+
+            # the lumped mass matrix for 2 Gauss points
+            massL = np.zeros((2, 2), dtype=float)
+            row, col = np.diag_indices_from(massC)
+            massL[row, col] = massC.sum(axis=1)
+
+            # the mass matrix is the average of the above two mass matrices
+            mass = 0.5 * (massC + massL)
+        return mass
+
+    def stiffnessMatrix(self):
+        return
+
+    def forcingFunction(self):
+        return

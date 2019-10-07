@@ -4,11 +4,9 @@
 from chords import chord
 import math as m
 import numpy as np
-import numpy.linalg as linalg
 from pentagons import pentagon
+from tetrahedra import tetrahedron
 from vertices import vertex
-from shapeFnTetrahedra import shapeFunction
-
 
 """
 Module dodecahedra.py provides geometric info about a deforming dodecahedron.
@@ -32,7 +30,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.1"
 __date__ = "08-08-2019"
-__update__ = "09-27-2019"
+__update__ = "09-30-2019"
 __authors__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, zamani.shahla@tamu.edu"
 
@@ -354,41 +352,41 @@ class dodecahedron(object):
             33: None
         }
 
-        # establish the chords of a dodecahedron as a dictionary
+        # create the chords of a dodecahedron as a dictionary
         self._chord = {
-            1: chord(1, self._vertex[9], self._vertex[10], h),
-            2: chord(2, self._vertex[1], self._vertex[9], h),
-            3: chord(3, self._vertex[2], self._vertex[10], h),
-            4: chord(4, self._vertex[3], self._vertex[10], h),
-            5: chord(5, self._vertex[4], self._vertex[9], h),
-            6: chord(6, self._vertex[1], self._vertex[11], h),
-            7: chord(7, self._vertex[2], self._vertex[11], h),
-            8: chord(8, self._vertex[3], self._vertex[13], h),
-            9: chord(9, self._vertex[4], self._vertex[13], h),
-            10: chord(10, self._vertex[2], self._vertex[17], h),
-            11: chord(11, self._vertex[17], self._vertex[18], h),
-            12: chord(12, self._vertex[3], self._vertex[18], h),
-            13: chord(13, self._vertex[4], self._vertex[16], h),
-            14: chord(14, self._vertex[15], self._vertex[16], h),
-            15: chord(15, self._vertex[1], self._vertex[15], h),
-            16: chord(16, self._vertex[5], self._vertex[15], h),
-            17: chord(17, self._vertex[5], self._vertex[12], h),
-            18: chord(18, self._vertex[11], self._vertex[12], h),
-            19: chord(19, self._vertex[6], self._vertex[12], h),
-            20: chord(20, self._vertex[6], self._vertex[17], h),
-            21: chord(21, self._vertex[7], self._vertex[18], h),
-            22: chord(22, self._vertex[7], self._vertex[14], h),
-            23: chord(23, self._vertex[13], self._vertex[14], h),
-            24: chord(24, self._vertex[8], self._vertex[14], h),
-            25: chord(25, self._vertex[8], self._vertex[16], h),
-            26: chord(26, self._vertex[5], self._vertex[19], h),
-            27: chord(27, self._vertex[6], self._vertex[20], h),
-            28: chord(28, self._vertex[7], self._vertex[20], h),
-            29: chord(29, self._vertex[8], self._vertex[19], h),
-            30: chord(30, self._vertex[19], self._vertex[20], h)
+            1: chord(1, self._vertex[9], self._vertex[10], h, gaussPtsBar),
+            2: chord(2, self._vertex[1], self._vertex[9], h, gaussPtsBar),
+            3: chord(3, self._vertex[2], self._vertex[10], h, gaussPtsBar),
+            4: chord(4, self._vertex[3], self._vertex[10], h, gaussPtsBar),
+            5: chord(5, self._vertex[4], self._vertex[9], h, gaussPtsBar),
+            6: chord(6, self._vertex[1], self._vertex[11], h, gaussPtsBar),
+            7: chord(7, self._vertex[2], self._vertex[11], h, gaussPtsBar),
+            8: chord(8, self._vertex[3], self._vertex[13], h, gaussPtsBar),
+            9: chord(9, self._vertex[4], self._vertex[13], h, gaussPtsBar),
+            10: chord(10, self._vertex[2], self._vertex[17], h, gaussPtsBar),
+            11: chord(11, self._vertex[17], self._vertex[18], h, gaussPtsBar),
+            12: chord(12, self._vertex[3], self._vertex[18], h, gaussPtsBar),
+            13: chord(13, self._vertex[4], self._vertex[16], h, gaussPtsBar),
+            14: chord(14, self._vertex[15], self._vertex[16], h, gaussPtsBar),
+            15: chord(15, self._vertex[1], self._vertex[15], h, gaussPtsBar),
+            16: chord(16, self._vertex[5], self._vertex[15], h, gaussPtsBar),
+            17: chord(17, self._vertex[5], self._vertex[12], h, gaussPtsBar),
+            18: chord(18, self._vertex[11], self._vertex[12], h, gaussPtsBar),
+            19: chord(19, self._vertex[6], self._vertex[12], h, gaussPtsBar),
+            20: chord(20, self._vertex[6], self._vertex[17], h, gaussPtsBar),
+            21: chord(21, self._vertex[7], self._vertex[18], h, gaussPtsBar),
+            22: chord(22, self._vertex[7], self._vertex[14], h, gaussPtsBar),
+            23: chord(23, self._vertex[13], self._vertex[14], h, gaussPtsBar),
+            24: chord(24, self._vertex[8], self._vertex[14], h, gaussPtsBar),
+            25: chord(25, self._vertex[8], self._vertex[16], h, gaussPtsBar),
+            26: chord(26, self._vertex[5], self._vertex[19], h, gaussPtsBar),
+            27: chord(27, self._vertex[6], self._vertex[20], h, gaussPtsBar),
+            28: chord(28, self._vertex[7], self._vertex[20], h, gaussPtsBar),
+            29: chord(29, self._vertex[8], self._vertex[19], h, gaussPtsBar),
+            30: chord(30, self._vertex[19], self._vertex[20], h, gaussPtsBar)
         }
 
-        # establish the pentagons of a dodecahedron as a dictionary
+        # create the pentagons of a dodecahedron as a dictionary
         self._pentagon = {
             1: pentagon(1, self._chord[6], self._chord[7], self._chord[3],
                         self._chord[1], self._chord[2], h, gaussPtsPent),
@@ -417,7 +415,7 @@ class dodecahedron(object):
         }
 
         # asign the remaining vertices; they are the pentagonal centroids
-        # and the dodecahedral centroid
+        # and the centroid of the dodecahedron
         c = np.array(3, dtype=float)
         c = self._pentagon[1].centroid('ref')
         self._vertex[21] = vertex(21, c[0], c[1], c[2], h)
@@ -445,88 +443,184 @@ class dodecahedron(object):
         self._vertex[32] = vertex(32, c[0], c[1], c[2], h)
         self._vertex[33] = vertex(33, 0.0, 0.0, 0.0, h)
 
-        # update the volume: this is costly because dodecahedron is irregular
+        # create the tetrahedra that fill the volume as a dictionary
+        self._tetrahedron = {
+            1: tetrahedron(1, self._vertex[11], self._vertex[2],
+                           self._vertex[21], self._vertex[33], h, gaussPtsTet),
+            2: tetrahedron(2, self._vertex[2], self._vertex[10],
+                           self._vertex[21], self._vertex[33], h, gaussPtsTet),
+            3: tetrahedron(3, self._vertex[10], self._vertex[9],
+                           self._vertex[21], self._vertex[33], h, gaussPtsTet),
+            4: tetrahedron(4, self._vertex[9], self._vertex[1],
+                           self._vertex[21], self._vertex[33], h, gaussPtsTet),
+            5: tetrahedron(5, self._vertex[1], self._vertex[11],
+                           self._vertex[21], self._vertex[33], h, gaussPtsTet),
+            6: tetrahedron(6, self._vertex[10], self._vertex[2],
+                           self._vertex[22], self._vertex[33], h, gaussPtsTet),
+            7: tetrahedron(7, self._vertex[2], self._vertex[17],
+                           self._vertex[22], self._vertex[33], h, gaussPtsTet),
+            8: tetrahedron(8, self._vertex[17], self._vertex[18],
+                           self._vertex[22], self._vertex[33], h, gaussPtsTet),
+            9: tetrahedron(9, self._vertex[18], self._vertex[3],
+                           self._vertex[22], self._vertex[33], h, gaussPtsTet),
+            10: tetrahedron(10, self._vertex[3], self._vertex[10],
+                            self._vertex[22], self._vertex[33], h,
+                            gaussPtsTet),
+            11: tetrahedron(11, self._vertex[13], self._vertex[4],
+                            self._vertex[23], self._vertex[33], h,
+                            gaussPtsTet),
+            12: tetrahedron(12, self._vertex[4], self._vertex[9],
+                            self._vertex[23], self._vertex[33], h,
+                            gaussPtsTet),
+            13: tetrahedron(13, self._vertex[9], self._vertex[10],
+                            self._vertex[23], self._vertex[33], h,
+                            gaussPtsTet),
+            14: tetrahedron(14, self._vertex[10], self._vertex[3],
+                            self._vertex[23], self._vertex[33], h,
+                            gaussPtsTet),
+            15: tetrahedron(15, self._vertex[3], self._vertex[13],
+                            self._vertex[23], self._vertex[33], h,
+                            gaussPtsTet),
+            16: tetrahedron(16, self._vertex[9], self._vertex[4],
+                            self._vertex[24], self._vertex[33], h,
+                            gaussPtsTet),
+            17: tetrahedron(17, self._vertex[4], self._vertex[16],
+                            self._vertex[24], self._vertex[33], h,
+                            gaussPtsTet),
+            18: tetrahedron(18, self._vertex[16], self._vertex[15],
+                            self._vertex[24], self._vertex[33], h,
+                            gaussPtsTet),
+            19: tetrahedron(19, self._vertex[15], self._vertex[1],
+                            self._vertex[24], self._vertex[33], h,
+                            gaussPtsTet),
+            20: tetrahedron(20, self._vertex[1], self._vertex[9],
+                            self._vertex[24], self._vertex[33], h,
+                            gaussPtsTet),
+            21: tetrahedron(21, self._vertex[15], self._vertex[5],
+                            self._vertex[25], self._vertex[33], h,
+                            gaussPtsTet),
+            22: tetrahedron(22, self._vertex[5], self._vertex[12],
+                            self._vertex[25], self._vertex[33], h,
+                            gaussPtsTet),
+            23: tetrahedron(23, self._vertex[12], self._vertex[11],
+                            self._vertex[25], self._vertex[33], h,
+                            gaussPtsTet),
+            24: tetrahedron(24, self._vertex[11], self._vertex[1],
+                            self._vertex[25], self._vertex[33], h,
+                            gaussPtsTet),
+            25: tetrahedron(25, self._vertex[1], self._vertex[15],
+                            self._vertex[25], self._vertex[33], h,
+                            gaussPtsTet),
+            26: tetrahedron(26, self._vertex[17], self._vertex[2],
+                            self._vertex[26], self._vertex[33], h,
+                            gaussPtsTet),
+            27: tetrahedron(27, self._vertex[2], self._vertex[11],
+                            self._vertex[26], self._vertex[33], h,
+                            gaussPtsTet),
+            28: tetrahedron(28, self._vertex[11], self._vertex[12],
+                            self._vertex[26], self._vertex[33], h,
+                            gaussPtsTet),
+            29: tetrahedron(29, self._vertex[12], self._vertex[6],
+                            self._vertex[26], self._vertex[33], h,
+                            gaussPtsTet),
+            30: tetrahedron(30, self._vertex[6], self._vertex[17],
+                            self._vertex[26], self._vertex[33], h,
+                            gaussPtsTet),
+            31: tetrahedron(31, self._vertex[18], self._vertex[7],
+                            self._vertex[27], self._vertex[33], h,
+                            gaussPtsTet),
+            32: tetrahedron(32, self._vertex[7], self._vertex[14],
+                            self._vertex[27], self._vertex[33], h,
+                            gaussPtsTet),
+            33: tetrahedron(33, self._vertex[14], self._vertex[13],
+                            self._vertex[27], self._vertex[33], h,
+                            gaussPtsTet),
+            34: tetrahedron(34, self._vertex[13], self._vertex[3],
+                            self._vertex[27], self._vertex[33], h,
+                            gaussPtsTet),
+            35: tetrahedron(35, self._vertex[3], self._vertex[18],
+                            self._vertex[27], self._vertex[33], h,
+                            gaussPtsTet),
+            36: tetrahedron(36, self._vertex[16], self._vertex[4],
+                            self._vertex[28], self._vertex[33], h,
+                            gaussPtsTet),
+            37: tetrahedron(37, self._vertex[4], self._vertex[13],
+                            self._vertex[28], self._vertex[33], h,
+                            gaussPtsTet),
+            38: tetrahedron(38, self._vertex[13], self._vertex[14],
+                            self._vertex[28], self._vertex[33], h,
+                            gaussPtsTet),
+            39: tetrahedron(39, self._vertex[14], self._vertex[8],
+                            self._vertex[28], self._vertex[33], h,
+                            gaussPtsTet),
+            40: tetrahedron(40, self._vertex[8], self._vertex[16],
+                            self._vertex[28], self._vertex[33], h,
+                            gaussPtsTet),
+            41: tetrahedron(41, self._vertex[12], self._vertex[5],
+                            self._vertex[29], self._vertex[33], h,
+                            gaussPtsTet),
+            42: tetrahedron(42, self._vertex[5], self._vertex[19],
+                            self._vertex[29], self._vertex[33], h,
+                            gaussPtsTet),
+            43: tetrahedron(43, self._vertex[19], self._vertex[20],
+                            self._vertex[29], self._vertex[33], h,
+                            gaussPtsTet),
+            44: tetrahedron(44, self._vertex[20], self._vertex[6],
+                            self._vertex[29], self._vertex[33], h,
+                            gaussPtsTet),
+            45: tetrahedron(45, self._vertex[6], self._vertex[12],
+                            self._vertex[29], self._vertex[33], h,
+                            gaussPtsTet),
+            46: tetrahedron(46, self._vertex[14], self._vertex[7],
+                            self._vertex[30], self._vertex[33], h,
+                            gaussPtsTet),
+            47: tetrahedron(47, self._vertex[7], self._vertex[20],
+                            self._vertex[30], self._vertex[33], h,
+                            gaussPtsTet),
+            48: tetrahedron(48, self._vertex[20], self._vertex[19],
+                            self._vertex[30], self._vertex[33], h,
+                            gaussPtsTet),
+            49: tetrahedron(49, self._vertex[19], self._vertex[8],
+                            self._vertex[30], self._vertex[33], h,
+                            gaussPtsTet),
+            50: tetrahedron(50, self._vertex[8], self._vertex[14],
+                            self._vertex[30], self._vertex[33], h,
+                            gaussPtsTet),
+            51: tetrahedron(51, self._vertex[20], self._vertex[7],
+                            self._vertex[31], self._vertex[33], h,
+                            gaussPtsTet),
+            52: tetrahedron(52, self._vertex[7], self._vertex[18],
+                            self._vertex[31], self._vertex[33], h,
+                            gaussPtsTet),
+            53: tetrahedron(53, self._vertex[18], self._vertex[17],
+                            self._vertex[31], self._vertex[33], h,
+                            gaussPtsTet),
+            54: tetrahedron(54, self._vertex[17], self._vertex[6],
+                            self._vertex[31], self._vertex[33], h,
+                            gaussPtsTet),
+            55: tetrahedron(55, self._vertex[6], self._vertex[20],
+                            self._vertex[31], self._vertex[33], h,
+                            gaussPtsTet),
+            56: tetrahedron(56, self._vertex[19], self._vertex[5],
+                            self._vertex[32], self._vertex[33], h,
+                            gaussPtsTet),
+            57: tetrahedron(57, self._vertex[5], self._vertex[15],
+                            self._vertex[32], self._vertex[33], h,
+                            gaussPtsTet),
+            58: tetrahedron(58, self._vertex[15], self._vertex[16],
+                            self._vertex[32], self._vertex[33], h,
+                            gaussPtsTet),
+            59: tetrahedron(59, self._vertex[16], self._vertex[8],
+                            self._vertex[32], self._vertex[33], h,
+                            gaussPtsTet),
+            60: tetrahedron(60, self._vertex[8], self._vertex[19],
+                            self._vertex[32], self._vertex[33], h, gaussPtsTet)
+        }
 
-        # volume of an irregular tetrahedron
-        def volTet(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4):
-            # compute the square of the lengths of its six edges
-            l12 = (x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2
-            l13 = (x3 - x1)**2 + (y3 - y1)**2 + (z3 - z1)**2
-            l14 = (x4 - x1)**2 + (y4 - y1)**2 + (z4 - z1)**2
-            l23 = (x3 - x2)**2 + (y3 - y2)**2 + (z3 - z2)**2
-            l24 = (x4 - x2)**2 + (y4 - y2)**2 + (z4 - z2)**2
-            l34 = (x4 - x3)**2 + (y4 - y3)**2 + (z4 - z3)**2
-            # prepare matrix from which the volume is computed (Ref. 2 above)
-            A = np.array([[0.0, 1.0, 1.0, 1.0, 1.0],
-                          [1.0, 0.0, l12, l13, l14],
-                          [1.0, l12, 0.0, l23, l24],
-                          [1.0, l13, l23, 0.0, l34],
-                          [1.0, l14, l24, l34, 0.0]])
-            volT = m.sqrt(linalg.det(A) / 288.0)
-            return volT
-
-        # volume of five tetrahedons associated with a face that is a pentagon
-        def volPent(p):
-            # two vertices are common to all five tetrahedons
-            # the origin and the centroid of the pentagon
-            cx, cy, cz = p.centroid('reference')
-
-            # get the chords of the pentagon
-            n1, n2, n3, n4, n5 = p.chordNumbers()
-            c1 = p.getChord(n1)
-            c2 = p.getChord(n2)
-            c3 = p.getChord(n3)
-            c4 = p.getChord(n4)
-            c5 = p.getChord(n5)
-
-            # chord 1
-            n1, n2 = c1.vertexNumbers()
-            v1 = c1.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('reference')
-            v2 = c1.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('reference')
-            volP1 = volTet(0.0, 0.0, 0.0, cx, cy, cz, x1, y1, z1, x2, y2, z2)
-
-            # chord 2
-            n1, n2 = c2.vertexNumbers()
-            v1 = c2.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('reference')
-            v2 = c2.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('reference')
-            volP2 = volTet(0.0, 0.0, 0.0, cx, cy, cz, x1, y1, z1, x2, y2, z2)
-
-            # chord 3
-            n1, n2 = c3.vertexNumbers()
-            v1 = c3.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('reference')
-            v2 = c3.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('reference')
-            volP3 = volTet(0.0, 0.0, 0.0, cx, cy, cz, x1, y1, z1, x2, y2, z2)
-
-            # chord 4
-            n1, n2 = c4.vertexNumbers()
-            v1 = c4.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('reference')
-            v2 = c4.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('reference')
-            volP4 = volTet(0.0, 0.0, 0.0, cx, cy, cz, x1, y1, z1, x2, y2, z2)
-
-            # chord 5
-            n1, n2 = c5.vertexNumbers()
-            v1 = c5.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('reference')
-            v2 = c5.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('reference')
-            volP5 = volTet(0.0, 0.0, 0.0, cx, cy, cz, x1, y1, z1, x2, y2, z2)
-
-            # add up the tetrahedral volumes
-            volP = volP1 + volP2 + volP3 + volP4 + volP5
-            return volP
-
-        # add up the volumes associated with the twelve pentangonal faces
+        # add up the volumes associated with the sixty tetrahedra
         vol = 0.0
-        for i in range(1, 13):
-            vol = vol + volPent(self._pentagon[i])
+        for i in range(1, 61):
+            vol = vol + self._tetrahedron[i].volume('ref')
         self._refVol = vol
         self._prevVol = vol
         self._currVol = vol
@@ -579,7 +673,7 @@ class dodecahedron(object):
             raise RuntimeError("Error: nextF sent to dodecahedron.update " +
                                "must be a 3x3 numpy array.")
 
-        # update the vertices of the dodecahedron
+        # update the vertices for the lattice of the dodecahedron
         for i in range(1, 21):
             x0, y0, z0 = self._vertex[i].coordinates('reference')
             # deformation of the dodecahedron is taken to be homogeneous
@@ -596,90 +690,26 @@ class dodecahedron(object):
         for i in range(1, 13):
             self._pentagon[i].update()
 
+        # update the vertices that comprise the centroids of the dodecahedron
+        c = np.array(3, dtype=float)
+        for i in range(21, 33):
+            c = self._pentagon[1].centroid('next')
+            self._vertex[i].update(c[0], c[1], c[2])
+
+        # update the tetrahedra of the dodecahedron
+        for i in range(1, 61):
+            self._tetrahedron[i].update()
+
         # update volume: this is costly because the dodecahedron is irregular
-
-        # volume of an irregular tetrahedron
-        def volTet(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4):
-            # compute the square of the lengths of its six edges
-            l12 = (x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2
-            l13 = (x3 - x1)**2 + (y3 - y1)**2 + (z3 - z1)**2
-            l14 = (x4 - x1)**2 + (y4 - y1)**2 + (z4 - z1)**2
-            l23 = (x3 - x2)**2 + (y3 - y2)**2 + (z3 - z2)**2
-            l24 = (x4 - x2)**2 + (y4 - y2)**2 + (z4 - z2)**2
-            l34 = (x4 - x3)**2 + (y4 - y3)**2 + (z4 - z3)**2
-
-            # prepare matrix from which the volume is computed (Ref. 2 above)
-            A = np.array([[0.0, 1.0, 1.0, 1.0, 1.0],
-                          [1.0, 0.0, l12, l13, l14],
-                          [1.0, l12, 0.0, l23, l24],
-                          [1.0, l13, l23, 0.0, l34],
-                          [1.0, l14, l24, l34, 0.0]])
-            volT = m.sqrt(linalg.det(A) / 288.0)
-            return volT
-
-        # volume of five tetrahedons associated with a face that is a pentagon
-        def volPent(p):
-            # two vertices are common to all five tetrahedons
-            # the origin and the centroid of the pentagon
-            cx, cy, cz = p.centroid('next')
-
-            # get the chords of the pentagon
-            n1, n2, n3, n4, n5 = p.chordNumbers()
-            c1 = p.getChord(n1)
-            c2 = p.getChord(n2)
-            c3 = p.getChord(n3)
-            c4 = p.getChord(n4)
-            c5 = p.getChord(n5)
-
-            # chord 1
-            n1, n2 = c1.vertexNumbers()
-            v1 = c1.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('next')
-            v2 = c1.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('next')
-            volP1 = volTet(0.0, 0.0, 0.0, cx, cy, cz, x1, y1, z1, x2, y2, z2)
-
-            # chord 2
-            n1, n2 = c2.vertexNumbers()
-            v1 = c2.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('next')
-            v2 = c2.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('next')
-            volP2 = volTet(0.0, 0.0, 0.0, cx, cy, cz, x1, y1, z1, x2, y2, z2)
-
-            # chord 3
-            n1, n2 = c3.vertexNumbers()
-            v1 = c3.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('next')
-            v2 = c3.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('next')
-            volP3 = volTet(0.0, 0.0, 0.0, cx, cy, cz, x1, y1, z1, x2, y2, z2)
-
-            # chord 4
-            n1, n2 = c4.vertexNumbers()
-            v1 = c4.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('next')
-            v2 = c4.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('next')
-            volP4 = volTet(0.0, 0.0, 0.0, cx, cy, cz, x1, y1, z1, x2, y2, z2)
-
-            # chord 5
-            n1, n2 = c5.vertexNumbers()
-            v1 = c5.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('next')
-            v2 = c5.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('next')
-            volP5 = volTet(0.0, 0.0, 0.0, cx, cy, cz, x1, y1, z1, x2, y2, z2)
-
-            # add up the tetrahedral volumes
-            volP = volP1 + volP2 + volP3 + volP4 + volP5
-            return volP
-
         # add up the volumes associated with the twelve pentangonal faces
         vol = 0.0
-        for i in range(1, 13):
-            vol = vol + volPent(self._pentagon[i])
+        for i in range(1, 61):
+            vol = vol + self._tetrahedron[i].volume('next')
         self._nextVol = vol
+
+
+
+
 
         def detJacTet(x1, x2, x3, x4):
             if self._gaussPtsTet == 1:

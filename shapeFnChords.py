@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Sep 26 14:07:19 2019
-
-@author: al
-"""
 
 import numpy as np
 
@@ -30,7 +25,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "09-23-2019"
-__update__ = "09-27-2019"
+__update__ = "09-30-2019"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -39,7 +34,9 @@ Change in version "1.3.0":
 
 Created
 
+
 Overview of module shapeFnChords.py:
+
 
 Module shapeFnChords.py provides the various shape functions for a point
 xi residing along a chord, where 'xi' associates with an x coordinate.
@@ -75,7 +72,7 @@ methods
         x1   is a physical coordinate, a float, located at vertex 1
         x2   is a physical coordinate, a float, located at vertex 2
     returns
-        det   is the determinant of the Jacobian matrix
+        det  is the determinant of the Jacobian matrix
     inputs are coordinates evaluated in a global chordal coordinate system
 
     Gmtx = sf.G(x1, x2, x01, x02)

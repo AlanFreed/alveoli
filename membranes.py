@@ -27,7 +27,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "05-02-2019"
-__update__ = "09-24-2019"
+__update__ = "10-05-2019"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -78,11 +78,13 @@ methods
         preparation to advance a solution to its next location along its
         solution path
 
-    Gram-Schmidt factorization of the deformation gradient
+    Reindex the coordinate indices if necessary
 
     qMtx = m.Q(state)
         returns 2x2 reindexing matrix applied to the deformation gradient
         prior to its Gram-Schmidt decomposition in configuration 'state'
+
+    Gram-Schmidt factorization of a reindexed deformation gradient
 
     rMtx = m.R(state)
         returns 2x2 rotation matrix 'Q' derived from a QR decomposition of the
@@ -90,7 +92,7 @@ methods
 
     omega = m.spin(state)
         returns 2x2 spin matrix caused by planar deformation, i.e., dR R^t,
-        in configuration 'state'
+        in the reindexed coordinate system for configuration 'state'
 
     uMtx = m.U(state)
         returns 2x2 Laplace stretch 'R' derived from a QR decomposition of the
@@ -111,6 +113,7 @@ methods
         'state'
 
     The extensive thermodynamic variables for a membrane and their rates
+    accuired from a reindexed deformation gradient
 
     delta = m.dilation(state)
         returns the planar dilation derived from a QR decomposition of the
@@ -154,7 +157,7 @@ class membrane(object):
         if h > np.finfo(float).eps:
             self._h = float(h)
         else:
-            raise RuntimeError("Error: stepsize sent to the membrane " +
+            raise RuntimeError("The stepsize sent to the membrane " +
                                "constructor wasn't positive.")
 
         # create the required matrices
@@ -215,15 +218,16 @@ class membrane(object):
 
     def update(self, F):
         # verify the initial deformation gradient
-        if (not isinstance(F, np.ndarray)) or (F.shape != (2, 2)):
-            raise RuntimeError(
-                "Error: F must be 2x2 numpy array in call to membrane.update.")
+        if (not isinstance(F, np.ndarray)) or (not F.shape == (2, 2)):
+            raise RuntimeError("F must be 2x2 numpy array in call to " +
+                               "membrane.update.")
 
         # extract kinematic variables out of the deformation gradient
         x = F[0, 0]
         y = F[1, 1]
         alpha = F[1, 0] / x
         beta = F[0, 1] / y
+
         # if necessary, pivot the deformation gradient before calculating the
         # physical variables for a planar deformation
         gammaTilde = y * (alpha + beta) / (x * (1.0 + alpha**2))
@@ -244,6 +248,7 @@ class membrane(object):
             self._bn = x * (1.0 - alpha * beta) / m.sqrt(1.0 + beta**2)
             self._gn = gammaHat
             theta = m.atan(-beta)
+
         # determine rates for the physical variables (cf. appendix in Ref. 2)
         self._dan = ((3.0 * self._an - 4.0 * self._ac + self._ap) /
                      (2.0 * self._h))
@@ -327,12 +332,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._Qr)
             else:
-                raise RuntimeError(
-                                  "Error: unknown state {} in call membrane.R."
-                                  .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.Q.")
         else:
-            raise RuntimeError("Error: unknown state {} in call to membrane.R."
-                               .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.Q.")
 
     def R(self, state):
         if isinstance(state, str):
@@ -345,12 +349,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._R0)
             else:
-                raise RuntimeError(
-                                  "Error: unknown state {} in call membrane.R."
-                                  .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.R.")
         else:
-            raise RuntimeError("Error: unknown state {} in call to membrane.R."
-                               .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.R.")
 
     def spin(self, state):
         if isinstance(state, str):
@@ -376,17 +379,15 @@ class membrane(object):
                 elif state == 'r' or state == 'ref' or state == 'reference':
                     omega3D = np.zeros((3, 3), dtype=float)
                 else:
-                    raise RuntimeError(
-                            "Error: unknown state {} in call to pentagon.spin."
-                            .format(state))
+                    raise RuntimeError("An unknown state {} ".format(state) +
+                                       "in a call to membrane.spin.")
             else:
                 # rotations are likely to be disontinuous because of a
                 # coordinate re-indexing that took place
                 omega3D = np.zeros((3, 3), dtype=float)
         else:
-            raise RuntimeError(
-                            "Error: unknown state {} in call to pentagon.spin."
-                            .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.spin.")
         omega2D = np.zeros((2, 2), dtype=float)
         omega2D[0, 1] = omega3D[0, 1]
         omega2D[1, 0] = omega3D[1, 0]
@@ -403,12 +404,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._U0)
             else:
-                raise RuntimeError(
-                                  "Error: unknown state {} in call membrane.U."
-                                  .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.U.")
         else:
-            raise RuntimeError("Error: unknown state {} in call to membrane.U."
-                               .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.U.")
 
     def UInv(self, state):
         if isinstance(state, str):
@@ -421,13 +421,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._U0Inv)
             else:
-                raise RuntimeError(
-                               "Error: unknown state {} in call membrane.UInv."
-                               .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.UInv.")
         else:
-            raise RuntimeError(
-                            "Error: unknown state {} in call to membrane.UInv."
-                            .format(str(state)))
+            raise RuntimeError("An unknown state {}.format(str(state)) " +
+                               "in a call to membrane.UInv.")
 
     def dU(self, state):
         if isinstance(state, str):
@@ -440,13 +438,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._dU0)
             else:
-                raise RuntimeError(
-                                 "Error: unknown state {} in call membrane.dU."
-                                 .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.dU.")
         else:
-            raise RuntimeError(
-                              "Error: unknown state {} in call to membrane.dU."
-                              .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.dU.")
 
     def dUInv(self, state):
         if isinstance(state, str):
@@ -459,13 +455,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._dU0Inv)
             else:
-                raise RuntimeError(
-                              "Error: unknown state {} in call membrane.dUInv."
-                              .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.dUInv.")
         else:
-            raise RuntimeError(
-                           "Error: unknown state {} in call to membrane.dUInv."
-                           .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.dUInv.")
 
     # The extensive thermodynamic variables and their rates
 
@@ -483,13 +477,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError(
-                           "Error: unknown state {} in call membrane.dilation."
-                           .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.dilation.")
         else:
-            raise RuntimeError(
-                        "Error: unknown state {} in call to membrane.dilation."
-                        .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.dilation.")
 
     def squeeze(self, state):
         if isinstance(state, str):
@@ -517,13 +509,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError(
-                            "Error: unknown state {} in call membrane.squeeze."
-                            .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.squeeze.")
         else:
-            raise RuntimeError(
-                         "Error: unknown state {} in call to membrane.squeeze."
-                         .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.squeeze.")
 
     def shear(self, state):
         if isinstance(state, str):
@@ -536,13 +526,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError(
-                              "Error: unknown state {} in call membrane.shear."
-                              .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.shear.")
         else:
-            raise RuntimeError(
-                           "Error: unknown state {} in call to membrane.shear."
-                           .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.shear.")
 
     def dDilation(self, state):
         if isinstance(state, str):
@@ -555,13 +543,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError(
-                          "Error: unknown state {} in call membrane.dDilation."
-                          .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.dDilation.")
         else:
-            raise RuntimeError(
-                       "Error: unknown state {} in call to membrane.dDilation."
-                       .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.dDilation.")
 
     def dSqueeze(self, state):
         if isinstance(state, str):
@@ -583,13 +569,11 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError(
-                           "Error: unknown state {} in call membrane.dSqueeze."
-                           .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.dSqueeze.")
         else:
-            raise RuntimeError(
-                        "Error: unknown state {} in call to membrane.dSqueeze."
-                        .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.dSqueeze.")
 
     def dShear(self, state):
         if isinstance(state, str):
@@ -602,10 +586,8 @@ class membrane(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError(
-                             "Error: unknown state {} in call membrane.dShear."
-                             .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.dShear.")
         else:
-            raise RuntimeError(
-                          "Error: unknown state {} in call to membrane.dShear."
-                          .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.dShear.")
