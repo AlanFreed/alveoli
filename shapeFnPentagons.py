@@ -5,7 +5,7 @@ from math import cos, pi, sin
 import numpy as np
 
 """
-Module shapeFnPentagons.py provides shape functions for interpolating pentagons
+File shapeFnPentagons.py provides shape functions for interpolating pentagons.
 
 Copyright (c) 2019 Alan D. Freed
 
@@ -26,7 +26,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.2"
 __date__ = "04-30-2019"
-__update__ = "09-27-2019"
+__update__ = "10-05-2019"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -38,11 +38,11 @@ Change in version "1.3.0":
 method added
 
     det = sf.detJacobian(x1, x2, x3, x4, x5)
-        x1    is a tuple of current coordinates  (x, y)  located at vertex 1
-        x2    is a tuple of current coordinates  (x, y)  located at vertex 2
-        x3    is a tuple of current coordinates  (x, y)  located at vertex 3
-        x4    is a tuple of current coordinates  (x, y)  located at vertex 4
-        x5    is a tuple of current coordinates  (x, y)  located at vertex 5
+        x1    is a tuple of current coordinates (x, y) located at vertex 1
+        x2    is a tuple of current coordinates (x, y) located at vertex 2
+        x3    is a tuple of current coordinates (x, y) located at vertex 3
+        x4    is a tuple of current coordinates (x, y) located at vertex 4
+        x5    is a tuple of current coordinates (x, y) located at vertex 5
     returns
         det   is the determinant of the Jacobian matrix
 
@@ -62,7 +62,7 @@ of this regular pentagon is at the origin of the natural coordinate system.
 These shape functions are used for interpolating within this region where
 values at the five vertices for this interpolated field are supplied.
 
-Also provided are the spatial derivatives of these shape functions, taken
+Also provided are the spatial derivatives for these shape functions, taken
 with respect to coordinates 'xi' and 'eta'.  From these one can construct
 approxiamtions for the displacement G and deformation F gradients.
 
@@ -188,7 +188,7 @@ Reference
 class shapeFunction(object):
 
     def __init__(self, xi, eta):
-        # construct the five, exported, shape functions
+        # construct the five, exported, shape functions for location (xi, eta)
 
         # create the x and y vertex vectors in their natural coordinate frame
         self.det = 0
@@ -296,7 +296,7 @@ class shapeFunction(object):
         dBdXi = beta[1] + 2 * beta[3] * xi + beta[4] * eta
         dBdEta = beta[2] + beta[4] * xi + 2 * beta[5] * eta
 
-        # determine the numerators for the first derivatives
+        # determine the numerators for the spatial derivatives
         dNumdXi = np.zeros(6, dtype=float)
         dNumdEta = np.zeros(6, dtype=float)
         for i in range(1, 6):
@@ -342,9 +342,8 @@ class shapeFunction(object):
             # determine the determinant of the Jacobian
             det = jacob[0, 0] * jacob[1, 1] - jacob[1, 0] * jacob[0, 1]
         else:
-            raise RuntimeError(
-                         "Error: each argument of shapeFunction.detJacobian " +
-                         "must be a tuple of coordinates, e.g., (x, y).")
+            raise RuntimeError("Each argument of shapeFunction.detJacobian " +
+                               "must be a tuple of coordinates, e.g., (x, y).")
         return det
 
     def G(self, x1, x2, x3, x4, x5, x01, x02, x03, x04, x05):
@@ -401,9 +400,8 @@ class shapeFunction(object):
             # calculate the displacement gradient
             Gmtx = np.dot(disGrad, curGradInv)
         else:
-            raise RuntimeError(
-                         "Error: each argument of shapeFunction.G must be a " +
-                         "tuple of coordinates, e.g., (x, y).")
+            raise RuntimeError("Each argument of shapeFunction.G must be a " +
+                               "tuple of coordinates, e.g., (x, y).")
         return Gmtx
 
     def F(self, x1, x2, x3, x4, x5, x01, x02, x03, x04, x05):
@@ -460,9 +458,8 @@ class shapeFunction(object):
             # calculate the deformation gradient
             Fmtx = np.identity(2) + np.dot(disGrad, refGradInv)
         else:
-            raise RuntimeError(
-                         "Error: each argument of shapeFunction.F must be a " +
-                         "tuple of coordinates, e.g., (x, y).")
+            raise RuntimeError("Each argument of shapeFunction.F must be a " +
+                               "tuple of coordinates, e.g., (x, y).")
         return Fmtx
 
 

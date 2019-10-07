@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import materialProperties as mp
 import math as m
 import numpy as np
 import numpy.linalg as linalg
@@ -29,7 +30,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "09-25-2019"
-__update__ = "09-27-2019"
+__update__ = "10-06-2019"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -92,15 +93,16 @@ methods
 
     t.update()
         assigns new coordinate values to the tetrahedorn for its next location
-        and updates all effected fields.  To be called after all vertices have
+        and updates all affected fields.  To be called after all vertices have
         had their coordinates updated.  This may be called multiple times
-        before freezing it with advance
+        before freezing it with a call to advance
 
     t.advance()
-        assigns the current location into the previous location, and then it
-        assigns the next location into the current location, thereby freezing
-        the location of the present next-location in preparation to advance to
-        the next step along a solution path
+        assigns fields belonging to the current location into their cournter-
+        parts in the previous location, and then it assigns their next values
+        into the current location, thereby freezing the location of the present
+        next-location in preparation to advance to the next step along a
+        solution path
 
     Geometric fields associated with a tetrahedral volume in 3 space
 
@@ -156,15 +158,17 @@ methods
         returns the velocity gradient at the specified Gauss point for the
         specified configuration
 
-    Fields needed to construct finite element representations
+    Fields needed to construct finite element representations.  The mass and
+    stiffness matrices are 12x12
 
-    sf = t.shapeFunction(self, gaussPt):
+    sf = t.shapeFunction(gaussPt):
         returns the shape function associated with the specified Gauss point
 
     massM = t.massMatrix(rho)
-        rho      the mass density with units of mass per unit volume
-    returns
-        massM    a 12x12 mass matrix for the tetrahedron
+        returns an average of the lumped and consistent mass matrices (ensures
+        the mass matrix is not singular) of dimension 12x12 for the chosen
+        number of Gauss points for a tetrahedron whose mass density, rho,
+        is specified.
 
     kMtx = c.stiffnessMatrix()
         returns a tangent stiffness matrix for the chosen number of Gauss
@@ -213,15 +217,15 @@ class tetrahedron(object):
         if h > np.finfo(float).eps:
             self._h = float(h)
         else:
-            raise RuntimeError("Error: stepsize in the tetrahedron " +
-                               "constructor isn't positive.")
+            raise RuntimeError("The stepsize sent to the tetrahedron " +
+                               "constructor wasn't positive.")
         # check the number of Gauss points to use
         if gaussPts == 1 or gaussPts == 4 or gaussPts == 5:
             self._gaussPts = gaussPts
         else:
-            raise RuntimeError('Error: {} Gauss points were specified in ' +
-                               'tetrahedra constructor; must be 1, 4 or 5.'
-                               .format(gaussPts))
+            raise RuntimeError('{} Gauss points were '.format(gaussPts) +
+                               'specified in the tetrahedron constructor; ' +
+                               'it must be 1, 4 or 5.')
 
         # create a shape function for the centroid of the tetrahedron
         self._centroidSF = shapeFunction(0.25, 0.25, 0.25)
@@ -477,6 +481,8 @@ class tetrahedron(object):
         self._centroidZc = self._centroidZ0
         self._centroidZn = self._centroidZ0
 
+        self._rho = mp.rhoAir()
+
         return  # a new instance of type tetrahedron
 
     # volume of an irregular tetrahedron
@@ -511,9 +517,8 @@ class tetrahedron(object):
             s = s + '   3: ' + self._vertex[3].toString(state) + '\n'
             s = s + '   4: ' + self._vertex[4].toString(state)
         else:
-            raise RuntimeError(
-                     "Error: unknown state {} in call to tetrahedron.toString."
-                     .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to tetrahedron.toString.")
         return s
 
     def number(self):
@@ -536,9 +541,8 @@ class tetrahedron(object):
         elif self._vertex[4].number() == number:
             return self._vertex[4]
         else:
-            raise RuntimeError(
-                     'Error: the requested vertex {} is not in tetrhaderon {}.'
-                     .format(number, self._number))
+            raise RuntimeError('The requested vertex {} is '.format(number) +
+                               'not in tetrhaderon {}.'.format(self._number))
 
     def gaussPoints(self):
         return self._gaussPts
@@ -553,7 +557,7 @@ class tetrahedron(object):
         x4, y4, z4 = self._vertex[4].coordinates('next')
 
         # determine the volume of this tetrahedron in this next state
-        self._Vn = self.volTet(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4)
+        self._Vn = self._volTet(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4)
 
         # locate the centroid of this tetrahedrond in this next state
         self._centroidXn = self._centroidSF.interpolate(x1, x2, x3, x4)
@@ -645,6 +649,14 @@ class tetrahedron(object):
 
         return  # nothing
 
+    # Material properties that associate with this tetrahedron.
+
+    def massDensity(self):
+        # returns the mass density of the chord (collagen and elastin fibers)
+        return self._rho
+
+    # Geometric properties of this tetrahedron
+
     def volume(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -656,13 +668,11 @@ class tetrahedron(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return self._V0
             else:
-                raise RuntimeError(
-                       "Error: unknown state {} in call to tetrahedron.volume."
-                       .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to tetrahedron.volume.")
         else:
-            raise RuntimeError(
-                       "Error: unknown state {} in call to tetrahedron.volume."
-                       .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to tetrahedron.volume.")
 
     def volumetricStretch(self, state):
         if isinstance(state, str):
@@ -675,13 +685,11 @@ class tetrahedron(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 1.0
             else:
-                raise RuntimeError("Error: unknown state {} in a call to " +
-                                   "tetrahedron.volumetricStretch."
-                                   .format(state))
+                raise RuntimeError("An unknown state {} in ".format(state) +
+                                   "a call to tetrahedron.volumetricStretch.")
         else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "tetrahedron.volumetricStretch."
-                               .format(str(state)))
+            raise RuntimeError("An unknown state {} in ".format(str(state)) +
+                               "a call to tetrahedron.volumetricStretch.")
 
     def volumetricStrain(self, state):
         if isinstance(state, str):
@@ -694,13 +702,11 @@ class tetrahedron(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError("Error: unknown state {} in a call to " +
-                                   "tetrahedron.volumetricStrain."
-                                   .format(state))
+                raise RuntimeError("An unknown state {} in ".format(state) +
+                                   "a call to tetrahedron.volumetricStrain.")
         else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "tetrahedron.volumetricStrain."
-                               .format(str(state)))
+            raise RuntimeError("An unknown state {} in ".format(str(state)) +
+                               "a call to tetrahedron.volumetricStrain.")
 
     def dVolumetricStrain(self, state):
         if isinstance(state, str):
@@ -720,13 +726,11 @@ class tetrahedron(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError("Error: unknown state {} in a call to " +
-                                   "tetrahedron.dVolumetricStrain."
-                                   .format(state))
+                raise RuntimeError("An unknown state {} in ".format(state) +
+                                   "a call to tetrahedron.dVolumetricStrain.")
         else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "tetrahedron.dVolumetricStrain."
-                               .format(str(state)))
+            raise RuntimeError("An unknown state {} in ".format(str(state)) +
+                               "a call to tetrahedron.dVolumetricStrain.")
 
     def centroid(self, state):
         if isinstance(state, str):
@@ -747,11 +751,11 @@ class tetrahedron(object):
                 cy = self._centroidY0
                 cz = self._centroidZ0
             else:
-                raise RuntimeError("Error: unknown state {} in a call to " +
-                                   "tetrahedron.centroid.".format(state))
+                raise RuntimeError("An unknown state {} in ".format(state) +
+                                   "a call to tetrahedron.centroid.")
         else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "tetrahedron.centroid.".format(str(state)))
+            raise RuntimeError("An unknown state {} in ".format(str(state)) +
+                               "a call to tetrahedron.centroid.")
         return np.array([cx, cy, cz])
 
     def displacement(self, state):
@@ -788,11 +792,11 @@ class tetrahedron(object):
                 vy = 0.0
                 vz = 0.0
             else:
-                raise RuntimeError("Error: unknown state {} in a call to " +
-                                   "tetrahedron.velocity.".format(state))
+                raise RuntimeError("An unknown state {} in ".format(state) +
+                                   "a call to tetrahedron.velocity.")
         else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "tetrahedron.velocity.".format(str(state)))
+            raise RuntimeError("An unknown state {} in ".format(str(state)) +
+                               "a call to tetrahedron.velocity.")
         return np.array([vx, vy, vz])
 
     def acceleration(self, state):
@@ -811,22 +815,16 @@ class tetrahedron(object):
                 ay = (yn - 2.0 * yc + yp) / h2
                 az = (zn - 2.0 * zc + zp) / h2
         else:
-            raise RuntimeError("Error: unknown state {} in call a to " +
-                               "tetrahedron.acceleration.".format(str(state)))
+            raise RuntimeError("An unknown state {} in ".format(str(state)) +
+                               "a call to tetrahedron.acceleration.")
         return np.array([ax, ay, az])
 
     # displacement gradient at a Gauss point
     def G(self, gaussPt, state):
         if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "tetrahedron.G and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) +
-                                   "to tetrahedron.G and you sent {}."
-                                   .format(gaussPt))
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "tetrahedron.G, you sent {}.".format(gaussPt))
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
                 return np.copy(self._Gc[gaussPt])
@@ -837,24 +835,18 @@ class tetrahedron(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._G0[gaussPt])
             else:
-                raise RuntimeError("Error: unknown state {} in call a to " +
-                                   "tetrahedron.G.".format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to tetrahedron.G.")
         else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "tetrahedron.G.".format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to tetrahedron.G.")
 
     # deformation gradient at a Gauss point
     def F(self, gaussPt, state):
         if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in a call " +
-                                   "to tetrahedron.F and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in a "
-                                   .format(self._gaussPts) +
-                                   "call to tetrahedron.F and you sent {}."
-                                   .format(gaussPt))
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "tetrahedron.F, you sent {}.".format(gaussPt))
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
                 return np.copy(self._Fc[gaussPt])
@@ -865,34 +857,54 @@ class tetrahedron(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._F0[gaussPt])
             else:
-                raise RuntimeError("Error: unknown state {} in a call to " +
-                                   "tetrahedron.F.".format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to tetrahedron.F.")
         else:
-            raise RuntimeError("Error: unknown state {} in a call to " +
-                               "tetrahedron.F.".format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to tetrahedron.F.")
 
     def L(self, gaussPt, state):
-        return
+        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+            raise RuntimeError("The gaussPt must be in " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "tetrahedron.L, you sent {}.".format(gaussPt))
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                # use central difference scheme
+                dF = ((self._Fn[gaussPt] - self._Fp[gaussPt])
+                      / (2.0 * self._h))
+                fInv = linalg.inv(self._Fc[gaussPt])
+            elif state == 'n' or state == 'next':
+                # use backward difference scheme
+                dF = ((3.0 * self._Fn[gaussPt] - 4.0 * self._Fc[gaussPt] +
+                       self._Fp[gaussPt]) / (2.0 * self._h))
+                fInv = linalg.inv(self._Fn[gaussPt])
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                # use forward difference scheme
+                dF = ((-self._Fn[gaussPt] + 4.0 * self._Fc[gaussPt] -
+                       3.0 * self._Fp[gaussPt]) / (2.0 * self._h))
+                fInv = linalg.inv(self._Fp[gaussPt])
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                dF = np.zeros(3, dtype=float)
+                fInv = np.identity(3, dtype=float)
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to tetrahedron.L.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to tetrahedron.L.")
+        return np.dot(dF, fInv)
 
     def shapeFunction(self, gaussPt):
         if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "tetrahedron.shapeFunction and you sent {}."
-                                   .format(gaussPt))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPts) + "to " +
-                                   "tetrahedron.shapeFunction and you sent {}."
-                                   .format(gaussPt))
+            raise RuntimeError("The gaussPt must be in the range of " +
+                               "[1, {}] in call to ".format(self._gaussPts) +
+                               "tetrahedron.shapeFunction and " +
+                               " you sent {}.".format(gaussPt))
             sf = self._shapeFns[gaussPt]
         return sf
 
-    def massMatrix(self, rho):
-        if rho <= 0.0:
-            raise RuntimeError("Mass density rho must be positive, you sent " +
-                               "{} to tetrahedron.massMatrix.".format(rho))
-
+    def massMatrix(self):
         # assign coordinates at the vertices in the reference configuration
         x10 = (self._x10, self._y10, self._z10)
         x20 = (self._x20, self._y20, self._z20)
@@ -910,8 +922,16 @@ class tetrahedron(object):
             nn1 = np.dot(np.transpose(self._shapeFns[1].Nmatx),
                          self._shapeFns[1].Nmatx)
 
-            # Integration to get the mass matrix for 1 Gauss point
-            mass = rho * (detJ * wel[0]) * nn1
+            # the consistent mass matrix for 1 Gauss point
+            massC = self._rho * (detJ * wel[0] * nn1)
+
+            # the lumped mass matrix for 1 Gauss point
+            massL = np.zeros((12, 12), dtype=float)
+            row, col = np.diag_indices_from(massC)
+            massL[row, col] = massC.sum(axis=1)
+
+            # the mass matrix is the average of the above two mass matrices
+            mass = 0.5 * (massC + massL)
         elif self._gaussPts == 4:
             # 'natural' weights of the element
             wgt = 1.0 / 24.0
@@ -931,9 +951,17 @@ class tetrahedron(object):
             nn4 = np.dot(np.transpose(self._shapeFns[4].Nmatx),
                          self._shapeFns[4].Nmatx)
 
-            # Integration to get the mass matrix for 4 Gauss points
-            mass = (rho * (detJ1 * wel[0] * nn1 + detJ2 * wel[1] * nn2 +
-                           detJ3 * wel[2] * nn3 + detJ4 * wel[3] * nn4))
+            # the consistent mass matrix for 4 Gauss points
+            massC = (self._rho * (detJ1 * wel[0] * nn1 + detJ2 * wel[1] * nn2 +
+                                  detJ3 * wel[2] * nn3 + detJ4 * wel[3] * nn4))
+
+            # the lumped mass matrix for 4 Gauss points
+            massL = np.zeros((12, 12), dtype=float)
+            row, col = np.diag_indices_from(massC)
+            massL[row, col] = massC.sum(axis=1)
+
+            # the mass matrix is the average of the above two mass matrices
+            mass = 0.5 * (massC + massL)
         else:  # gaussPts = 5
             # 'natural' weights of the element
             wgt1 = -2.0 / 15.0
@@ -957,10 +985,18 @@ class tetrahedron(object):
             nn5 = np.dot(np.transpose(self._shapeFns[5].Nmatx),
                          self._shapeFns[5].Nmatx)
 
-            # Integration to get the mass Matrix for 5 Gauss points
-            mass = (rho * (detJ1 * wel[0] * nn1 + detJ2 * wel[1] * nn2 +
-                           detJ3 * wel[2] * nn3 + detJ4 * wel[3] * nn4 +
-                           detJ5 * wel[4] * nn5))
+            # the consistent mass Matrix for 5 Gauss points
+            massC = (self._rho * (detJ1 * wel[0] * nn1 + detJ2 * wel[1] * nn2 +
+                                  detJ3 * wel[2] * nn3 + detJ4 * wel[3] * nn4 +
+                                  detJ5 * wel[4] * nn5))
+
+            # the lumped mass matrix for 5 Gauss points
+            massL = np.zeros((12, 12), dtype=float)
+            row, col = np.diag_indices_from(massC)
+            massL[row, col] = massC.sum(axis=1)
+
+            # the mass matrix is the average of the above two mass matrices
+            mass = 0.5 * (massC + massL)
         return mass
 
     def stiffnessMatrix(self):

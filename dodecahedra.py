@@ -30,7 +30,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.1"
 __date__ = "08-08-2019"
-__update__ = "09-30-2019"
+__update__ = "10-06-2019"
 __authors__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, zamani.shahla@tamu.edu"
 
@@ -41,29 +41,17 @@ Changes in version "1.3.0":
     Tetrahedra are included in the construction.  They are used to represent
     the volume of a dodecahedron.
 
-methods added
-
-    detjac = d.detJacobianTet(gaussPt, state)
-        gaussPt  the  Gauss point  for which the Jacobian associates
-        state    the configuration for which the Jacobian associates
-    returns
-        detjac   the determinant of the Jacobian matrix in tetrahedron
-
-    massM = p.massMatrixTet(gaussPt, rho)
-        gaussPt  the Gauss point for which the mass matrix is to be supplied
-        rho      the mass density
-    returns
-        massM    a 12x12 mass matrix for the Tetrahedron associated with
-                 Gauss point 'gaussPt'
-
 
 Overview of module Dodecahedra.py:
 
 
 Class dodecahedron in file dodecahedra.py allows for the creation of objects
-that are to be used to represent irregular dodecahedra comprised of twelve
-irregular pentagons, thirty chords of differing lengths, and twenty vertices.
-The dodecahedron is regular in its reference configuration, otherwise not.
+that are to be used to represent irregular dodecahedra comprised of sixty
+irregular tetrahedra, twelve irregular pentagons, thirty chords of differing
+lengths, and twenty vertices that connect the chord and pentagons, plus
+thirteen more vertices that locate the centroids of the pentagons and the
+dodecahedron.  Typically, the dodecahedron is regular in its reference
+configuration, otherwise not.
 
 Initial coordinates that locate a vertex in a dodecahedron used to model the
 alveoli of lung are assigned according to a reference configuration where the
@@ -90,29 +78,23 @@ class dodecahedron
 
 constructor
 
-    d = dodecahedron(diaChord, widthSepta, rhoChord, rhoSepta, rhoAir,
-                     gaussPtsChord, gaussPtsPent, gaussPtsTet, F0, h,
+    d = dodecahedron(gaussPtsChord, gaussPtsPent, gaussPtsTet, F0, h,
                      alveolarDiameter=1.9524008028984345)
-        diaChord           diameter of the septal chords (in cm)
-        widthSepta         thickness of the septal membranes (in cm)
-        rhoChord           mass density of the septal chords (in gr/cm^3)
-        rhoSepta           mass density of the septal membranes (in gr/cm^3)
-        rhoAir             mass density of the air (in gr/cm^3)
-        gaussPtsBar        number of Gauss points in a chord: 1, 2 or 3
+        gaussPtsChord      number of Gauss points in a chord: 1, 2 or 3
         gaussPtsPent       number of Gauss points in a pentagon: 1, 4 or 7
         gaussPtsTet        number of Gauss points in a tetrahedron: 1, 4 or 5
         F0                 far-field deformation gradient for a reference shape
         h                  time seperating two successive calls to 'advance'
         alveolarDiameter   mean diameter of an alveolar sac (in cm)
 
-    The default alveolar diameter results in vertices of the dodecahedron
-    taking on coordinate values that associate with its natural configuration,
-    i.e., eight of the twenty vertices take on the coordinates of cube whose
-    coordinate origin resides at cube's centroid with all dodecahedral vertices
-    touching a sphere of unit radius.
+    The default alveolar diameter, with F0 = I, results in vertices of the
+    dodecahedron that take on coordinate values which associate with its
+    natural configuration, i.e., eight of the twenty vertices take on the
+    coordinates of cube whose coordinate origin resides at cube's centroid
+    with all non-centroidal vertices touching a sphere of unit radius.
 
     The deformation gradient 'F0' allows for irregular dodecahedra in their
-    reference configuration with  F0 = I  producing regular dodecahedra in
+    reference configuration, with  F0 = I  producing regular dodecahedra in
     their reference state.
 
 methods
@@ -152,7 +134,7 @@ methods
         this next configuration.  It calls the update method for all of its
         vertices, chords, pentagons and tetrahera, and then updates the local
         fields of the dodecahedron.  This method may be called multiple times
-        before freezing its values with a call to advance
+        before freezing its values with a call to method 'advance'
 
         the actual deformation being imposed on the dodecahedron is the dot
         product between 'nextF' and 'F0', i.e., F = nextF.F0, as 'F0' is taken
@@ -195,46 +177,32 @@ Reference
 
 class dodecahedron(object):
 
-    def __init__(self, diaChord, widthSepta, rhoChord, rhoSepta, rhoAir,
-                 gaussPtsBar, gaussPtsPent, gaussPtsTet, F0, h,
+    def __init__(self, gaussPtsChord, gaussPtsPent, gaussPtsTet, F0, h,
                  alveolarDiameter=1.9524008028984345):
         # verify the inputs
-        if diaChord <= 0.0:
-            raise RuntimeError("The diameter sent to the constructor was " +
-                               "{}; it must be positive.".format(diaChord))
-        if widthSepta <= 0.0:
-            raise RuntimeError("The width sent to the constructor was " +
-                               "{}; it must be positive.".format(widthSepta))
-        if rhoChord <= 0.0:
-            raise RuntimeError("Mass density rhoChord must be positive, you " +
-                               "sent {} to the constructor..".format(rhoChord))
-        if rhoSepta <= 0.0:
-            raise RuntimeError("Mass density rhoSepta must be positive, you " +
-                               "sent {} to the constructor..".format(rhoSepta))
-        if rhoAir <= 0.0:
-            raise RuntimeError("Mass density rhoAir must be positive, you " +
-                               "sent {} to the constructor..".format(rhoAir))
-        if gaussPtsBar != 1 and gaussPtsBar != 2 and gaussPtsBar != 3:
+        if gaussPtsChord != 1 and gaussPtsChord != 2 and gaussPtsChord != 3:
             raise RuntimeError('Gauss points for the chords were specified ' +
-                               'at {}; it must be 1, 2 or 3.'
-                               .format(gaussPtsBar))
-        if gaussPtsPent != 1 and gaussPtsPent != 2 and gaussPtsPent != 3:
+                               'at {}; '.format(gaussPtsChord) +
+                               'it must be 1, 2 or 3.')
+        if gaussPtsPent != 1 and gaussPtsPent != 4 and gaussPtsPent != 7:
             raise RuntimeError('Gauss points for the pentagons were ' +
-                               'specified at {}; it must be 1, 4 or 7.'
-                               .format(gaussPtsPent))
-        if gaussPtsTet != 1 and gaussPtsTet != 2 and gaussPtsTet != 3:
+                               'specified at {}; '.format(gaussPtsPent) +
+                               'it must be 1, 4 or 7.')
+        if gaussPtsTet != 1 and gaussPtsTet != 4 and gaussPtsTet != 5:
             raise RuntimeError('Gauss points for the tetrahedra were ' +
-                               'specified at {}; it must be 1, 4 or 5.'
-                               .format(gaussPtsTet))
+                               'specified at {}; '.format(gaussPtsTet) +
+                               'it must be 1, 4 or 5.')
         if (not isinstance(F0, np.ndarray)) or (F0.shape != (3, 3)):
             raise RuntimeError("Error: F0 sent to the dodecahedron " +
                                "constructor must be a 3x3 numpy array.")
         if h < np.finfo(float).eps:
-            raise RuntimeError('Error: the stepsize sent to the dodecahedron' +
-                               "constructor wasn't positive.")
+            raise RuntimeError('The stepsize sent to the dodecahedron ' +
+                               'constructor must be greater than ' +
+                               'machine precision.')
         if alveolarDiameter < np.finfo(float).eps:
-            raise RuntimeError('Error: the alveolar diameter must be ' +
-                               'positive valued.')
+            raise RuntimeError('The alveolar diameter sent to the ' +
+                               'dodecahedron constructor must be ' +
+                               'greater than machine precision.')
         # the default diameter places the dodecahedron within an unit sphere
         # provided that F0 = I
 
@@ -354,36 +322,40 @@ class dodecahedron(object):
 
         # create the chords of a dodecahedron as a dictionary
         self._chord = {
-            1: chord(1, self._vertex[9], self._vertex[10], h, gaussPtsBar),
-            2: chord(2, self._vertex[1], self._vertex[9], h, gaussPtsBar),
-            3: chord(3, self._vertex[2], self._vertex[10], h, gaussPtsBar),
-            4: chord(4, self._vertex[3], self._vertex[10], h, gaussPtsBar),
-            5: chord(5, self._vertex[4], self._vertex[9], h, gaussPtsBar),
-            6: chord(6, self._vertex[1], self._vertex[11], h, gaussPtsBar),
-            7: chord(7, self._vertex[2], self._vertex[11], h, gaussPtsBar),
-            8: chord(8, self._vertex[3], self._vertex[13], h, gaussPtsBar),
-            9: chord(9, self._vertex[4], self._vertex[13], h, gaussPtsBar),
-            10: chord(10, self._vertex[2], self._vertex[17], h, gaussPtsBar),
-            11: chord(11, self._vertex[17], self._vertex[18], h, gaussPtsBar),
-            12: chord(12, self._vertex[3], self._vertex[18], h, gaussPtsBar),
-            13: chord(13, self._vertex[4], self._vertex[16], h, gaussPtsBar),
-            14: chord(14, self._vertex[15], self._vertex[16], h, gaussPtsBar),
-            15: chord(15, self._vertex[1], self._vertex[15], h, gaussPtsBar),
-            16: chord(16, self._vertex[5], self._vertex[15], h, gaussPtsBar),
-            17: chord(17, self._vertex[5], self._vertex[12], h, gaussPtsBar),
-            18: chord(18, self._vertex[11], self._vertex[12], h, gaussPtsBar),
-            19: chord(19, self._vertex[6], self._vertex[12], h, gaussPtsBar),
-            20: chord(20, self._vertex[6], self._vertex[17], h, gaussPtsBar),
-            21: chord(21, self._vertex[7], self._vertex[18], h, gaussPtsBar),
-            22: chord(22, self._vertex[7], self._vertex[14], h, gaussPtsBar),
-            23: chord(23, self._vertex[13], self._vertex[14], h, gaussPtsBar),
-            24: chord(24, self._vertex[8], self._vertex[14], h, gaussPtsBar),
-            25: chord(25, self._vertex[8], self._vertex[16], h, gaussPtsBar),
-            26: chord(26, self._vertex[5], self._vertex[19], h, gaussPtsBar),
-            27: chord(27, self._vertex[6], self._vertex[20], h, gaussPtsBar),
-            28: chord(28, self._vertex[7], self._vertex[20], h, gaussPtsBar),
-            29: chord(29, self._vertex[8], self._vertex[19], h, gaussPtsBar),
-            30: chord(30, self._vertex[19], self._vertex[20], h, gaussPtsBar)
+            1: chord(1, self._vertex[9], self._vertex[10], h, gaussPtsChord),
+            2: chord(2, self._vertex[1], self._vertex[9], h, gaussPtsChord),
+            3: chord(3, self._vertex[2], self._vertex[10], h, gaussPtsChord),
+            4: chord(4, self._vertex[3], self._vertex[10], h, gaussPtsChord),
+            5: chord(5, self._vertex[4], self._vertex[9], h, gaussPtsChord),
+            6: chord(6, self._vertex[1], self._vertex[11], h, gaussPtsChord),
+            7: chord(7, self._vertex[2], self._vertex[11], h, gaussPtsChord),
+            8: chord(8, self._vertex[3], self._vertex[13], h, gaussPtsChord),
+            9: chord(9, self._vertex[4], self._vertex[13], h, gaussPtsChord),
+            10: chord(10, self._vertex[2], self._vertex[17], h, gaussPtsChord),
+            11: chord(11, self._vertex[17], self._vertex[18], h,
+                      gaussPtsChord),
+            12: chord(12, self._vertex[3], self._vertex[18], h, gaussPtsChord),
+            13: chord(13, self._vertex[4], self._vertex[16], h, gaussPtsChord),
+            14: chord(14, self._vertex[15], self._vertex[16], h,
+                      gaussPtsChord),
+            15: chord(15, self._vertex[1], self._vertex[15], h, gaussPtsChord),
+            16: chord(16, self._vertex[5], self._vertex[15], h, gaussPtsChord),
+            17: chord(17, self._vertex[5], self._vertex[12], h, gaussPtsChord),
+            18: chord(18, self._vertex[11], self._vertex[12], h,
+                      gaussPtsChord),
+            19: chord(19, self._vertex[6], self._vertex[12], h, gaussPtsChord),
+            20: chord(20, self._vertex[6], self._vertex[17], h, gaussPtsChord),
+            21: chord(21, self._vertex[7], self._vertex[18], h, gaussPtsChord),
+            22: chord(22, self._vertex[7], self._vertex[14], h, gaussPtsChord),
+            23: chord(23, self._vertex[13], self._vertex[14], h,
+                      gaussPtsChord),
+            24: chord(24, self._vertex[8], self._vertex[14], h, gaussPtsChord),
+            25: chord(25, self._vertex[8], self._vertex[16], h, gaussPtsChord),
+            26: chord(26, self._vertex[5], self._vertex[19], h, gaussPtsChord),
+            27: chord(27, self._vertex[6], self._vertex[20], h, gaussPtsChord),
+            28: chord(28, self._vertex[7], self._vertex[20], h, gaussPtsChord),
+            29: chord(29, self._vertex[8], self._vertex[19], h, gaussPtsChord),
+            30: chord(30, self._vertex[19], self._vertex[20], h, gaussPtsChord)
         }
 
         # create the pentagons of a dodecahedron as a dictionary
@@ -628,9 +600,12 @@ class dodecahedron(object):
 
     def verticesToString(self, state):
         s = 'In state ' + state + ', the dodecahedron has vertices of: \n'
-        for i in range(1, 20):
+        for i in range(1, 21):
             s = s + '   ' + self._vertex[i].toString(state) + '\n'
-        s = s + '   ' + self._vertex[20].toString(state)
+        'The following extra vertices associate with the various centroids:\n'
+        for i in range(21, 33):
+            s = s + '   ' + self._vertex[i].toString(state) + '\n'
+        s = s + '   ' + self._vertex[33].toString(state)
         return s
 
     def chordsToString(self, state):
@@ -647,40 +622,55 @@ class dodecahedron(object):
         s = s + self._pentagon[12].toString(state)
         return s
 
+    def tetrahedraToString(self, state):
+        s = 'In state ' + state + ', the dodecahedron has tetrahedra of: \n'
+        for i in range(1, 60):
+            s = s + self._tetrahedron[i].toString(state) + '\n'
+        s = s + self._tetrahedron[60].toString(state)
+        return s
+
     def getVertex(self, number):
-        if number > 0 and number < 21:
+        if number > 0 and number < 34:
             return self._vertex[number]
         else:
-            raise RuntimeError('Error: requested vertex {} does not exist.'
-                               .format(number))
+            raise RuntimeError('The requested vertex {} '.format(number) +
+                               'does not exist.')
 
     def getChord(self, number):
         if number > 0 and number < 31:
             return self._chord[number]
         else:
-            raise RuntimeError('Error: requested chord {} does not exist.'
-                               .format(number))
+            raise RuntimeError('The requested chord {} '.format(number) +
+                               'does not exist.')
 
     def getPentagon(self, number):
         if number > 0 and number < 13:
             return self._pentagon[number]
         else:
-            raise RuntimeError('Error: requested pentagon {} does not exist'
-                               .format(number))
+            raise RuntimeError('The requested pentagon {} '.format(number) +
+                               'does not exist.')
 
-    def update(self, nextF, rho):
+    def getTetrahedron(self, number):
+        if number > 0 and number < 61:
+            return self._tetrahedron[number]
+        else:
+            raise RuntimeError('The requested tetrahedron {} '.format(number) +
+                               'does not exist.')
+
+    def update(self, nextF):
         if (not isinstance(nextF, np.ndarray)) or (nextF.shape != (3, 3)):
-            raise RuntimeError("Error: nextF sent to dodecahedron.update " +
+            raise RuntimeError("The nextF sent to dodecahedron.update " +
                                "must be a 3x3 numpy array.")
 
         # update the vertices for the lattice of the dodecahedron
         for i in range(1, 21):
-            x0, y0, z0 = self._vertex[i].coordinates('reference')
+            x0, y0, z0 = self._vertex[i].coordinates('ref')
             # deformation of the dodecahedron is taken to be homogeneous
             x = nextF[0, 0] * x0 + nextF[0, 1] * y0 + nextF[0, 2] * z0
             y = nextF[1, 0] * x0 + nextF[1, 1] * y0 + nextF[1, 2] * z0
             z = nextF[2, 0] * x0 + nextF[2, 1] * y0 + nextF[2, 2] * z0
             self._vertex[i].update(x, y, z)
+        # vertices 21-33 are updated after the pentagons are updated
 
         # update the chords of the dodecahedron
         for i in range(1, 31):
@@ -695,6 +685,7 @@ class dodecahedron(object):
         for i in range(21, 33):
             c = self._pentagon[1].centroid('next')
             self._vertex[i].update(c[0], c[1], c[2])
+        # the 33rd vertex is at the centroid of the dodecahedron; it is fixed
 
         # update the tetrahedra of the dodecahedron
         for i in range(1, 61):
@@ -707,80 +698,9 @@ class dodecahedron(object):
             vol = vol + self._tetrahedron[i].volume('next')
         self._nextVol = vol
 
-
-
-
-
-        def detJacTet(x1, x2, x3, x4):
-            if self._gaussPtsTet == 1:
-                # determinant of the Jacobian Matrix
-                detJ1 = self._shapeFnsT[1].jacob(x1, x2, x3, x4)
-
-                detJn = {
-                        1: detJ1
-                        }
-
-            elif self._gaussPtsTet == 4:
-                # determinant of the Jacobian Matrix
-                detJ1 = self._shapeFnsT[1].jacob(x1, x2, x3, x4)
-                detJ2 = self._shapeFnsT[2].jacob(x1, x2, x3, x4)
-                detJ3 = self._shapeFnsT[3].jacob(x1, x2, x3, x4)
-                detJ4 = self._shapeFnsT[4].jacob(x1, x2, x3, x4)
-
-                detJn = {
-                        1: detJ1,
-                        2: detJ2,
-                        3: detJ3,
-                        4: detJ4
-                        }
-
-            else:  # gaussPtsTet = 5
-                # determinant of the Jacobian Matrix
-                detJ1 = self._shapeFnsT[1].jacob(x1, x2, x3, x4)
-                detJ2 = self._shapeFnsT[2].jacob(x1, x2, x3, x4)
-                detJ3 = self._shapeFnsT[3].jacob(x1, x2, x3, x4)
-                detJ4 = self._shapeFnsT[4].jacob(x1, x2, x3, x4)
-                detJ5 = self._shapeFnsT[5].jacob(x1, x2, x3, x4)
-
-                detJn = {
-                        1: detJ1,
-                        2: detJ2,
-                        3: detJ3,
-                        4: detJ4,
-                        5: detJ5
-                        }
-
-            return detJn
-
-        def nextDetJacob(p):
-            # two vertices are common to all five tetrahedons
-            # the origin and the centroid of the pentagon
-            cx, cy, cz = p.centroid('next')
-
-            # get the chords of the pentagon
-            n1, n2, n3, n4, n5 = p.chordNumbers()
-            c1 = p.getChord(n1)
-
-            # chord 1
-            n1, n2 = c1.vertexNumbers()
-            v1 = c1.getVertex(n1)
-            x1, y1, z1 = v1.coordinates('next')
-            v2 = c1.getVertex(n2)
-            x2, y2, z2 = v2.coordinates('next')
-            # current vertex coordinates of tetrahedron
-            x1 = (x1, y1, z1)
-            x2 = (x2, y2, z2)
-            x3 = (cx, cy, cz)
-            x4 = (0.0, 0.0, 0.0)
-            detJn = detJacTet(x1, x2, x3, x4)
-
-            return detJn
-
-        self._detJn = nextDetJacob(self._pentagon[1])
-
     def advance(self):
         # advance kinematic fields of the vertices
-        for i in range(1, 21):
+        for i in range(1, 34):
             self._vertex[i].advance()
 
         # advance kinematic fields of the chords
@@ -791,6 +711,10 @@ class dodecahedron(object):
         for i in range(1, 13):
             self._pentagon[i].advance()
 
+        # advance kinematic fields of the tetrahedra
+        for i in range(1, 61):
+            self._tetrahedron[i].advance()
+
         # advance kinematic fields of the dodecahedron
         self._prevVol = self._currVol
         self._currVol = self._nextVol
@@ -799,103 +723,6 @@ class dodecahedron(object):
         for i in range(1, self._gaussPtsTet+1):
             self._detJp[i] = self._detJc[i]
             self._detJc[i] = self._detJn[i]
-
-    # properties of the tetrahedra within the dodecahedron
-
-    # determinant of Jacobian at a Gauss point
-    def detJacobianTet(self, gaussPtTet, state):
-        if (gaussPtTet < 1) or (gaussPtTet > self._gaussPtsTet):
-            if self._gaussPtsTet == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "dodecahedron.detJacobianTet and you " +
-                                   "sent {}.".format(gaussPtTet))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPtsTet) +
-                                   "to dodecahedron.detJacobianTet and you " +
-                                   "sent {}.".format(gaussPtTet))
-        if isinstance(state, str):
-            if state == 'c' or state == 'curr' or state == 'current':
-                return self._detJc
-            elif state == 'n' or state == 'next':
-                return self._detJn
-            elif state == 'p' or state == 'prev' or state == 'previous':
-                return self._detJp
-            elif state == 'r' or state == 'ref' or state == 'reference':
-                return self._detJ0
-            else:
-                raise RuntimeError("Error: unknown state {} in call to " +
-                                   "dodecahedron.detJT.".format(state))
-        else:
-            raise RuntimeError("Error: unknown state {} in call to " +
-                               "dodecahedron.detJT.".format(str(state)))
-
-    def massMatrixTet(self, gaussPtTet, rho):
-        if (gaussPtTet < 1) or (gaussPtTet > self._gaussPtsTet):
-            if self._gaussPtsTet == 1:
-                raise RuntimeError("Error: gaussPt can only be 1 in call to " +
-                                   "dodecahedron.massMatrixTet and you " +
-                                   "sent {}.".format(gaussPtTet))
-            else:
-                raise RuntimeError("Error: gaussPt must be in [1, {}] in call "
-                                   .format(self._gaussPtsTet) + "to " +
-                                   "dodecahedron.massMatrixTet and you " +
-                                   "sent {}.".format(gaussPtTet))
-
-        # determine the mass matrix
-        if self._gaussPtsTet == 1:
-            # 'natural' weight of the element
-            wel = np.array([1 / 6])
-
-            nn1 = np.dot(np.transpose(self._shapeFnsT[1].Nmatx),
-                         self._shapeFnsT[1].Nmatx)
-
-            # Integration to get the mass Matrix for 1 Gauss points
-            mass = rho * (nn1 * self._detJc[1] * wel[0])
-            return mass
-
-        elif self._gaussPtsTet == 4:
-            # 'natural' weight of the element
-            wel = np.array([1 / 24, 1 / 24, 1 / 24, 1 / 24])
-
-            nn1 = np.dot(np.transpose(self._shapeFnsT[1].Nmatx),
-                         self._shapeFnsT[1].Nmatx)
-            nn2 = np.dot(np.transpose(self._shapeFnsT[2].Nmatx),
-                         self._shapeFnsT[2].Nmatx)
-            nn3 = np.dot(np.transpose(self._shapeFnsT[3].Nmatx),
-                         self._shapeFnsT[3].Nmatx)
-            nn4 = np.dot(np.transpose(self._shapeFnsT[4].Nmatx),
-                         self._shapeFnsT[4].Nmatx)
-
-            # Integration to get the mass Matrix for 4 Gauss points
-            mass = (rho * (nn1 * self._detJc[1] * wel[0] +
-                           nn2 * self._detJc[2] * wel[1] +
-                           nn3 * self._detJc[3] * wel[2] +
-                           nn4 * self._detJc[4] * wel[3]))
-            return mass
-
-        else:  # gaussPtsTet = 5
-            # 'natural' weight of the element
-            wel = np.array([-2 / 15, 3 / 40, 3 / 40, 3 / 40, 3 / 40])
-
-            nn1 = np.dot(np.transpose(self._shapeFnsT[1].Nmatx),
-                         self._shapeFnsT[1].Nmatx)
-            nn2 = np.dot(np.transpose(self._shapeFnsT[2].Nmatx),
-                         self._shapeFnsT[2].Nmatx)
-            nn3 = np.dot(np.transpose(self._shapeFnsT[3].Nmatx),
-                         self._shapeFnsT[3].Nmatx)
-            nn4 = np.dot(np.transpose(self._shapeFnsT[4].Nmatx),
-                         self._shapeFnsT[4].Nmatx)
-            nn5 = np.dot(np.transpose(self._shapeFnsT[5].Nmatx),
-                         self._shapeFnsT[5].Nmatx)
-
-            # Integration to get the mass Matrix for 5 Gauss points
-            mass = (rho * (nn1 * self._detJc[1] * wel[0] +
-                           nn2 * self._detJc[2] * wel[1] +
-                           nn3 * self._detJc[3] * wel[2] +
-                           nn4 * self._detJc[4] * wel[3] +
-                           nn5 * self._detJc[5] * wel[4]))
-            return mass
 
     # properties of volume
 
@@ -910,13 +737,11 @@ class dodecahedron(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return self._refVol
             else:
-                raise RuntimeError(
-                      "Error: unknown state {} in call to dodecahedron.volume."
-                      .format(state))
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to dodecahedron.volume.")
         else:
-            raise RuntimeError(
-                      "Error: unknown state {} in call to dodecahedron.volume."
-                      .format(str(state)))
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to dodecahedron.volume.")
 
     def volumetricStretch(self, state):
         if isinstance(state, str):
@@ -929,11 +754,11 @@ class dodecahedron(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 1.0
             else:
-                raise RuntimeError("Error: unknown state {} in".format(state) +
-                                   " call to dodecahedron.volumetricStretch.")
+                raise RuntimeError("An unknown state {} in a ".format(state) +
+                                   "call to dodecahedron.volumetricStretch.")
         else:
-            raise RuntimeError("Error: unknown state {} in".format(str(state))
-                               + " call to dodecahedron.volumetricStretch.")
+            raise RuntimeError("An unknown state {} in ".format(str(state)) +
+                               "a call to dodecahedron.volumetricStretch.")
 
     def volumetricStrain(self, state):
         if isinstance(state, str):
@@ -946,11 +771,11 @@ class dodecahedron(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError("Error: unknown state {} in".format(state) +
-                                   " call to dodecahedron.volumetricStretch.")
+                raise RuntimeError("An unknown state {} in a ".format(state) +
+                                   "call to dodecahedron.volumetricStrain.")
         else:
-            raise RuntimeError("Error: unknown state {}".format(str(state)) +
-                               " in call to dodecahedron.volumetricStretch.")
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to dodecahedron.volumetricStrain.")
 
     def dVolumetricStrain(self, state):
         if isinstance(state, str):
@@ -972,8 +797,8 @@ class dodecahedron(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError("Error: unknown state {}".format(state) +
-                                   " in dodecahedron.dVolumetricStrain.")
+                raise RuntimeError("An unknown state {} in a ".format(state) +
+                                   "call to dodecahedron.dVolumetricStrain.")
         else:
-            raise RuntimeError("Error: unknown state {}".format(str(state)) +
-                               " in dodecahedron.dVolumetricStrain.")
+            raise RuntimeError("An unknown state {} in ".format(str(state)) +
+                               "a call to dodecahedron.dVolumetricStrain.")

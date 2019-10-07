@@ -25,7 +25,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "09-23-2019"
-__update__ = "09-30-2019"
+__update__ = "10-03-2019"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -123,9 +123,7 @@ class shapeFunction(object):
         self.N2 = (1.0 + xi) / 2.0
 
         # create the exported 1x2 shape function matrix for a chord
-        self.Nmatx = np.array((1, 2), dtype=float)
-        self.Nmatx[0, 0] = self.N1
-        self.Nmatx[0, 1] = self.N2
+        self.Nmatx = np.array([self.N1, self.N2])
 
         # create the two, exported, derivatives of the shape functions
         self.dN1dXi = -0.5

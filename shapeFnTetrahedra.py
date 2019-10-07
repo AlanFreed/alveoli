@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import numbers
 
 """
 Module shapeFnTetrahedra.py provides shape functions for interpolating a
@@ -27,7 +26,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "09-18-2019"
-__update__ = "09-27-2019"
+__update__ = "10-05-2019"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -40,8 +39,8 @@ Overview of module shapeFnTetrahedra.py:
 
 Module shapeFnTetrahedra.py provides the four shape functions for a point
 (xi, eta, zeta) residing within a tetrahedron, or along its boundary, where
-'xi', 'eta' and 'zeta' are the x, y and z coordinates, respectively.  Its
-vertices in the tetrahedon's natural coordinate system are located at
+'xi', 'eta' and 'zeta' are the x, y and z coordinates, respectively.  A
+tetrahedron's vertices in its natural coordinate system are located at
     vertex1: (xi, eta, zeta) = (0, 0, 0)
     vertex2: (xi, eta, zeta) = (1, 0, 0)
     vertex3: (xi, eta, zeta) = (0, 1, 0)
@@ -50,8 +49,7 @@ The volume of this tetrahedron is 1/6.
 
 Also provided are the spatial derivatives of these shape functions, taken
 with respect to coordinates 'xi', 'eta' and 'zeta'.  From these one can
-construct approxiamtions for the displacement G and deformation F gradients.
-
+construct approximations for the displacement G and deformation F gradients.
 
 class
 
@@ -67,10 +65,10 @@ constructor
 methods
 
     y = sf.interpolate(y1, y2, y3, y4)
-        y1   is the value of field  y  located at vertex 1
-        y2   is the value of field  y  located at vertex 2
-        y3   is the value of field  y  located at vertex 3
-        y4   is the value of field  y  located at vertex 4
+        y1   is the value of field y located at vertex 1
+        y2   is the value of field y located at vertex 2
+        y3   is the value of field y located at vertex 3
+        y4   is the value of field y located at vertex 4
     returns
         y    is its interpolated value for field y at location (xi, eta, zeta)
 
@@ -94,9 +92,9 @@ methods
         x04  is a tuple of reference coordinates (x, y, z) located at vertex 4
     returns
         Gmtx is the displacement gradient (a 3x3 matrix) at (xi, eta, zeta)
-                    / du/dx  du/dy  du/dz \         u = x - X  or  x - x0
-             Gmtx = | dv/dx  dv/dy  dv/dz |  where  v = y - Y  or  y - y0
-                    \ dw/dx  dw/dy  dw/dz /         w = z - Z  or  z - z0
+                    / du/dx  du/dy  du/dz \         u = x - X  or  u = x - x0
+             Gmtx = | dv/dx  dv/dy  dv/dz |  where  v = y - Y  or  v = y - y0
+                    \ dw/dx  dw/dy  dw/dz /         w = z - Z  or  w = z - z0
     inputs are tuples of coordinates evaluated in a global coordinate system
 
     Fmtx = sf.F(x1, x2, x3, x4, x01, x02, x03, x04)
@@ -124,7 +122,8 @@ variables
     sf.N3        the 3rd shape function
     sf.N4        the 4th shape function
 
-    sf.Nmatx     the 3x12 matrix of shape functions for the tetrahedron
+    sf.Nmatx     a 3x12 matrix of shape functions for the tetrahedron located
+                 at (xi, eta, zeta)
 
     # partial derivatives of the shape functions
 
@@ -169,7 +168,7 @@ class shapeFunction(object):
                                [0.0, 0.0, self.N1, 0.0, 0.0, self.N2, 0.0,
                                 0.0, self.N3, 0.0, 0.0, self.N4]])
 
-        # create the ten, eported, first derivatives of the shape functions
+        # create the ten, eported, derivatives of these shape functions
         self.dN1dXi = -1
         self.dN2dXi = 1
         self.dN3dXi = 0
@@ -215,9 +214,9 @@ class shapeFunction(object):
             # determine the determinant of the Jacobian of a tetrahedron
             det = np.linalg.det(jacob)
         else:
-            raise RuntimeError(
-                    "Error: each argument of shapeFunction.detJacobian must " +
-                    "be a tuple of coordinates, e.g., (x, y, z).")
+            raise RuntimeError("Each argument of shapeFunction.detJacobian " +
+                               "must be a tuple of coordinates, " +
+                               "e.g., (x, y, z).")
         return det
 
     def G(self, x1, x2, x3, x4, x01, x02, x03, x04):
@@ -283,9 +282,8 @@ class shapeFunction(object):
             # calculate the displacement gradient
             Gmtx = np.dot(disGrad, curGradInv)
         else:
-            raise RuntimeError(
-                         "Error: each argument of shapeFunction.G must be a " +
-                         "tuple of coordinates, e.g., (x, y, z).")
+            raise RuntimeError("Each argument of shapeFunction.G must be " +
+                               "a tuple of coordinates, e.g., (x, y, z).")
         return Gmtx
 
     def F(self, x1, x2, x3, x4, x01, x02, x03, x04):
@@ -302,6 +300,7 @@ class shapeFunction(object):
             w2 = x2[2] - x02[2]
             w3 = x3[2] - x03[2]
             w4 = x4[2] - x04[2]
+
             # determine the displacement gradient
             disGrad = np.zeros((3, 3), dtype=float)
             disGrad[0, 0] = (self.dN1dXi * u1 + self.dN2dXi * u2 +
@@ -350,7 +349,6 @@ class shapeFunction(object):
             # calculate the deformation gradient
             Fmtx = np.identity(3, dtype=float) + np.dot(disGrad, refGradInv)
         else:
-            raise RuntimeError(
-                         "Error: each argument of shapeFunction.F must be a " +
-                         "tuple of coordinates, e.g., (x, y, z).")
+            raise RuntimeError("Each argument of shapeFunction.F must be a " +
+                               "tuple of coordinates, e.g., (x, y, z).")
         return Fmtx
