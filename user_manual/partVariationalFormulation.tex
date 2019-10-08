@@ -23,7 +23,7 @@ where subscript `$\mbox{}_{1D}$' applies to the alveolar chords, subscript `$\mb
 \section{Mass Matrix}
 A consistent mass matrix \cite{Archer65} established in its natural co-ordinate system is defined as
 \begin{equation}
-	\mathbf{M} = \sum_m \int_{V_m} \rho_m \, \mathbf{N}_m^{\mathsf{T}} \mathbf{N}_m \,
+	\mathbf{M}_{C} = \sum_m \int_{V_m} \rho_m \, \mathbf{N}_m^{\mathsf{T}} \mathbf{N}_m \,
 	\mathrm{d} V_m
 	\label{consistentMassMatrix}
 \end{equation}
@@ -35,11 +35,11 @@ The row-sum techniques is considered to construct the lumped mass matrix, that i
 \end{equation}
 wherein $\sum_{j=1}^n N_j = 1$, and $n$ is the Gauss integration points.
 
-The lumped-consistent weighted mass matrix $\mathbf{M}_{LC} $ is defined as 
+The lumped-consistent weighted mass matrix $\mathbf{M}_{LC} $ is defined as follow
 \begin{equation}
 \mathbf{M}_{LC}  = (1 - \mu) \, \mathbf{M}_{C} + \mu \, \mathbf{M}_{L}
 \end{equation}
-wherein $\mu$ is a free scalar parameter that is considered to be $\mu = 1/2$ to minimize low frequency dispersion.
+wherein $\mu$ is a free scalar parameter that is considered to be $\mu = 1/2$ to minimize low frequency dispersion
 \begin{equation}
 \mathbf{M}_{LC}  = \frac{1}{2} \, (\mathbf{M}_{C} + \mathbf{M}_{L})
 \label{LumconsMass}
@@ -49,6 +49,7 @@ wherein $\mu$ is a free scalar parameter that is considered to be $\mu = 1/2$ to
 The determinant of the Jacobian matrix is used for the transformation of integral from the global coordinate system to the natural coordinate system by
 \begin{equation}
      |J| = \mathrm{\det} J =  \frac{\partial x }{\partial\xi} = \sum\nolimits_{i=1}^n N_{i,\xi} (\xi) \, x_i
+     \label{detJac1D}
 \end{equation}
 wherein $N_{i}$ are the shape functions for a two-node alveolar chords in its natural coordinate system which are defined in a matrix form as
 \begin{equation}
@@ -270,4 +271,32 @@ The lumped mass matrix for tetrahedron makes the diagonal parameters as follow
 
 wherein $\sum_{j=1}^n N_j = 1$. 
 
+\section{Stiffness Matrix}
+A stiffness matrix \cite{Reddy93} of an element can be obtained as 
+\begin{equation}
+\mathbf{K} = \sum_m \int_{V_m} \rho_m \, \mathbf{B}_m^{\mathsf{T}} \,  \mathbf{D}_m \, \mathbf{B}_m \,
+\mathrm{d} V_m
+\label{consistentMassMatrix}
+\end{equation}
+wherein $\mathbf{B}_m$ is the strain-displacement matrix, and D is the matrix of elastic modulus.
+
+\subsection{Stiffness Matrix for Chord}
+The stiffness matrix for a 1-D alveolar chord that is transformed from global coordinate system to the natural coordiante system by the determinant of the Jacobian matrix, i.e., Eq.~(\ref{detJac1D}) is evaluated numerically as 
+\begin{equation}
+\mathbf{K}_{1} = \int_{\Gamma} \, \mathbf{B}^{\mathsf{T}} \, \mathbf{D} \, \mathbf{B} \, A \, \mathrm{d} x  = \int_{-1}^{1} \mathbf{B}^{\mathsf{T}} \, \mathbf{D} \, \mathbf{B} \, A \, |\mathbf{J}|\,  \mathrm{d} \xi =  \sum_{i=1}^{n}  \mathbf{B}^{\mathsf{T}} \, \mathbf{D} \, \mathbf{B} \, A\, |\mathbf{J}| \, \mathrm{w}_i
+\end{equation}
+with $\mathrm{w}_i$ being the  weighting coefficients of the Gauss integration rule, and $A$ being the cross section area of alveolar chord. The values of $\xi$ and $\mathrm{w}_i$ for $n = 1, 2$, and $3$ Gauss integration points are demonstrated in Table~\ref{tabQuadrature1D}.
+In calculation of the stiffness matrix for an element, the strain-displacement matrix $\mathbf{B}$ is required that is the derivatives of the shape functions with respect to the global coordinate system  
+\begin{equation}
+\mathbf{B} = \begin{bmatrix}
+\partial N_1 \ \partial x &  \partial N_2 / \partial x
+\end{bmatrix} = \begin{bmatrix}
+\partial N_1 / \partial \xi \, \partial \xi / \partial x &  \partial N_2 / \partial \xi \, \partial \xi / \partial x
+\end{bmatrix} = \begin{bmatrix}
+\partial N_1 / \partial \xi &  \partial N_2 / \partial \xi \, 
+\end{bmatrix} \, |\mathbf{J}|^{-1}
+\end{equation}
+wherein $\xi$ is abscissae of the Gauss integration rule. 
+
+For instance, a one Gauss point integration rule $n = 1$ can be selected for the numerical integration to calculate the stiffness matrix for alveolar chord
 
