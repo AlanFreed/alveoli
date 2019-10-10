@@ -51,7 +51,7 @@ irregular tetrahedra, twelve irregular pentagons, thirty chords of differing
 lengths, and twenty vertices that connect the chord and pentagons, plus
 thirteen more vertices that locate the centroids of the pentagons and the
 dodecahedron.  Typically, the dodecahedron is regular in its reference
-configuration, otherwise not.
+configuration, but this is not necessary.
 
 Initial coordinates that locate a vertex in a dodecahedron used to model the
 alveoli of lung are assigned according to a reference configuration where the
@@ -67,7 +67,7 @@ pleural pressures, but not all will remain open.  Alveoli are their smallest at
 max expiration.  Alveolar size is determined by the transpulmonary pressure.
 The greater the transpulmonary pressure the greater the alveolar size will be.
 
-Numerous methods have a string argument that is denoted as  state  which can
+Numerous methods have a string argument that is denoted as 'state' which can
 take on any of the following values:
     'c', 'curr', 'current'       gets the value for a current configuration
     'n', 'next'                  gets the value for a next configuration
@@ -78,54 +78,54 @@ class dodecahedron
 
 constructor
 
-    d = dodecahedron(gaussPtsChord, gaussPtsPent, gaussPtsTet, F0, h,
-                     alveolarDiameter=1.9524008028984345)
-        gaussPtsChord      number of Gauss points in a chord: 1, 2 or 3
-        gaussPtsPent       number of Gauss points in a pentagon: 1, 4 or 7
-        gaussPtsTet        number of Gauss points in a tetrahedron: 1, 4 or 5
-        F0                 far-field deformation gradient for a reference shape
-        h                  time seperating two successive calls to 'advance'
-        alveolarDiameter   mean diameter of an alveolar sac (in cm)
+    d = dodecahedron(gaussPtsChord, gaussPtsPentegon, gaussPtsTetrahedron,
+                     F0, h=1.0, alveolarDiameter=1.9524008028984345)
+        gaussPtsChord        number of Gauss points in a chord: 1, 2 or 3
+        gaussPtsPentagon     number of Gauss points in a pentagon: 1, 4 or 7
+        gaussPtsTetrahedron  number of Gauss points in a tetrahedron: 1, 4 or 5
+        F0                   far-field deformation gradient for reference shape
+        h                    time seperating two successive calls to 'advance'
+        alveolarDiameter     mean diameter of an alveolar sac (in cm)
 
     The default alveolar diameter, with F0 = I, results in vertices of the
     dodecahedron that take on coordinate values which associate with its
     natural configuration, i.e., eight of the twenty vertices take on the
-    coordinates of cube whose coordinate origin resides at cube's centroid
+    coordinates of cube whose coordinate origin resides at cube's centroid,
     with all non-centroidal vertices touching a sphere of unit radius.
 
-    The deformation gradient 'F0' allows for irregular dodecahedra in their
-    reference configuration, with  F0 = I  producing regular dodecahedra in
-    their reference state.
+    The deformation gradient 'F0' allows for an irregular dodecahedron in its
+    reference configuration, with  F0 = I  producing a regular dodecahedron
+    in its reference state.
 
 methods
 
     s = d.vertices2string(state)
-        returns a string description for the set of vertices that describe a
-        dodecahedron in configuration 'state'
+        returns a string description for the set of all vertices that describe
+        a dodecahedron in its configuration 'state'
 
     s = d.chords2string(state)
-        returns a string description for the set of chords that describe a
-        dodecahedron in configuration 'state'
+        returns a string description for the set of all chords that describe a
+        dodecahedron in its configuration 'state'
 
     s = d.pentagons2string(state)
-        returns a string description for the set of pentagons that describe a
-        dodecahedron in configuration 'state'
+        returns a string description for the set of all pentagons that describe
+        a dodecahedron in its configuration 'state'
 
     s = d.tetrahedra2string(state)
-        returns a string description for the set of tetrahedra that describe
-        the volume of a dodecahedron in configuration 'state'
+        returns a string description for the set of all tetrahedra that
+        describe the volume of a dodecahedron in its configuration 'state'
 
     v = d.getVertex(number)
-        returns the vertex with number 'number', which must be in [1, 33]
+        returns the vertex with number 'number', which must lie in [1, 33]
 
     c = d.getChord(number)
-        returns the chord with number 'number', which must be in [1, 30]
+        returns the chord with number 'number', which must lie in [1, 30]
 
     p = d.getPentagon(number)
-        returns the pentagon with number 'number', which must be in [1, 12]
+        returns the pentagon with number 'number', which must lie in [1, 12]
 
     t = d.getTetrahedron(number)
-        returns the tetrahedron with number 'number', which must be in [1, 60]
+        returns the tetrahedron with number 'number', which must lie in [1, 60]
 
     d.update(nextF)
         assuming that the deformation imposed on an alveolus is homogeneous,
@@ -133,12 +133,12 @@ methods
         new coordinate values to all of the vertices of the dodecahedron for
         this next configuration.  It calls the update method for all of its
         vertices, chords, pentagons and tetrahera, and then updates the local
-        fields of the dodecahedron.  This method may be called multiple times
-        before freezing its values with a call to method 'advance'
+        fields of the dodecahedron itself.  This method may be called multiple
+        times before freezing its values with a call to the method 'advance'
 
         the actual deformation being imposed on the dodecahedron is the dot
         product between 'nextF' and 'F0', i.e., F = nextF.F0, as 'F0' is taken
-        to describe the reference shape.  'F0' is not a shape change caused by
+        to describe its reference shape.  'F0' is not a shape change caused by
         imposed tractions
 
     d.advance()
@@ -146,17 +146,17 @@ methods
         tetrahedra comprising the dodecahedron, where current fields are
         assigned to previous fields, and then next fields are assigned to
         current fields for these objects.  Afterwords, it assigns the next
-        fields to the current fields of the dodecahedron, thereby freezing
-        the present next-fields in preparation for advancing the solution
-        along its path
+        fields to the current fields for the dodecahedron, thereby freezing
+        the present next-fields into their associated current fields in
+        preparation for advancing the solution along its path of trajectory
 
     The geometric fields associated with a dodecahedron
 
     v = d.volume(state)
-        returns the volume of this dodecahedron in configuration 'state'
+        returns the volume of this dodecahedron for configuration 'state'
 
     vLambda = d.volumetricStretch(state)
-        returns the cube root of volume(state) divided by its reference volume
+        returns the cube root of volume(state) divided by volume('reference')
         for this dodecahedron
 
     vStrain = d.volumetricStrain(state)
@@ -177,20 +177,22 @@ Reference
 
 class dodecahedron(object):
 
-    def __init__(self, gaussPtsChord, gaussPtsPent, gaussPtsTet, F0, h,
-                 alveolarDiameter=1.9524008028984345):
+    def __init__(self, gaussPtsChord, gaussPtsPentagon, gaussPtsTetrahedron,
+                 F0, h=1.0, alveolarDiameter=1.9524008028984345):
         # verify the inputs
         if gaussPtsChord != 1 and gaussPtsChord != 2 and gaussPtsChord != 3:
             raise RuntimeError('Gauss points for the chords were specified ' +
                                'at {}; '.format(gaussPtsChord) +
                                'it must be 1, 2 or 3.')
-        if gaussPtsPent != 1 and gaussPtsPent != 4 and gaussPtsPent != 7:
+        if (gaussPtsPentagon != 1 and gaussPtsPentagon != 4
+           and gaussPtsPentagon != 7):
             raise RuntimeError('Gauss points for the pentagons were ' +
-                               'specified at {}; '.format(gaussPtsPent) +
+                               'specified at {}; '.format(gaussPtsPentagon) +
                                'it must be 1, 4 or 7.')
-        if gaussPtsTet != 1 and gaussPtsTet != 4 and gaussPtsTet != 5:
-            raise RuntimeError('Gauss points for the tetrahedra were ' +
-                               'specified at {}; '.format(gaussPtsTet) +
+        if (gaussPtsTetrahedron != 1 and gaussPtsTetrahedron != 4
+           and gaussPtsTetrahedron != 5):
+            raise RuntimeError('Gauss points for the tetrahedra were specified'
+                               + ' at {}; '.format(gaussPtsTetrahedron) +
                                'it must be 1, 4 or 5.')
         if (not isinstance(F0, np.ndarray)) or (F0.shape != (3, 3)):
             raise RuntimeError("Error: F0 sent to the dodecahedron " +
@@ -361,29 +363,31 @@ class dodecahedron(object):
         # create the pentagons of a dodecahedron as a dictionary
         self._pentagon = {
             1: pentagon(1, self._chord[6], self._chord[7], self._chord[3],
-                        self._chord[1], self._chord[2], h, gaussPtsPent),
+                        self._chord[1], self._chord[2], h, gaussPtsPentagon),
             2: pentagon(2, self._chord[4], self._chord[3], self._chord[10],
-                        self._chord[11], self._chord[12], h, gaussPtsPent),
+                        self._chord[11], self._chord[12], h, gaussPtsPentagon),
             3: pentagon(3, self._chord[8], self._chord[9], self._chord[5],
-                        self._chord[1], self._chord[4], h, gaussPtsPent),
+                        self._chord[1], self._chord[4], h, gaussPtsPentagon),
             4: pentagon(4, self._chord[2], self._chord[5], self._chord[13],
-                        self._chord[14], self._chord[15], h, gaussPtsPent),
+                        self._chord[14], self._chord[15], h, gaussPtsPentagon),
             5: pentagon(5, self._chord[15], self._chord[16], self._chord[17],
-                        self._chord[18], self._chord[6], h, gaussPtsPent),
+                        self._chord[18], self._chord[6], h, gaussPtsPentagon),
             6: pentagon(6, self._chord[20], self._chord[10], self._chord[7],
-                        self._chord[18], self._chord[19], h, gaussPtsPent),
+                        self._chord[18], self._chord[19], h, gaussPtsPentagon),
             7: pentagon(7, self._chord[12], self._chord[21], self._chord[22],
-                        self._chord[23], self._chord[8], h, gaussPtsPent),
+                        self._chord[23], self._chord[8], h, gaussPtsPentagon),
             8: pentagon(8, self._chord[25], self._chord[13], self._chord[9],
-                        self._chord[23], self._chord[24], h, gaussPtsPent),
+                        self._chord[23], self._chord[24], h, gaussPtsPentagon),
             9: pentagon(9, self._chord[19], self._chord[17], self._chord[26],
-                        self._chord[30], self._chord[27], h, gaussPtsPent),
+                        self._chord[30], self._chord[27], h, gaussPtsPentagon),
             10: pentagon(10, self._chord[24], self._chord[22], self._chord[28],
-                         self._chord[30], self._chord[29], h, gaussPtsPent),
+                         self._chord[30], self._chord[29], h,
+                         gaussPtsPentagon),
             11: pentagon(11, self._chord[27], self._chord[28], self._chord[21],
-                         self._chord[11], self._chord[20], h, gaussPtsPent),
+                         self._chord[11], self._chord[20], h,
+                         gaussPtsPentagon),
             12: pentagon(12, self._chord[29], self._chord[26], self._chord[16],
-                         self._chord[14], self._chord[25], h, gaussPtsPent)
+                         self._chord[14], self._chord[25], h, gaussPtsPentagon)
         }
 
         # asign the remaining vertices; they are the pentagonal centroids
@@ -418,181 +422,191 @@ class dodecahedron(object):
         # create the tetrahedra that fill the volume as a dictionary
         self._tetrahedron = {
             1: tetrahedron(1, self._vertex[11], self._vertex[2],
-                           self._vertex[21], self._vertex[33], h, gaussPtsTet),
+                           self._vertex[21], self._vertex[33], h,
+                           gaussPtsTetrahedron),
             2: tetrahedron(2, self._vertex[2], self._vertex[10],
-                           self._vertex[21], self._vertex[33], h, gaussPtsTet),
+                           self._vertex[21], self._vertex[33], h,
+                           gaussPtsTetrahedron),
             3: tetrahedron(3, self._vertex[10], self._vertex[9],
-                           self._vertex[21], self._vertex[33], h, gaussPtsTet),
+                           self._vertex[21], self._vertex[33], h,
+                           gaussPtsTetrahedron),
             4: tetrahedron(4, self._vertex[9], self._vertex[1],
-                           self._vertex[21], self._vertex[33], h, gaussPtsTet),
+                           self._vertex[21], self._vertex[33], h,
+                           gaussPtsTetrahedron),
             5: tetrahedron(5, self._vertex[1], self._vertex[11],
-                           self._vertex[21], self._vertex[33], h, gaussPtsTet),
+                           self._vertex[21], self._vertex[33], h,
+                           gaussPtsTetrahedron),
             6: tetrahedron(6, self._vertex[10], self._vertex[2],
-                           self._vertex[22], self._vertex[33], h, gaussPtsTet),
+                           self._vertex[22], self._vertex[33], h,
+                           gaussPtsTetrahedron),
             7: tetrahedron(7, self._vertex[2], self._vertex[17],
-                           self._vertex[22], self._vertex[33], h, gaussPtsTet),
+                           self._vertex[22], self._vertex[33], h,
+                           gaussPtsTetrahedron),
             8: tetrahedron(8, self._vertex[17], self._vertex[18],
-                           self._vertex[22], self._vertex[33], h, gaussPtsTet),
+                           self._vertex[22], self._vertex[33], h,
+                           gaussPtsTetrahedron),
             9: tetrahedron(9, self._vertex[18], self._vertex[3],
-                           self._vertex[22], self._vertex[33], h, gaussPtsTet),
+                           self._vertex[22], self._vertex[33], h,
+                           gaussPtsTetrahedron),
             10: tetrahedron(10, self._vertex[3], self._vertex[10],
                             self._vertex[22], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             11: tetrahedron(11, self._vertex[13], self._vertex[4],
                             self._vertex[23], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             12: tetrahedron(12, self._vertex[4], self._vertex[9],
                             self._vertex[23], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             13: tetrahedron(13, self._vertex[9], self._vertex[10],
                             self._vertex[23], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             14: tetrahedron(14, self._vertex[10], self._vertex[3],
                             self._vertex[23], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             15: tetrahedron(15, self._vertex[3], self._vertex[13],
                             self._vertex[23], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             16: tetrahedron(16, self._vertex[9], self._vertex[4],
                             self._vertex[24], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             17: tetrahedron(17, self._vertex[4], self._vertex[16],
                             self._vertex[24], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             18: tetrahedron(18, self._vertex[16], self._vertex[15],
                             self._vertex[24], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             19: tetrahedron(19, self._vertex[15], self._vertex[1],
                             self._vertex[24], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             20: tetrahedron(20, self._vertex[1], self._vertex[9],
                             self._vertex[24], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             21: tetrahedron(21, self._vertex[15], self._vertex[5],
                             self._vertex[25], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             22: tetrahedron(22, self._vertex[5], self._vertex[12],
                             self._vertex[25], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             23: tetrahedron(23, self._vertex[12], self._vertex[11],
                             self._vertex[25], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             24: tetrahedron(24, self._vertex[11], self._vertex[1],
                             self._vertex[25], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             25: tetrahedron(25, self._vertex[1], self._vertex[15],
                             self._vertex[25], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             26: tetrahedron(26, self._vertex[17], self._vertex[2],
                             self._vertex[26], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             27: tetrahedron(27, self._vertex[2], self._vertex[11],
                             self._vertex[26], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             28: tetrahedron(28, self._vertex[11], self._vertex[12],
                             self._vertex[26], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             29: tetrahedron(29, self._vertex[12], self._vertex[6],
                             self._vertex[26], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             30: tetrahedron(30, self._vertex[6], self._vertex[17],
                             self._vertex[26], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             31: tetrahedron(31, self._vertex[18], self._vertex[7],
                             self._vertex[27], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             32: tetrahedron(32, self._vertex[7], self._vertex[14],
                             self._vertex[27], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             33: tetrahedron(33, self._vertex[14], self._vertex[13],
                             self._vertex[27], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             34: tetrahedron(34, self._vertex[13], self._vertex[3],
                             self._vertex[27], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             35: tetrahedron(35, self._vertex[3], self._vertex[18],
                             self._vertex[27], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             36: tetrahedron(36, self._vertex[16], self._vertex[4],
                             self._vertex[28], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             37: tetrahedron(37, self._vertex[4], self._vertex[13],
                             self._vertex[28], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             38: tetrahedron(38, self._vertex[13], self._vertex[14],
                             self._vertex[28], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             39: tetrahedron(39, self._vertex[14], self._vertex[8],
                             self._vertex[28], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             40: tetrahedron(40, self._vertex[8], self._vertex[16],
                             self._vertex[28], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             41: tetrahedron(41, self._vertex[12], self._vertex[5],
                             self._vertex[29], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             42: tetrahedron(42, self._vertex[5], self._vertex[19],
                             self._vertex[29], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             43: tetrahedron(43, self._vertex[19], self._vertex[20],
                             self._vertex[29], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             44: tetrahedron(44, self._vertex[20], self._vertex[6],
                             self._vertex[29], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             45: tetrahedron(45, self._vertex[6], self._vertex[12],
                             self._vertex[29], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             46: tetrahedron(46, self._vertex[14], self._vertex[7],
                             self._vertex[30], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             47: tetrahedron(47, self._vertex[7], self._vertex[20],
                             self._vertex[30], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             48: tetrahedron(48, self._vertex[20], self._vertex[19],
                             self._vertex[30], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             49: tetrahedron(49, self._vertex[19], self._vertex[8],
                             self._vertex[30], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             50: tetrahedron(50, self._vertex[8], self._vertex[14],
                             self._vertex[30], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             51: tetrahedron(51, self._vertex[20], self._vertex[7],
                             self._vertex[31], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             52: tetrahedron(52, self._vertex[7], self._vertex[18],
                             self._vertex[31], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             53: tetrahedron(53, self._vertex[18], self._vertex[17],
                             self._vertex[31], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             54: tetrahedron(54, self._vertex[17], self._vertex[6],
                             self._vertex[31], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             55: tetrahedron(55, self._vertex[6], self._vertex[20],
                             self._vertex[31], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             56: tetrahedron(56, self._vertex[19], self._vertex[5],
                             self._vertex[32], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             57: tetrahedron(57, self._vertex[5], self._vertex[15],
                             self._vertex[32], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             58: tetrahedron(58, self._vertex[15], self._vertex[16],
                             self._vertex[32], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             59: tetrahedron(59, self._vertex[16], self._vertex[8],
                             self._vertex[32], self._vertex[33], h,
-                            gaussPtsTet),
+                            gaussPtsTetrahedron),
             60: tetrahedron(60, self._vertex[8], self._vertex[19],
-                            self._vertex[32], self._vertex[33], h, gaussPtsTet)
+                            self._vertex[32], self._vertex[33], h,
+                            gaussPtsTetrahedron)
         }
 
         # add up the volumes associated with the sixty tetrahedra
         vol = 0.0
         for i in range(1, 61):
-            vol = vol + self._tetrahedron[i].volume('ref')
+            vol += self._tetrahedron[i].volume('ref')
         self._refVol = vol
         self._prevVol = vol
         self._currVol = vol
@@ -601,32 +615,32 @@ class dodecahedron(object):
     def verticesToString(self, state):
         s = 'In state ' + state + ', the dodecahedron has vertices of: \n'
         for i in range(1, 21):
-            s = s + '   ' + self._vertex[i].toString(state) + '\n'
+            s += '   ' + self._vertex[i].toString(state) + '\n'
         'The following extra vertices associate with the various centroids:\n'
         for i in range(21, 33):
-            s = s + '   ' + self._vertex[i].toString(state) + '\n'
-        s = s + '   ' + self._vertex[33].toString(state)
+            s += '   ' + self._vertex[i].toString(state) + '\n'
+        s += '   ' + self._vertex[33].toString(state)
         return s
 
     def chordsToString(self, state):
         s = 'In state ' + state + ', the dodecahedron has chords of: \n'
         for i in range(1, 30):
-            s = s + self._chord[i].toString(state) + '\n'
-        s = s + self._chord[30].toString(state)
+            s += self._chord[i].toString(state) + '\n'
+        s += self._chord[30].toString(state)
         return s
 
     def pentagonsToString(self, state):
         s = 'In state ' + state + ', the dodecahedron has pentagons of: \n'
         for i in range(1, 12):
-            s = s + self._pentagon[i].toString(state) + '\n'
-        s = s + self._pentagon[12].toString(state)
+            s += self._pentagon[i].toString(state) + '\n'
+        s += self._pentagon[12].toString(state)
         return s
 
     def tetrahedraToString(self, state):
         s = 'In state ' + state + ', the dodecahedron has tetrahedra of: \n'
         for i in range(1, 60):
-            s = s + self._tetrahedron[i].toString(state) + '\n'
-        s = s + self._tetrahedron[60].toString(state)
+            s += self._tetrahedron[i].toString(state) + '\n'
+        s += self._tetrahedron[60].toString(state)
         return s
 
     def getVertex(self, number):
@@ -658,7 +672,7 @@ class dodecahedron(object):
                                'does not exist.')
 
     def update(self, nextF):
-        if (not isinstance(nextF, np.ndarray)) or (nextF.shape != (3, 3)):
+        if (not isinstance(nextF, np.ndarray)) or (not nextF.shape == (3, 3)):
             raise RuntimeError("The nextF sent to dodecahedron.update " +
                                "must be a 3x3 numpy array.")
 
@@ -683,7 +697,7 @@ class dodecahedron(object):
         # update the vertices that comprise the centroids of the dodecahedron
         c = np.array(3, dtype=float)
         for i in range(21, 33):
-            c = self._pentagon[1].centroid('next')
+            c = self._pentagon[i-20].centroid('next')
             self._vertex[i].update(c[0], c[1], c[2])
         # the 33rd vertex is at the centroid of the dodecahedron; it is fixed
 
@@ -691,11 +705,10 @@ class dodecahedron(object):
         for i in range(1, 61):
             self._tetrahedron[i].update()
 
-        # update volume: this is costly because the dodecahedron is irregular
-        # add up the volumes associated with the twelve pentangonal faces
+        # update volume
         vol = 0.0
         for i in range(1, 61):
-            vol = vol + self._tetrahedron[i].volume('next')
+            vol += self._tetrahedron[i].volume('next')
         self._nextVol = vol
 
     def advance(self):
@@ -718,11 +731,6 @@ class dodecahedron(object):
         # advance kinematic fields of the dodecahedron
         self._prevVol = self._currVol
         self._currVol = self._nextVol
-
-        # advance the fields associated with each Gauss point
-        for i in range(1, self._gaussPtsTet+1):
-            self._detJp[i] = self._detJc[i]
-            self._detJc[i] = self._detJn[i]
 
     # properties of volume
 
