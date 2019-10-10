@@ -104,12 +104,13 @@ where $\alpha = \textfrac{\pi}{10} = 18^{\circ}$.  (There are twenty, equal, pie
 To dimension the alveoli of human lung, Sobin, Fung \& Tremer \cite{Sobinetal88} measured the mean diameter across an individual alveolus, viz., $D$ of Eq.~(\ref{dodecahedralHeight}),  sectioned from human lungs that were fixed at three different pressures.  Samples were taken from nine lungs extracted postmortem from individuals between 16 to 89 years of age.\footnote{%
 	Sobin \textit{et~al}.\ \cite{Sobinetal88} documented an age effect in these data that has been averaged over here, i.e., ignored.
 }
-At a transpulmonary pressure of 4~cm~$\text{H}_2$O, the mean alveolar diameter was $D = 191$ $\pm$ 86~$\mu$m determined from a sampling size of 1423; at a pressure of 10~cm~$\text{H}_2$O, $D = 202$ $\pm$ 88~$\mu$m determined from a sampling size of 1296; and at a pressure of 14~cm~$\text{H}_2$O, $D = 235$ $\pm$ 99~$\mu$m determined from a sampling size of 1083.  These data are plotted in Fig.~\ref{septalLengthFig}.  All reported and drawn error bounds pertain to plus\slash minus one standard deviation in error.
+At a transpulmonary pressure of 4~cm~$\text{H}_2$O, the mean alveolar diameter was $D = 191$ $\pm$ 86~$\mu$m determined from a sampling size of 1423; at a pressure of 10~cm~$\text{H}_2$O, $D = 202$ $\pm$ 88~$\mu$m determined from a sampling size of 1296; and at a pressure of 14~cm~$\text{H}_2$O, $D = 235$ $\pm$ 99~$\mu$m determined from a sampling size of 1083.  These data are plotted in Fig.~\ref{septalLengthFig}.  All reported and drawn error bounds pertain to plus\slash minus one standard deviation in error.  The distribution was found to be normal.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=10cm]{figures/septalLength.jpg}
-	\caption{Septal length $L$ as a function of transpulmonary pressure $P$ in human lung.  The alveolar diameters $D$ and their standard deviations in error, as reported by Sobin \textit{et~al}.\ \cite{Sobinetal88}, have been converted into measures of septal chord length $L$ via Eq.~(\ref{dodecahedralHeight}).}
+	\includegraphics[width=0.4\textwidth]{figures/septalLength.jpg}
+    \includegraphics[width=0.44\textwidth]{figures/alveolarDiaHistogram.jpg}
+	\caption{Mean and standard deviations for alveolar diameter in human lung illustrated in the left graphic, as reported by Sobin \textit{et~al}.\ \cite{Sobinetal88}, with a typical histogram for these statistics illustrated in the right graphic.  Note that this distribution has been truncated at an alveolar diameter of 24~$\mu$m.}
 	\label{septalLengthFig}
 \end{figure}
 
@@ -187,6 +188,8 @@ The co-ordinates positioning the twenty vertices of a regular dodecahedron in it
 	\caption{Natural co-ordinates for the vertices of a regular dodecahedron, as labeled in Fig.~\ref{figDodecahedron} according to Eq.~(\ref{regDodecahedron}).}
 	\label{TableDodecahedron}
 \end{table}
+
+The sixty tetrahedra that fill the volume of the dodecahedron contain vertices according to the following strategy.  Beginning with pentagon~1 and sequencing to pentagon~12, two of the four vertices come from a side of the pentagon in question with the remaining two vertices being the centroid for that pentagon and the centroid of the, i.e., at the coordinate origin.  From Table~\ref{TablePentagons}, tetrahedron~1 contains vertices 11 and 2 of pentagon~1, tetrahedron~2 contains vertices 2 and 10, tetrahedron~3 contains vertices 10 and 9, tetrahedron~4 contains vertices 9 and 1, tetrahedron~5 contains vertices 1 and 11, tetrahedron~6 contains vertices 10 and 2 from pentagon~2, etc.
 
 \begin{table}
 	\begin{center}

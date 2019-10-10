@@ -193,7 +193,10 @@
 % \includeonly{appSolvers}
 
 %%
-\usepackage{wasysym}
+% \usepackage{wasysym}
+% Extracted out the font for a pentagon directly to avoid 'too many math alphabets'
+\def\wasyfamily{\fontencoding{U}\fontfamily{wasy}\selectfont}
+\def\pentagon   {\mbox{\wasyfamily\char68}}
 
 \usepackage{geometry,mathtools}
 \setcounter{MaxMatrixCols}{12}
@@ -324,7 +327,7 @@ write
 \newpage
 \small
 \bibliographystyle{elsarticle-num}
-\bibliography{my}
+\bibliography{dodec}
 \normalsize
 
 \setcounter{equation}{0}

@@ -487,41 +487,45 @@ Because the purpose for the alveolar model being constructed is to better unders
 
 \subsection{Modeling a Septal Chord Subjected to a Shock Wave}
 
+\begin{table}
+    \centering
+    \begin{tabular}{|r|ccc|} 
+        \hline 
+        transpulmonary pressure &
+        \multicolumn{3}{|c|}{$4 \, \mathrm{cm} \, \mathrm{H}_2^{\vphantom{|}} \mathrm{O}$} \\ 
+        \hline
+        Age & 15--35 & 36--45 & $>$ 65 $\vphantom{|}^{\vphantom{|}}$ \\ \hline 
+        collagen: $\sqrt{D}^{\vphantom{|}}, \; ( \mu \textrm{m} )^{1/2}$ & 
+        0.952 $\pm$ 0.242 & 0.958 $\pm$ 0.255 & 1.045 $\pm$ 0.270 \\
+        elastin: $\sqrt{D}, \; ( \mu \textrm{m} )^{1/2}$ & 
+        0.957 $\pm$ 0.239 & 0.970 $\pm$ 0.213 & 1.093 $\pm$ 0.274 \\
+        \hline\hline       
+        transpulmonary pressure &
+        \multicolumn{3}{|c|}{$14 \, \mathrm{cm} \, \mathrm{H}_2^{\vphantom{|}} \mathrm{O}$} \\ 
+        \hline
+        Age & 15--35 & 36--45 & $>$ 65 $\vphantom{|}^{\vphantom{|}}$ \\ \hline 
+        collagen: $\sqrt{D}^{\vphantom{|}}, \; ( \mu \textrm{m} )^{1/2}$ & 
+        0.955 $\pm$ 0.246 & 0.994 $\pm$ 0.237 & 1.054 $\pm$ 0.279 \\
+        elastin: $\sqrt{D}, \; ( \mu \textrm{m} )^{1/2}$ & 
+        0.956 $\pm$ 0.237 & 0.988 $\pm$ 0.263 & 1.079 $\pm$ 0.281 \\
+        \hline
+    \end{tabular}
+    \caption{\label{tab:alveolarProp}
+        Mean and standard deviations in variance for the square root of septal chord diameters $\sqrt{D}$ reported by Sobin \textit{et~al}.\ \cite{Sobinetal88}.  These septal chords are comprised of collagen and elastin fibers, which act largely independently, and therefore are considered to be loaded in parallel with one another.}
+\end{table}
+
 Alveoli are biologic structures constructed of septal chords that circumscribe alveolar membranes that envelope an alveolar sac whereat gas exchange occurs.  These chords are comprised of individual collagen and elastin fibers loaded in parallel \cite{Matsudaetal87,Sobinetal88}.  The extent of elastic energy stored within a chord will depend upon the diameters $D^c$ and $D^e$ and length $L$ of these individual fibers.\footnote{
 	Sobin \textit{et~al}.\ \cite{Sobinetal88} considered that the stored energy of chords also depends upon their curvature, which they measured and quantified, i.e., they considered these chords to be beams.  However, with a slenderness ratio of $\bar{L}/\bar{D} = 102 \pm 12$, which we obtained from their data, it is reasonable to model them as rods, not beams.  Consequently, the dodecahedral truss to be considered is a pinned truss, not a rigid truss, thereby greatly simplifying the boundary value problem.
 }
-Let superscript `$\mbox{}^c$' denote collagen, and superscript `$\mbox{}^e$' denote elastin.  Sobin \textit{et~al}.\ \cite{Sobinetal88} determined that septal chord length $L$ distributes normally in human lungs, with a mean $\bar{L}$ and standard deviation $\sigma_L$ that depend upon age and transpulmonary pressure.  They also determined that the square root of their diameters $\sqrt{D}$ distribute normally, with a mean $\bar{D}^{1/2}$ and standard deviation $\sigma_{\sqrt{D}}$ that also depend upon age and transpulmonary pressure, as presented in Table~\ref{tab:alveolarProp}. 
+Let superscript `$\mbox{}^c$' denote collagen, and superscript `$\mbox{}^e$' denote elastin.  Sobin \textit{et~al}.\ \cite{Sobinetal88} determined that the square root of their diameters $\sqrt{D}$ distribute normally, with a mean $\bar{D}^{1/2}$ and standard deviation $\sigma_{\sqrt{D}}$ that also depend upon age and transpulmonary pressure, as presented in Table~\ref{tab:alveolarProp} and illustrated in Fig.~\ref{fig:septalChordStats}. 
 
-\begin{table}
+\begin{figure}
     \centering
-	\begin{tabular}{|r|ccc|} 
-		\hline 
-		transpulmonary pressure &
-		\multicolumn{3}{|c|}{$4 \, \mathrm{cm} \, \mathrm{H}_2^{\vphantom{|}} \mathrm{O}$} \\ 
-		\hline
-		Age & 15--35 & 36--45 & $>$ 65 $\vphantom{|}^{\vphantom{|}}$ \\ \hline 
-		collagen: $\sqrt{D}^{\vphantom{|}}, \; ( \mu \textrm{m} )^{1/2}$ & 
-		0.952 $\pm$ 0.242 & 0.958 $\pm$ 0.255 & 1.045 $\pm$ 0.270 \\
-		elastin: $\sqrt{D}, \; ( \mu \textrm{m} )^{1/2}$ & 
-		0.957 $\pm$ 0.239 & 0.970 $\pm$ 0.213 & 1.093 $\pm$ 0.274 \\
-		$L, \; \mu \textrm{m}$ & 
-		155.5 $\pm$ 62.8 & 179.2 $\pm$ 74.5 & 239.7 $\pm$ 123.0 \\ 
-		\hline\hline       
-		transpulmonary pressure &
-		\multicolumn{3}{|c|}{$14 \, \mathrm{cm} \, \mathrm{H}_2^{\vphantom{|}} \mathrm{O}$} \\ 
-		\hline
-		Age & 15--35 & 36--45 & $>$ 65 $\vphantom{|}^{\vphantom{|}}$ \\ \hline 
-		collagen: $\sqrt{D}^{\vphantom{|}}, \; ( \mu \textrm{m} )^{1/2}$ & 
-		0.955 $\pm$ 0.246 & 0.994 $\pm$ 0.237 & 1.054 $\pm$ 0.279 \\
-		elastin: $\sqrt{D}, \; ( \mu \textrm{m} )^{1/2}$ & 
-		0.956 $\pm$ 0.237 & 0.988 $\pm$ 0.263 & 1.079 $\pm$ 0.281 \\
-		$L, \; \mu \textrm{m}$ & 
-		176.9 $\pm$ 65.7 & 228.1 $\pm$ 97.0 & 298.4 $\pm$ 134.2 \\ 
-		\hline
-	\end{tabular}
-	\caption{\label{tab:alveolarProp}
-		Mean and standard deviations in variance for the square root of septal chord diameters $\sqrt{D}$ and for septal chord lengths $L$, as reported by \cite{Sobinetal88}.  These septal chords are comprised of collagen and elastin fibers, which act largely independently, and therefore are considered to be loaded in parallel with one another.}
-\end{table}
+    \includegraphics[width=0.45\textwidth]{figures/collagenFiberDiaHistogram.jpg}
+    \includegraphics[width=0.45\textwidth]{figures/elastinFiberDiaHistogram.jpg}
+    \caption{Typical histograms for collagen and elastin chord diameters pertaining to the statistics reported in Table~\ref{tab:alveolarProp}.  Their tails weigh heavy at the larger diameters, because their distributions are normal in the square roots of their diameters.  These histograms are identical for all practical purposes.}
+    \label{fig:septalChordStats}
+\end{figure}
 
 The collagen and elastin fibers that make up a septal chord have the same length, they experience the same strain, and they exist at the same temperature; therefore, we employ Eqn.~(\ref{Helmholtz1D}) as the governing constitutive equation to describe their mechanical behavior
 \begin{displaymath}
