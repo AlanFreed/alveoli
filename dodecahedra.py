@@ -39,7 +39,7 @@ r"""
 Changes in version "1.3.0":
 
     Tetrahedra are included in the construction.  They are used to represent
-    the volume of a dodecahedron.
+    the volume of a dodecahedron and its properties.
 
 
 Overview of module Dodecahedra.py:

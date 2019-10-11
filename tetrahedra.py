@@ -30,7 +30,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "09-25-2019"
-__update__ = "10-06-2019"
+__update__ = "10-11-2019"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -456,10 +456,10 @@ class tetrahedron(object):
         self._x40, self._y40, self._z40 = self._vertex[4].coordinates('ref')
 
         # determine the volume of this tetrahedron in its reference state
-        self._V0 = self.volTet(self._x10, self._y10, self._z10,
-                               self._x20, self._y20, self._z20,
-                               self._x30, self._y30, self._z30,
-                               self._x40, self._y40, self._z40)
+        self._V0 = self._volTet(self._x10, self._y10, self._z10,
+                                self._x20, self._y20, self._z20,
+                                self._x30, self._y30, self._z30,
+                                self._x40, self._y40, self._z40)
         self._Vp = self._V0
         self._Vc = self._V0
         self._Vn = self._V0
