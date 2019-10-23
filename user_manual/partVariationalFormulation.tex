@@ -331,7 +331,7 @@ The incremental form of  Eq.~(\ref{straindis}) yield
 \mathrm{d} \bar{\mathbf{B}} = \mathrm{d} \left(\mathbf{B}_L + \mathbf{B}_N \right) = \mathrm{d} \mathbf{B}_N = \mathrm{d} (\mathbf{A} \, \mathbf{G}) = \mathrm{d} \mathbf{A} \, \mathbf{G}
 \end{equation} 
 
-The tangent stiffness matrix can be obtained by substituting the definition of $\mathrm{d} \boldsymbol{\sigma}$ into Eq.~(\ref{diffresidual}) as follow
+The tangent stiffness matrix can be obtained by substituting the definition of $\mathrm{d} \boldsymbol{\sigma}$ into Eq.~(\ref{diffresidual}) as follow \cite{Elseifi98}
 \begin{equation}
 \begin{aligned}
 \mathrm{d} \mathbf{R} & = \int_{V} \, \mathrm{d} \bar{\mathbf{B}}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathrm{d} V + \int_{V} \, \bar{\mathbf{B}}^{\mathsf{T}} \, \mathbf{M} \, \bar{\mathbf{B}} \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta} \\ 
@@ -353,11 +353,9 @@ where
 \begin{equation}
 \begin{aligned}
 \mathbf{G} = \begin{bmatrix}
-\partial N_1 / \partial x & \partial N_2 / \partial x
+ N_{1,x} &  N_{2,x}
 \end{bmatrix} = \begin{bmatrix}
-\partial N_1 / \partial \xi \cdot \partial \xi / \partial x &  \partial N_2 / \partial \xi \cdot \partial \xi / \partial x
-\end{bmatrix} = \begin{bmatrix}
-\partial N_1 / \partial \xi &  \partial N_2 / \partial \xi \, 
+ N_{1,\xi} &  \partial N_{2,\xi} \, 
 \end{bmatrix} \, \mathbf{J}^{-1}
 \end{aligned}
 \end{equation}
@@ -371,11 +369,9 @@ with $\mathrm{w}_i$ being the  weighting coefficients of the Gauss integration r
 In calculation of the stiffness matrix for an element, the linear strain-displacement matrix $\mathbf{B}_L$ is required that is the derivatives of the shape functions with respect to the global coordinate system  
 \begin{equation}
 \mathbf{B}_L = \begin{bmatrix}
-\partial N_1 / \partial x &  \partial N_2 / \partial x
+ N_{1,x} &   N_{2,x}
 \end{bmatrix} = \begin{bmatrix}
-\partial N_1 / \partial \xi \cdot \partial \xi / \partial x &  \partial N_2 / \partial \xi \cdot \partial \xi / \partial x
-\end{bmatrix} = \begin{bmatrix}
-\partial N_1 / \partial \xi &  \partial N_2 / \partial \xi \, 
+ N_{1,\xi} &   N_{2,\xi} \, 
 \end{bmatrix} \, \mathbf{J}^{-1}
 \end{equation}
 wherein $\xi$ is abscissae of the Gauss integration rule. 
@@ -394,12 +390,12 @@ where $\mathbf{B}_N$ have the expression
 \mathbf{B}_{N} & =  \mathbf{A} \, \mathbf{G} = \begin{bmatrix}
 \partial \mathbf{u} / \partial \mathbf{x} 
 \end{bmatrix} \, \begin{bmatrix}
-\partial N_1 / \partial x & \partial N_2 / \partial x
+ N_{1,x} &  N_{2,x}
 \end{bmatrix} \\
 & = \begin{bmatrix}
 \sum\nolimits_{i=1}^n N_{i,x} \, u_i
 \end{bmatrix} \, \begin{bmatrix}
-\partial N_1 / \partial \xi &  \partial N_2 / \partial \xi \, 
+ N_{1,\xi} &   N_{2,\xi} \, 
 \end{bmatrix} \, \mathbf{J}^{-1}
 \end{aligned}
 \end{equation}
@@ -460,30 +456,30 @@ Taylor series are used here to obtain the linear and nonlinear part of displacem
 The linear strain displacement matrix $\mathbf{B}_L$ can be obtained by differentiation of displacements expressed through the nodal displacements and shape functions from infinitesimal linear strain vector that take the form of
 \begin{equation}
 \mathbf{B}_L = \frac{1}{2} \, \begin{bmatrix}
-\partial N_i / \partial x &  \partial N_i / \partial y \\
-\partial N_i / \partial x & -\partial N_i / \partial y \\
-2 \, \partial N_i / \partial y & 2 \, \partial N_i / \partial x \end{bmatrix} 
+ N_{i,x} &   N_{i,y} \\
+ N_{i,x} & - N_{i,y} \\
+2 \,  N_{i,y} & 2 \,  N_{i,x} \end{bmatrix} 
 \end{equation}
 The nonlinear strain terms can be written as 
 \begin{equation}
 \boldsymbol{\epsilon}_ N = \frac{1}{2} \, \begin{bmatrix}
--\frac{1}{2} \, \partial u_i / \partial x &  -4 \, \partial u_i / \partial y & 0 & -\frac{1}{2} \, \partial v_i / \partial y \\
--\frac{1}{2} \, \partial u_i / \partial x &  4 \, \partial v_i / \partial x & 4 \, \partial v_i / \partial x & \frac{1}{2} \, \partial v_i / \partial y \\
--2 \, \partial u_i / \partial y &  -4 \, \partial u_i / \partial x & 0 & 2 \, \partial v_i / \partial x \end{bmatrix} \, \begin{Bmatrix}
-\partial u_i / \partial x\\
-\partial v_i / \partial x\\
-\partial u_i / \partial y\\
-\partial v_i / \partial y
+-\frac{1}{2} \, \partial u / \partial x &  -4 \, \partial u / \partial y & 0 & -\frac{1}{2} \, \partial v / \partial y \\
+-\frac{1}{2} \, \partial u / \partial x &  4 \, \partial v / \partial x & 4 \, \partial v / \partial x & \frac{1}{2} \, \partial v / \partial y \\
+-2 \, \partial u / \partial y &  -4 \, \partial u / \partial x & 0 & 2 \, \partial v / \partial x \end{bmatrix} \, \begin{Bmatrix}
+\partial u / \partial x\\
+\partial v / \partial x\\
+\partial u / \partial y\\
+\partial v / \partial y
 \end{Bmatrix}
 = \frac{1}{2} \, \mathbf{A} \, \boldsymbol{\theta}
 \end{equation}
 the derivative of displacement can be related to the nodal parameters via
 \begin{equation}
 \boldsymbol{\theta} =  \begin{Bmatrix}
-\partial u_i / \partial x\\
-\partial v_i / \partial x\\
-\partial u_i / \partial y\\
-\partial v_i / \partial y
+\partial u / \partial x\\
+\partial v / \partial x\\
+\partial u / \partial y\\
+\partial v / \partial y
 \end{Bmatrix}
 = \begin{Bmatrix}
 \sum\nolimits_{i=1}^5 N_{i,x} \, u_i\\
@@ -508,9 +504,9 @@ hence $\mathbf{B}_N$ become
 \begin{equation}
 \begin{aligned}
 \mathbf{B}_{N}  =  \mathbf{A} \, \mathbf{G} = \begin{bmatrix}
--\frac{1}{2} \, \partial u_i / \partial x &  -4 \, \partial u_i / \partial y & 0 & -\frac{1}{2} \, \partial v_i / \partial y \\
--\frac{1}{2} \, \partial u_i / \partial x &  4 \, \partial v_i / \partial x & 4 \, \partial v_i / \partial x & \frac{1}{2} \, \partial v_i / \partial y \\
--2 \, \partial u_i / \partial y &  -4 \, \partial u_i / \partial x & 0 & 2 \, \partial v_i / \partial x \end{bmatrix}  \, \begin{bmatrix}
+-\frac{1}{2} \, \partial u / \partial x &  -4 \, \partial u / \partial y & 0 & -\frac{1}{2} \, \partial v / \partial y \\
+-\frac{1}{2} \, \partial u / \partial x &  4 \, \partial v / \partial x & 4 \, \partial v / \partial x & \frac{1}{2} \, \partial v / \partial y \\
+-2 \, \partial u / \partial y &  -4 \, \partial u / \partial x & 0 & 2 \, \partial v / \partial x \end{bmatrix}  \, \begin{bmatrix}
 N_{i,x} &  0 \\
 0 & N_{i,x} \\
 N_{i,y} & 0 \\
