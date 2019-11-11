@@ -560,7 +560,7 @@ The material properties needed to model septal chords are listed in Tables~\ref{
         \multicolumn{3}{|c|}{Collagen$\vphantom{|^{|^|}}$} \\ \hline
         $\rho^c$ \hfill [$\textrm{gr/cm}^{3^{\phantom{|}}}$] & $1.34$ & 
         Fels \cite{Fels64} \\
-        $\eta^c$ \hfill [erg/gr.K] & $3.7 \times 10^4$ &  \\
+        $\eta^c$ \hfill [erg/gr.K] & $3.7 \times 10^7$ &  \\
         $C^c$ \hfill [erg/gr.K] & $1.7 \times 10^7$ & 
         Kanagy \cite{Kanagy55} \\
         $\alpha^c$ \hfill [1/C] & $1.8 \times 10^{-4}$ & 
@@ -572,7 +572,7 @@ The material properties needed to model septal chords are listed in Tables~\ref{
         Parameter & Value & Reference \\ \hline
         $\rho^e$ \hfill [$\textrm{gr/cm}^{3^{\phantom{|}}}$] & $1.31$ & 
         Lillie \& Gosline \cite{LillieGosline02a} \\
-        $\eta^e$ \hfill [erg/gr.K] & $3.4 \times 10^4$ & 
+        $\eta^e$ \hfill [erg/gr.K] & $3.4 \times 10^7$ & 
         Shadwick \& Gosline \cite{ShadwickGosline85} \\
         $C^e$ \hfill [$\textrm{erg/gr.K}$] & $4.2 \times 10^7$  & 
         Kakivaya \& Hoeve \cite{KakivayaHoeve75} \\
@@ -747,3 +747,31 @@ where $S^a$ is the desired entropy of the air within an alveolar sac with $S^a_0
 Pressure $P$ is mapped to nodal forces at the vertices of a dodecahedron via Eqn.~(\ref{septalStresses}) in our alveolar model.  This requires finite element technology, which is discussed in Part~\ref{partVariational}.
 
 \section{Code Verification and Constitutive Parameterization}
+
+All material parameters are assigned from their respective statistical distributions.  For example, there are thirty chords in a dodecahedron comprised of collagen and elastin fibers that are loaded in parallel.  Figure~\ref{figStressStrainFibers} presents a typical set of stress\slash strain response curves for the chords of a dodecahedron whose parameters are displayed in Table~\ref{tabStressStrainFibers}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/collagenStressStrain.jpg}
+    \includegraphics[width=0.45\textwidth]{figures/elastinStressStrain.jpg}
+    \caption{Typical stress\slash strain curves for collagen (left) and elastin (right) fibers that make up a septal chord.  Their material parameters have been assigned via statistical distributions.}
+    \label{figStressStrainFibers}
+\end{figure}
+
+\begin{table}
+    \centering
+    \begin{tabular}{|l|l|l|l|}
+        \hline
+        \multicolumn{2}{|c|}{Collagen$\vphantom{|^{|^|}}$} & 
+        \multicolumn{2}{|c|}{Elastin} \\ \hline
+        $E_1^c$ \hfill [barye] & $5.0 \times 10^{5^{\vphantom{|}}} \pm 2.0 \times 10^5$ &  
+        $E_1^e$ \hfill [barye] & $2.3 \times 10^6 \pm 1.0 \times 10^6$ \\
+        $E_2^c$ \hfill [barye] & $5.0 \times 10^7 \pm 1.0 \times 10^7$ &  
+        $E_2^e$ \hfill [barye] & $1.0 \times 10^7 \pm 2.0 \times 10^6$ \\
+        $e^c_t$ & $0.09 \pm 0.015$ &
+        $e^e_t$ & $0.4 \pm 0.1$ \\ 
+        \hline
+    \end{tabular}
+    \caption{Physical properties for hydrated collagen and elastin fibers when described with the fiber model of Freed \& Rajagopal \cite{FreedRajagopal16}.}
+    \label{tabStressStrainFibers}
+\end{table}
