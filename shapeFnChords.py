@@ -68,12 +68,16 @@ methods
     returns
         yXi  is its interpolated value for y at location xi
 
-    det = sf.detJacobian(x1, x2)
+    jacob = sf.jacobian(x1, x2)
         x1   is a physical coordinate, a float, located at vertex 1
         x2   is a physical coordinate, a float, located at vertex 2
     returns
-        det  is the determinant of the Jacobian matrix
+        jacob  is the Jacobian matrix
     inputs are coordinates evaluated in a global chordal coordinate system
+
+    dNmat = sf.dNdximat()
+    returns
+        dNmat is the matrix of derevative of shape functions respect to xi
 
     Gmtx = sf.G(x1, x2, x01, x02)
         x1   is a physical  coordinate, a float, located at vertex 1
@@ -136,11 +140,16 @@ class shapeFunction(object):
         y = self.N1 * y1 + self.N2 * y2
         return y
 
-    # calculate the determinant of the Jacobian at Gauss point xi
-    def detJacobian(self, x1, x2):
-        jacobian = self.dN1dXi * x1 + self.dN2dXi * x2
-        return jacobian
+    # calculate the Jacobian at Gauss point xi
+    def jacobian(self, x1, x2):
+        jacob = self.dN1dXi * x1 + self.dN2dXi * x2
+        return jacob
 
+    # create the matrix of derivative of shape function respect to xi
+    def dNdximat(self):
+        dNmat = np.array([[self.dN1dXi, self.dN2dXi]]) 
+        return dNmat
+    
     # calculate the displacement gradient at Gauss point xi
     def G(self, x1, x2, x01, x02):
         u1 = x1 - x01
