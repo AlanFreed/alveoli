@@ -25,7 +25,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "10-05-2019"
-__update__ = "10-06-2019"
+__update__ = "11-07-2019"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -55,38 +55,83 @@ Mass densities (gr/cm^3) for the various alveolar constituents are:
 
     rho = rhoSepta()
 
-The following procedures supply random values describing alveolar geometry.
+Entropy densities (erg/gr.K) for the various alveolar constituents are:
 
-    l = alveolarDia()
-        Determines a random length l for the septal fiber in centimeters.  From
-        this information, a mean alveolar diameter is determined and returned.
+    eta = etaAir()
+
+    eta = etaBlood()
+
+    eta = etaCollagen()
+
+    eta = etaElastin()
+
+    eta = etaH2O()
+
+    eta = etaSepta()
+
+Specific heats at constant pressure (erg/gr.K) for the alveolar consitituents:
+
+    cp = CpAir()
+
+    cp = CpBlood()
+
+    cp = CpCollagen()
+
+    cp = CpElastin()
+
+    cp = CpH2O()
+
+    cp = CpSepta()
+
+Coefficients of linear thermal expansion (1/K) for the aveolar constituents:
+
+    alpha = alphaAir()
+
+    alpha = alphaBlood()
+
+    alpha = alphaCollagen()
+
+    alpha = alphaElastin()
+
+    alpha = alphaH2O()
+
+    alpha = alphaSepta()
+
+The following procedures supply random values describing geometries in alveoli.
+
+    l = alveolarDiameter()
+        Determines an alveolar diameter from its statistical distribution.
         Associates with humans, age 15-35, whose lungs were fixed at 4 cm H20.
-        Data are from: Sobin, Fung & Tremer, 1988.  The values are extrapolated
-        back to zero gauge pressure, which are the returned values.
+        Data are from: Sobin, Fung & Tremer, 1988.  The returned values have
+        been extrapolated back to zero gauge pressure.
 
-    d = chordDiaCollagen()
-        Returns a random diameter d for a collegen septal fiber in centimeters.
-        Associates with humans, age 15-35, whose lungs were fixed at 4 cm H20.
-        Data are from: Sobin, Fung & Tremer, 1988.
+    d = fiberDiameterCollagen()
+        Returns the diameter (in centimeters) of a collagen fiber determined
+        from its statistical distribution.  Associates with humans, age 15-35,
+        whose lungs were fixed at 4 cm H20.  Data are from: Sobin, Fung and
+        Tremer, 1988.  The returned values have been extrapolated back to zero
+        gauge pressure.
 
-    d = chordDiaElastin()
-        Returns a random diameter d for an elastin septal fiber in centimeters.
-        Associates with humans, age 15-35, whose lungs were fixed at 4 cm H2O.
-        Data are from: Sobin, Fung & Tremer, 1988.
+    d = fiberDiameterElastin()
+        Returns the diameter (in centimeters) of an elastin fiber determined
+        from its statistical distribution.  Associates with humans, age 15-35,
+        whose lungs were fixed at 4 cm H20.  Data are from: Sobin, Fung and
+        Tremer, 1988.  The returned values have been extrapolated back to zero
+        gauge pressure.
 
     w = septalWidth()
-        Returns a random thickness for the septal membrane.  No data are known
+        Returns a random thickness for a septal membrane.  No data are known
         from which to establish these statistics, so they are assumed.
 
 The following procedures supply random values for the constitutive parameters.
 No data are available to establish the statistical qualities of these model
-parameters so they are all asigned based upon our judgment.
+parameters so they have all been asigned based upon our judgment.
 
-    E1, E2, e_t = collagenChord()
+    E1, E2, e_t = collagenFiber()
         Returns random elastic moduli for the compliant, E1, and stiff, E2,
         fiber responses with a transtion between them occuring at strain e_t.
 
-    E1, E2, e_t = elastinChord()
+    E1, E2, e_t = elastinFiber()
         Returns random elastic moduli for the compliant, E1, and stiff, E2,
         fiber responses with a transtion between them occuring at strain e_t.
 
@@ -98,45 +143,158 @@ parameters so they are all asigned based upon our judgment.
         thousand times less.  This is an important characteristic of tissues.
         The first moduli in these sets describe the compliant response, the
         second moduli in these sets describe the stiff response, and the third
-        set of values represent their strains of transition.
+        value in these sets represent their strains of transition.
 
-These parameters associate with the implicit elastic model of Freed & Rajagopal
+These parameters associate with an implicit elastic model of Freed & Rajagopal.
 """
+
+# volume fractions for constituents in septa, which are best estimates
+
+vfCollagen = 0.1
+vfElastin = 0.1
+vfH2O = 0.5
+vfBlood = 0.3
+
+# mass densities in grams per centimeter cubed
 
 
 def rhoAir():
     rho = 1.16E-3
-    return rho  # in grams per centimeter cubed
+    return rho
 
 
 def rhoBlood():
     rho = 1.04
-    return rho  # in grams per centimeter cubed
+    return rho
 
 
 def rhoCollagen():
     rho = 1.34
-    return rho  # in grams per centimeter cubed
+    return rho
 
 
 def rhoElastin():
     rho = 1.31
-    return rho  # in grams per centimeter cubed
+    return rho
 
 
 def rhoH2O():
     rho = 1.0
-    return rho  # in grams per centimeter cubed
+    return rho
 
 
 def rhoSepta():
-    # these volume fractions are our best estimates
-    rho = (0.1 * (rhoCollagen() + rhoElastin()) +
-           0.5 * rhoH2O() + 0.3 * rhoBlood())
-    return rho  # in grams per centimeter cubed
+    rho = (vfCollagen * rhoCollagen() + vfElastin * rhoElastin() +
+           vfH2O * rhoH2O() + vfBlood * rhoBlood())
+    return rho
 
 
-def alveolarDia():
+# entropy densities in ergs per gram Kelvin
+
+
+def etaAir():
+    eta = 3.796E7
+    return eta
+
+
+def etaBlood():
+    eta = 3.0E7  # this is a guess - not able to find a value for this
+    return eta
+
+
+def etaCollagen():
+    eta = 3.7E7
+    return eta
+
+
+def etaElastin():
+    eta = 3.4E7
+    return eta
+
+
+def etaH2O():
+    eta = 3.883E7
+    return eta
+
+
+def etaSepta():
+    eta = (vfCollagen * etaCollagen() + vfElastin * etaElastin() +
+           vfH2O * etaH2O() + vfBlood * etaBlood())
+    return eta
+
+
+# specific heats at constant pressure in ergs per gram Kelvin
+
+
+def CpAir():
+    cp = 1.006E7
+    return cp
+
+
+def CpBlood():
+    cp = 9.4E6
+    return cp
+
+
+def CpCollagen():
+    cp = 1.7E7
+    return cp
+
+
+def CpElastin():
+    cp = 4.2E7
+    return cp
+
+
+def CpH2O():
+    cp = 4.187E7
+    return cp
+
+
+def CpSepta():
+    cp = (vfCollagen * CpCollagen() + vfElastin * CpElastin() +
+          vfH2O * CpH2O() + vfBlood * CpBlood())
+    return cp
+
+
+# coefficients for linear thermal expansion in reciprocal Kelvin
+
+
+def alphaAir():
+    alpha = 1.0 / 310.0  # = 1 / body temperature (in K)
+    return alpha
+
+
+def alphaBlood():
+    alpha = 2.5E-4
+    return alpha
+
+
+def alphaCollagen():
+    alpha = 1.8E-4
+    return alpha
+
+
+def alphaElastin():
+    alpha = 3.2E-4
+    return alpha
+
+
+def alphaH2O():
+    alpha = 2.9E-4
+    return alpha
+
+
+def alphaSepta():
+    alpha = (vfCollagen * alphaCollagen() + vfElastin * alphaElastin() +
+             vfH2O * alphaH2O() + vfBlood * alphaBlood())
+    return alpha
+
+
+# statistical data
+
+
+def alveolarDiameter():
     # Statistics from: Sobin, Fung and Tremer, J. Appl. Phys., Vol. 64, 1988.
     # alveolar diameter was found to distribute normally
     mu = 177.0      # mean diameter in microns: extrapolated to zero pressure
@@ -150,7 +308,7 @@ def alveolarDia():
     return dia  # in centimeters
 
 
-def chordDiaCollagen():
+def fiberDiameterCollagen():
     # Statistics from: Sobin, Fung and Tremer, J. Appl. Phys., Vol. 64, 1988.
     # the square root of fiber diameter was found to distribute normally
     mu = 0.952      # mean of the square root of fiber diameter in microns
@@ -165,7 +323,7 @@ def chordDiaCollagen():
     return dia  # in centimeters
 
 
-def chordDiaElastin():
+def fiberDiameterElastin():
     # Statistics from: Sobin, Fung and Tremer, J. Appl. Phys., Vol. 64, 1988.
     # the square root of fiber diameter was found to distribute normally
     mu = 0.957      # mean of the square root of fiber diameter in microns
@@ -193,33 +351,33 @@ def septalWidth():
     return width  # in centimeters
 
 
-def collagenChord():
+def collagenFiber():
     # no statistics available, based on judgment
     # the compliant modulus
-    mu1 = 5.0E4     # the mean compliant modulus in barye
-    sigma1 = 2.0E4  # the standard deviation
+    mu1 = 5.0E5     # the mean compliant modulus in barye
+    sigma1 = 2.0E5  # the standard deviation
     E1 = random.gauss(mu1, sigma1)
     # bracket the permissible variability
-    while (E1 < mu1 - 2.0 * sigma1) or (E1 > mu1 + 4.0 * sigma1):
+    while (E1 < mu1 - 2.25 * sigma1) or (E1 > mu1 + 4.0 * sigma1):
         E1 = random.gauss(mu1, sigma1)
     # the stiffness modulus
     mu2 = 5.0E7     # the mean stiff modulus in barye
-    sigma2 = 1.5E7  # the standard deviation
+    sigma2 = 1.0E7  # the standard deviation
     E2 = random.gauss(mu2, sigma2)
     # bracket the permissible variability
-    while (E1 >= E2) or (E2 < mu2 - 3.0 * sigma2) or (E2 > mu2 + 4.0 * sigma2):
+    while (E1 >= E2) or (E2 < mu2 - 4.0 * sigma2) or (E2 > mu2 + 4.0 * sigma2):
         E2 = random.gauss(mu2, sigma2)
     # the transition strain
     muT = 0.09       # the mean transition strain at 30% total lung capacity
-    sigmaT = 0.03    # standard deviation
+    sigmaT = 0.015    # standard deviation
     e_t = random.gauss(muT, sigmaT)
     # bracket the permissible variability
-    while (e_t < muT - 2.0 * sigmaT) or (e_t > muT + 4.0 * sigmaT):
+    while (e_t < muT - 3.0 * sigmaT) or (e_t > muT + 4.0 * sigmaT):
         e_t = random.gauss(muT, sigmaT)
     return E1, E2, e_t
 
 
-def elastinChord():
+def elastinFiber():
     # no statistics available, based on judgment
     # the compliant modulus
     mu1 = 2.3E6     # the mean compliant modulus in barye
@@ -230,10 +388,10 @@ def elastinChord():
         E1 = random.gauss(mu1, sigma1)
     # the stiffness modulus
     mu2 = 1.0E7     # the mean stiff modulus in barye
-    sigma2 = 3.0E6  # the standard deviation
+    sigma2 = 2.0E6  # the standard deviation
     E2 = random.gauss(mu2, sigma2)
     # bracket the permissible variability
-    while (E1 >= E2) or (E2 < mu2 - 3.0 * sigma2) or (E2 > mu2 + 4.0 * sigma2):
+    while (E1 >= E2) or (E2 < mu2 - 4.0 * sigma2) or (E2 > mu2 + 4.0 * sigma2):
         E2 = random.gauss(mu2, sigma2)
     # the transition strain
     muT = 0.4        # the mean transition strain
