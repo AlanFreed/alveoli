@@ -48,7 +48,7 @@ wherein $\mu$ is a free scalar parameter that is considered to be $\mu = 1/2$ to
 \subsection{Mass Matrix of Chord}
 The determinant of the Jacobian matrix is used for the transformation of integral from the global coordinate system to the natural coordinate system by
 \begin{equation}
-     |\mathbf{J}| = \mathrm{\det} \mathbf{J} = \mathrm{\det} \begin{bmatrix}\frac{\partial x }{\partial\xi} \end{bmatrix} = \sum\nolimits_{i=1}^n N_{i,\xi} (\xi) \, x_i
+     |\mathbf{J}| = \mathrm{\det} \mathbf{J} = \mathrm{\det} \begin{bmatrix} \frac{\partial x }{\partial\xi} \end{bmatrix} = \sum\nolimits_{i=1}^n N_{i,\xi} (\xi) \, x_i
      \label{detJac1D}
 \end{equation}
 wherein $N_{i}$ are the shape functions for a two-node alveolar chords in its natural coordinate system which are defined in a matrix form as
@@ -166,19 +166,19 @@ wherein $\sum_{j=1}^n N_j = 1$.
 For instance,the lumped-consistent mass matrix of a pentagon  with $1$ Gauss integration point at the center of pentagon that is constructed by averaging consistent mass matrix and the lumped mass matrix becomes 
 \begin{equation}
 \mathbf{M}_{2LC}  = \rho \, h
-\begin{bmatrix}
-0.28532 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 \\ 0.04755 & 0 \\
-0 & 0.28532 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755\\ 0 & 0.04755
+\scalefont{0.75}{ \begin{bmatrix}
+0.28532 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 \\
+0 & 0.28532 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755
 \\
-0.04755 & 0 & 0.28532 & 0 & 0.04755 & 0 & 0.04755 & 0 \\ 0.04755 & 0\\
-0 & 0.04755 & 0 & 0.28532 & 0 & 0.04755 & 0 & 0.04755\\ 0 & 0.04755 \\
-0.04755 & 0 & 0.04755 & 0 & 0.28532 & 0 & 0.04755 & 0 \\ 0.04755 & 0 \\
-0 & 0.04755 & 0 & 0.04755 & 0 & 0.28532 & 0 & 0.04755\\ 0 & 0.04755 \\
-0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.28532 & 0\\ 0.04755 & 0\\
-0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.28532\\ 0 & 0.04755\\
-0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 \\ 0.28532 & 0 & 0.04755\\
-0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755\\ 0 & 0.28532\\
-\end{bmatrix} 
+0.04755 & 0 & 0.28532 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0\\
+0 & 0.04755 & 0 & 0.28532 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 \\
+0.04755 & 0 & 0.04755 & 0 & 0.28532 & 0 & 0.04755 & 0 & 0.04755 & 0 \\
+0 & 0.04755 & 0 & 0.04755 & 0 & 0.28532 & 0 & 0.04755 & 0 & 0.04755 \\
+0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.28532 & 0 & 0.04755 & 0\\
+0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.28532 & 0 & 0.04755\\
+0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.28532 & 0 \\
+0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.04755 & 0 & 0.28532\\
+\end{bmatrix} }
 \label{LumconsMassMatrix2D}
 \end{equation}
 
@@ -273,29 +273,21 @@ wherein $\sum_{j=1}^n N_j = 1$.
 \section{Stiffness Matrix}
 For the nonlinear elastic material like soft tissues, as they generally become stiffer with increased deformation, the slope of stress-strain curve will change, and therefore the instantaneous stiffness will change. So, it is required to derive the tangent stiffness for our purpose. 
 
-The total potential energy of a deformed body can be expressed as the differences between the potential energy of deformation $\delta{U}$ and the potential energy of the external loading $\delta{W}$ \cite{Yangetal10}. 
+The total potential energy of a deformed body can be expressed as the differences between the variation in the potential energy of deformation $\delta{U}$ and the variation in the potential energy of the external loading $\delta{W}$ \cite{Yangetal10}, where 
 \begin{subequations}
 \begin{align}
 \delta{W} & = \mathbf{F} \, \mathrm{d} \boldsymbol{\Delta}\\
 \delta{U} & = \int_{V} \, \bar{\mathbf{B}}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta}
 \end{align}
 \end{subequations}
-where $\mathbf{F}$ is the vector of external forces, and $\bar{\mathbf{B}}$ is the matrix of strain displacement for large deflection which make the relation between strain increments and displacement increments 
+where $\mathbf{F}$ is the vector of external forces, and $\bar{\mathbf{B}}$ is the matrix of strain displacement for large deflection which make the relation between strain and displacement 
 \begin{equation}
-\mathrm{d} \boldsymbol{\epsilon} = \bar{\mathbf{B}} \, \mathrm{d} \boldsymbol{\Delta}
+\boldsymbol{\epsilon} = \bar{\mathbf{B}} \,  \boldsymbol{\Delta}
+\label{strain}
 \end{equation}
-and it can be defined as a sum of linear and nonlinear strain displacements as follow
+The displacement fields are interpolated as
 \begin{equation}
-\bar{\mathbf{B}} = \mathbf{B}_L + \mathbf{B}_N
-\label{straindis}
-\end{equation} 
-where $\mathbf{B}_L$ can be obtained from the linear analysis $\boldsymbol{\epsilon} = \mathbf{B}_L \, \boldsymbol{\Delta}$, and $\mathbf{B}_N$ is a function of displacement $ \mathbf{u}$ that can be defined as 
-\begin{equation}
-\mathbf{B}_N = \mathbf{A} \, \mathbf{G}
-\end{equation} 
-wherein $\mathbf{A}= \partial \mathbf{u} / \partial \mathbf{x}$ is the derivative of displacements, and $\mathbf{G}= \partial \mathbf{N} / \partial \mathbf{x}$ is the derivative of shape functions respect to the global coordinate system. The displacement fields are interpolated as
-\begin{equation}
-\bar{\mathbfsf{ u}} = 
+\bar{\mathbf{ u}} = 
 \begin{Bmatrix}
 u \\
 v     
@@ -305,59 +297,156 @@ v
 \sum_{i=1}^{n} u_j \, N_j \\
 \sum_{i=1}^{n} v_j \, N_j     
 \end{Bmatrix}
-= \mathbf{N} \, \mathbf{\Delta}
+= \mathbf{N} \, \boldsymbol{\Delta}
 \end{equation}
-with
+with $\boldsymbol{\Delta}$ being the vector of displacement. 
+The strain displacement can be defined as sum of linear and nonlinear strain displacements as follow
 \begin{equation}
-\mathbf{\Delta}^T  = 
-\begin{Bmatrix}
-u_1 , v_1, u_2 , v_2, ..., u_n , v_n
-\end{Bmatrix}
+\bar{\mathbf{B}} = \mathbf{B}_L + \mathbf{B}_N
+\label{straindis}
+\end{equation} 
+$\mathbf{B}_L$ can be obtained from the linear analysis $\boldsymbol{\epsilon}_L = \mathbf{B}_L \, \boldsymbol{\Delta}$, and $\mathbf{B}_N$ that is a function of displacement $ \mathbf{u}$ can be obtained from the nonlinear part of strain $\boldsymbol{\epsilon}_N$ which can be formed as follow 
+\begin{equation}
+\boldsymbol{\epsilon}_N = \tfrac{1}{2} \, {\mathbf{A}} \,  \boldsymbol{\theta}
 \end{equation}
+wherein ${\mathbf{A}}$ being the matrix of  derivative of displacements, and $\boldsymbol{\theta}$ being the vector of derivative of displacements that can be obtained via $\boldsymbol{\theta} = \mathbf{H} \, \boldsymbol{\Delta} $ where $\mathrm{d} \boldsymbol{\theta} = \mathbf{H} \, \mathrm{d} \boldsymbol{\Delta}$ with $\mathbf{H}$ being the derivative of shape functions respect to the global coordinate system. Thus, the derivative of strain can be obtained via
+\begin{equation}
+\mathrm{d} \boldsymbol{\epsilon} = \mathrm{d} (\boldsymbol{\epsilon}_L + \boldsymbol{\epsilon}_N) = \mathrm{d} \boldsymbol{\epsilon}_N = \tfrac{1}{2} \, (\mathrm{d} \mathbf{A} \, \boldsymbol{\theta} + \mathbf{A} \, \mathrm{d} \boldsymbol{\theta}) = \tfrac{1}{2} \, (\mathrm{d} \mathbf{A} \, \mathbf{H} \, \boldsymbol{\Delta} + \mathbf{A} \, \mathbf{H} \, \mathrm{d} \boldsymbol{\Delta})
+\label{dstrain1}
+\end{equation}
+where $\mathrm{d} \mathbf{A} = \mathbf{A}^{'} \, \mathrm{d} \boldsymbol{\Delta} $. Besides, the derivative of strain in Eq.~(\ref{strain}) become 
+\begin{equation}
+\mathrm{d} \boldsymbol{\epsilon} = \mathrm{d} \bar{\mathbf{B}} \, \boldsymbol{\Delta} + \bar{\mathbf{B}} \, \mathrm{d} \boldsymbol{\Delta}
+\label{dstrain2}
+\end{equation}
+wherein $\mathrm{d} \bar{\mathbf{B}} = \mathrm{d} (\mathbf{B}_L + \mathbf{B}_N) = \mathrm{d} \mathbf{B}_N$. Therefor, the nonlinear strain displacement and its derivative can be obtained by equating Eq.~(\ref{dstrain1}) and Eq.~(\ref{dstrain2}) which yield
+\begin{equation}
+\mathbf{B}_N = \tfrac{1}{2} \, \mathbf{A} \, \mathbf{H} - \mathbf{B}_L \quad \text{with} \quad \mathrm{d} \mathbf{B}_N = \tfrac{1}{2} \, \mathrm{d} \mathbf{A} \, \mathbf{H}
+\end{equation} 
+ 
 
-In order to satisfy the equilibrium, the first variation of the total potential energy which is known as the residual force should be zero. 
+In order to satisfy the equilibrium, the first variation of the total potential energy which is known as the residual force should be zero \cite{Elseifi98}. 
 \begin{equation}
 \mathbf{R} = \int_{V} \, \bar{\mathbf{B}}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathrm{d} V - \mathbf{F} = 0
 \label{residual}
 \end{equation}
-differentiation of the residual force yield 
+derivative of the residual force yield 
 \begin{equation}
 \mathrm{d} \mathbf{R} = \int_{V} \, \mathrm{d} \bar{\mathbf{B}}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathrm{d} V + \int_{V} \, \bar{\mathbf{B}}^{\mathsf{T}} \, \mathrm{d} \boldsymbol{\sigma} \, \mathrm{d} V 
 \label{diffresidual}
 \end{equation}
-where $\mathrm{d} \boldsymbol{\sigma} = \mathbf{M} \, \mathrm{d} \boldsymbol{\epsilon} = \mathbf{M} \, \bar{\mathbf{B}} \, \mathrm{d} \boldsymbol{\Delta}$, with $\mathbf{M}$ being the matrix of elastic modulus. 
-The incremental form of  Eq.~(\ref{straindis}) yield
-\begin{equation}
-\mathrm{d} \bar{\mathbf{B}} = \mathrm{d} \left(\mathbf{B}_L + \mathbf{B}_N \right) = \mathrm{d} \mathbf{B}_N = \mathrm{d} (\mathbf{A} \, \mathbf{G}) = \mathrm{d} \mathbf{A} \, \mathbf{G}
-\end{equation} 
+where $\mathrm{d} \boldsymbol{\sigma} = \mathbf{M} \, \mathrm{d} \boldsymbol{\epsilon} = \mathbf{M} \, \mathrm{d} \mathbf{B}_N \, \boldsymbol{\Delta} + \mathbf{M} \,  \bar{\mathbf{B}} \, \mathrm{d} \boldsymbol{\Delta}$, with $\mathbf{M}$ being the matrix of elastic modulus. 
 
-The tangent stiffness matrix can be obtained by substituting the definition of $\mathrm{d} \boldsymbol{\sigma}$ into Eq.~(\ref{diffresidual}) as follow \cite{Elseifi98}
+The tangent stiffness matrix can be obtained by substituting the definition of $\mathrm{d} \boldsymbol{\sigma}$ into Eq.~(\ref{diffresidual}) as follow 
 \begin{equation}
 \begin{aligned}
-\mathrm{d} \mathbf{R} & = \int_{V} \, \mathrm{d} \bar{\mathbf{B}}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathrm{d} V + \int_{V} \, \bar{\mathbf{B}}^{\mathsf{T}} \, \mathbf{M} \, \bar{\mathbf{B}} \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta} \\ 
-& = \int_{V} \, \mathbf{G}^{\mathsf{T}} \, \mathrm{d} \mathbf{A}^{\mathsf{T}} \boldsymbol{\sigma} \, \mathrm{d} V + \int_{V} \, \left(\mathbf{B}_L + \mathbf{B}_N \right)^{\mathsf{T}} \, \mathbf{M} \,  \left(\mathbf{B}_L + \mathbf{B}_N \right) \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta} \\ 
-& = \mathbf{K}_{\boldsymbol{\sigma}} \, \mathrm{d} \boldsymbol{\Delta} + \int_{V} \, \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta}\\ 
-& + \int_{V} \,  \left(\mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \,  \right) \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta}\\
+\mathrm{d} \mathbf{R} & = \int_{V} \, \mathrm{d} \mathbf{B}_N^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathrm{d} V + \int_{V} \, \bar{\mathbf{B}}^{\mathsf{T}} \, \mathbf{M} \, \mathrm{d} \mathbf{B}_N \, \boldsymbol{\Delta} \, \mathrm{d} V  + \int_{V} \, \bar{\mathbf{B}}^{\mathsf{T}} \, \mathbf{M} \, \bar{\mathbf{B}} \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta} \\ 
+& = \int_{V} \, \frac{1}{2} \, (\mathbf{H}^{\mathsf{T}} \, \mathrm{d} \mathbf{A}^{\mathsf{T}} \boldsymbol{\sigma}) \, \mathrm{d} V + \int_{V} \, \frac{1}{2} \, \left(\mathbf{B}_L + \mathbf{B}_N \right)^{\mathsf{T}} \, \mathbf{M} \, \mathrm{d} \mathbf{A} \, \mathbf{H} \, \boldsymbol{\Delta} \, \mathrm{d} V  \\
+& + \int_{V} \, \left(\mathbf{B}_L + \mathbf{B}_N \right)^{\mathsf{T}} \, \mathbf{M} \,  \left(\mathbf{B}_L + \mathbf{B}_N \right) \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta} \\ 
+& = \frac{1}{2} \, \int_{V} \, \mathbf{H}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathbf{A}^{'} \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta} + \frac{1}{2} \, \int_{V} \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{A}^{'} \, \mathbf{H} \, \boldsymbol{\Delta} \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta}\\
+& + \frac{1}{2} \, \int_{V} \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{A}^{'} \, \mathbf{H} \, \boldsymbol{\Delta} \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta} + \int_{V} \, \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta}\\ 
+& + \int_{V} \,  \left(\mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, \right) \, \mathrm{d} V \, \mathrm{d} \boldsymbol{\Delta}\\
 & = \left(\mathbf{K}_{\boldsymbol{\sigma}} + \mathbf{K}_L + \mathbf{K}_N\right)\mathrm{d} \boldsymbol{\Delta} = \mathbf{K}_T \, \mathrm{d} \boldsymbol{\Delta}
 \end{aligned} 
 \end{equation} 
-wherein $\mathbf{K}_{\boldsymbol{\sigma}}$ being the stiffness matrix associated with the initial stress, $\mathbf{K}_L$ being the conventional small displacement stiffness matrix, $\mathbf{K}_N$ being the the large displacement stiffness matrix, and $\mathbf{K}_T$ being the tangent-stiffness matrix 
+wherein $\mathbf{K}_{\boldsymbol{\sigma}}$ being the stiffness matrix associated with the initial stress, $\mathbf{K}_L$ being the conventional small displacement stiffness matrix, $\mathbf{K}_N$ being the the large displacement stiffness matrix, and $\mathbf{K}_T$ being the tangent-stiffness matrix. 
 
 \subsection{Stiffness Matrix for Chord}
+The components of Laplace stretch $\boldsymbol{\mathcal{U}}$ has a Cholesky factorization expressed in terms of the right Cauchy-Green deformation tensor $\mathbf{C} \defeq \mathbf{F}^{\mathsf{T}} \mathbf{F} = \boldsymbol{\mathcal{U}}^{\mathsf{T}} \boldsymbol{\mathcal{U}}$, which is a symmetric second-order tensor. 
+A 1-D chord has an axial strain of $e = \ln ( a / a_0 ) = \ln ( L / L_0 )$ 
+where $a$ that is the first component of Laplace stretch can be written in terms of derivative of displacements as follow
+\begin{equation}
+a = {\mathcal{U}}_{11} = \sqrt{C_{11}}  \quad \text{with} \quad \mathrm{C_{11}} = \left(\frac{\mathrm{\partial u}}{\partial x}\right)^2 + 2\, \frac{\mathrm{\partial u}}{\partial x}  + 1
+\end{equation} 
+The total axial strain of chord can be written in terms of linear and nonlinear incremental strains as follow
+\begin{equation}
+ e = e_{L} + e_{N}
+\end{equation}
+Taylor series are used here to obtain the linear and nonlinear part of displacements 
+\begin{subequations}
+	\begin{align}
+	e_{L} & = \mathrm{\frac{\partial u}{\partial x}} \\
+	e_{N} & = -\frac{1}{2} \, \mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} 
+	\end{align}
+\end{subequations}
+
+The linear strain displacement matrix $\mathbf{B}_L$ can be obtained by derivative of displacements as follow
+\begin{subequations}
+	\begin{align}
+e_L  = 
+\partial u / \partial x   = &
+\sum\nolimits_{i=1}^2 N_{i,x} \, u_i = \begin{bmatrix}
+[\mathbf{b}_1], & [\mathbf{b}_2]
+\end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
+= [\mathbf{B}_L] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}\\
+ \intertext{with} \mathbf{b}_i  &= 
+N_{i,x} \quad {and} \quad
+\mathbf{\Delta}^T  = 
+\begin{Bmatrix}
+u_1 ,u_2
+\end{Bmatrix} 
+\end{align}
+\end{subequations}
+
+
+The nonlinear strain terms can be written as 
+\begin{equation}
+e_ N =  \tfrac{1}{2} \,
+ [-\partial u / \partial x ]
+\{\partial u / \partial x\}
+= \tfrac{1}{2} \, \mathbf{A} \, \boldsymbol{\theta}
+\end{equation}
+the derivative of displacement can be related to the nodal parameters via
+\begin{equation}
+\boldsymbol{\theta} =  \begin{Bmatrix}
+\partial u / \partial x
+\end{Bmatrix}
+= \begin{Bmatrix}
+\sum\nolimits_{i=1}^2 N_{i,x} \, u_i
+\end{Bmatrix} 
+= \begin{bmatrix}
+[\mathbf{h}_1], & [\mathbf{h}_2]
+\end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
+= [\mathbf{H}] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} \quad \text{with} \quad \mathbf{h}_i = N_{i,x}  
+\end{equation}
+hence $\mathbf{B}_N$ become
+\begin{equation}
+\mathbf{B}_N = \tfrac{1}{2} \, \mathbf{A} \, \mathbf{H} - \mathbf{B}_L =  \begin{bmatrix}
+[\mathbf{b}_1], & [\mathbf{b}_2] 
+\end{bmatrix} 
+\end{equation}
+where
+\begin{equation}
+\mathbf{b}_i  =   
+\tfrac{1}{2} \, [-\partial u / \partial x] \cdot
+N_{i,x} - N_{i,x} 
+\end{equation}
+
+
 The stress stiffness matrix $\mathbf{K}_{\boldsymbol{\sigma}}$ expresses the influence of membrane stresses on the lateral deflection that is independent of material properties.
 \begin{equation}
-\mathbf{K}_{\boldsymbol{\sigma}} = \int_{V} \, \mathbf{G}^{\mathsf{T}} \, \mathrm{d} \mathbf{A}^{\mathsf{T}} \boldsymbol{\sigma} \, \mathrm{d} V = \int_{\Gamma} \, \mathbf{G}^{\mathsf{T}} \,  \boldsymbol{\sigma} \, \mathbf{G} \, A \, \mathrm{d} x 
-= \int_{-1}^{1} \mathbf{G}^{\mathsf{T}} \,  \boldsymbol{\sigma} \, \mathbf{G} \, |\mathbf{J}|  \, G \,  \mathrm{d} \xi =  \sum_{i=1}^{n}  \mathbf{G}^{\mathsf{T}} \,  \boldsymbol{\sigma} \, \mathbf{G}  \, |\mathbf{J}| \, A \, \mathrm{w}_i
+\begin{aligned}
+\mathbf{K}_{\boldsymbol{\sigma}} & = \frac{1}{2} \, \int_{V} \, \mathbf{H}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathbf{A}^{'} \, \mathrm{d} V = \frac{1}{2} \, \int_{\Gamma} \, \mathbf{H}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathbf{A}^{'} \, A \, \mathrm{d} x 
+= \frac{1}{2} \, \int_{-1}^{1} \mathbf{H}^{\mathsf{T}} \,  \, \boldsymbol{\sigma} \, \mathbf{A}^{'} \, |\mathbf{J}|  \, A \,  \mathrm{d} \xi\\
+& = \frac{1}{2} \, \sum_{i=1}^{n}  \mathbf{H}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathbf{A}^{'}  \, |\mathbf{J}| \, A \, \mathrm{w}_i
+\end{aligned}
 \end{equation}
 where 
 \begin{equation}
 \begin{aligned}
-\mathbf{G} = \begin{bmatrix}
+\mathbf{H} = \begin{bmatrix}
  N_{1,x} &  N_{2,x}
 \end{bmatrix} = \begin{bmatrix}
  N_{1,\xi} &  \partial N_{2,\xi} \, 
 \end{bmatrix} \, \mathbf{J}^{-1}
 \end{aligned}
+\end{equation}
+and $\mathbf{A}^{'}$ can be defined as follow
+\begin{equation}
+\mathrm{d} \mathbf{A} = \mathbf{A}^{'} \, \mathrm{d} \boldsymbol{\Delta} = \begin{bmatrix}
+[\mathbf{a}^{'}_1], & [\mathbf{a}^{'}_2]
+\end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
+= [\mathbf{A}^{'}] \begin{Bmatrix} \mathrm{d} \boldsymbol{\Delta} \end{Bmatrix} \quad \text{with} \quad \mathbf{a}^{'}_i = - N_{i,x}  
 \end{equation}
 
 
@@ -378,24 +467,30 @@ wherein $\xi$ is abscissae of the Gauss integration rule.
 
 The large displacement stiffness matrix for chord can be presented as follow
 \begin{equation}
-\begin{aligned}
-\mathbf{K}_{N} & =  \int_{V} \,  \left(\mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \,  \right) \mathrm{d} V \\
-& = \int_{-1}^{1} \left(\mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \,  \right) \, |\mathbf{J}|  \, A \,  \mathrm{d} \xi \\
-& = \sum_{i=1}^{n}  \left(\mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \right) \, |\mathbf{J}| \, A \, \mathrm{w}_i
-\end{aligned}
+\mathbf{K}_{N}  = \int_{V} \mathbf{D} \, \mathrm{d} V \\
+ = \int_{-1}^{1} \mathbf{D} \, |\mathbf{J}|  \, A \,  \mathrm{d} \xi 
+= \sum_{i=1}^{n} \mathbf{D} \, |\mathbf{J}| \, A \, \mathrm{w}_i
 \end{equation}
-where $\mathbf{B}_N$ have the expression 
+where $\mathbf{D}$ take the form of
+\begin{equation}
+\mathbf{D} = \tfrac{1}{2} \, \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{A}^{'} \, \mathbf{H} \, \boldsymbol{\Delta} + \tfrac{1}{2} \, \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{A}^{'} \, \mathbf{H} \, \boldsymbol{\Delta} + \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N 
+\end{equation}
+wherein $\mathbf{B}_N$ have the expression 
 \begin{equation}
 \begin{aligned}
-\mathbf{B}_{N} & =  \mathbf{A} \, \mathbf{G} = \begin{bmatrix}
+\mathbf{B}_{N} & =  \tfrac{1}{2} \, \begin{bmatrix}
 \partial \mathbf{u} / \partial \mathbf{x} 
 \end{bmatrix} \, \begin{bmatrix}
  N_{1,x} &  N_{2,x}
-\end{bmatrix} \\
-& = \begin{bmatrix}
-\sum\nolimits_{i=1}^n N_{i,x} \, u_i
+\end{bmatrix} - \begin{bmatrix}
+N_{1,x} &   N_{2,x}
+\end{bmatrix}  \\
+& = \tfrac{1}{2} \, \begin{bmatrix}
+\sum\nolimits_{=1}^n N_{i,x} \, u_i
 \end{bmatrix} \, \begin{bmatrix}
  N_{1,\xi} &   N_{2,\xi} \, 
+\end{bmatrix} \, \mathbf{J}^{-1} - \begin{bmatrix}
+N_{1,\xi} &   N_{2,\xi} \, 
 \end{bmatrix} \, \mathbf{J}^{-1}
 \end{aligned}
 \end{equation}
@@ -426,9 +521,9 @@ where ${C_{11}}$, ${C_{12}}$, ${C_{21}}$ and ${C_{22}}$ are components of the Gr
 	\mathrm{\partial v / \partial x} & 1+\mathrm{\partial v / \partial y}
 	\end{bmatrix}\\
 	\intertext{with}
-	\mathrm{C_{11}}&= \mathrm{\partial u / \partial x}^2+ {\mathrm{\partial v / \partial x}}^2 + 2\, \mathrm{\partial u / \partial x}  + 1\\
-	\mathrm{C_{12}}&= \mathrm{\partial u / \partial y} + \mathrm{\partial v / \partial x} + \mathrm{\partial u / \partial x} \cdot \mathrm{\partial u / \partial y} + \mathrm{\partial v / \partial x} \cdot \mathrm{\partial v / \partial y}\\
-	\mathrm{C_{22}}&= \mathrm{\partial u / \partial y}^2 + {\mathrm{\partial v / \partial y}}^2 + 2\, \mathrm{\partial v / \partial y} + 1
+	\mathrm{C_{11}}&= \left(\frac{\mathrm{\partial u}}{\partial x}\right)^2+ \left(\frac{\mathrm{\partial v}}{\partial x}\right)^2 + 2\, \frac{\mathrm{\partial u}}{\partial x}  + 1\\
+	\mathrm{C_{12}}&= \frac{\mathrm{\partial u}}{\partial y} + \frac{\mathrm{\partial v}}{\partial x} + \frac{\mathrm{\partial u}}{\partial x} \cdot \frac{\mathrm{\partial u}}{\partial y} + \frac{\mathrm{\partial v}}{\partial x} \cdot \frac{\mathrm{\partial v}}{\partial y}\\
+	\mathrm{C_{22}}&= \left(\frac{\mathrm{\partial u}}{\partial y}\right)^2 + \left(\frac{\mathrm{\partial v}}{\partial y}\right)^2 + 2\, \frac{\mathrm{\partial v}}{\partial y} + 1
 	\end{align}
 \end{subequations}
 
@@ -444,10 +539,10 @@ It is useful to define the total virtual strains Eq.~(\ref{conjugateStrains}) in
 Taylor series are used here to obtain the linear and nonlinear part of displacements 
 \begin{subequations}
 	\begin{align}
-	\mathrm \xi_{L} & =\frac{1}{2}\, \left(\mathrm{\frac{\partial u}{\partial x}} + \mathrm{\frac{\partial v}{\partial y}}\right)\\
-	\mathrm \xi_{N} & = \frac{1}{4}\, \left(- \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} - 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
-	\mathrm \varepsilon_{L} & =\frac{1}{2}\, \left(\mathrm{\frac{\partial u}{\partial x}} - \mathrm{\frac{\partial v}{\partial y}}\right)\\
-	\mathrm \varepsilon_{N} & = \frac{1}{4}\, \left(2 \, \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial x}} + \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} + 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
+	\mathrm \xi_{L} & = \frac{1}{2} \, \left(\mathrm{\frac{\partial u}{\partial x}} + \mathrm{\frac{\partial v}{\partial y}}\right)\\
+	\mathrm \xi_{N} & = \frac{1}{4} \, \left(- \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} - 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
+	\mathrm \varepsilon_{L} & = \frac{1}{2} \, \left(\mathrm{\frac{\partial u}{\partial x}} - \mathrm{\frac{\partial v}{\partial y}}\right)\\
+	\mathrm \varepsilon_{N} & = \frac{1}{4} \, \left(2 \, \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial x}} + \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} + 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
 	\mathrm \gamma_{L} & = \mathrm{\frac{\partial u}{\partial y}} + \mathrm{\frac{\partial v}{\partial x}}\\
 	\mathrm \gamma_{N} & = \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial y}} - 2\, \mathrm{\frac{ \partial u}{\partial x}}\, \mathrm{\frac{ \partial v}{\partial x}} 
 	-\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial y}}
@@ -455,71 +550,126 @@ Taylor series are used here to obtain the linear and nonlinear part of displacem
 \end{subequations}
 The linear strain displacement matrix $\mathbf{B}_L$ can be obtained by differentiation of displacements expressed through the nodal displacements and shape functions from infinitesimal linear strain vector that take the form of
 \begin{equation}
-\mathbf{B}_L = \frac{1}{2} \, \begin{bmatrix}
- N_{i,x} &   N_{i,y} \\
- N_{i,x} & - N_{i,y} \\
-2 \,  N_{i,y} & 2 \,  N_{i,x} \end{bmatrix} 
+\begin{aligned}
+\boldsymbol{\epsilon}_L & = \frac{1}{2} \, \begin{bmatrix}
+\partial u / \partial x & 0 & 0 &   \partial v / \partial y \\
+\partial u / \partial x & 0 & 0 & - \partial v / \partial y \\
+0 & 2 \, \partial u / \partial y & 2 \, \partial v / \partial x & 0 \end{bmatrix} \\
+& = \frac{1}{2} \, \begin{bmatrix}
+\sum\nolimits_{i=1}^5 N_{i,x} \, u_i & 0 & 0 &   \sum\nolimits_{i=1}^5 N_{i,y} \, v_i \\
+\sum\nolimits_{i=1}^5 N_{i,x} \, u_i & 0 & 0 & - \sum\nolimits_{i=1}^5 N_{i,y} \, v_i \\
+0 & 2 \, \sum\nolimits_{i=1}^5 N_{i,y} \, u_i & 2 \, \sum\nolimits_{i=1}^5 N_{i,x} \, v_i & 0 \end{bmatrix} \\
+& = \begin{bmatrix}
+[\mathbf{b}_1], & [\mathbf{b}_2], & [\mathbf{b}_3], & [\mathbf{b}_4], & [\mathbf{b}_5] 
+\end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
+= [\mathbf{B}_L] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} 
+\end{aligned}
 \end{equation}
+wherein 
+\begin{subequations}
+\begin{align}
+\mathbf{b}_i = &
+\frac{1}{2} \, \begin{bmatrix}
+N_{i,x} & 0 & 0 &   N_{i,y} \\
+N_{i,x} & 0 & 0 & - N_{i,y} \\
+0 & 2 \,  N_{i,y} & 2 \,  N_{i,x} & 0 \end{bmatrix}\\
+\intertext{and}
+\mathbf{\Delta}^T  = &
+\begin{Bmatrix}
+u_1 ,u_1, v_1, v_1, u_2 ,u_2, v_2, v_2, ..., u_n ,u_n, v_n, v_n
+\end{Bmatrix}
+\end{align}
+\end{subequations}
+
+
 The nonlinear strain terms can be written as 
 \begin{equation}
 \boldsymbol{\epsilon}_ N = \frac{1}{2} \, \begin{bmatrix}
--\frac{1}{2} \, \partial u / \partial x &  -4 \, \partial u / \partial y & 0 & -\frac{1}{2} \, \partial v / \partial y \\
--\frac{1}{2} \, \partial u / \partial x &  4 \, \partial v / \partial x & 4 \, \partial v / \partial x & \frac{1}{2} \, \partial v / \partial y \\
--2 \, \partial u / \partial y &  -4 \, \partial u / \partial x & 0 & 2 \, \partial v / \partial x \end{bmatrix} \, \begin{Bmatrix}
+-\frac{1}{2} \, \partial u / \partial x &  - \, \partial v / \partial x & 0 & -\frac{1}{2} \, \partial v / \partial y \\
+-\frac{1}{2} \, \partial u / \partial x &  \partial v / \partial x & \partial v / \partial x & \frac{1}{2} \, \partial v / \partial y \\
+-2 \, \partial u / \partial y & 0 & -4 \, \partial u / \partial x  & 2 \, \partial v / \partial x \end{bmatrix} \, \begin{Bmatrix}
 \partial u / \partial x\\
-\partial v / \partial x\\
 \partial u / \partial y\\
+\partial v / \partial x\\
 \partial v / \partial y
 \end{Bmatrix}
-= \frac{1}{2} \, \mathbf{A} \, \boldsymbol{\theta}
+= \tfrac{1}{2} \, \mathbf{A} \, \boldsymbol{\theta}
 \end{equation}
 the derivative of displacement can be related to the nodal parameters via
 \begin{equation}
 \boldsymbol{\theta} =  \begin{Bmatrix}
 \partial u / \partial x\\
-\partial v / \partial x\\
 \partial u / \partial y\\
+\partial v / \partial x\\
 \partial v / \partial y
 \end{Bmatrix}
 = \begin{Bmatrix}
 \sum\nolimits_{i=1}^5 N_{i,x} \, u_i\\
-\sum\nolimits_{i=1}^5 N_{i,x} \, v_i\\
 \sum\nolimits_{i=1}^5 N_{i,y} \, u_i\\
+\sum\nolimits_{i=1}^5 N_{i,x} \, v_i\\
 \sum\nolimits_{i=1}^5 N_{i,y} \, v_i
 \end{Bmatrix} 
 = \begin{bmatrix}
-[\mathbf{g}_1], & [\mathbf{g}_2], & [\mathbf{g}_3], & [\mathbf{g}_4], & [\mathbf{g}_5] 
+[\mathbf{h}_1], & [\mathbf{h}_2], & [\mathbf{h}_3], & [\mathbf{h}_4], & [\mathbf{h}_5] 
 \end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
-= [\mathbf{G}] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} 
+= [\mathbf{H}] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} 
 \end{equation}
 where 
 \begin{equation}
-\mathbf{g}_i = \begin{bmatrix}
-N_{i,x} &  0 \\
-0 & N_{i,x} \\
-N_{i,y} & 0 \\
-0 & N_{i,y} \end{bmatrix} 
+\mathbf{h}_i = \begin{bmatrix}
+N_{i,x} &  0 & 0 & 0 \\
+0 & N_{i,y} & 0 & 0  \\
+0 & 0 & N_{i,x} & 0 \\
+0 & 0 & 0  & N_{i,y} \end{bmatrix} 
 \end{equation}
 hence $\mathbf{B}_N$ become
 \begin{equation}
+\mathbf{B}_N = \tfrac{1}{2} \, \mathbf{A} \, \mathbf{H} - \mathbf{B}_L = \tfrac{1}{2} \, \begin{bmatrix}
+ [\mathbf{b}_1], & [\mathbf{b}_2], & [\mathbf{b}_3], & [\mathbf{b}_4], & [\mathbf{b}_5] 
+\end{bmatrix} 
+\end{equation}
+where
+\begin{equation}
 \begin{aligned}
-\mathbf{B}_{N}  =  \mathbf{A} \, \mathbf{G} = \begin{bmatrix}
--\frac{1}{2} \, \partial u / \partial x &  -4 \, \partial u / \partial y & 0 & -\frac{1}{2} \, \partial v / \partial y \\
--\frac{1}{2} \, \partial u / \partial x &  4 \, \partial v / \partial x & 4 \, \partial v / \partial x & \frac{1}{2} \, \partial v / \partial y \\
--2 \, \partial u / \partial y &  -4 \, \partial u / \partial x & 0 & 2 \, \partial v / \partial x \end{bmatrix}  \, \begin{bmatrix}
-N_{i,x} &  0 \\
-0 & N_{i,x} \\
-N_{i,y} & 0 \\
-0 & N_{i,y} \end{bmatrix} 
+\mathbf{b}_i  = &   \begin{bmatrix}
+-\frac{1}{2} \, \partial u / \partial x &  - \, \partial v / \partial x & 0 & -\frac{1}{2} \, \partial v / \partial y \\
+-\frac{1}{2} \, \partial u / \partial x &  \partial v / \partial x & \partial v / \partial x & \frac{1}{2} \, \partial v / \partial y \\
+-2 \, \partial u / \partial y & 0 & -4 \, \partial u / \partial x  & 2 \, \partial v / \partial x \end{bmatrix}  \, \begin{bmatrix}
+N_{i,x} &  0 & 0 & 0 \\
+0 & N_{i,y} & 0 & 0  \\
+0 & 0 & N_{i,x} & 0 \\
+0 & 0 & 0  & N_{i,y} \end{bmatrix} \\
+ - & \begin{bmatrix}
+ N_{i,x} & 0 & 0 &   N_{i,y} \\
+ N_{i,x} & 0 & 0 & - N_{i,y} \\
+ 0 & 2 \,  N_{i,y} & 2 \,  N_{i,x} & 0 \end{bmatrix}
 \end{aligned}
 \end{equation}
 
 The stress stiffness matrix for a 2-D alveolar septa take the form of
 \begin{equation}
-\mathbf{K}_{\boldsymbol{\sigma}} = \int_{V} \, \mathbf{G}^{\mathsf{T}} \, \mathrm{d} \mathbf{A}^{\mathsf{T}} \boldsymbol{\sigma} \, \mathrm{d} V
-= \int_{\pentagon} \int_{\pentagon} \mathbf{G}^{\mathsf{T}} \,  \boldsymbol{\sigma} \, \mathbf{G} \, |\mathbf{J}|  \, h \,  \mathrm{d} \xi \,  \mathrm{d} \eta =  \sum_{i=1}^{n}  \mathbf{G}^{\mathsf{T}} \,  \boldsymbol{\sigma} \, \mathbf{G} \, |\mathbf{J}| \, h \, \mathrm{w}_i
+\mathbf{K}_{\boldsymbol{\sigma}} = \frac{1}{2} \, \int_{V} \, \mathbf{H}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathbf{A}^{'} \, \mathrm{d} V
+= \frac{1}{2} \, \int_{\pentagon} \int_{\pentagon} \mathbf{H}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathbf{A}^{'} \, |\mathbf{J}|  \, h \,  \mathrm{d} \xi \,  \mathrm{d} \eta =  \frac{1}{2} \, \sum_{i=1}^{n}  \mathbf{H}^{\mathsf{T}} \, \boldsymbol{\sigma} \, \mathbf{A}^{'} \, |\mathbf{J}| \, h \, \mathrm{w}_i
 \end{equation}
-where $n$ stands for number of Gauss points, and $\mathrm{w}_i$ denotes the natural weight of the element demonstrated in Table~\ref{tabQuadrature}.
+where $n$ stands for number of Gauss points, $\mathrm{w}_i$ denotes the natural weight of the element demonstrated in Table~\ref{tabQuadrature}, and $\mathbf{A}^{'}$ can be defined as follow
+\begin{equation}
+\mathrm{d} \mathbf{A} = \mathbf{A}^{'} \, \mathrm{d} \boldsymbol{\Delta} = \begin{bmatrix}
+[\mathbf{a}^{'}_1], & [\mathbf{a}^{'}_2], & [\mathbf{a}^{'}_3], & [\mathbf{a}^{'}_4], & [\mathbf{a}^{'}_5] 
+\end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
+= [\mathbf{A}^{'}] \begin{Bmatrix} \mathrm{d} \boldsymbol{\Delta} \end{Bmatrix}
+\end{equation}
+where
+\begin{equation}
+\mathbf{a}^{'}_i = \begin{bmatrix}
+-\tfrac{1}{2} \, N_{i,x} &  - N_{i,x} & 0 & -\tfrac{1}{2} \, N_{i,y} \\
+-\tfrac{1}{2} \, N_{i,x} &  N_{i,x} &  N_{i,x} &  \tfrac{1}{2} \, N_{i,y} \\
+-2 \, N_{i,y} & 0 & -4 \, N_{i,x} & 2 \, N_{i,x} \end{bmatrix} \quad \text{and} \quad  \mathrm{d} \boldsymbol{\Delta} = \begin{Bmatrix}
+\mathrm{d} u_i\\
+\mathrm{d} u_i\\
+\mathrm{d} v_i\\
+\mathrm{d} v_i
+\end{Bmatrix}
+\end{equation}
 
 The small displacement stiffness matrix for pentagon is evaluated numerically as 
 \begin{equation}
@@ -528,31 +678,13 @@ The small displacement stiffness matrix for pentagon is evaluated numerically as
 
 The large displacement stiffness matrix for chord can be presented as follow
 \begin{equation}
-\begin{aligned}
-\mathbf{K}_{N} & =  \int_{V} \,  \left(\mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \,  \right) \mathrm{d} V \\
-& = \int_{\pentagon} \int_{\pentagon} \left(\mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \,  \right)  \, |\mathbf{J}|\, h \, \mathrm{d} \xi \, \mathrm{d} \eta \\
-& = \sum_{i=1}^{n}  \left(\mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \right) \, |\mathbf{J}| \, h \, \mathrm{w}_i
-\end{aligned}
+\mathbf{K}_{N} =  \int_{V} \mathbf{D} \, \mathrm{d} V 
+= \int_{\pentagon} \int_{\pentagon} \mathbf{D} \, |\mathbf{J}|\, h \, \mathrm{d} \xi \, \mathrm{d} \eta 
+= \sum_{i=1}^{n}  \mathbf{D} \, |\mathbf{J}| \, h \, \mathrm{w}_i
 \end{equation}
-
-\subsection{Stiffness Matrix for Tetrahedron}
-The stress stiffness matrix for a tetrahedron can be expressed as follow
+where $\mathbf{D}$ have the expression 
 \begin{equation}
-\mathbf{K}_{\boldsymbol{\sigma}} = \int_{V} \, \mathbf{G}^{\mathsf{T}} \, \mathrm{d} \mathbf{A}^{\mathsf{T}} \boldsymbol{\sigma} \, \mathrm{d} V
-=  \sum_{i=1}^{n}  \mathbf{G}^{\mathsf{T}} \,  \boldsymbol{\sigma} \, \mathbf{G} \, |\mathbf{J}| \, \mathrm{w}_i
-\end{equation}   
-
-The small displacement stiffness matrix for tetrahedron is evaluated numerically as 
-\begin{equation}
-\mathbf{K}_{L} = \int_{V} \, \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, \mathrm{d} V  =  \sum_{i=1}^{n}  \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, |\mathbf{J}| \, \mathrm{w}_i
-\end{equation}
-
-The large displacement stiffness matrix for chord can be presented as follow
-\begin{equation}
-\begin{aligned}
-\mathbf{K}_{N} & =  \int_{V} \,  \left(\mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \,  \right) \mathrm{d} V \\
-& = \sum_{i=1}^{n}  \left(\mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \right) \, |\mathbf{J}| \, \mathrm{w}_i
-\end{aligned}
+\mathbf{D} = \tfrac{1}{2} \, \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{A}^{'} \, \mathbf{H} \, \boldsymbol{\Delta} + \tfrac{1}{2} \, \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{A}^{'} \, \mathbf{H} \, \boldsymbol{\Delta} + \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N
 \end{equation}
 
 
