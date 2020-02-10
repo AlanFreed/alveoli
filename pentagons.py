@@ -9,7 +9,6 @@ import numpy as np
 from ridder import findRoot
 from shapeFnPentagons import shapeFunction
 import spin as spinMtx
-from numpy.linalg import inv
 from numpy.linalg import det
 
 
@@ -35,7 +34,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.1"
 __date__ = "08-08-2019"
-__update__ = "10-06-2019"
+__update__ = "02-10-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -46,15 +45,32 @@ Change in version "1.3.0":
 methods
 
     massM = p.massMatrix(rho, width)
-        gaussPt  the Gauss point for which the mass matrix is to be supplied
-        rho      the mass density with units of mass per unit volume
-        width    the membrane thickness
+       gaussPt  the Gauss point for which the mass matrix is to be supplied
+       rho      the mass density with units of mass per unit volume
+       width    the membrane thickness
     returns
-        massM    a 10x10 mass matrix for the pentagon associated with 'gaussPt'
+        massM   a 10x10 mass matrix for the pentagon associated with 'gaussPt'
 
-    stiffM = p.stiffnessMatrix()
+    stiffM = p.stiffnessMatrix(M, sp, ss, st)
+        M      the modulus matrix definding the material properties 
+        sp     the engineering stress conjugated with dilation 
+        ss     the engineering stress conjugated with squeez 
+        st     the engineering stress conjugated with shear 
 
-    fFn = p.forcingFunction()
+    returns
+        stiffM  a 10x10 stiffness matrix for the pentagon associated with
+        'gaussPt'
+
+        
+    force = p.forcingFunction(sp, ss, st, gaussPts, state)
+        sp     the engineering stress conjugated with dilation 
+        ss     the engineering stress conjugated with squeez 
+        st     the engineering stress conjugated with shear 
+        gaussPt  the Gauss point for which the force vector is to be supplied
+
+    returns
+      fprce  a 10x1 force vector for the pentagon associated with 'gaussPt' in
+      configuration 'state'   
 
 Overview of module pentagons.py:
 
@@ -1790,9 +1806,9 @@ class pentagon(object):
         else:  # gaussPts = 7
             # 'natural' weights of the element
             w = np.array([0.6257871064166934, 0.3016384608809768,
-                            0.3169910433902452, 0.3155445150066620,
-                            0.2958801959111726, 0.2575426306970870,
-                            0.2642573384350463])
+                          0.3169910433902452, 0.3155445150066620,
+                          0.2958801959111726, 0.2575426306970870,
+                          0.2642573384350463])
 
             jacob1 = self._shapeFns[1].jacobian(x01, x02, x03, x04, x05)
             jacob2 = self._shapeFns[2].jacobian(x01, x02, x03, x04, x05)
@@ -1844,7 +1860,7 @@ class pentagon(object):
             mass = 0.5 * (massC + massL)
         return mass
 
-    def stiffnessMatrix(self, M):
+    def stiffnessMatrix(self, M, sp, st, ss):
         # current vertex coordinates in pentagonal frame of reference
         x1 = (self._v1x, self._v1y)
         x2 = (self._v2x, self._v2y)
@@ -1858,23 +1874,14 @@ class pentagon(object):
         x03 = (self._v3x0, self._v3y0)
         x04 = (self._v4x0, self._v4y0)
         x05 = (self._v5x0, self._v5y0)
-
-        # displacement of each vertex
-        u1 = x1[0] - x01[0]
-        u2 = x2[0] - x02[0]
-        u3 = x3[0] - x03[0]
-        u4 = x4[0] - x04[0]
-        u5 = x5[0] - x05[0]
-        v1 = x1[1] - x01[1]
-        v2 = x2[1] - x02[1]
-        v3 = x3[1] - x03[1]
-        v4 = x4[1] - x04[1]
-        v5 = x5[1] - x05[1]
         
-        # creat the displacement vector
-        delta = np.array([[u1, u1, v1, v1, u2, u2, v2, v2, u3, u3, v3, v3, 
-                           u4, u4, v4, v4, u5, u5, v5, v5]]).T
-            
+        # create the stress matrix
+        T = np.zeros((2, 2), dtype=float)
+        T[0, 0] = sp
+        T[0, 1] = st
+        T[1, 0] = st
+        T[1, 1] = ss
+                    
         # determine the stiffness matrix
         if self._gaussPts == 1:
             # 'natural' weight of the element
@@ -1886,27 +1893,30 @@ class pentagon(object):
             detJ = det(jacob)
             
             # create the linear Bmatrix
-            BL = self._shapeFns[1].BLinear(x1, x2, x3, x4, x5) * inv(detJ)
+            BL = self._shapeFns[1].BLinear(x1, x2, x3, x4, x5) / detJ
             # the linear stiffness matrix for 1 Gauss point
             KL = self._width * (detJ * w[0] * BL.T.dot(M).dot(BL))
             
             # create the nonlinear Bmatrix
-            BN = self._shapeFns[1].BNonLinear(x1, x2, x3, x4, x5, 
+            BNF = self._shapeFns[1].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                   x01, x02, x03, x04, x05)
-            # creat the H matrix
-            H = self._shapeFns[1].Hmatrix(x1, x2, x3, x4, x5)
-            # creat the AP matrix
-            AP = self._shapeFns[1].APmatrix(x1, x2, x3, x4, x5)
+            BNS = self._shapeFns[1].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                  x01, x02, x03, x04, x05)
+            # total nonlinear Bmatrix
+            BN = np.add(BNF, BNS)
+            
+            # creat the H1 matrix
+            HF = self._shapeFns[1].FirstHmatrix(x1, x2, x3, x4, x5)
+            # creat the H2 matrix
+            HS = self._shapeFns[1].SecondHmatrix(x1, x2, x3, x4, x5)
+            
             # the nonlinear stiffness matrix for 1 Gauss point
             KN = self._width * (detJ * w[0] * (BL.T.dot(M).dot(BN) +
-                                BN.T.dot(M).dot(BL) + BN.T.dot(M).dot(BN) +
-                                0.5 * BL.T.dot(M).dot(AP).dot(H).dot(delta) +
-                                0.5 * BN.T.dot(M).dot(AP).dot(H).dot(delta)))
-            
-            # create the stress matrix
+                                BN.T.dot(M).dot(BL) + BN.T.dot(M).dot(BN)))
             
             # create the stress stiffness matrix            
-            KS = self._width * (detJ * w[0] * H.T.dot(st).dot(H))
+            KS = self._width * (detJ * w[0] * HF.T.dot(T).dot(HF) +
+                                detJ * w[0] * HS.T.dot(T).dot(HS))
             
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS
@@ -1914,7 +1924,7 @@ class pentagon(object):
         elif self._gaussPts == 4:
             # 'natural' weights of the element
             w = np.array([0.5449124407446143, 0.6439082046243272,
-                            0.5449124407446146, 0.6439082046243275])
+                          0.5449124407446146, 0.6439082046243275])
 
             jacob1 = self._shapeFns[1].jacobian(x01, x02, x03, x04, x05)
             jacob2 = self._shapeFns[2].jacobian(x01, x02, x03, x04, x05)
@@ -1928,10 +1938,10 @@ class pentagon(object):
             detJ4 = det(jacob4)
 
             # create the linear Bmatrix
-            BL1 = self._shapeFns[1].BLinear(x1, x2, x3, x4, x5) * inv(detJ1)
-            BL2 = self._shapeFns[2].BLinear(x1, x2, x3, x4, x5) * inv(detJ2)
-            BL3 = self._shapeFns[3].BLinear(x1, x2, x3, x4, x5) * inv(detJ3)
-            BL4 = self._shapeFns[4].BLinear(x1, x2, x3, x4, x5) * inv(detJ4)
+            BL1 = self._shapeFns[1].BLinear(x1, x2, x3, x4, x5) / detJ1
+            BL2 = self._shapeFns[2].BLinear(x1, x2, x3, x4, x5) / detJ2
+            BL3 = self._shapeFns[3].BLinear(x1, x2, x3, x4, x5) / detJ3
+            BL4 = self._shapeFns[4].BLinear(x1, x2, x3, x4, x5) / detJ4
 
             # the linear stiffness matrix for 4 Gauss points
             KL = self._width * (detJ1 * w[0] * BL1.T.dot(M).dot(BL1) +
@@ -1939,53 +1949,65 @@ class pentagon(object):
                                 detJ3 * w[2] * BL3.T.dot(M).dot(BL3) +
                                 detJ4 * w[3] * BL4.T.dot(M).dot(BL4))
             
-            # create the nonlinear Bmatrix
-            BN1 = self._shapeFns[1].BNonLinear(x1, x2, x3, x4, x5, 
+            # create the first nonlinear Bmatrix
+            BNF1 = self._shapeFns[1].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                 x01, x02, x03, x04, x05)
-            BN2 = self._shapeFns[2].BNonLinear(x1, x2, x3, x4, x5, 
+            BNF2 = self._shapeFns[2].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                 x01, x02, x03, x04, x05)
-            BN3 = self._shapeFns[3].BNonLinear(x1, x2, x3, x4, x5, 
+            BNF3 = self._shapeFns[3].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                 x01, x02, x03, x04, x05)
-            BN4 = self._shapeFns[4].BNonLinear(x1, x2, x3, x4, x5, 
+            BNF4 = self._shapeFns[4].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                 x01, x02, x03, x04, x05)
+            
+            # create the second nonlinear Bmatrix
+            BNS1 = self._shapeFns[1].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                x01, x02, x03, x04, x05)
+            BNS2 = self._shapeFns[2].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                x01, x02, x03, x04, x05)
+            BNS3 = self._shapeFns[3].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                x01, x02, x03, x04, x05)
+            BNS4 = self._shapeFns[4].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                x01, x02, x03, x04, x05)
+            
+            # total nonlinear Bmatrix
+            BN1 = np.add(BNF1, BNS1)
+            BN2 = np.add(BNF2, BNS2)
+            BN3 = np.add(BNF3, BNS3)
+            BN4 = np.add(BNF4, BNS4)
 
-            # create the H matrix
-            H1 = self._shapeFns[1].Hmatrix(x1, x2, x3, x4, x5)
-            H2 = self._shapeFns[2].Hmatrix(x1, x2, x3, x4, x5)
-            H3 = self._shapeFns[3].Hmatrix(x1, x2, x3, x4, x5)
-            H4 = self._shapeFns[4].Hmatrix(x1, x2, x3, x4, x5)
+            # create the first H matrix
+            HF1 = self._shapeFns[1].FirstHmatrix(x1, x2, x3, x4, x5)
+            HF2 = self._shapeFns[2].FirstHmatrix(x1, x2, x3, x4, x5)
+            HF3 = self._shapeFns[3].FirstHmatrix(x1, x2, x3, x4, x5)
+            HF4 = self._shapeFns[4].FirstHmatrix(x1, x2, x3, x4, x5)
 
-            # create the AP matrix
-            AP1 = self._shapeFns[1].APmatrix(x1, x2, x3, x4, x5)
-            AP2 = self._shapeFns[2].APmatrix(x1, x2, x3, x4, x5)
-            AP3 = self._shapeFns[3].APmatrix(x1, x2, x3, x4, x5)
-            AP4 = self._shapeFns[4].APmatrix(x1, x2, x3, x4, x5)
+            # create the second H matrix
+            HS1 = self._shapeFns[1].SecondHmatrix(x1, x2, x3, x4, x5)
+            HS2 = self._shapeFns[2].SecondHmatrix(x1, x2, x3, x4, x5)
+            HS3 = self._shapeFns[3].SecondHmatrix(x1, x2, x3, x4, x5)
+            HS4 = self._shapeFns[4].SecondHmatrix(x1, x2, x3, x4, x5)
+            
+
             
             # the nonlinear stiffness matrix for 1 Gauss point
             KN = self._width * (detJ1 * w[0] * (BL1.T.dot(M).dot(BN1) + 
-                                BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1) +
-                                0.5 * BL1.T.dot(M).dot(AP1).dot(H1).dot(delta) +
-                                0.5 * BN1.T.dot(M).dot(AP1).dot(H1).dot(delta)) +
+                                BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) +
                                 detJ2 * w[1] * (BL2.T.dot(M).dot(BN2) +
-                                BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2) +
-                                0.5 * BL2.T.dot(M).dot(AP2).dot(H2).dot(delta) +
-                                0.5 * BN2.T.dot(M).dot(AP2).dot(H2).dot(delta)) +
+                                BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2)) +
                                 detJ3 * w[2] * (BL3.T.dot(M).dot(BN3) +
-                                BN3.T.dot(M).dot(BL3) + BN3.T.dot(M).dot(BN3) +
-                                0.5 * BL3.T.dot(M).dot(AP3).dot(H3).dot(delta) +
-                                0.5 * BN3.T.dot(M).dot(AP3).dot(H3).dot(delta)) +
+                                BN3.T.dot(M).dot(BL3) + BN3.T.dot(M).dot(BN3)) +
                                 detJ4 * w[3] * (BL4.T.dot(M).dot(BN4) +
-                                BN4.T.dot(M).dot(BL4) + BN4.T.dot(M).dot(BN4) +
-                                0.5 * BL4.T.dot(M).dot(AP4).dot(H4).dot(delta) +
-                                0.5 * BN4.T.dot(M).dot(AP4).dot(H4).dot(delta)))
+                                BN4.T.dot(M).dot(BL4) + BN4.T.dot(M).dot(BN4)))
 
-            # create the stress matrix
-            
             # create the stress stiffness matrix
-            KS = self._width * (detJ1 * w[0] * H1.T.dot(st).dot(AP1) +
-                                detJ2 * w[1] * H2.T.dot(st).dot(AP2) +
-                                detJ3 * w[2] * H3.T.dot(st).dot(AP3) +
-                                detJ4 * w[3] * H4.T.dot(st).dot(AP4))            
+            KS = self._width * (detJ1 * w[0] * HF1.T.dot(T).dot(HF1) +
+                                detJ2 * w[1] * HF2.T.dot(T).dot(HF2) +
+                                detJ3 * w[2] * HF3.T.dot(T).dot(HF3) +
+                                detJ4 * w[3] * HF4.T.dot(T).dot(HF4) +
+                                detJ1 * w[0] * HS1.T.dot(T).dot(HS1) +
+                                detJ2 * w[1] * HS2.T.dot(T).dot(HS2) +
+                                detJ3 * w[2] * HS3.T.dot(T).dot(HS3) +
+                                detJ4 * w[3] * HS4.T.dot(T).dot(HS4))            
             
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS
@@ -2015,13 +2037,13 @@ class pentagon(object):
             detJ7 = det(jacob7)
             
             # create the linear Bmatrix
-            BL1 = self._shapeFns[1].BLinear(x1, x2, x3, x4, x5) * inv(detJ1)
-            BL2 = self._shapeFns[2].BLinear(x1, x2, x3, x4, x5) * inv(detJ2)         
-            BL3 = self._shapeFns[3].BLinear(x1, x2, x3, x4, x5) * inv(detJ3)
-            BL4 = self._shapeFns[4].BLinear(x1, x2, x3, x4, x5) * inv(detJ4)
-            BL5 = self._shapeFns[5].BLinear(x1, x2, x3, x4, x5) * inv(detJ5)      
-            BL6 = self._shapeFns[6].BLinear(x1, x2, x3, x4, x5) * inv(detJ6)
-            BL7 = self._shapeFns[7].BLinear(x1, x2, x3, x4, x5) * inv(detJ7)
+            BL1 = self._shapeFns[1].BLinear(x1, x2, x3, x4, x5) / detJ1
+            BL2 = self._shapeFns[2].BLinear(x1, x2, x3, x4, x5) / detJ2         
+            BL3 = self._shapeFns[3].BLinear(x1, x2, x3, x4, x5) / detJ3
+            BL4 = self._shapeFns[4].BLinear(x1, x2, x3, x4, x5) / detJ4
+            BL5 = self._shapeFns[5].BLinear(x1, x2, x3, x4, x5) / detJ5     
+            BL6 = self._shapeFns[6].BLinear(x1, x2, x3, x4, x5) / detJ6
+            BL7 = self._shapeFns[7].BLinear(x1, x2, x3, x4, x5) / detJ7
 
             # the consistent mass matrix for 7 Gauss points
             KL = self._width * (detJ1 * w[0] * BL1.T.dot(M).dot(BL1) +
@@ -2032,85 +2054,217 @@ class pentagon(object):
                                 detJ6 * w[5] * BL6.T.dot(M).dot(BL6) +
                                 detJ7 * w[6] * BL7.T.dot(M).dot(BL7))
 
-            # create the nonlinear Bmatrix
-            BN1 = self._shapeFns[1].BNonLinear(x1, x2, x3, x4, x5, 
+            # create the first nonlinear Bmatrix
+            BNF1 = self._shapeFns[1].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                   x01, x02, x03, x04, x05)
-            BN2 = self._shapeFns[2].BNonLinear(x1, x2, x3, x4, x5, 
+            BNF2 = self._shapeFns[2].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                   x01, x02, x03, x04, x05)
-            BN3 = self._shapeFns[3].BNonLinear(x1, x2, x3, x4, x5, 
+            BNF3 = self._shapeFns[3].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                   x01, x02, x03, x04, x05)
-            BN4 = self._shapeFns[4].BNonLinear(x1, x2, x3, x4, x5, 
+            BNF4 = self._shapeFns[4].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                   x01, x02, x03, x04, x05)
-            BN5 = self._shapeFns[5].BNonLinear(x1, x2, x3, x4, x5, 
+            BNF5 = self._shapeFns[5].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                   x01, x02, x03, x04, x05)
-            BN6 = self._shapeFns[6].BNonLinear(x1, x2, x3, x4, x5, 
+            BNF6 = self._shapeFns[6].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                   x01, x02, x03, x04, x05)
-            BN7 = self._shapeFns[7].BNonLinear(x1, x2, x3, x4, x5, 
+            BNF7 = self._shapeFns[7].FirstBNonLinear(x1, x2, x3, x4, x5, 
                                   x01, x02, x03, x04, x05)
 
-            
-            # create the H matrix
-            H1 = self._shapeFns[1].Hmatrix(x1, x2, x3, x4, x5)
-            H2 = self._shapeFns[2].Hmatrix(x1, x2, x3, x4, x5)
-            H3 = self._shapeFns[3].Hmatrix(x1, x2, x3, x4, x5)
-            H4 = self._shapeFns[4].Hmatrix(x1, x2, x3, x4, x5)
-            H5 = self._shapeFns[5].Hmatrix(x1, x2, x3, x4, x5)
-            H6 = self._shapeFns[6].Hmatrix(x1, x2, x3, x4, x5)
-            H7 = self._shapeFns[7].Hmatrix(x1, x2, x3, x4, x5)
+            # create the first nonlinear Bmatrix
+            BNS1 = self._shapeFns[1].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                  x01, x02, x03, x04, x05)
+            BNS2 = self._shapeFns[2].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                  x01, x02, x03, x04, x05)
+            BNS3 = self._shapeFns[3].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                  x01, x02, x03, x04, x05)
+            BNS4 = self._shapeFns[4].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                  x01, x02, x03, x04, x05)
+            BNS5 = self._shapeFns[5].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                  x01, x02, x03, x04, x05)
+            BNS6 = self._shapeFns[6].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                  x01, x02, x03, x04, x05)
+            BNS7 = self._shapeFns[7].SecondBNonLinear(x1, x2, x3, x4, x5, 
+                                  x01, x02, x03, x04, x05)
 
-            # create the AP matrix
-            AP1 = self._shapeFns[1].APmatrix(x1, x2, x3, x4, x5)
-            AP2 = self._shapeFns[2].APmatrix(x1, x2, x3, x4, x5)
-            AP3 = self._shapeFns[3].APmatrix(x1, x2, x3, x4, x5)
-            AP4 = self._shapeFns[4].APmatrix(x1, x2, x3, x4, x5)
-            AP5 = self._shapeFns[5].APmatrix(x1, x2, x3, x4, x5)
-            AP6 = self._shapeFns[6].APmatrix(x1, x2, x3, x4, x5)
-            AP7 = self._shapeFns[7].APmatrix(x1, x2, x3, x4, x5)
+            # total nonlinear Bmatrix
+            BN1 = np.add(BNF1, BNS1)
+            BN2 = np.add(BNF2, BNS2)
+            BN3 = np.add(BNF3, BNS3)
+            BN4 = np.add(BNF4, BNS4)
+            BN5 = np.add(BNF5, BNS5)
+            BN6 = np.add(BNF6, BNS6)
+            BN7 = np.add(BNF7, BNS7)
+
+            # create the first H matrix
+            HF1 = self._shapeFns[1].FirstHmatrix(x1, x2, x3, x4, x5)
+            HF2 = self._shapeFns[2].FirstHmatrix(x1, x2, x3, x4, x5)
+            HF3 = self._shapeFns[3].FirstHmatrix(x1, x2, x3, x4, x5)
+            HF4 = self._shapeFns[4].FirstHmatrix(x1, x2, x3, x4, x5)
+            HF5 = self._shapeFns[5].FirstHmatrix(x1, x2, x3, x4, x5)
+            HF6 = self._shapeFns[6].FirstHmatrix(x1, x2, x3, x4, x5)
+            HF7 = self._shapeFns[7].FirstHmatrix(x1, x2, x3, x4, x5)
+
+            # create the second H matrix
+            HS1 = self._shapeFns[1].SecondHmatrix(x1, x2, x3, x4, x5)
+            HS2 = self._shapeFns[2].SecondHmatrix(x1, x2, x3, x4, x5)
+            HS3 = self._shapeFns[3].SecondHmatrix(x1, x2, x3, x4, x5)
+            HS4 = self._shapeFns[4].SecondHmatrix(x1, x2, x3, x4, x5)
+            HS5 = self._shapeFns[5].SecondHmatrix(x1, x2, x3, x4, x5)
+            HS6 = self._shapeFns[6].SecondHmatrix(x1, x2, x3, x4, x5)
+            HS7 = self._shapeFns[7].SecondHmatrix(x1, x2, x3, x4, x5)            
             
             # the nonlinear stiffness matrix for 1 Gauss point
             KN = self._width * (detJ1 * w[0] * (BL1.T.dot(M).dot(BN1) + 
-                                BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1) +
-                                0.5 * BL1.T.dot(M).dot(AP1).dot(H1).dot(delta) +
-                                0.5 * BN1.T.dot(M).dot(AP1).dot(H1).dot(delta)) +
+                                BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) +
                                 detJ2 * w[1] * (BL2.T.dot(M).dot(BN2) +
-                                BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2) +
-                                0.5 * BL2.T.dot(M).dot(AP2).dot(H2).dot(delta) +
-                                0.5 * BN2.T.dot(M).dot(AP2).dot(H2).dot(delta)) +
+                                BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2)) +
                                 detJ3 * w[2] * (BL3.T.dot(M).dot(BN3) +
-                                BN3.T.dot(M).dot(BL3) + BN3.T.dot(M).dot(BN3) +
-                                0.5 * BL3.T.dot(M).dot(AP3).dot(H3).dot(delta) +
-                                0.5 * BN3.T.dot(M).dot(AP3).dot(H3).dot(delta)) +
+                                BN3.T.dot(M).dot(BL3) + BN3.T.dot(M).dot(BN3)) +
                                 detJ4 * w[3] * (BL4.T.dot(M).dot(BN4) +
-                                BN4.T.dot(M).dot(BL4) + BN4.T.dot(M).dot(BN4) +
-                                0.5 * BL4.T.dot(M).dot(AP4).dot(H4).dot(delta) +
-                                0.5 * BN4.T.dot(M).dot(AP4).dot(H4).dot(delta)) +
+                                BN4.T.dot(M).dot(BL4) + BN4.T.dot(M).dot(BN4)) +
                                 detJ5 * w[4] * (BL5.T.dot(M).dot(BN5) +
-                                BN5.T.dot(M).dot(BL5) + BN5.T.dot(M).dot(BN5) +
-                                0.5 * BL5.T.dot(M).dot(AP5).dot(H5).dot(delta) +
-                                0.5 * BN5.T.dot(M).dot(AP5).dot(H5).dot(delta)) +
+                                BN5.T.dot(M).dot(BL5) + BN5.T.dot(M).dot(BN5)) +
                                 detJ6 * w[5] * (BL6.T.dot(M).dot(BN6) +
-                                BN6.T.dot(M).dot(BL6) + BN6.T.dot(M).dot(BN6) +
-                                0.5 * BL6.T.dot(M).dot(AP6).dot(H6).dot(delta) +
-                                0.5 * BN6.T.dot(M).dot(AP6).dot(H6).dot(delta)) +
+                                BN6.T.dot(M).dot(BL6) + BN6.T.dot(M).dot(BN6)) +
                                 detJ7 * w[6] * (BL7.T.dot(M).dot(BN7) +
-                                BN7.T.dot(M).dot(BL7) + BN7.T.dot(M).dot(BN7) +
-                                0.5 * BL7.T.dot(M).dot(AP7).dot(H7).dot(delta) +
-                                0.5 * BN7.T.dot(M).dot(AP7).dot(H7).dot(delta)))          
+                                BN7.T.dot(M).dot(BL7) + BN7.T.dot(M).dot(BN7)))          
 
             # create the stress matrix
             
             # create the stress stiffness matrix            
-            KS = self._width * (detJ1 * w[0] * H1.T.dot(st).dot(AP1) +
-                                detJ2 * w[1] * H2.T.dot(st).dot(AP2) +
-                                detJ3 * w[2] * H3.T.dot(st).dot(AP3) +
-                                detJ4 * w[3] * H4.T.dot(st).dot(AP4) +
-                                detJ5 * w[4] * H5.T.dot(st).dot(AP5) +
-                                detJ6 * w[5] * H6.T.dot(st).dot(AP6) +
-                                detJ7 * w[6] * H7.T.dot(st).dot(AP7))   
+            KS = self._width * (detJ1 * w[0] * HF1.T.dot(T).dot(HF1) +
+                                detJ2 * w[1] * HF2.T.dot(T).dot(HF2) +
+                                detJ3 * w[2] * HF3.T.dot(T).dot(HF3) +
+                                detJ4 * w[3] * HF4.T.dot(T).dot(HF4) +
+                                detJ5 * w[4] * HF5.T.dot(T).dot(HF5) +
+                                detJ6 * w[5] * HF6.T.dot(T).dot(HF6) +
+                                detJ7 * w[6] * HF7.T.dot(T).dot(HF7) +
+                                detJ1 * w[0] * HS1.T.dot(T).dot(HS1) +
+                                detJ2 * w[1] * HS2.T.dot(T).dot(HS2) +
+                                detJ3 * w[2] * HS3.T.dot(T).dot(HS3) +
+                                detJ4 * w[3] * HS4.T.dot(T).dot(HS4) +
+                                detJ5 * w[4] * HS5.T.dot(T).dot(HS5) +
+                                detJ6 * w[5] * HS6.T.dot(T).dot(HS6) +
+                                detJ7 * w[6] * HS7.T.dot(T).dot(HS7))   
             
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS                        
         return stiffT
 
-    def forcingFunction(self):
+    def forcingFunction(self, sp, ss, st, gaussPts, state):
+        nx, ny, nz = self.normal(state)
+        U = self.U(gaussPts, state)
+        F = self.F(gaussPts, state)
+        
+        # create the normal vector
+        n = np.array([nx, ny])
+
+        # create the Kirchhoff stress matrix
+        KStrs = np.zeros((2, 2), dtype=float)
+        KStrs[0, 0] = (1 / 2) * (sp + ss)
+        KStrs[1, 1] = (1 / 2) * (sp - ss)
+        KStrs[0, 1] = U[1, 1] * st / U[0, 0]
+        KStrs[1, 0] = KStrs[0, 1] 
+        
+        # create the Cauchy stress
+        j = np.linalg.det(F)
+        CStrs = KStrs / j
+        
+        # create the traction vector
+        t = np.dot(CStrs, np.transpose(n))
+
+        # assign coordinates at the vertices in the reference configuration
+        x01 = (self._v1x0, self._v1y0)
+        x02 = (self._v2x0, self._v2y0)
+        x03 = (self._v3x0, self._v3y0)
+        x04 = (self._v4x0, self._v4y0)
+        x05 = (self._v5x0, self._v5y0)
+
+        # determine the force vector
+        if self._gaussPts == 1:
+            # 'natural' weight of the element
+            w = np.array([2.3776412907378837])
+
+            jacob = self._shapeFns[1].jacobian(x01, x02, x03, x04, x05)
+            
+            # determinant of the Jacobian matrix
+            detJ = det(jacob)
+            
+            nMat1 = np.transpose(self._shapeFns[1].Nmatx)
+                         
+
+            # the force vector for 1 Gauss point
+            FVec = detJ * w[0] * np.dot(nMat1, np.transpose(t))
+
+        elif self._gaussPts == 4:
+            # 'natural' weights of the element
+            w = np.array([0.5449124407446143, 0.6439082046243272,
+                          0.5449124407446146, 0.6439082046243275])
+
+            jacob1 = self._shapeFns[1].jacobian(x01, x02, x03, x04, x05)
+            jacob2 = self._shapeFns[2].jacobian(x01, x02, x03, x04, x05)
+            jacob3 = self._shapeFns[3].jacobian(x01, x02, x03, x04, x05)
+            jacob4 = self._shapeFns[4].jacobian(x01, x02, x03, x04, x05)
+
+            # determinant of the Jacobian matrix
+            detJ1 = det(jacob1)
+            detJ2 = det(jacob2)
+            detJ3 = det(jacob3)            
+            detJ4 = det(jacob4)
+
+            nMat1 = np.transpose(self._shapeFns[1].Nmatx)
+            nMat2 = np.transpose(self._shapeFns[2].Nmatx)
+            nMat3 = np.transpose(self._shapeFns[3].Nmatx)
+            nMat4 = np.transpose(self._shapeFns[4].Nmatx)
+
+            # the force vector for 4 Gauss points
+            FVec = (detJ1 * w[0] * np.dot(nMat1, np.transpose(t)) + 
+                    detJ2 * w[1] * np.dot(nMat2, np.transpose(t)) + 
+                    detJ3 * w[2] * np.dot(nMat3, np.transpose(t)) +
+                    detJ4 * w[3] * np.dot(nMat4, np.transpose(t)))
+
+        else:  # gaussPts = 7
+            # 'natural' weights of the element
+            w = np.array([0.6257871064166934, 0.3016384608809768,
+                          0.3169910433902452, 0.3155445150066620,
+                          0.2958801959111726, 0.2575426306970870,
+                          0.2642573384350463])
+
+            jacob1 = self._shapeFns[1].jacobian(x01, x02, x03, x04, x05)
+            jacob2 = self._shapeFns[2].jacobian(x01, x02, x03, x04, x05)
+            jacob3 = self._shapeFns[3].jacobian(x01, x02, x03, x04, x05)
+            jacob4 = self._shapeFns[4].jacobian(x01, x02, x03, x04, x05)
+            jacob5 = self._shapeFns[5].jacobian(x01, x02, x03, x04, x05)
+            jacob6 = self._shapeFns[6].jacobian(x01, x02, x03, x04, x05)
+            jacob7 = self._shapeFns[7].jacobian(x01, x02, x03, x04, x05)
+
+            # determinant of the Jacobian matrix
+            detJ1 = det(jacob1)
+            detJ2 = det(jacob2)
+            detJ3 = det(jacob3)            
+            detJ4 = det(jacob4)
+            detJ5 = det(jacob5)
+            detJ6 = det(jacob6)            
+            detJ7 = det(jacob7)
+            
+            nMat1 = np.transpose(self._shapeFns[1].Nmatx)
+            nMat2 = np.transpose(self._shapeFns[2].Nmatx)
+            nMat3 = np.transpose(self._shapeFns[3].Nmatx)
+            nMat4 = np.transpose(self._shapeFns[4].Nmatx)
+            nMat5 = np.transpose(self._shapeFns[5].Nmatx)
+            nMat6 = np.transpose(self._shapeFns[6].Nmatx)
+            nMat7 = np.transpose(self._shapeFns[7].Nmatx)
+
+            # the force vector for 7 Gauss points
+            FVec = (detJ1 * w[0] * np.dot(nMat1, np.transpose(t)) +
+                    detJ2 * w[1] * np.dot(nMat2, np.transpose(t)) +
+                    detJ3 * w[2] * np.dot(nMat3, np.transpose(t)) +
+                    detJ4 * w[3] * np.dot(nMat4, np.transpose(t)) +
+                    detJ5 * w[4] * np.dot(nMat5, np.transpose(t)) +
+                    detJ6 * w[5] * np.dot(nMat6, np.transpose(t)) +
+                    detJ7 * w[6] * np.dot(nMat7, np.transpose(t)))
+
+        return FVec        
+        
+        
         return

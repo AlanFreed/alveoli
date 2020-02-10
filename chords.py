@@ -8,8 +8,6 @@ from ridder import findRoot
 from shapeFnChords import shapeFunction
 import spin as spinMtx
 from vertices import vertex
-from numpy.linalg import inv
-from numpy.linalg import det
 
 """
 Module chords.py provides geometric information about a septal chord.
@@ -33,7 +31,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "08-08-2019"
-__update__ = "10-06-2019"
+__update__ = "02-10-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -491,15 +489,15 @@ class chord(object):
             }
 
         # establish the material properties for this chord
-        dia = mp.chordDiaCollagen()
+        dia = mp.fiberDiameterCollagen()
         self._areaC = np.pi * dia**2 / 4.0
-        dia = mp.chordDiaElastin()
+        dia = mp.fiberDiameterElastin()
         self._areaE = np.pi * dia**2 / 4.0
         self._rho = ((self._areaC * mp.rhoCollagen() +
                       self._areaE * mp.rhoElastin()) /
                      (self._areaC + self._areaE))
-        self._E1c, self._E2c, self._e_tc = mp.collagenChord()
-        self._E1e, self._E2e, self._e_te = mp.elastinChord()
+        self._E1c, self._E2c, self._e_tc = mp.collagenFiber()
+        self._E1e, self._E2e, self._e_te = mp.elastinFiber()
 
     def toString(self, state):
         if self._number < 10:
@@ -1055,7 +1053,7 @@ class chord(object):
             J = self._shapeFns[1].jacobian(x01, x02)
 
             # the consistent mass matrix for 1 Gauss point
-            massC = self._rho * area * (det(J) * w[0] * nn1)
+            massC = self._rho * area * J * w[0] * nn1
 
             # the lumped mass matrix for 1 Gauss point
             massL = np.zeros((2, 2), dtype=float)
@@ -1085,8 +1083,7 @@ class chord(object):
             J2 = self._shapeFns[2].jacobian(x01, x02)
 
             # the consistent mass matrix for 2 Gauss points
-            massC = self._rho * area * (det(J1) * w[0] * nn1 +
-                                        det(J2) * w[1] * nn2)
+            massC = self._rho * area * (J1 * w[0] * nn1 + J2 * w[1] * nn2)
 
             # the lumped mass matrix for 2 Gauss points
             massL = np.zeros((2, 2), dtype=float)
@@ -1124,9 +1121,8 @@ class chord(object):
             J3 = self._shapeFns[3].jacobian(x01, x02)
 
             # the consistent mass matrix for 3 Gauss points
-            massC = self._rho * area * (det(J1) * w[0] * nn1 +
-                                        det(J2) * w[1] * nn2 +
-                                        det(J3) * w[2] * nn3)
+            massC = self._rho * area * (J1 * w[0] * nn1 + J2 * w[1] * nn2 +
+                                        J3 * w[2] * nn3)
 
             # the lumped mass matrix for 3 Gauss points
             massL = np.zeros((2, 2), dtype=float)
@@ -1137,7 +1133,7 @@ class chord(object):
             mass = 0.5 * (massC + massL)
         return mass
 
-    def stiffnessMatrix(self, M):
+    def stiffnessMatrix(self, M, se, sc):
         # cross-sectional area of the chord (both collagen and elastin fibers)
         area = self._areaC + self._areaE
 
@@ -1147,10 +1143,8 @@ class chord(object):
         xn1 = -self._Ln / 2.0
         xn2 = self._Ln / 2.0
         
-        # initial displacement vector
-        u1 = xn1 - x01
-        u2 = xn2 - x02   
-        delta = np.array([[u1, u2]]).T
+        # creat the stress matrix
+        T = se + sc        
                
         # determine the stiffness matrix        
         if self._gaussPts == 1:
@@ -1162,26 +1156,22 @@ class chord(object):
             J = self._shapeFns[1].jacobian(x01, x02)
             
             # create the linear Bmatrix
-            BL = self._shapeFns[1].dNdximat() * inv(J)
+            BL = self._shapeFns[1].dNdximat() / J
             # the linear stiffness matrix for 1 Gauss point
-            KL = area * (det(J) * w[0] * BL.T.dot(M).dot(BL))
+            KL = area * (J * w[0] * BL.T.dot(M).dot(BL))
             
             # create the matrix of derivative of shape functions (H matrix)
-            H = self._shapeFns[1].dNdximat() * inv(J)
+            H = self._shapeFns[1].dNdximat() / J
             # create the matrix of derivative of displacements (A matrix)
-            A = - self._shapeFns[1].G(xn1, xn2, x01, x02) * inv(J)            
+            A = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J       
             # create the nonlinear Bmatrix
-            BN = (1 / 2) * (np.dot(A, H) - BL)
+            BN = np.dot(A, H) 
             # the nonlinear stiffness matrix for 1 Gauss point
-            KN = area * det(J) * w[0] * (BL.T.dot(M).dot(BN) +
-                            BN.T.dot(M).dot(BL) + BN.T.dot(M).dot(BN) +
-                            0.5 * BL.T.dot(M).dot(-H).dot(H).dot(delta) +
-                            0.5 * BN.T.dot(M).dot(-H).dot(H).dot(delta))
-            
-            # creat the stress matrix
+            KN = (area * J * w[0] * (BL.T.dot(M).dot(BN) + 
+                  BN.T.dot(M).dot(BL) + BN.T.dot(M).dot(BN)))
             
             # the stress stiffness matrix for 1 Gauss point
-            KS = area / 2 * (det(J) * w[0] * H.T.dot(st).dot(-H))
+            KS = area * (J * w[0] * H.T.dot(T).dot(H))
             
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS
@@ -1194,43 +1184,36 @@ class chord(object):
             # at Gauss point 1         
             J1 = self._shapeFns[1].jacobian(x01, x02)            
             # create the linear Bmatrix
-            BL1 = self._shapeFns[1].dNdximat() * inv(J1)
+            BL1 = self._shapeFns[1].dNdximat() / J1
 
             # at Gauss point 2
             J2 = self._shapeFns[2].jacobian(x01, x02)           
             # create the linear  Bmatrix
-            BL2 = self._shapeFns[2].dNdximat() * inv(J2)   
+            BL2 = self._shapeFns[2].dNdximat() / J2
 
             # the linear stiffness matrix for 2 Gauss points
-            KL = area * (det(J1) * w[0] * BL1.T.dot(M).dot(BL1) +
-                         det(J2) * w[1] * BL2.T.dot(M).dot(BL2))
-
+            KL = (area * (J1 * w[0] * BL1.T.dot(M).dot(BL1) +
+                          J2 * w[1] * BL2.T.dot(M).dot(BL2)))
 
             # create the matrix of derivative of shape functions (H matrix)
-            H1 = self._shapeFns[1].dNdximat() * inv(J)
-            H2 = self._shapeFns[2].dNdximat() * inv(J)
+            H1 = self._shapeFns[1].dNdximat() / J
+            H2 = self._shapeFns[2].dNdximat() / J
             # create the matrix of derivative of displacements (A matrix)
-            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) * inv(J1)  
-            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) * inv(J2) 
+            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J1 
+            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) / J2
             # create the nonlinear Bmatrix
-            BN1 = (1 / 2) * (np.dot(A1, H1) - BL1) 
-            BN2 = (1 / 2) * (np.dot(A2, H2) - BL2)
+            BN1 = np.dot(A1, H1) 
+            BN2 = np.dot(A2, H2) 
 
             # the nonlinear stiffness matrix for 2 Gauss point
-            KN = area * (det(J1) * w[0] * (BL1.T.dot(M).dot(BN1) +
-                             BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1) +
-                             0.5 * BL1.T.dot(M).dot(-H1).dot(H1).dot(delta) +
-                             0.5 * BN1.T.dot(M).dot(-H1).dot(H1).dot(delta)) +
-                             det(J2) * w[1] * (BL2.T.dot(M).dot(BN2) +
-                             BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2) +
-                             0.5 * BL2.T.dot(M).dot(-H2).dot(H2).dot(delta) +
-                             0.5 * BN2.T.dot(M).dot(-H2).dot(H2).dot(delta)))
-            
-            # creat the stress matrix
+            KN = (area * (J1 * w[0] * (BL1.T.dot(M).dot(BN1) +
+                          BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) + 
+                          J2 * w[1] * (BL2.T.dot(M).dot(BN2) +
+                          BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2))))
             
             # the stress stiffness matrix for 1 Gauss point
-            KS = area / 2 * ((det(J1) * w[0] * H1.T.dot(st).dot(-H1)) +
-                             (det(J2) * w[1] * H2.T.dot(st).dot(-H2)))
+            KS = (area * (J1 * w[0] * H1.T.dot(T).dot(H1) +
+                          J2 * w[1] * H2.T.dot(T).dot(H2)))
             
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS
@@ -1244,64 +1227,136 @@ class chord(object):
             # at Gauss point 1
             J1 = self._shapeFns[1].jacobian(x01, x02)            
             # create the linear Bmatrix
-            BL1 = self._shapeFns[1].dNdximat() * inv(J1)
+            BL1 = self._shapeFns[1].dNdximat() / J1
 
             # at Gauss point 2
             J2 = self._shapeFns[2].jacobian(x01, x02)            
             # create the linear Bmatrix
-            BL2 = self._shapeFns[2].dNdximat() * inv(J2)
+            BL2 = self._shapeFns[2].dNdximat() / J2
 
             # at Gauss point 3
             J3 = self._shapeFns[3].jacobian(x01, x02)            
             # create the linear Bmatrix
-            BL3 = self._shapeFns[3].dNdximat() * inv(J3)
+            BL3 = self._shapeFns[3].dNdximat() / J3
 
             # the linear stiffness matrix for 3 Gauss points
-            KL = area * (det(J1) * w[0] * BL1.T.dot(M).dot(BL1) +
-                         det(J2) * w[1] * BL2.T.dot(M).dot(BL2) +
-                         det(J3) * w[2] * BL3.T.dot(M).dot(BL3))            
-
+            KL = (area * (J1 * w[0] * BL1.T.dot(M).dot(BL1) +
+                          J2 * w[1] * BL2.T.dot(M).dot(BL2) +
+                          J3 * w[2] * BL3.T.dot(M).dot(BL3)))            
 
             # create the matrix of derivative of shape functions (H matrix)
-            H1 = self._shapeFns[1].dNdximat() * inv(J1)
-            H2 = self._shapeFns[2].dNdximat() * inv(J2)
-            H3 = self._shapeFns[3].dNdximat() * inv(J3)
+            H1 = self._shapeFns[1].dNdximat() / J1
+            H2 = self._shapeFns[2].dNdximat() / J2
+            H3 = self._shapeFns[3].dNdximat() / J3
             # create the matrix of derivative of displacements (A matrix)
-            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) * inv(J1)  
-            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) * inv(J2) 
-            A3 = - self._shapeFns[3].G(xn1, xn2, x01, x02) * inv(J3) 
+            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J1  
+            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) / J2 
+            A3 = - self._shapeFns[3].G(xn1, xn2, x01, x02) / J3 
             # create the nonlinear Bmatrix
-            BN1 = (1 / 2) * (np.dot(A1, H1) - BL1) 
-            BN2 = (1 / 2) * (np.dot(A2, H2) - BL2)
-            BN3 = (1 / 2) * (np.dot(A3, H3) - BL3)
+            BN1 = np.dot(A1, H1) 
+            BN2 = np.dot(A2, H2)
+            BN3 = np.dot(A3, H3)
 
             # the nonlinear stiffness matrix for 3 Gauss point
-            KN = area * (det(J1) * w[0] * (BL1.T.dot(M).dot(BN1) +
-                             BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1) +
-                             0.5 * BL1.T.dot(M).dot(-H1).dot(H1).dot(delta) +
-                             0.5 * BN1.T.dot(M).dot(-H1).dot(H1).dot(delta)) +
-                             det(J2) * w[1] * (BL2.T.dot(M).dot(BN2) +
-                             BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2) +
-                             0.5 * BL2.T.dot(M).dot(-H2).dot(H2).dot(delta) +
-                             0.5 * BN2.T.dot(M).dot(-H2).dot(H2).dot(delta)) +
-                             det(J3) * w[2] * (BL3.T.dot(M).dot(BN3) +
-                             BN3.T.dot(M).dot(BL3) + BN3.T.dot(M).dot(BN3) +
-                             0.5 * BL3.T.dot(M).dot(-H3).dot(H3).dot(delta) +
-                             0.5 * BN3.T.dot(M).dot(-H3).dot(H3).dot(delta)))
+            KN = (area * (J1 * w[0] * (BL1.T.dot(M).dot(BN1) +
+                          BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) +
+                          J2 * w[1] * (BL2.T.dot(M).dot(BN2) +
+                          BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2)) +
+                          J3 * w[2] * (BL3.T.dot(M).dot(BN3) +
+                          BN3.T.dot(M).dot(BL3) + BN3.T.dot(M).dot(BN3))))
 
-        
-            # creat the stress matrix
-            
             # the stress stiffness matrix for 1 Gauss point
-            KS = area / 2 * ((det(J1) * w[0] * H1.T.dot(st).dot(-H1)) +
-                             (det(J2) * w[1] * H2.T.dot(st).dot(-H2)) +
-                             (det(J3) * w[2] * H3.T.dot(st).dot(-H3)))
-   
-                             
+            KS = (area * (J1 * w[0] * H1.T.dot(T).dot(H1) +
+                          J2 * w[1] * H2.T.dot(T).dot(H2) +
+                          J3 * w[2] * H3.T.dot(T).dot(H3)))
+                                
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS
                         
         return stiffT
 
-    def forcingFunction(self):
+    def forcingFunction(self, se, sc):
+        
+        # create the traction 
+        T = sc + se
+        t = T
+        
+        # initial natural coordinates for a chord
+        x01 = -self._L0 / 2.0
+        x02 = self._L0 / 2.0
+
+        # determine the force vector
+        if self._gaussPts == 1:
+            # 'natural' weight of the element
+            wgt = 2.0
+            w = np.array([wgt])
+
+            N1 = self._shapeFns[1].N1
+            N2 = self._shapeFns[1].N2
+            n = np.array([[N1, N2]])
+            nMat1 = np.transpose(n)
+
+            J = self._shapeFns[1].jacobian(x01, x02)
+
+            # the force vector for 1 Gauss point
+            Force = J * w[0] * nMat1 * t
+
+        elif self._gaussPts == 2:
+            # 'natural' weights of the element
+            wgt = 1.0
+            w = np.array([wgt, wgt])
+
+            # at Gauss point 1
+            N1 = self._shapeFns[1].N1
+            N2 = self._shapeFns[1].N2
+            n1 = np.array([[N1, N2]])
+            nMat1 = np.transpose(n1)
+
+            # at Gauss point 2
+            N1 = self._shapeFns[2].N1
+            N2 = self._shapeFns[2].N2
+            n2 = np.array([[N1, N2]])
+            nMat2 = np.transpose(n2)
+
+            J1 = self._shapeFns[1].jacobian(x01, x02)
+            J2 = self._shapeFns[2].jacobian(x01, x02)
+
+            # the force vector for 2 Gauss points
+            Force = J1 * w[0] * nMat1 * t + J2 * w[1] * nMat2 * t
+
+        else:  # gaussPts = 3
+            # 'natural' weights of the element
+            wgt1 = 5.0 / 9.0
+            wgt2 = 8.0 / 9.0
+            w = np.array([wgt1, wgt2, wgt1])
+
+            # at Gauss point 1
+            N1 = self._shapeFns[1].N1
+            N2 = self._shapeFns[1].N2
+            n1 = np.array([[N1, N2]])
+            nMat1 = np.transpose(n1)
+
+            # at Gauss point 2
+            N1 = self._shapeFns[2].N1
+            N2 = self._shapeFns[2].N2
+            n2 = np.array([[N1, N2]])
+            nMat2 = np.transpose(n2)
+
+            # at Gauss point 3
+            N1 = self._shapeFns[3].N1
+            N2 = self._shapeFns[3].N2
+            n3 = np.array([[N1, N2]])
+            nMat3 = np.transpose(n3)
+
+            J1 = self._shapeFns[1].jacobian(x01, x02)
+            J2 = self._shapeFns[2].jacobian(x01, x02)
+            J3 = self._shapeFns[3].jacobian(x01, x02)
+
+            # the force vector for 3 Gauss points
+            Force = (J1 * w[0] * nMat1 * t + J2 * w[1] * nMat2 * t +
+                    J3 * w[2] * nMat3 * t)
+
+        return Force      
+        
+        
         return
