@@ -9,7 +9,7 @@ from vertices import vertex
 
 """
 Created on Mon Jan 28 2019
-Last Updated:  Oct 06 2019
+Last Updated:  Feb 10 2020
 
 A test file for class chord in file chords.py.
 
@@ -83,7 +83,7 @@ def run():
     print(c.toString('prev'))
     print('length:      {:8.5e}'.format(c.length('prev')))
     print('stretch:     {:8.5e}'.format(c.stretch('prev')))
-    print('strain:      {:8.5e}'.format(c.strain('prev')))
+    print('strain:      {:8.5e05}'.format(c.strain('prev')))
     print('strain rate: {:8.5e}'.format(c.dStrain('prev')))
     centroid = c.centroid('prev')
     print('centroid:     ' +
@@ -164,4 +164,14 @@ def run():
     print(np.linalg.inv(mass))
 
 
+    print("\nThe stiffness matrix for this chord is:")
+    stiff = c.stiffnessMatrix(1, 1, 1)
+    print(stiff)
+    
+
+    print("\nThe force vector for this chord is:")
+    Force = c.forcingFunction(1, 1)
+    print(Force)
+
+    
 run()
