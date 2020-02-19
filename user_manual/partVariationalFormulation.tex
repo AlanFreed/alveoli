@@ -151,9 +151,9 @@ In quadrilateral derivations,  the Jacobian of two-dimensional transformations t
 \end{equation}
 The numerical integration of Eq.~(\ref{massintegral2d}) result in 
 \begin{equation}
-    \mathbf{M}_{2C} = \sum_{i=1}^{n} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,|\mathbf{J}| \, h \, w_i
+    \mathbf{M}_{2C} = \sum_{i=1}^{n} \sum_{j=1}^{n} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,|\mathbf{J}| \, h \, w_i \, w_j
 \end{equation}
-where $n$ stands for number of Gauss points, and $\mathrm{w}_i$ denotes the natural weight of the element.
+where $n$ stands for number of Gauss points, and $\mathrm{w}_i$ and $\mathrm{w}_j$ denote the natural weight of the element.
 There are three mass matrix for each pentagon based upon three Gauss, quadrature rules in Table~\ref{tabQuadrature} which are integrating polynomials of order 3 and 5, respectively. 
 
 The Lumped mass matrix for pentagon makes the diagonal parameters as follow
@@ -208,9 +208,9 @@ in which $\mathrm{N}_i (i = 1, 2, 3, 4)$ are four shape functions corresponding 
 \end{subequations}
 The numerical integration is used to obtain the mass matrix of tetrahedron via
 \begin{equation}
-    \mathbf{M}_{3C} = \sum_{i=1}^{n_i} \rho  \mathbf{N}^{\mathsf{T}} \mathbf{N} \,  \,|\mathbf{J}| \, w_i
+    \mathbf{M}_{3C} = \sum_{i=1}^{n} \sum_{j=1}^{n} \sum_{k=1}^{n} \rho  \mathbf{N}^{\mathsf{T}} \mathbf{N} \,  \,|\mathbf{J}| \, w_i \, w_j \, w_k
 \end{equation}
-wherein $|\mathbf{J}|$ being the determinant of the Jacobian matrix in a tetrahedron that are calculated using derivatives of shape functions with respect to the local coordinates $(\xi, \eta, \zeta)$, and the current global coordinates $(x_i, y_i, z_i)$ at the $i^{\mathrm{th}}$ vertex via
+wherein $|\mathbf{J}|$ being the determinant of the Jacobian matrix in a tetrahedron that are calculated using derivatives of shape functions with respect to the local coordinates $(\xi, \eta, \zeta)$, and the current global coordinates $(x, y, z)$ via
 \begin{equation}
 \begin{aligned}
  \mathbf{J}= &
@@ -674,7 +674,7 @@ N_{i,y} &  0  \\
 In order to be able to evaluate the nonlinear stiffness matrix, $[\mathbf{\bar{B}}]$ should be established as the summation of $ \mathbf{B}_{N1}$ and $\mathbf{B}_{N2}$.
 Hence, the stress stiffness matrix for a 2-D alveolar septa take the form of
 \begin{equation}
-\mathbf{K}_\mathbf{S} = \int_{\pentagon} \int_{\pentagon}  \mathrm{d} \mathbf{B}_N^{\mathsf{T}} \, \mathbf{T} \, |\mathbf{J}|  \, h \,  \mathrm{d} \xi \,  \mathrm{d} \eta =  \sum_{i=1}^{n}   \mathrm{d} \mathbf{B}_N^{\mathsf{T}} \, \mathbf{T} \, |\mathbf{J}| \, h \, \mathrm{w}_i
+\mathbf{K}_\mathbf{S} = \int_{\pentagon} \int_{\pentagon}  \mathrm{d} \mathbf{B}_N^{\mathsf{T}} \, \mathbf{T} \, |\mathbf{J}|  \, h \,  \mathrm{d} \xi \,  \mathrm{d} \eta =  \sum_{i=1}^{n}  \sum_{j=1}^{n}  \mathrm{d} \mathbf{B}_N^{\mathsf{T}} \, \mathbf{T} \, |\mathbf{J}| \, h \, \mathrm{w}_i \mathrm{w}_j
 \label{stressstif}
 \end{equation}
 where $n$ stands for number of Gauss points, $\mathrm{w}_i$ denotes the natural weight of the element demonstrated in Table~\ref{tabQuadrature}
@@ -710,17 +710,464 @@ s^{\tau} & s^{\sigma}
 \end{equation}
 The small/linear displacement stiffness matrix for pentagon is evaluated numerically as 
 \begin{equation}
-\mathbf{K}_{L} = \int_{\pentagon} \int_{\pentagon} \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, |\mathbf{J}| \, h \,  \mathrm{d} \xi \,  \mathrm{d} \eta =  \sum_{i=1}^{n}  \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, |\mathbf{J}|  \, h \, \mathrm{w}_i
+\mathbf{K}_{L} = \int_{\pentagon} \int_{\pentagon} \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, |\mathbf{J}| \, h \,  \mathrm{d} \xi \,  \mathrm{d} \eta =  \sum_{i=1}^{n} \sum_{j=1}^{n} \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, |\mathbf{J}|  \, h \, \mathrm{w}_i \mathrm{w}_j
 \end{equation}
 The large/nonlinear displacement stiffness matrix for chord can be presented as follow
 \begin{equation}
 \mathbf{K}_{N} = \int_{\pentagon} \int_{\pentagon} \mathbf{D} \, |\mathbf{J}|\, h \, \mathrm{d} \xi \, \mathrm{d} \eta 
-= \sum_{i=1}^{n}  \mathbf{D} \, |\mathbf{J}| \, h \, \mathrm{w}_i
+= \sum_{i=1}^{n} \sum_{j=1}^{n} \mathbf{D} \, |\mathbf{J}| \, h \, \mathrm{w}_i \mathrm{w}_j
 \end{equation}
 where $\mathbf{D}$ have the expression 
 \begin{equation}
 \mathbf{D} = \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N
 \end{equation}
+
+
+\subsection{Stiffness Matrix for alveolar volume}
+The Laplace stretch associated with a alveolar volume has geometric interpretations that one can assign \cite{FreedSrinivasa15}
+\begin{subequations}
+	\label{LagrangianPhysicalStretch}
+	\begin{align}
+	\mathcal{U}_{ij} & = \begin{bmatrix}
+	a & a \gamma & a \beta \\
+	0 & b & b \alpha \\
+	0 & 0 & c \end{bmatrix} 
+	\end{align}
+\end{subequations}
+The components of Laplace stretch $\boldsymbol{\mathcal{U}}$ has a  Cholesky factorization expressed in terms of the right Cauchy-Green deformation tensor $\mathbf{C} \defeq \mathbf{F}^{\mathsf{T}} \mathbf{F} = \boldsymbol{\mathcal{U}}^{\mathsf{T}} \boldsymbol{\mathcal{U}}$, which is a symmetric second-order tensor. 
+\begin{equation}
+\begin{aligned}
+\mathcal{U}_{11} & = \sqrt{C_{11}} & 
+\mathcal{U}_{12} & = C_{12} / \mathcal{U}_{11} &
+\mathcal{U}_{13} & = C_{13} / \mathcal{U}_{11} \\
+\mathcal{U}_{21} & = 0 &
+\mathcal{U}_{22} & = \sqrt{C_{22} - \mathcal{U}_{12}^{\,2}} &
+\mathcal{U}_{23} & = \bigl( C_{23} - \mathcal{U}_{12\,}\mathcal{U}_{13} \bigr) / \mathcal{U}_{22} \\
+\mathcal{U}_{31} & = 0 &
+\mathcal{U}_{32} & = 0 & 
+\mathcal{U}_{33} & = \sqrt{C_{33} - \mathcal{U}_{13}^{\,2} - \mathcal{U}_{23}^{\,2}}
+\end{aligned}
+\label{LagrangianLaplaceStretch}
+\end{equation}
+where ${C_{11}}$, ${C_{12}}$, ${C_{21}}$ and ${C_{22}}$ are components of the Green deformation matrix $\mathbf{C}$ wherein  $\mathbf{F}$ is the deformation gradient.
+\begin{subequations}
+	\begin{align}
+	\mathbf{C} &= \mathbf{F}^{\mathsf{T}} \mathbf{F} =
+	\begin{bmatrix}
+	C_{11} & C_{12} & C_{13} \\
+	C_{21} & C_{22} & C_{23} \\
+	C_{31} & C_{32} & C_{33}
+	\end{bmatrix} \quad \textrm{,} \quad
+	\mathbf{F} =  
+	\begin{bmatrix}
+	1 + \mathrm{\partial u / \partial x} & \mathrm{\partial u / \partial y} & \mathrm{\partial u / \partial z} \\
+	\mathrm{\partial v / \partial x} & 1 + \mathrm{\partial v / \partial y} & \mathrm{\partial v / \partial z} \\
+	\mathrm{\partial w / \partial x} & \mathrm{\partial w / \partial y} & 1 + \mathrm{\partial w / \partial z}
+	\end{bmatrix}\\
+	\intertext{with}
+	\mathrm{C_{11}} & = \left(\frac{\mathrm{\partial u}}{\partial x}\right)^2 + \left(\frac{\mathrm{\partial v}}{\partial x}\right)^2 + \left(\frac{\mathrm{\partial w}}{\partial x}\right)^2 + 2\, \frac{\mathrm{\partial u}}{\partial x}  + 1\\
+	\mathrm{C_{22}} & = \left(\frac{\mathrm{\partial u}}{\partial y}\right)^2 + \left(\frac{\mathrm{\partial v}}{\partial y}\right)^2 + \left(\frac{\mathrm{\partial w}}{\partial y}\right)^2 + 2\, \frac{\mathrm{\partial v}}{\partial y} + 1\\
+	\mathrm{C_{33}} & = \left(\frac{\mathrm{\partial u}}{\partial z}\right)^2 + \left(\frac{\mathrm{\partial v}}{\partial z}\right)^2 + \left(\frac{\mathrm{\partial w}}{\partial z}\right)^2 + 2\, \frac{\mathrm{\partial w}}{\partial z} + 1 \\
+	\mathrm{C_{12}} & = \mathrm{C_{21}} = \frac{\mathrm{\partial u}}{\partial y} + \frac{\mathrm{\partial v}}{\partial x} + \frac{\mathrm{\partial u}}{\partial x} \cdot \frac{\mathrm{\partial u}}{\partial y} + \frac{\mathrm{\partial v}}{\partial x} \cdot \frac{\mathrm{\partial v}}{\partial y} + \frac{\mathrm{\partial w}}{\partial x} \cdot \frac{\mathrm{\partial w}}{\partial y}\\
+    \mathrm{C_{13}} & = \mathrm{C_{31}} = \frac{\mathrm{\partial u}}{\partial z} + \frac{\mathrm{\partial w}}{\partial x} + \frac{\mathrm{\partial u}}{\partial x} \cdot \frac{\mathrm{\partial u}}{\partial z} + \frac{\mathrm{\partial v}}{\partial x} \cdot \frac{\mathrm{\partial v}}{\partial z} + \frac{\mathrm{\partial w}}{\partial x} \cdot \frac{\mathrm{\partial w}}{\partial z} \\
+    \mathrm{C_{23}} & = \mathrm{C_{32}} = \frac{\mathrm{\partial v}}{\partial z} + \frac{\mathrm{\partial w}}{\partial y} + \frac{\mathrm{\partial u}}{\partial y} \cdot \frac{\mathrm{\partial u}}{\partial z} + \frac{\mathrm{\partial v}}{\partial y} \cdot \frac{\mathrm{\partial v}}{\partial z} + \frac{\mathrm{\partial w}}{\partial y} \cdot \frac{\mathrm{\partial w}}{\partial z}
+	\end{align}
+\end{subequations}
+the dilatation $\delta$ for the alveolar volume is 
+\begin{subequations}
+	\begin{align}
+	 \mathrm  \xi & \defeq \ln \sqrt[3]{\frac{a}{a_0}
+		\frac{b}{b_0} \frac{c}{c_0}} \\
+	\intertext{and the squeezes $\varepsilon_i$ and the shear strains $\gamma_i$ are defined accordingly}
+	\varepsilon_1 & \defeq \ln \sqrt[3]{\frac{a}
+		{a_0} \frac{b_0}{b}} & 	\gamma_1 & \defeq \alpha - \alpha_0 \\
+	\varepsilon_2 & \defeq \ln \sqrt[3]{\frac{b}
+		{b_0} \frac{c_0}{c}} & \gamma_2 & \defeq \beta - \beta_0 \\
+	\varepsilon_3 & \defeq \ln \sqrt[3]{\frac{c}
+		{c_0} \frac{a_0}{a}} & 	\gamma_3 & \defeq \gamma - \gamma_0 
+	\end{align}
+\end{subequations}
+wherein $a_0$, $b_0$ and $c_0$ are their initial elongation ratios, and where $\alpha_0$, $\beta_0$ and $\gamma_0$ are their initial shears.
+It is useful to define the above strains in terms of linear and nonlinear incremental strains as follow
+\begin{subequations}
+	\begin{align}
+	\mathrm  \xi & = \mathrm \xi_{L} + \mathrm  \xi_{N1} + \mathrm  \xi_{N2} + \mathrm  \xi_{N3}\\
+	\mathrm  \varepsilon_{i} & = \mathrm  \varepsilon_{iL} + \mathrm  \varepsilon_{iN1} + \mathrm  \varepsilon_{iN2} + \mathrm  \varepsilon_{iN3} \\
+	\mathrm \gamma_{i} & = \mathrm  \gamma_{iL} + \mathrm  \gamma_{iN1} + \mathrm  \gamma_{iN2} + \mathrm  \gamma_{iN3}
+	\end{align}
+	\label{totalvirtualstrain}
+\end{subequations}
+Taylor series are used here to obtain the linear and nonlinear part of displacements 
+\begin{subequations}
+	\begin{align}
+	\mathrm \xi_{L} & = \frac{1}{3} \, \left(\mathrm{\frac{\partial u}{\partial x}} + \mathrm{\frac{\partial v}{\partial y}} + \mathrm{\frac{\partial w}{\partial z}}\right)\\
+	\mathrm \xi_{N} & = \frac{1}{6} \, \Big(-\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} + \mathrm{\frac{\partial u}{\partial z}}\, \mathrm{\frac{\partial u}{\partial z}}  - \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} - \mathrm{\frac{\partial v}{\partial z}}\, \mathrm{\frac{\partial v}{\partial z}} + \mathrm{\frac{\partial w}{\partial x}}\, \mathrm{\frac{\partial w}{\partial x}} - \mathrm{\frac{\partial w}{\partial y}}\, \mathrm{\frac{\partial w}{\partial y}} - \mathrm{\frac{\partial w}{\partial z}}\, \mathrm{\frac{\partial w}{\partial z}} 
+    \notag \\
+    \mbox{} &  - 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}} - 4 \, \mathrm{\frac{\partial v}{\partial z}}\, \mathrm{\frac{\partial w}{\partial y}} \Big)\\
+	\mathrm \varepsilon_{1L} & = \frac{1}{3} \, \left(\mathrm{\frac{\partial u}{\partial x}} - \mathrm{\frac{\partial v}{\partial y}}\right)\\
+	\mathrm \varepsilon_{1N} & = \frac{1}{6} \, \left(2 \, \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial x}} + \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} - \mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} +  \mathrm{\frac{\partial w}{\partial x}}\, \mathrm{\frac{\partial w}{\partial x}} -  \mathrm{\frac{\partial w}{\partial y}}\, \mathrm{\frac{\partial w}{\partial y}} + 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
+	\mathrm \varepsilon_{2L} & = \frac{1}{3} \, \left(\mathrm{\frac{\partial v}{\partial y}} - \mathrm{\frac{\partial w}{\partial z}}\right)\\
+	\mathrm \varepsilon_{2N} & = \frac{1}{6} \, \Big(- \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial x}} - \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} - \mathrm{\frac{\partial u}{\partial z}}\, \mathrm{\frac{\partial u}{\partial z}} + \mathrm{\frac{\partial v}{\partial z}}\, \mathrm{\frac{\partial v}{\partial z}} + 3 \,  \mathrm{\frac{\partial w}{\partial y}}\, \mathrm{\frac{\partial w}{\partial y}} +  \mathrm{\frac{\partial w}{\partial z}}\, \mathrm{\frac{\partial w}{\partial z}}  \notag \\
+	\mbox{} & - 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}} + 4 \, \mathrm{\frac{\partial v}{\partial z}}\, \mathrm{\frac{\partial w}{\partial y}}\Big)\\
+	\mathrm \varepsilon_{3L} & = \frac{1}{3} \, \left(-\mathrm{\frac{\partial u}{\partial x}} + \mathrm{\frac{\partial w}{\partial z}}\right)\\
+	\mathrm \varepsilon_{3N} & = \frac{1}{6} \, \Big(- \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial x}} + \mathrm{\frac{ \partial u}{\partial x}}\, \mathrm{\frac{ \partial u}{\partial x}} + \mathrm{\frac{\partial u}{\partial z}}\, \mathrm{\frac{\partial u}{\partial z}} - \mathrm{\frac{\partial v}{\partial z}}\, \mathrm{\frac{\partial v}{\partial z}} - \mathrm{\frac{\partial w}{\partial x}}\, \mathrm{\frac{\partial w}{\partial x}} - 2 \,  \mathrm{\frac{\partial w}{\partial y}}\, \mathrm{\frac{\partial w}{\partial y}} \notag \\
+	\mbox{} & -  \mathrm{\frac{\partial w}{\partial z}}\, \mathrm{\frac{\partial w}{\partial z}} - 4 \, \mathrm{\frac{\partial v}{\partial z}}\, \mathrm{\frac{\partial w}{\partial y}}\Big)\\
+		\mathrm \gamma_{1L} & = \mathrm{\frac{\partial v}{\partial z}} + \mathrm{\frac{\partial w}{\partial y}}\\
+	\mathrm \gamma_{1N} & = 2 \, \mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial v}{\partial z}} - \mathrm{\frac{ \partial u}{\partial z}}\, \mathrm{\frac{ \partial v}{\partial x}} + 2 \, \mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial w}{\partial y}} - \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial w}{\partial x}} - \mathrm{\frac{\partial v}{\partial y}}\, \mathrm{\frac{\partial v}{\partial z}} -   \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial w}{\partial x}} \notag \\
+	\mbox{} & - 2 \, \mathrm{\frac{\partial v}{\partial y}}\, \mathrm{\frac{\partial w}{\partial y}} + \mathrm{\frac{\partial w}{\partial y}}\, \mathrm{\frac{\partial w}{\partial z}}\\
+	\mathrm \gamma_{2L} & = \mathrm{\frac{\partial v}{\partial z}} + \mathrm{\frac{\partial w}{\partial y}}\\
+    \mathrm \gamma_{2N} & = \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial u}{\partial z}} - 2 \, \mathrm{\frac{ \partial u}{\partial x}}\, \mathrm{\frac{ \partial v}{\partial z}} - 2 \, \mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial w}{\partial y}} + \mathrm{\frac{\partial v}{\partial y}}\, \mathrm{\frac{\partial v}{\partial z}} + \mathrm{\frac{\partial w}{\partial y}}\, \mathrm{\frac{\partial w}{\partial z}}\\
+    \mathrm \gamma_{3L} & = \mathrm{\frac{\partial u}{\partial y}} + \mathrm{\frac{\partial v}{\partial x}}\\
+    \mathrm \gamma_{3N} & = - \mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial y}} - 2 \, \mathrm{\frac{ \partial u}{\partial x}}\, \mathrm{\frac{ \partial v}{\partial x}} + \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial y}} + \mathrm{\frac{\partial w}{\partial x}}\, \mathrm{\frac{\partial w}{\partial y}} 
+	\end{align}
+\end{subequations}
+The linear strain displacement matrix $\mathbf{B}_L$ can be obtained by differentiation of displacements expressed through the nodal displacements and shape functions from infinitesimal linear strain vector that take the form of
+\begin{equation}
+\begin{aligned}
+\mathbf{E}_L & =  \begin{Bmatrix}
+\mathrm \xi_{L} \\
+\mathrm \varepsilon_{1L} \\
+\mathrm \varepsilon_{2L} \\
+\mathrm \varepsilon_{3L} \\
+\mathrm \gamma_{1L} \\
+\mathrm \gamma_{2L} \\
+\mathrm \gamma_{3L}\end{Bmatrix} = 
+\begin{Bmatrix}
+\tfrac{1}{3} \, u_{,x} + \tfrac{1}{3} \, v_{,y} + \tfrac{1}{3} \, w_{,z} \\
+\tfrac{1}{3} \, u_{,x} - \tfrac{1}{3} \, v_{,y} \\
+\tfrac{1}{3} \, v_{,y} - \tfrac{1}{3} \, w_{,z} \\
+- \tfrac{1}{3} \, u_{,x} + \tfrac{1}{3} \, w_{,z} \\ 
+v_{,z} +  w_{,y} \\ 
+v_{,z} +  w_{,y} \\ 
+u_{,y} +  v_{,x} \\\end{Bmatrix} = \begin{bmatrix}
+\tfrac{1}{3} \, \sum\nolimits_{i=1}^4 N_{i,x}  & \tfrac{1}{3} \, \sum\nolimits_{i=1}^4 N_{i,y} & \tfrac{1}{3} \, \sum\nolimits_{i=1}^4 N_{i,z} \\
+\tfrac{1}{3} \, \sum\nolimits_{i=1}^4 N_{i,x}  & \tfrac{-1}{3} \, \sum\nolimits_{i=1}^4 N_{i,y} & 0 \\ 0 & \tfrac{1}{3} \, \sum\nolimits_{i=1}^4 N_{i,y}  &  \tfrac{-1}{3} \, \sum\nolimits_{i=1}^4 N_{i,z} \\  \tfrac{-1}{3} \, \sum\nolimits_{i=1}^4 N_{i,x}  & 0 & \tfrac{1}{3} \, \sum\nolimits_{i=1}^4 N_{i,z} \\ 0 & \sum\nolimits_{i=1}^4 N_{i,z}  &  \sum\nolimits_{i=1}^4 N_{i,y} \\ 0 & \sum\nolimits_{i=1}^4 N_{i,z}  &  \sum\nolimits_{i=1}^4 N_{i,y} \\ \sum\nolimits_{i=1}^4 N_{i,y}  &  \sum\nolimits_{i=1}^4 N_{i,x} & 0 \end{bmatrix} \, \begin{Bmatrix}
+u_{i} \\
+v_{i} \\
+w_{i} \end{Bmatrix} \\
+& = \begin{bmatrix}
+[\mathbf{b}_1], & [\mathbf{b}_2], & [\mathbf{b}_3], & [\mathbf{b}_4]
+\end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
+= [\mathbf{B}_L] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} 
+\end{aligned}
+\end{equation}
+wherein 
+\begin{subequations}
+	\begin{align}
+	\mathbf{b}_i = & \begin{bmatrix}
+	\tfrac{1}{3} \,  N_{i,x}  & \tfrac{1}{3} \,  N_{i,y} & \tfrac{1}{3} \,  N_{i,z} \\
+	\tfrac{1}{3} \,  N_{i,x}  & -\tfrac{1}{3} \,  N_{i,y} & 0 \\ 0 & \tfrac{1}{3} \, N_{i,y}  & - \tfrac{1}{3} \,  N_{i,z} \\ - \tfrac{1}{3} \,  N_{i,x}  & 0 & \tfrac{1}{3} \,  N_{i,z} \\ 0 &  N_{i,z}  &  N_{i,y} \\ 0 & N_{i,z}  &   N_{i,y} \\  N_{i,y}  &   N_{i,x} & 0 \end{bmatrix}  \\
+	\intertext{and}
+	\mathbf{\Delta}^T  = &
+	\begin{Bmatrix}
+	u_1, v_1, w_1 u_2, v_2, w_2 ...,u_n, v_n, w_n
+	\end{Bmatrix}
+	\end{align}
+\end{subequations}
+The first nonlinear strain terms can be written as 
+\begin{equation}
+\begin{aligned}
+\mathbf{E}_{N1} & =  \begin{Bmatrix}
+\mathrm \xi_{L} \\
+\mathrm \varepsilon_{1N} \\
+\mathrm \varepsilon_{2N} \\
+\mathrm \varepsilon_{3N} \\
+\mathrm \gamma_{1N} \\
+\mathrm \gamma_{2N} \\
+\mathrm \gamma_{3N} \end{Bmatrix} =
+\begin{Bmatrix}
+\tfrac{1}{6} \,  \left( -u_{,x}^2 - 2 \, u_{,y} \, v_{,x}  +  w_{,x}^2  \right)\\
+\tfrac{1}{6} \,  \left( -u_{,x}^2 + 2 \, v_{,x}^2 +  w_{,x}^2 \right) \\
+\tfrac{1}{6} \,  \left( - v_{,x}^2 \right) \\
+\tfrac{1}{6} \,  \left( u_{,x}^2 - v_{,x}^2 -  w_{,x}^2  \right) \\ 
+2 \, u_{,x} \, v_{,z} - u_{,z} \, v_{,x} - v_{,x} \, w_{,x} \\
+ - 2 \, u_{,x} \, v_{,z} \\ 
+ - u_{,x} \, u_{,y} - 2 \, u_{,x} \, v_{,x}\end{Bmatrix} = \\
+ & \frac{1}{2} \, \begin{bmatrix}
+-\tfrac{1}{3} \, \partial u / \partial x &  - \tfrac{2}{3} \, \partial u / \partial y & \tfrac{1}{3} \, \partial w / \partial x  \\
+-\tfrac{1}{3} \, \partial u / \partial x &  \tfrac{2}{3} \, \partial v / \partial x & \tfrac{1}{3} \, \partial w / \partial x  \\
+0  & -\tfrac{1}{3} \, \partial v / \partial x & 0 \\
+\tfrac{1}{3} \, \partial u / \partial x &  - \tfrac{1}{3} \, \partial v / \partial x & - \tfrac{1}{3} \, \partial w / \partial x  \\
+4 \, \partial v / \partial z &  - 2 \, \partial u / \partial z & - 2 \,  \partial v / \partial x  \\
+- 4 \, \partial v / \partial z &  0 & 0  \\
+- 2 \, \partial u / \partial y &  - 4 \, \partial u / \partial x & 0   \end{bmatrix} \, \begin{Bmatrix}
+\partial u / \partial x\\
+\partial v / \partial x \\
+\partial w / \partial x
+\end{Bmatrix}
+= \tfrac{1}{2} \, [\mathbf{A}_1] \, [\boldsymbol{\theta}_1]
+\end{aligned}
+\end{equation}
+
+the derivative of displacement can be related to the nodal parameters via
+\begin{equation}
+[\boldsymbol{\theta}_1] =  \begin{Bmatrix}
+\partial u / \partial x\\
+\partial v / \partial x \\
+\partial w / \partial x
+\end{Bmatrix}
+= \begin{Bmatrix}
+\sum\nolimits_{i=1}^5 N_{i,x} \, u_i\\
+\sum\nolimits_{i=1}^5 N_{i,x} \, v_i \\
+\sum\nolimits_{i=1}^5 N_{i,x} \, w_i
+\end{Bmatrix} 
+= \begin{bmatrix}
+[\mathbf{h}_1], & [\mathbf{h}_2], & [\mathbf{h}_3], & [\mathbf{h}_4]
+\end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
+= [\mathbf{H}_1] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} 
+\end{equation}
+where 
+\begin{equation}
+\mathbf{h}_i = \begin{bmatrix}
+N_{i,x} &  0 & 0  \\
+0 & N_{i,x} & 0  \\
+0 & 0 & N_{i,x}\end{bmatrix} 
+\end{equation}
+hence $\mathbf{B}_{N1}$ become
+\begin{equation}
+\mathbf{B}_{N1} = [\mathbf{A}_1] \, [\mathbf{H}_1] = \begin{bmatrix}
+[\mathbf{b}_1], & [\mathbf{b}_2], & [\mathbf{b}_3], & [\mathbf{b}_4] 
+\end{bmatrix} 
+\end{equation}
+where
+\begin{equation}
+\mathbf{b}_i = \begin{bmatrix}
+
+-\tfrac{1}{3} \, \partial u / \partial x &  - \tfrac{2}{3} \, \partial u / \partial y & \tfrac{1}{3} \, \partial w / \partial x  \\
+-\tfrac{1}{3} \, \partial u / \partial x &  \tfrac{2}{3} \, \partial v / \partial x & \tfrac{1}{3} \, \partial w / \partial x  \\
+0  & -\tfrac{1}{3} \, \partial v / \partial x & 0 \\
+\tfrac{1}{3} \, \partial u / \partial x &  - \tfrac{1}{3} \, \partial v / \partial x & - \tfrac{1}{3} \, \partial w / \partial x  \\
+4 \, \partial v / \partial z &  - 2 \, \partial u / \partial z & - 2 \,  \partial v / \partial x  \\
+- 4 \, \partial v / \partial z &  0 & 0  \\
+- 2 \, \partial u / \partial y &   - 4 \, \partial u / \partial x & 0   \end{bmatrix}  \, \begin{bmatrix}
+N_{i,x} &  0 & 0  \\
+0 & N_{i,x} & 0  \\
+0 & 0 & N_{i,x} \end{bmatrix} 
+\end{equation}
+The second nonlinear strain terms can be written as 
+\begin{equation}
+\begin{aligned}
+\mathbf{E}_{N2} & =  \begin{Bmatrix}
+\mathrm \xi_{L} \\
+\mathrm \varepsilon_{1N} \\
+\mathrm \varepsilon_{2N} \\
+\mathrm \varepsilon_{3N} \\
+\mathrm \gamma_{1N} \\
+\mathrm \gamma_{2N} \\
+\mathrm \gamma_{3N} \end{Bmatrix} =
+\begin{Bmatrix}
+\tfrac{1}{6} \,  \left( - v_{,y}^2 - w_{,y}^2  \right)\\
+\tfrac{1}{6} \,  \left( 2 \, u_{,y} \, v_{,x} + 2 v_{,y}^2 -  w_{,y}^2 \right) \\
+\tfrac{1}{6} \,  \left( - 2 \, u_{,y} \, v_{,x} - v_{,y}^2 + 3 \, w_{,y}^2 \right) \\
+\tfrac{1}{6} \,  \left(-2 \, w_{,y}^2 \right) \\ 
+- u_{,y} \, w_{,x} - 2 \, v_{,y} \, w_{,y} + w_{,y} \, w_{,z} \\
+u_{,y} \, u_{,z} - 2 \, u_{,x} \, w_{,y} \\ 
+ v_{,x} \, v_{,y}  + w_{,x} \, w_{,y} \end{Bmatrix} = \\
+& \frac{1}{2} \, \begin{bmatrix}
+0 &  - \tfrac{1}{3} \, \partial v / \partial y & \tfrac{1}{3} \, \partial w / \partial y  \\
+\tfrac{2}{3} \, \partial v / \partial x &  \tfrac{2}{3} \, \partial v / \partial y & - \tfrac{1}{3} \, \partial w / \partial y  \\
+-\tfrac{2}{3} \, \partial v / \partial x  & -\tfrac{1}{3} \, \partial v / \partial y & \partial w / \partial y \\
+0 & 0 & - \tfrac{2}{3} \, \partial w / \partial y   \\
+- 2 \, \partial w / \partial x &  - 4 \, \partial w / \partial y & 2 \,  \partial w / \partial z  \\
+2 \, \partial u / \partial z &  0 & - 4 \, \partial u / \partial x  \\
+0 &  2 \, \partial v / \partial x &  2 \, \partial w / \partial x  \end{bmatrix} \, \begin{Bmatrix}
+\partial u / \partial y\\
+\partial v / \partial y \\
+\partial w / \partial y
+\end{Bmatrix}
+= \tfrac{1}{2} \, [\mathbf{A}_2] \, [\boldsymbol{\theta}_2]
+\end{aligned}
+\end{equation}
+the derivative of displacement can be related to the nodal parameters via
+\begin{equation}
+[\boldsymbol{\theta}_2] =  \begin{Bmatrix}
+\partial u / \partial y\\
+\partial v / \partial y \\
+\partial w / \partial y
+\end{Bmatrix}
+= \begin{Bmatrix}
+\sum\nolimits_{i=1}^5 N_{i,y} \, u_i\\
+\sum\nolimits_{i=1}^5 N_{i,y} \, v_i \\
+\sum\nolimits_{i=1}^5 N_{i,y} \, w_i
+\end{Bmatrix} 
+= \begin{bmatrix}
+[\mathbf{h}_1], & [\mathbf{h}_2], & [\mathbf{h}_3], & [\mathbf{h}_4] 
+\end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
+= [\mathbf{H}_2] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} 
+\end{equation}
+where 
+\begin{equation}
+\mathbf{h}_i = \begin{bmatrix}
+N_{i,y} &  0 & 0  \\
+0 & N_{i,y} & 0  \\
+0 & 0 & N_{i,y} \end{bmatrix} 
+\end{equation}
+hence $\mathbf{B}_{N2}$ become
+\begin{equation}
+\mathbf{B}_{N2} = [\mathbf{A}_2] \, [\mathbf{H}_2] = \begin{bmatrix}
+[\mathbf{b}_1], & [\mathbf{b}_2], & [\mathbf{b}_3], & [\mathbf{b}_4]
+\end{bmatrix} 
+\end{equation}
+where
+\begin{equation}
+\mathbf{b}_i = \begin{bmatrix}
+0 &  - \tfrac{1}{3} \, \partial v / \partial y & \tfrac{1}{3} \, \partial w / \partial y  \\
+\tfrac{2}{3} \, \partial v / \partial x &  \tfrac{2}{3} \, \partial v / \partial y & - \tfrac{1}{3} \, \partial w / \partial y  \\
+-\tfrac{2}{3} \, \partial v / \partial x  & -\tfrac{1}{3} \, \partial v / \partial y & \partial w / \partial y \\
+0 & 0 & - \tfrac{2}{3} \, \partial w / \partial y   \\
+- 2 \, \partial w / \partial x &  - 4 \, \partial w / \partial y & 2 \,  \partial w / \partial z  \\
+2 \, \partial u / \partial z &  0 & - 4 \, \partial u / \partial x  \\
+0 &  2 \, \partial v / \partial x &  2 \, \partial w / \partial x  \end{bmatrix} \, \begin{bmatrix}
+N_{i,y} &  0 & 0  \\
+0 & N_{i,y} & 0  \\
+0 & 0 & N_{i,y}  \end{bmatrix} 
+\end{equation}
+
+The third nonlinear strain terms can be written as 
+\begin{equation}
+\begin{aligned}
+\mathbf{E}_{N3} & =  \begin{Bmatrix}
+\mathrm \xi_{L} \\
+\mathrm \varepsilon_{1N} \\
+\mathrm \varepsilon_{2N} \\
+\mathrm \varepsilon_{3N} \\
+\mathrm \gamma_{1N} \\
+\mathrm \gamma_{2N} \\
+\mathrm \gamma_{3N} \end{Bmatrix} =
+\begin{Bmatrix}
+\tfrac{1}{6} \,  \left( u_{,z}^2 - v_{,z}^2 - 4 \, v_{,z} \, w_{,y} - w_{,z}^2   \right)\\
+0 \\
+\tfrac{1}{6} \,  \left( - u_{,z}^2 + v_{,z}^2 + 4 \, v_{,z} \, w_{,y} + w_{,z}^2  \right) \\
+\tfrac{1}{6} \,  \left( u_{,z}^2 - v_{,z}^2 - w_{,z}^2 - 4 \, v_{,z} \, w_{,y}\right) \\ 
+- v_{,y} \, v_{,z}  \\
+v_{,y} \, v_{,z} + w_{,y} \, w_{,z} \\ 
+0 \end{Bmatrix} = \\
+& \frac{1}{2} \, \begin{bmatrix}
+\tfrac{1}{3} \, \partial u / \partial z &  - \tfrac{1}{3} \, \partial v / \partial z - \tfrac{4}{3} \, \partial w / \partial y & - \tfrac{1}{3} \, \partial w / \partial z   \\
+0 &  0 & 0  \\
+- \tfrac{1}{3} \, \partial u / \partial z &  \tfrac{1}{3} \, \partial v / \partial z + \tfrac{4}{3} \, \partial w / \partial y & \tfrac{1}{3} \, \partial w / \partial z \\
+\tfrac{1}{3} \, \partial u / \partial z &  - \tfrac{1}{3} \, \partial v / \partial z - \tfrac{4}{3} \, \partial w / \partial y & - \tfrac{1}{3} \, \partial w / \partial z \\
+0 &  -2 \, \partial v / \partial y & 0  \\
+0 &  2 \, \partial v / \partial y & 2 \, \partial w / \partial y  \\
+0 &  0 &  0  \end{bmatrix} \, \begin{Bmatrix}
+\partial u / \partial z\\
+\partial v / \partial z \\
+\partial w / \partial z
+\end{Bmatrix}
+= \tfrac{1}{2} \, [\mathbf{A}_3] \, [\boldsymbol{\theta}_3]
+\end{aligned}
+\end{equation}
+the derivative of displacement can be related to the nodal parameters via
+\begin{equation}
+[\boldsymbol{\theta}_3] =  \begin{Bmatrix}
+\partial u / \partial z\\
+\partial v / \partial z \\
+\partial w / \partial z
+\end{Bmatrix}
+= \begin{Bmatrix}
+\sum\nolimits_{i=1}^5 N_{i,z} \, u_i\\
+\sum\nolimits_{i=1}^5 N_{i,z} \, v_i \\
+\sum\nolimits_{i=1}^5 N_{i,z} \, w_i
+\end{Bmatrix} 
+= \begin{bmatrix}
+[\mathbf{h}_1], & [\mathbf{h}_2], & [\mathbf{h}_3], & [\mathbf{h}_4] 
+\end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
+= [\mathbf{H}_3] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} 
+\end{equation}
+where 
+\begin{equation}
+\mathbf{h}_i = \begin{bmatrix}
+N_{i,z} &  0 & 0  \\
+0 & N_{i,z} & 0  \\
+0 & 0 & N_{i,z} \end{bmatrix} 
+\end{equation}
+hence $\mathbf{B}_{N3}$ become
+\begin{equation}
+\mathbf{B}_{N3} = [\mathbf{A}_3] \, [\mathbf{H}_3] = \begin{bmatrix}
+[\mathbf{b}_1], & [\mathbf{b}_2], & [\mathbf{b}_3], & [\mathbf{b}_4]
+\end{bmatrix} 
+\end{equation}
+where
+\begin{equation}
+\mathbf{b}_i = \begin{bmatrix}
+\tfrac{1}{3} \, \partial u / \partial z &  - \tfrac{1}{3} \, \partial v / \partial z - \tfrac{4}{3} \, \partial w / \partial y & - \tfrac{1}{3} \, \partial w / \partial z   \\
+0 &  0 & 0  \\
+- \tfrac{1}{3} \, \partial u / \partial z &  \tfrac{1}{3} \, \partial v / \partial z + \tfrac{4}{3} \, \partial w / \partial y & \tfrac{1}{3} \, \partial w / \partial z \\
+\tfrac{1}{3} \, \partial u / \partial z &  - \tfrac{1}{3} \, \partial v / \partial z - \tfrac{4}{3} \, \partial w / \partial y & - \tfrac{1}{3} \, \partial w / \partial z \\
+0 &  -2 \, \partial v / \partial y & 0  \\
+0 &  2 \, \partial v / \partial y & 2 \, \partial w / \partial y  \\
+0 &  0 &  0 \end{bmatrix} \, \begin{bmatrix}
+N_{i,z} &  0 & 0  \\
+0 & N_{i,z} & 0  \\
+0 & 0 & N_{i,z}  \end{bmatrix} 
+\end{equation}
+
+In order to be able to evaluate the nonlinear stiffness matrix, $[\mathbf{\bar{B}}]$ should be established as the summation of $ \mathbf{B}_{N1}$, $\mathbf{B}_{N2}$ and $\mathbf{B}_{N3}$.
+Hence, the stress stiffness matrix for a 3-D alveolar volume take the form of
+\begin{equation}
+\mathbf{K}_\mathbf{S} = \int_{V}  \mathrm{d} \mathbf{B}_N^{\mathsf{T}} \, \mathbf{T} \, |\mathbf{J}|  \, \mathrm{d} \xi \,  \mathrm{d} \eta \, \mathrm{d} \zeta =  \sum_{i=1}^{n} \sum_{j=1}^{n}  \sum_{k=1}^{n}    \mathrm{d} \mathbf{B}_N^{\mathsf{T}} \, \mathbf{T} \, |\mathbf{J}| \, \mathrm{w}_i \mathrm{w}_j \mathrm{w}_k
+\label{stressstifvol}
+\end{equation}
+where $n$ stands for number of Gauss points. Table~\ref{tabQuadraturetetra}
+By taking the variation of Eq.~(\ref{straindis}) and substituting the definition of first and second nonlinear strain displacement matrices, the total nonlinear strain displacement matrix becomes
+\begin{equation}
+\mathrm{d}[\mathbf{B}_N]^{\mathsf{T}} = [\mathbf{H}_1^{\mathsf{T}}] \mathrm{d} [\mathbf{A}_1^{\mathsf{T}}] + [\mathbf{H}_2^{\mathsf{T}}] \mathrm{d} [\mathbf{A}_2^{\mathsf{T}}] + [\mathbf{H}_3^{\mathsf{T}}] \mathrm{d} [\mathbf{A}_3^{\mathsf{T}}]
+\end{equation}
+which on substituting into Eq.~(\ref{stressstifvol}) gives 
+\begin{equation}
+\mathbf{K_\mathbf{S}} \mathrm{d} \boldsymbol{\Delta} = \int_A \left(
+[\mathbf{H}_1^{\mathsf{T}}] \mathrm{d} [\mathbf{A}_1^{\mathsf{T}}] + [\mathbf{H}_2^{\mathsf{T}}] \mathrm{d} [\mathbf{A}_2^{\mathsf{T}}] + [\mathbf{H}_3^{\mathsf{T}}] \mathrm{d} [\mathbf{A}_3^{\mathsf{T}}] \right) \, \begin{Bmatrix} s^{\pi} \\ s^{\sigma_1} \\ s^{\sigma_2}  \\ s^{\tau_1} \\ s^{\tau_2} \\ s^{\tau_3} \end{Bmatrix} \, \mathrm{d} A
+\end{equation}
+However, using the mathematical properties of the matrix $\mathbf{A}$, the following expression will appear
+\begin{equation}
+\begin{aligned}
+ & \mathrm{d} [\mathbf{A}_1^{\mathsf{T}}] \, \begin{Bmatrix} s^{\pi} \\ s^{\sigma_1} \\ s^{\sigma_2} \\ s^{\tau_1} \\ s^{\tau_2} \\ s^{\tau_3}  \end{Bmatrix} = 
+\begin{bmatrix}s^{\pi} & s^{\tau_1} & s^{\tau_3}\\ 
+s^{\tau_1} & s^{\sigma_1} & s^{\tau_2} \\ 
+s^{\tau_3} & s^{\tau_2} & s^{\sigma_2} \end{bmatrix} \, [\mathbf{H}_1] \, \mathrm{d} \boldsymbol{\Delta} \\
+& \mathrm{d} [\mathbf{A}_2^{\mathsf{T}}] \, \begin{Bmatrix}s^{\pi} \\ s^{\sigma_1} \\ s^{\sigma_2}  \\ s^{\tau_1} \\ s^{\tau_2} \\ s^{\tau_3}  \end{Bmatrix} = 
+ \begin{bmatrix} s^{\pi} & s^{\tau_1} & s^{\tau_3}\\ 
+ s^{\tau_1} & s^{\sigma_1} & s^{\tau_2} \\ 
+ s^{\tau_3} & s^{\tau_2} & s^{\sigma_2}  \end{bmatrix} \, [\mathbf{H}_2] \, \mathrm{d} \boldsymbol{\Delta}\\
+ & \mathrm{d} [\mathbf{A}_3^{\mathsf{T}}] \, \begin{Bmatrix}s^{\pi} \\ s^{\sigma_1} \\ s^{\sigma_2}  \\ s^{\tau_1} \\ s^{\tau_2} \\ s^{\tau_3}  \end{Bmatrix} = 
+ \begin{bmatrix} s^{\pi} & s^{\tau_1} & s^{\tau_3}\\ 
+ s^{\tau_1} & s^{\sigma_1} & s^{\tau_2} \\ 
+ s^{\tau_3} & s^{\tau_2} & s^{\sigma_3}  \end{bmatrix} \, [\mathbf{H}_3] \, \mathrm{d} \boldsymbol{\Delta}
+ \end{aligned}
+\end{equation}
+and finally the stress/geometric stiffness matrix can be expressed as follow
+\begin{equation}
+\begin{aligned}
+\mathbf{K_{\mathbf{S}}} & = \sum_{i=1}^{n}  \sum_{j=1}^{n}  \sum_{k=1}^{n} [\mathbf{H}_1]^{\mathsf{T}}  \begin{bmatrix} s^{\pi} & s^{\tau_1} & s^{\tau_3}\\ 
+s^{\tau_1} & s^{\sigma_1} & s^{\tau_2} \\ 
+s^{\tau_3} & s^{\tau_2} & s^{\sigma_2}
+\end{bmatrix} \, [\mathbf{H}_1] \, |\mathbf{J}|  \mathrm{w}_i \mathrm{w}_j \mathrm{w}_k \\
+& + \sum_{i=1}^{n}  \sum_{j=1}^{n}  \sum_{k=1}^{n} [\mathbf{H}_2]^{\mathsf{T}}  \begin{bmatrix} s^{\pi} & s^{\tau_1} & s^{\tau_3}\\ 
+s^{\tau_1} & s^{\sigma_1} & s^{\tau_2} \\ 
+s^{\tau_3} & s^{\tau_2} & s^{\sigma_2}
+\end{bmatrix} \, [\mathbf{H}_2] \, |\mathbf{J}|  \, \mathrm{w}_i \mathrm{w}_j \mathrm{w}_k \\
+& + \sum_{i=1}^{n}  \sum_{j=1}^{n}  \sum_{k=1}^{n} [\mathbf{H}_3]^{\mathsf{T}}  \begin{bmatrix} s^{\pi} & s^{\tau_1} & s^{\tau_3}\\ 
+s^{\tau_1} & s^{\sigma_1} & s^{\tau_2} \\ 
+s^{\tau_3} & s^{\tau_2} & s^{\sigma_2}
+\end{bmatrix} \, [\mathbf{H}_3] \, |\mathbf{J}|  \, \mathrm{w}_i \mathrm{w}_j \mathrm{w}_k
+\end{aligned}
+\end{equation}
+The small/linear displacement stiffness matrix for tetrahedron is evaluated numerically as 
+\begin{equation}
+\mathbf{K}_{L} = \int_{V} \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, |\mathbf{J}| \,  \mathrm{d} \xi \,  \mathrm{d} \eta \,  \mathrm{d} \zeta =  \sum_{i=1}^{n}  \sum_{j=1}^{n}  \sum_{k=1}^{n}  \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, |\mathbf{J}|  \, \mathrm{w}_i \mathrm{w}_j \mathrm{w}_k
+\end{equation}
+The large/nonlinear displacement stiffness matrix for chord can be presented as follow
+\begin{equation}
+\mathbf{K}_{N} = \int_{V} \mathbf{D} \, |\mathbf{J}|\, \mathrm{d} \xi \, \mathrm{d} \eta \, \mathrm{d} \zeta
+= \sum_{i=1}^{n}  \sum_{j=1}^{n}  \sum_{k=1}^{n}  \mathbf{D} \, |\mathbf{J}| \, \mathrm{w}_i \mathrm{w}_j \mathrm{w}_k
+\end{equation}
+where $\mathbf{D}$ have the expression 
+\begin{equation}
+\mathbf{D} = \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N
+\end{equation}
+
+
+
 
 \section{Force Vector}
 %In the lung structure, the lung tissue(elastin and collagen) and the alveoli are two sources of force trying to collapse the lung. These inward forces are called the forces of recoil.  Inside of the alveoli, there is a fluid that makes the surface moist(a membrane of fluid is sticking to the surface) that is making an interface with the air, and this air-fluid interface also causes pressure inwards which try to collapse the alveoli called tension. The lung tissue is a third, and the fluid surface tension is $2/3$ of the total recoil. 
@@ -761,7 +1208,7 @@ Table~\ref{tabQuadrature1D} demonstrates the values of $\xi$ and $\mathrm{w}_i$ 
 The matrix of shape functions Eq.~(\ref{shape2D}) is used to obtain the force vector for alveolar septa.
 The force vector $\mathbf{F}_{2D}$ can also be obtained as follow
 \begin{equation}
-\mathbf{F}_{2D} = \int_{A} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} A = \int_{\pentagon} \int_{\pentagon} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \,|\mathbf{J}| \, \mathrm{d} \xi \, \mathrm{d} \eta = \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \,|\mathbf{J}| \, w_i
+\mathbf{F}_{2D} = \int_{A} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} A = \int_{\pentagon} \int_{\pentagon} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \,|\mathbf{J}| \, \mathrm{d} \xi \, \mathrm{d} \eta = \sum_{i=1}^{n} \sum_{j=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \,|\mathbf{J}| \, \mathrm{w}_i \mathrm{w}_j
 \end{equation}
 wherein $|\mathbf{J}|$ being the determinant of the Jacobian matrix Eq.~(\ref{jacobianpent}) for pentagon, $n$ stands for number of Gauss points, $\mathrm{w}_i$ denotes the natural weight of the element, and $\mathbf{t}$ is the traction vector on the septal alveolar as follow
 \begin{subequations}
@@ -785,10 +1232,9 @@ The analysis to find the force vector of a tetrahedron is used to reach the forc
 The matrix of shape functions Eq.~(\ref{shape3D}) is used to obtain the force vector for tetrahedron.
 The force vector $\mathbf{F}_{3D}$ can also be obtained as follow
 \begin{equation}
-\mathbf{F}_{3D} = \int_{V} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} V = \int \int \int \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \,|\mathbf{J}| \, \mathrm{d} \xi \, \mathrm{d} \eta \, \mathrm{d} \zeta = \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \,|\mathbf{J}| \, w_i
+\mathbf{F}_{3D} = \int_{V} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} V = \int \int \int \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \,|\mathbf{J}| \, \mathrm{d} \xi \, \mathrm{d} \eta \, \mathrm{d} \zeta = \sum_{i=1}^{n} \sum_{j=1}^{n} \sum_{k=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \,|\mathbf{J}| \, \mathrm{w}_i \mathrm{w}_j \mathrm{w}_k
 \end{equation}
-wherein $|\mathbf{J}|$ being the determinant of the Jacobian matrix Eq.~(\ref{jacobiantet}) for pentagon, $n$ stands for number of Gauss points, $\mathrm{w}_i$ denotes the natural weight of the element, and $\mathbf{t}$ is the presser on the tetrahedron that is described in part 4.
-In quadrilateral derivations, the Jacobian of two-dimensional transformations that connect the ${x, y}$ to ${\xi, \eta}$ coordinate systems is needed. 
+wherein $|\mathbf{J}|$ being the determinant of the Jacobian matrix Eq.~(\ref{jacobiantet}) for tetrahedron, $n$ stands for number of Gauss points, $\mathrm{w}_i$ denotes the natural weight of the element, and $\mathbf{t}$ is the surface traction on the tetrahedron that is described in part 4.
 There are three force vectors for each pentagon based upon three Gauss, quadrature rules in Table~\ref{tabQuadraturetetra}. 
 
 
