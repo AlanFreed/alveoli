@@ -538,6 +538,7 @@ class pentagon(object):
         x3, y3, z3 = v3.coordinates('ref')
         x4, y4, z4 = v4.coordinates('ref')
         x5, y5, z5 = v5.coordinates('ref')
+        
 
         # base vector 1: connects the two shoulders of a pentagon
         x = x5 - x2
@@ -632,12 +633,12 @@ class pentagon(object):
         self._v5y = self._v5y0
 
         # z offsets for the pentagonal plane (which should all be the same)
-        v1z = n3x * x1 + n3y * y1 + n3z * z1
-        v2z = n3x * x2 + n3y * y2 + n3z * z2
-        v3z = n3x * x3 + n3y * y3 + n3z * z3
-        v4z = n3x * x4 + n3y * y4 + n3z * z4
-        v5z = n3x * x5 + n3y * y5 + n3z * z5
-        vz0 = (v1z + v2z + v3z + v4z + v5z) / 5.0
+        self._v1z = n3x * x1 + n3y * y1 + n3z * z1
+        self._v2z = n3x * x2 + n3y * y2 + n3z * z2
+        self._v3z = n3x * x3 + n3y * y3 + n3z * z3
+        self._v4z = n3x * x4 + n3y * y4 + n3z * z4
+        self._v5z = n3x * x5 + n3y * y5 + n3z * z5
+        vz0 = (self._v1z + self._v2z + self._v3z + self._v4z + self._v5z) / 5.0
 
         # determine the initial areas of this irregular pentagon
         self._A0 = ((self._v1x0 * self._v2y0 - self._v2x0 * self._v1y0 +
@@ -698,7 +699,7 @@ class pentagon(object):
         self._Pp3D[:, :] = self._Pr3D[:, :]
         self._Pc3D[:, :] = self._Pr3D[:, :]
         self._Pn3D[:, :] = self._Pr3D[:, :]
-
+        
         # create matrices for a pentagon at its Gauss points via dictionaries
         # p implies previous, c implies current, n implies next
         if gaussPts == 1:
@@ -1069,11 +1070,11 @@ class pentagon(object):
         self._v5y = n2x * x5 + n2y * y5 + n2z * z5
 
         # z offsets for the pentagonal plane (which should all be the same)
-        v1z = n3x * x1 + n3y * y1 + n3z * z1
-        v2z = n3x * x2 + n3y * y2 + n3z * z2
-        v3z = n3x * x3 + n3y * y3 + n3z * z3
-        v4z = n3x * x4 + n3y * y4 + n3z * z4
-        v5z = n3x * x5 + n3y * y5 + n3z * z5
+        self._v1z = n3x * x1 + n3y * y1 + n3z * z1
+        self._v2z = n3x * x2 + n3y * y2 + n3z * z2
+        self._v3z = n3x * x3 + n3y * y3 + n3z * z3
+        self._v4z = n3x * x4 + n3y * y4 + n3z * z4
+        self._v5z = n3x * x5 + n3y * y5 + n3z * z5
 
         # determine the area of this irregular pentagon
         self._An = (self._v1x * self._v2y - self._v2x * self._v1y +
@@ -1106,7 +1107,7 @@ class pentagon(object):
               (self._v5y + self._v1y) * 
               (self._v5x * self._v1y - 
                self._v1x * self._v5y)) / (6.0 * self._An)
-        cz = (v1z + v2z + v3z + v4z + v5z) / 5.0
+        cz = (self._v1z + self._v2z + self._v3z + self._v4z + self._v5z) / 5.0
 
         # rotate this centroid back into the reference coordinate system
         self._centroidXn = n1x * cx + n2x * cy + n3x * cz
@@ -2152,13 +2153,23 @@ class pentagon(object):
         return stiffT
 
     def forcingFunction(self, sp, ss, st, gaussPts, state):
-        nx, ny, nz = self.normal(state)
+#        nx, ny, nz = self.normal(state)
+        P3D = self.rotation(state)
         U = self.U(gaussPts, state)
         F = self.F(gaussPts, state)
         
-        # create the normal vector
-        n = np.array([nx, ny])
+        # assign coordinates at the vertices in the reference configuration
+        x01 = (self._v1x0, self._v1y0)
+        x02 = (self._v2x0, self._v2y0)
+        x03 = (self._v3x0, self._v3y0)
+        x04 = (self._v4x0, self._v4y0)
+        x05 = (self._v5x0, self._v5y0)
 
+        # create the normal vector based on the third column of rotation matrix
+        # base vector3: e3 = e1 x e2
+        nV = np.array([P3D[0, 2], P3D[1, 2], P3D[2, 2]])
+        normV = np.array([nV[0], nV[1]])  
+          
         # create the Kirchhoff stress matrix
         KStrs = np.zeros((2, 2), dtype=float)
         KStrs[0, 0] = (1 / 2) * (sp + ss)
@@ -2171,14 +2182,7 @@ class pentagon(object):
         CStrs = KStrs / j
         
         # create the traction vector
-        t = np.dot(CStrs, np.transpose(n))
-
-        # assign coordinates at the vertices in the reference configuration
-        x01 = (self._v1x0, self._v1y0)
-        x02 = (self._v2x0, self._v2y0)
-        x03 = (self._v3x0, self._v3y0)
-        x04 = (self._v4x0, self._v4y0)
-        x05 = (self._v5x0, self._v5y0)
+        t = np.dot(CStrs, np.transpose(normV))
 
         # determine the force vector
         if self._gaussPts == 1:
