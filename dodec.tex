@@ -1,0 +1,375 @@
+%% This is file `elsarticle-template-1-num.tex',
+%%
+%% Copyright 2009 Elsevier Ltd
+%%
+%% This file is part of the 'Elsarticle Bundle'.
+%% ---------------------------------------------
+%%
+%% It may be distributed under the conditions of the LaTeX Project Public
+%% License, either version 1.2 of this license or (at your option) any
+%% later version.  The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.2 or later is part of all distributions of LaTeX
+%% version 1999/12/01 or later.
+%%
+%% The list of all files belonging to the 'Elsarticle Bundle' is
+%% given in the file `manifest.txt'.
+%%
+%% Template article for Elsevier's document class `elsarticle'
+%% with numbered style bibliographic references
+%%
+%% $Id: elsarticle-template-1-num.tex 149 2009-10-08 05:01:15Z rishi $
+%% $URL: http://lenova.river-valley.com/svn/elsbst/trunk/elsarticle-template-1-num.tex $
+%%
+%% \documentclass[preprint,12pt]{elsarticle}
+\documentclass[final,3p,12pt]{elsarticle}
+
+
+%% Use the option review to obtain double line spacing
+%% \documentclass[preprint,review,12pt]{elsarticle}
+
+%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+%% for a journal layout:
+%% \documentclass[final,1p,times]{elsarticle}
+%% \documentclass[final,1p,times,twocolumn]{elsarticle}
+%% \documentclass[final,3p,times]{elsarticle}
+%% \documentclass[final,3p,times,twocolumn]{elsarticle}
+%% \documentclass[final,5p,times]{elsarticle}
+%% \documentclass[final,5p,times,twocolumn]{elsarticle}
+
+%% if you use PostScript figures in your article
+%% use the graphics package for simple commands
+%% \usepackage{graphics}
+%% or use the graphicx package for more complicated commands
+%% \usepackage{graphicx}
+%% or use the epsfig package if you prefer to use the old commands
+%% \usepackage{epsfig}
+
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+%% The amsthm package provides extended theorem environments
+\usepackage{amsthm}
+\newtheorem*{cor}{Corollary}
+\newtheorem*{defn}{Definition}
+% \newtheorem*{algorithm}[theorem]{Algorithm}
+
+\renewcommand{\thepart}{\arabic{part}}
+\renewcommand{\thesection}{\thepart.\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+
+\renewcommand{\theequation}{\thepart.\arabic{equation}}
+\renewcommand{\thefigure}{\thepart.\arabic{figure}}
+\renewcommand{\thetable}{\thepart.\arabic{table}}
+%
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers after \end{frontmatter}.
+\usepackage{lineno}
+
+%% natbib.sty is loaded by default. However, natbib options can be
+%% provided with \biboptions{...} command. Following options are
+%% valid:
+
+%%   round  -  round parentheses are used (default)
+%%   square -  square brackets are used   [option]
+%%   curly  -  curly braces are used      {option}
+%%   angle  -  angle brackets are used    <option>
+%%   semicolon  -  multiple citations separated by semi-colon
+%%   colon  - same as semicolon, an earlier confusion
+%%   comma  -  separated by comma
+%%   numbers-  selects numerical citations
+%%   super  -  numerical citations as superscripts
+%%   sort   -  sorts multiple citations according to order in ref. list
+%%   sort&compress   -  like sort, but also compresses numerical citations
+%%   compress - compresses without sorting
+%%
+%% \biboptions{comma,round}
+
+\biboptions{sort&compress}
+
+\journal{Draft}
+
+
+%%
+%%  The following packages, definitions and macros were added by the authors.
+%%
+
+%
+\usepackage{amsmath}
+\usepackage{stmaryrd}    % source of \mapsfrom
+%\usepackage{mathtools}
+%
+\DeclareMathAlphabet{\mathbfit}{\encodingdefault}{\rmdefault}{bx}{sl}
+\DeclareMathAlphabet{\mathbfsf}{\encodingdefault}{\sfdefault}{bx}{n}
+%
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+%
+% \newdefinition{defn}{Definition}
+% \newdefinition{rmk}{Remark}
+\newdefinition{conjecture}{Conjecture}
+% \newtheorem{thm}{Theorem}
+% \newtheorem{cor}{Corollary}
+% \newproof{pf}{Proof}
+%
+%  Macros for creating nice text and script fractions.
+%  Do not break these long lines into multiple lines.
+%  Spaces CANNOT be present; it can introduce unwanted `rubber' spacing.
+%
+\newcommand{\textfrac}[2]
+   {\mbox{\leavevmode \kern.1em\raise.5ex\hbox{\ensuremath{\scriptstyle{#1}}}\kern-.1em\hspace{0em}/\hspace{0em}\kern-.1em\lower.25ex\hbox{\ensuremath{\scriptstyle{#2}}}\kern.1em
+   }}
+\newcommand{\scriptfrac}[2] 
+   {\mbox{\leavevmode \kern.05em\raise.25ex\hbox{\ensuremath{\scriptscriptstyle{#1}}}\kern-.05em\hspace{0em}\hbox{\ensuremath{\scriptstyle{/}}}\hspace{0em}\kern-.05em\lower.125ex\hbox{\ensuremath{\scriptscriptstyle{#2}}}\kern.05em
+   }}
+%
+%
+% Macro for typesetting ":=" in a nice manner.
+%
+\newcommand*{\defeq}{\mathrel{\vcenter{\baselineskip0.5ex \lineskiplimit0pt
+                     \hbox{\scriptsize.}\hbox{\scriptsize.}}}%
+                     =}
+%
+%
+%% Create a rectangle that is used to denote squeeze
+%
+\newcommand{\rectangle}[2]{{% #1 = width, #2 = height
+  \fboxsep=-\fboxrule\sbox0{}\wd0=#1\ht0=#2\relax\fbox{\box0}}}
+\newcommand*{\squeeze}{\rectangle{2.5pt}{5pt}}
+%
+% Create stacked accents that look right
+%
+\usepackage{mathabx}
+\newsavebox{\accentbox}
+\newcommand{\myaccent}[2]{%
+  \sbox\accentbox{$#2$}#1{\usebox\accentbox}}
+%
+% Create a d and an integral sign with slashes throug it
+%
+\newcommand{\dbar}{\ensuremath{\mathchar'26\mkern-11mu \mathrm{d}}}
+\newcommand{\ibar}{\mbox{
+   \lower.35ex\hbox{\ensuremath{\mathchar'26}}\kern-1ex\raise.35ex\hbox{\ensuremath{\int}}\kern0ex
+   }}
+\newcommand{\tint}{\hbox{\ensuremath{\int}}\kern0ex}
+%
+%
+% Creates equation numbers like (2.1) for 1st equation in section 2. 
+% Requires amsmath
+%
+% \numberwithin{equation}{section}
+%
+% to rotate a figure or a table and their captions using
+%
+\usepackage{rotating}
+\usepackage{graphicx}
+%
+% which is implemented via the command
+% \begin{sidewaysfigure} or \begin{sidewaystable}
+%
+\usepackage{color}
+%
+% Use for creating labeled lists
+%
+\usepackage{blindtext}
+\usepackage{scrextend}
+\addtokomafont{labelinglabel}{\sffamily}
+%
+% Use the following lines to output the various parts as separate pdf files.
+%
+% \includeonly{partIntroduction}
+% \includeonly{partDodecahedron}
+% \includeonly{partKinematics}
+% \includeonly{partConstitutiveTheory}
+% \includeonly{partNumericalIntegration}
+% \includeonly{partVariationalFormulation}
+% \includeonly{appImplicitElasticity}
+% \includeonly{appOverview}
+% \includeonly{appDodecahedron}
+% \includeonly{appVertices}
+% \includeonly{appChords}
+% \includeonly{appPentagons}
+% \includeonly{appModels}
+% \includeonly{appSolvers}
+
+%%
+% \usepackage{wasysym}
+% Extracted out the font for a pentagon directly to avoid 'too many math alphabets'
+\def\wasyfamily{\fontencoding{U}\fontfamily{wasy}\selectfont}
+\def\pentagon   {\mbox{\wasyfamily\char68}}
+
+\usepackage{geometry,mathtools}
+\setcounter{MaxMatrixCols}{12}
+
+% font for matrix
+\usepackage{amsmath,scalefnt}
+
+
+
+\begin{document}
+
+\begin{frontmatter}
+
+%% Title, authors and addresses
+
+%% use the tnoteref command within \title for footnotes;
+%% use the tnotetext command for the associated footnote;
+%% use the fnref command within \author or \address for footnotes;
+%% use the fntext command for the associated footnote;
+%% use the corref command within \author for corresponding author footnotes;
+%% use the cortext command for the associated footnote;
+%% use the ead command for the email address,
+%% and the form \ead[url] for the home page:
+%%
+%% \title{Title\tnoteref{label1}}
+%% \tnotetext[label1]{}
+%% \author{Name\corref{cor1}\fnref{label2}}
+%% \ead{email address}
+%% \ead[url]{home page}
+%% \fntext[label2]{}
+%% \cortext[cor1]{}
+%% \address{Address\fnref{label3}}
+%% \fntext[label3]{}
+
+\title{A Dodecahedral Model for Alveoli}
+
+%% use optional labels to link authors explicitly to addresses:
+%% \author[label1,label2]{<author name>}
+%% \address[label1]{<address>}
+%% \address[label2]{<address>}
+
+\author[add1,add2]{Alan D.~Freed\corref{corr}}
+
+\ead{afreed@tamu.edu, alan.d.freed.civ@mail.mil}
+
+\cortext[corr]{Corresponding author}
+
+\author[add1]{Shahla Zamani}
+
+\author[add2]{John D.~Clayton}
+
+% \author[add1]{J.~N.\ Reddy}
+
+\date{Draft version: \today}
+
+\address[add1]{Department of Mechanical Engineering, 
+              Texas A\&M University,
+              College Station, \\ TX 77843, 
+              United States}
+          
+\address[add2]{Impact Physics Branch, 
+               U.S.\ Army Research Laboratory,
+               Aberdeen Proving Ground, 
+               Aberdeen, MD 21005, 
+               United States}
+              
+              
+\begin{abstract}
+
+write
+
+\end{abstract}
+
+\begin{keyword}
+%% keywords here, in the form: keyword \sep keyword
+
+write
+
+%% MSC codes here, in the form: \MSC code \sep code
+%% or \MSC[2008] code \sep code (2000 is the default)
+
+% \MSC 15A06 \sep 65F05 \sep 74A05 \sep 74A10 \sep 74A15 \sep 74A20
+
+\end{keyword}
+
+\end{frontmatter}
+
+% \linenumbers
+
+%% main text
+
+\newpage
+\setcounter{part}{0}
+\include{partIntroduction}
+
+\newpage
+\setcounter{equation}{0}
+\setcounter{figure}{0}
+\setcounter{section}{0}
+\setcounter{table}{0}
+\include{partDodecahedron}
+
+\newpage
+\setcounter{equation}{0}
+\setcounter{figure}{0}
+\setcounter{section}{0}
+\setcounter{table}{0}
+\include{partKinematics}
+
+\newpage
+\setcounter{equation}{0}
+\setcounter{figure}{0}
+\setcounter{section}{0}
+\setcounter{table}{0}
+\include{partConstitutiveTheory}
+
+\newpage
+\setcounter{equation}{0}
+\setcounter{figure}{0}
+\setcounter{section}{0}
+\setcounter{table}{0}
+\include{partNumericalIntegration}
+
+\newpage
+\setcounter{equation}{0}
+\setcounter{figure}{0}
+\setcounter{section}{0}
+\setcounter{table}{0}
+\include{partVariationalFormulation}
+
+\newpage
+\noindent\textbf{Acknowledgments}
+
+\medskip
+\noindent
+A.D.F.\ acknowledges support of a Joint Faculty Appointment with the CCDC Army Research Laboratory.
+S.Z.\ acknowledges support from a grant funded by the CCDC Army Research Laboratory. 
+J.D.C.\ acknowledges support of the CCDC Army Research Laboratory.  
+Prof.\ J.N.\ Reddy was the PI for that part of this project performed at Texas A\&M University by S.Z. 
+Dr.\ M.\ Kleinberger was the Cooperative Agreement Manager (CAM) and J.D.C.\ was the Technical Manager (TM) for this contract at the CCDC Army Research Laboratory.
+
+\small
+\bibliographystyle{elsarticle-num}
+\bibliography{dodec}
+\normalsize
+
+\setcounter{equation}{0}
+\setcounter{figure}{0}
+\setcounter{table}{0}
+
+\appendix
+
+\include{appImplicitElasticity}
+
+\newpage
+\include{appOverview}
+
+\newpage
+\include{appDodecahedron}
+
+\newpage
+\include{appVertices}
+
+\newpage
+\include{appChords}
+
+\newpage
+\include{appPentagons}
+
+\newpage
+\include{appModels}
+
+\newpage
+\include{appSolvers}
+
+\end{document}
