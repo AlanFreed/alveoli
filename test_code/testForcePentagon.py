@@ -3,20 +3,22 @@
 
 from chords import chord
 import math as m
-from pentagons import pentagon
+from pentForces import pentForce
 from vertices import vertex
+import numpy as np
+
 
 """
-Created on Feb 09 2020
-Updated on Feb 10 2020
+Created on March 07 2020
+Updated on March 10 2020
 
-A test file for class pentagon in file pentagon.py to find the force vector
+A test file for class pentForce in file pentForces.py to find the force vector
 
-author: Prof. Alan Freed, Shahla Zamani
+author: Shahla Zamani
 """
 
 
-def run(pentagonGaussPts, state):
+def run(chordGaussPts, state):
 
     h = 0.1
     # phi is the golden ratio which appears in dodecahedra geometry
@@ -33,7 +35,6 @@ def run(pentagonGaussPts, state):
 
 
     # assign the cords for a pentagon that inscribes an unit circle
-    chordGaussPts = 3
     c1 = chord(4, v3, v10, h, chordGaussPts)
     c2 = chord(3, v2, v10, h, chordGaussPts)
     c3 = chord(10, v2, v17, h, chordGaussPts)
@@ -42,24 +43,22 @@ def run(pentagonGaussPts, state):
 
 
     # create the pentagon
-    p = pentagon(2, c1, c2, c3, c4, c5, h, pentagonGaussPts)
+    p = pentForce(2, c1, c2, c3, c4, c5, h, chordGaussPts)
     p.update()
     p.advance()
     
-    sp = 1
-    st = 1
-    ss = 1
-    state
+    cauchystress = np.array([[1, 1], [1, 1]])
     
-    force = p.forcingFunction(sp, st, ss, pentagonGaussPts, state)
+    
+    force = p.pentagonForcingFunction(cauchystress, state)
 
-    print('A pentagon with {} Gauss points has a force vector of:\n'
-          .format(pentagonGaussPts, state))
+    print('A pentagon with {} chordal Gauss points has a force vector of:\n'
+          .format(chordGaussPts))
     print(force)
 
 
 print("")
-run(1, 'n')
-run(4, 'n')
-run(7, 'n')
+run(1,'n')
+run(2,'n')
+run(3,'n')
 

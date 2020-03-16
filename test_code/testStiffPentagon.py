@@ -38,22 +38,32 @@ def run(pentagonGaussPts):
     c5 = chord(7, v4, v5, h, chordGaussPts)
 
     # create the pentagon
-    p = pentagon(1, c1, c2, c3, c4, c5, h, pentagonGaussPts, 1)
+    p = pentagon(1, c1, c2, c3, c4, c5, h, pentagonGaussPts)
     p.update()
     p.advance()
+    
+    
+    
+    sp = 1
+    st = 1
+    ss = 1
+    
+    M = np.zeros((3, 3), dtype=float)
+    M[0, 0] = 1
+    M[1, 1] = 1
+    M[2, 2] = 1
+    M[1, 2] = 1
+    M[2, 1] = 1
 
-    mass = p.massMatrix()
-    # normalize this matrix
-    maxEle = np.amax(mass)
-    mass = mass / maxEle
+    stiff = p.stiffnessMatrix(M, sp, st, ss)
 
-    print('A pentagon with {} Gauss points has a normalized mass matrix of:\n'
+    print('A pentagon with {} Gauss points has a stiffness matrix of:\n'
           .format(pentagonGaussPts))
-    print(mass)
-    print('\nwith a determinant of {:6.4e}.\n'.format(np.linalg.det(mass)))
+    print(stiff)
 
 
 print("")
 run(1)
 run(4)
 run(7)
+
