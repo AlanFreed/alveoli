@@ -9,6 +9,7 @@ from shapeFnChords import shapeFunction
 import spin as spinMtx
 from vertices import vertex
 
+
 """
 Module chords.py provides geometric information about a septal chord.
 
@@ -31,7 +32,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "08-08-2019"
-__update__ = "02-10-2020"
+__update__ = "10-06-2019"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -1036,8 +1037,8 @@ class chord(object):
         area = self._areaC + self._areaE
 
         # initial natural coordinates for a chord
-        x01 = -self._L0 / 2.0
-        x02 = self._L0 / 2.0
+        xn1 = -self._Ln / 2.0
+        xn2 = self._Ln / 2.0
 
         # determine the mass matrix
         if self._gaussPts == 1:
@@ -1050,7 +1051,7 @@ class chord(object):
             nn1 = np.array([[N1*N1, N1*N2],
                             [N2*N1, N2*N2]])
 
-            J = self._shapeFns[1].jacobian(x01, x02)
+            J = self._shapeFns[1].jacobian(xn1, xn2)
 
             # the consistent mass matrix for 1 Gauss point
             massC = self._rho * area * J * w[0] * nn1
@@ -1079,8 +1080,8 @@ class chord(object):
             nn2 = np.array([[N1*N1, N1*N2],
                             [N2*N1, N2*N2]])
 
-            J1 = self._shapeFns[1].jacobian(x01, x02)
-            J2 = self._shapeFns[2].jacobian(x01, x02)
+            J1 = self._shapeFns[1].jacobian(xn1, xn2)
+            J2 = self._shapeFns[2].jacobian(xn1, xn2)
 
             # the consistent mass matrix for 2 Gauss points
             massC = self._rho * area * (J1 * w[0] * nn1 + J2 * w[1] * nn2)
@@ -1116,9 +1117,9 @@ class chord(object):
             nn3 = np.array([[N1*N1, N1*N2],
                             [N2*N1, N2*N2]])
 
-            J1 = self._shapeFns[1].jacobian(x01, x02)
-            J2 = self._shapeFns[2].jacobian(x01, x02)
-            J3 = self._shapeFns[3].jacobian(x01, x02)
+            J1 = self._shapeFns[1].jacobian(xn1, xn2)
+            J2 = self._shapeFns[2].jacobian(xn1, xn2)
+            J3 = self._shapeFns[3].jacobian(xn1, xn2)
 
             # the consistent mass matrix for 3 Gauss points
             massC = self._rho * area * (J1 * w[0] * nn1 + J2 * w[1] * nn2 +
@@ -1153,22 +1154,22 @@ class chord(object):
             w = np.array([wgt])
             
             # Jacobian matrix for
-            J = self._shapeFns[1].jacobian(x01, x02)
+            J = self._shapeFns[1].jacobian(xn1, xn2)
             
             # create the linear Bmatrix
-            BL = self._shapeFns[1].dNdximat() / J
+            BL = self._shapeFns[1].dNdximat() / J 
             # the linear stiffness matrix for 1 Gauss point
             KL = area * (J * w[0] * BL.T.dot(M).dot(BL))
             
             # create the matrix of derivative of shape functions (H matrix)
             H = self._shapeFns[1].dNdximat() / J
             # create the matrix of derivative of displacements (A matrix)
-            A = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J       
+            A = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J            
             # create the nonlinear Bmatrix
             BN = np.dot(A, H) 
             # the nonlinear stiffness matrix for 1 Gauss point
             KN = (area * J * w[0] * (BL.T.dot(M).dot(BN) + 
-                  BN.T.dot(M).dot(BL) + BN.T.dot(M).dot(BN)))
+                  BN.T.dot(M).dot(BL) + BN.T.dot(M).dot(BN) ))
             
             # the stress stiffness matrix for 1 Gauss point
             KS = area * (J * w[0] * H.T.dot(T).dot(H))
@@ -1182,14 +1183,14 @@ class chord(object):
             w = np.array([wgt, wgt])
 
             # at Gauss point 1         
-            J1 = self._shapeFns[1].jacobian(x01, x02)            
+            J1 = self._shapeFns[1].jacobian(xn1, xn2)            
             # create the linear Bmatrix
             BL1 = self._shapeFns[1].dNdximat() / J1
 
             # at Gauss point 2
-            J2 = self._shapeFns[2].jacobian(x01, x02)           
+            J2 = self._shapeFns[2].jacobian(xn1, xn2)           
             # create the linear  Bmatrix
-            BL2 = self._shapeFns[2].dNdximat() / J2
+            BL2 = self._shapeFns[2].dNdximat() / J2   
 
             # the linear stiffness matrix for 2 Gauss points
             KL = (area * (J1 * w[0] * BL1.T.dot(M).dot(BL1) +
@@ -1199,17 +1200,17 @@ class chord(object):
             H1 = self._shapeFns[1].dNdximat() / J
             H2 = self._shapeFns[2].dNdximat() / J
             # create the matrix of derivative of displacements (A matrix)
-            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J1 
-            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) / J2
+            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J1  
+            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) / J2 
             # create the nonlinear Bmatrix
             BN1 = np.dot(A1, H1) 
             BN2 = np.dot(A2, H2) 
 
             # the nonlinear stiffness matrix for 2 Gauss point
             KN = (area * (J1 * w[0] * (BL1.T.dot(M).dot(BN1) +
-                          BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) + 
-                          J2 * w[1] * (BL2.T.dot(M).dot(BN2) +
-                          BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2))))
+                         BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) + 
+                         J2 * w[1] * (BL2.T.dot(M).dot(BN2) +
+                         BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2))))
             
             # the stress stiffness matrix for 1 Gauss point
             KS = (area * (J1 * w[0] * H1.T.dot(T).dot(H1) +
@@ -1225,17 +1226,17 @@ class chord(object):
             w = np.array([wgt1, wgt2, wgt1])
 
             # at Gauss point 1
-            J1 = self._shapeFns[1].jacobian(x01, x02)            
+            J1 = self._shapeFns[1].jacobian(xn1, xn2)            
             # create the linear Bmatrix
             BL1 = self._shapeFns[1].dNdximat() / J1
 
             # at Gauss point 2
-            J2 = self._shapeFns[2].jacobian(x01, x02)            
+            J2 = self._shapeFns[2].jacobian(xn1, xn2)            
             # create the linear Bmatrix
             BL2 = self._shapeFns[2].dNdximat() / J2
 
             # at Gauss point 3
-            J3 = self._shapeFns[3].jacobian(x01, x02)            
+            J3 = self._shapeFns[3].jacobian(xn1, xn2)            
             # create the linear Bmatrix
             BL3 = self._shapeFns[3].dNdximat() / J3
 
@@ -1261,7 +1262,7 @@ class chord(object):
             KN = (area * (J1 * w[0] * (BL1.T.dot(M).dot(BN1) +
                           BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) +
                           J2 * w[1] * (BL2.T.dot(M).dot(BN2) +
-                          BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2)) +
+                          BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2) ) +
                           J3 * w[2] * (BL3.T.dot(M).dot(BN3) +
                           BN3.T.dot(M).dot(BL3) + BN3.T.dot(M).dot(BN3))))
 
@@ -1282,29 +1283,29 @@ class chord(object):
         t = T
         
         # initial natural coordinates for a chord
-        x01 = -self._L0 / 2.0
-        x02 = self._L0 / 2.0
+        xn1 = -self._Ln / 2.0
+        xn2 = self._Ln / 2.0
 
         # determine the force vector
         if self._gaussPts == 1:
             # 'natural' weight of the element
             wgt = 2.0
-            w = np.array([wgt])
+            we = np.array([wgt])
 
             N1 = self._shapeFns[1].N1
             N2 = self._shapeFns[1].N2
             n = np.array([[N1, N2]])
             nMat1 = np.transpose(n)
 
-            J = self._shapeFns[1].jacobian(x01, x02)
+            J = self._shapeFns[1].jacobian(xn1, xn2)
 
             # the force vector for 1 Gauss point
-            Force = J * w[0] * nMat1 * t
+            FVec = J * we[0] * nMat1 * t
 
         elif self._gaussPts == 2:
             # 'natural' weights of the element
             wgt = 1.0
-            w = np.array([wgt, wgt])
+            we = np.array([wgt, wgt])
 
             # at Gauss point 1
             N1 = self._shapeFns[1].N1
@@ -1318,17 +1319,17 @@ class chord(object):
             n2 = np.array([[N1, N2]])
             nMat2 = np.transpose(n2)
 
-            J1 = self._shapeFns[1].jacobian(x01, x02)
-            J2 = self._shapeFns[2].jacobian(x01, x02)
+            J1 = self._shapeFns[1].jacobian(xn1, xn2)
+            J2 = self._shapeFns[2].jacobian(xn1, xn2)
 
             # the force vector for 2 Gauss points
-            Force = J1 * w[0] * nMat1 * t + J2 * w[1] * nMat2 * t
+            FVec = J1 * we[0] * nMat1 * t + J2 * we[1] * nMat2 * t
 
         else:  # gaussPts = 3
             # 'natural' weights of the element
             wgt1 = 5.0 / 9.0
             wgt2 = 8.0 / 9.0
-            w = np.array([wgt1, wgt2, wgt1])
+            we = np.array([wgt1, wgt2, wgt1])
 
             # at Gauss point 1
             N1 = self._shapeFns[1].N1
@@ -1348,15 +1349,14 @@ class chord(object):
             n3 = np.array([[N1, N2]])
             nMat3 = np.transpose(n3)
 
-            J1 = self._shapeFns[1].jacobian(x01, x02)
-            J2 = self._shapeFns[2].jacobian(x01, x02)
-            J3 = self._shapeFns[3].jacobian(x01, x02)
+            J1 = self._shapeFns[1].jacobian(xn1, xn2)
+            J2 = self._shapeFns[2].jacobian(xn1, xn2)
+            J3 = self._shapeFns[3].jacobian(xn1, xn2)
 
             # the force vector for 3 Gauss points
-            Force = (J1 * w[0] * nMat1 * t + J2 * w[1] * nMat2 * t +
-                    J3 * w[2] * nMat3 * t)
+            FVec = (J1 * we[0] * nMat1 * t + J2 * we[1] * nMat2 * t +
+                    J3 * we[2] * nMat3 * t)
 
-        return Force      
-        
-        
-        return
+        return FVec      
+
+

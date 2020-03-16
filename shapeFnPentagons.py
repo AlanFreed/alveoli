@@ -3,6 +3,8 @@
 
 from math import cos, pi, sin
 import numpy as np
+from numpy.linalg import det
+
 
 """
 File shapeFnPentagons.py provides shape functions for interpolating pentagons.
@@ -26,7 +28,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.2"
 __date__ = "04-30-2019"
-__update__ = "02-10-2020"
+__update__ = "10-05-2019"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -82,7 +84,7 @@ to the following graphic when looking outward in:
 By numbering the vertices and chords in a counterclockwise direction, the
 algorithm used to compute its area will be positive; otherwise, if they had
 been numbered clockwise, then the derived area would have been negative.
-First
+
 
 class
 
@@ -143,29 +145,29 @@ methods
         BL  is linear strain displacement matrix 
     inputs are tuples of coordinates evaluated in a global coordinate system
 
-    HmatF = sf.FirstHmatrix(x1, x2, x3, x4, x5)
+    Hmat = sf.Hmatrix(x1, x2, x3, x4, x5)
         x1   is a tuple of physical coordinates (x, y) located at vertex 1
         x2   is a tuple of physical coordinates (x, y) located at vertex 2
         x3   is a tuple of physical coordinates (x, y) located at vertex 3
         x4   is a tuple of physical coordinates (x, y) located at vertex 4
         x5   is a tuple of physical coordinates (x, y) located at vertex 5
     returns
-        HmatF  is derivative of shape functions from theta1 = H1 * D in 
-        nonlinear strain
+        Hmat  is derivative of shape functions from theta = H * D in nonlinear 
+        strain
     inputs are tuples of coordinates evaluated in a global coordinate system
 
-    HmatS = sf.SecondHmatrix(x1, x2, x3, x4, x5)
+    APmat = sf.APmatrix(x1, x2, x3, x4, x5)
         x1   is a tuple of physical coordinates (x, y) located at vertex 1
         x2   is a tuple of physical coordinates (x, y) located at vertex 2
         x3   is a tuple of physical coordinates (x, y) located at vertex 3
         x4   is a tuple of physical coordinates (x, y) located at vertex 4
         x5   is a tuple of physical coordinates (x, y) located at vertex 5
     returns
-        HmatS  is derivative of shape functions from theta2 = H2 * D in 
-        nonlinear strain
+        APmat  is derivative of shape functions from dA = A' * dD in nonlinear 
+        strain
     inputs are tuples of coordinates evaluated in a global coordinate system
-    
-    BNF = sf.FirstBNonLinear(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
+
+    BN = sf.BNonLinear(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
         x1   is a tuple of physical  coordinates (x, y) located at vertex 1
         x2   is a tuple of physical  coordinates (x, y) located at vertex 2
         x3   is a tuple of physical  coordinates (x, y) located at vertex 3
@@ -177,22 +179,8 @@ methods
         x04  is a tuple of reference coordinates (x, y) located at vertex 4
         x05  is a tuple of reference coordinates (x, y) located at vertex 5
     returns
-        BNF is the first nonlinear strain displacement matrix
+        BN is nonlinear strain displacement matrix
 
-    BNS = sf.SecondBNonLinear(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-        x1   is a tuple of physical  coordinates (x, y) located at vertex 1
-        x2   is a tuple of physical  coordinates (x, y) located at vertex 2
-        x3   is a tuple of physical  coordinates (x, y) located at vertex 3
-        x4   is a tuple of physical  coordinates (x, y) located at vertex 4
-        x5   is a tuple of physical  coordinates (x, y) located at vertex 5
-        x01  is a tuple of reference coordinates (x, y) located at vertex 1
-        x02  is a tuple of reference coordinates (x, y) located at vertex 2
-        x03  is a tuple of reference coordinates (x, y) located at vertex 3
-        x04  is a tuple of reference coordinates (x, y) located at vertex 4
-        x05  is a tuple of reference coordinates (x, y) located at vertex 5
-    returns
-        BNS is the second nonlinear strain displacement matrix 
-        
     Fmtx = sf.F(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
         x1   is a tuple of physical  coordinates (x, y) located at vertex 1
         x2   is a tuple of physical  coordinates (x, y) located at vertex 2
@@ -245,7 +233,7 @@ Reference
 """
 
 
-class shapeFunction(object):
+class pentShapeFunction(object):
 
     def __init__(self, xi, eta):
         # construct the five, exported, shape functions for location (xi, eta)
@@ -377,6 +365,11 @@ class shapeFunction(object):
         self.dN4dEta = kappa[5] * dNumdEta[5] / bPoly**2
 
         return  # the object
+    
+#    def pentShapeToEdge(self,):
+#        self.N1 = np.zeros((2, 10), dtype=float)
+#        self.N1 = self.Nmatx.subs(eta, eqEta1)
+    
 
     def interpolate(self, y1, y2, y3, y4, y5):
         y = (self.N1 * y1 + self.N2 * y2 + self.N3 * y3 + self.N4 * y4 +
@@ -468,43 +461,46 @@ class shapeFunction(object):
         jMat = self.jacobian(x1, x2, x3, x4, x5)
         BL = np.zeros((3, 10), dtype=float)
         
-        BL[0, 0] = (self.dN1dXi * jMat[1, 1] - self.dN1dEta * jMat[1, 0]) / 2
-        BL[0, 1] = (-self.dN1dXi * jMat[0, 1] + self.dN1dEta * jMat[0, 0]) / 2
-        BL[0, 2] = (self.dN2dXi * jMat[1, 1] - self.dN2dEta * jMat[1, 0]) / 2
-        BL[0, 3] = (-self.dN2dXi * jMat[0, 1] + self.dN2dEta * jMat[0, 0]) / 2
-        BL[0, 4] = (self.dN3dXi * jMat[1, 1] - self.dN3dEta * jMat[1, 0]) / 2
-        BL[0, 5] = (-self.dN3dXi * jMat[0, 1] + self.dN3dEta * jMat[0, 0]) / 2
-        BL[0, 6] = (self.dN4dXi * jMat[1, 1] - self.dN4dEta * jMat[1, 0]) / 2
-        BL[0, 7] = (-self.dN4dXi * jMat[0, 1] + self.dN4dEta * jMat[0, 0]) / 2
-        BL[0, 8] = (self.dN5dXi * jMat[1, 1] - self.dN5dEta * jMat[1, 0]) / 2
-        BL[0, 9] = (-self.dN5dXi * jMat[0, 1] + self.dN5dEta * jMat[0, 0]) / 2
+        BL[0, 0] = (self.dN1dXi * jMat[1, 1] - self.dN1dEta * jMat[0, 1]) / 2
+        BL[0, 1] = (-self.dN1dXi * jMat[1, 0] + self.dN1dEta * jMat[0, 0]) / 2
+        BL[0, 2] = (self.dN2dXi * jMat[1, 1] - self.dN2dEta * jMat[0, 1]) / 2
+        BL[0, 3] = (-self.dN2dXi * jMat[1, 0] + self.dN2dEta * jMat[0, 0]) / 2
+        BL[0, 4] = (self.dN3dXi * jMat[1, 1] - self.dN3dEta * jMat[0, 1]) / 2
+        BL[0, 5] = (-self.dN3dXi * jMat[1, 0] + self.dN3dEta * jMat[0, 0]) / 2
+        BL[0, 6] = (self.dN4dXi * jMat[1, 1] - self.dN4dEta * jMat[0, 1]) / 2
+        BL[0, 7] = (-self.dN4dXi * jMat[1, 0] + self.dN4dEta * jMat[0, 0]) / 2
+        BL[0, 8] = (self.dN5dXi * jMat[1, 1] - self.dN5dEta * jMat[0, 1]) / 2
+        BL[0, 9] = (-self.dN5dXi * jMat[1, 0] + self.dN5dEta * jMat[0, 0]) / 2
 
-        BL[1, 0] = (self.dN1dXi * jMat[1, 1] - self.dN1dEta * jMat[1, 0]) / 2
-        BL[1, 1] = (self.dN1dXi * jMat[0, 1] - self.dN1dEta * jMat[0, 0]) / 2
-        BL[1, 2] = (self.dN2dXi * jMat[1, 1] - self.dN2dEta * jMat[1, 0]) / 2
-        BL[1, 3] = (self.dN2dXi * jMat[0, 1] - self.dN2dEta * jMat[0, 0]) / 2
-        BL[1, 4] = (self.dN3dXi * jMat[1, 1] - self.dN3dEta * jMat[1, 0]) / 2
-        BL[1, 5] = (self.dN3dXi * jMat[0, 1] - self.dN3dEta * jMat[0, 0]) / 2
-        BL[1, 6] = (self.dN4dXi * jMat[1, 1] - self.dN4dEta * jMat[1, 0]) / 2
-        BL[1, 7] = (self.dN4dXi * jMat[0, 1] - self.dN4dEta * jMat[0, 0]) / 2
-        BL[1, 8] = (self.dN5dXi * jMat[1, 1] - self.dN5dEta * jMat[1, 0]) / 2
-        BL[1, 9] = (self.dN5dXi * jMat[0, 1] - self.dN5dEta * jMat[0, 0]) / 2
+        BL[1, 0] = (self.dN1dXi * jMat[1, 1] - self.dN1dEta * jMat[0, 1]) / 2
+        BL[1, 1] = (self.dN1dXi * jMat[1, 0] - self.dN1dEta * jMat[0, 0]) / 2
+        BL[1, 2] = (self.dN2dXi * jMat[1, 1] - self.dN2dEta * jMat[0, 1]) / 2
+        BL[1, 3] = (self.dN2dXi * jMat[1, 0] - self.dN2dEta * jMat[0, 0]) / 2
+        BL[1, 4] = (self.dN3dXi * jMat[1, 1] - self.dN3dEta * jMat[0, 1]) / 2
+        BL[1, 5] = (self.dN3dXi * jMat[1, 0] - self.dN3dEta * jMat[0, 0]) / 2
+        BL[1, 6] = (self.dN4dXi * jMat[1, 1] - self.dN4dEta * jMat[0, 1]) / 2
+        BL[1, 7] = (self.dN4dXi * jMat[1, 0] - self.dN4dEta * jMat[0, 0]) / 2
+        BL[1, 8] = (self.dN5dXi * jMat[1, 1] - self.dN5dEta * jMat[0, 1]) / 2
+        BL[1, 9] = (self.dN5dXi * jMat[1, 0] - self.dN5dEta * jMat[0, 0]) / 2
         
-        BL[2, 0] = -self.dN1dXi * jMat[0, 1] + self.dN1dEta * jMat[0, 0]
-        BL[2, 1] = self.dN1dXi * jMat[1, 1] - self.dN1dEta * jMat[1, 0]
-        BL[2, 2] = -self.dN2dXi * jMat[0, 1] + self.dN2dEta * jMat[0, 0]
-        BL[2, 3] = self.dN2dXi * jMat[1, 1] - self.dN2dEta * jMat[1, 0]
-        BL[2, 4] = -self.dN3dXi * jMat[0, 1] + self.dN3dEta * jMat[0, 0]
-        BL[2, 5] = self.dN3dXi * jMat[1, 1] - self.dN3dEta * jMat[1, 0]
-        BL[2, 6] = -self.dN4dXi * jMat[0, 1] + self.dN4dEta * jMat[0, 0]
-        BL[2, 7] = self.dN4dXi * jMat[1, 1] - self.dN4dEta * jMat[1, 0]
-        BL[2, 8] = -self.dN5dXi * jMat[0, 1] + self.dN5dEta * jMat[0, 0]
-        BL[2, 9] = self.dN5dXi * jMat[1, 1] - self.dN5dEta * jMat[1, 0]
+        BL[2, 0] = -self.dN1dXi * jMat[1, 0] + self.dN1dEta * jMat[0, 0]
+        BL[2, 1] = self.dN1dXi * jMat[1, 1] - self.dN1dEta * jMat[0, 1]
+        BL[2, 2] = -self.dN2dXi * jMat[1, 0] + self.dN2dEta * jMat[0, 0]
+        BL[2, 3] = self.dN2dXi * jMat[1, 1] - self.dN2dEta * jMat[0, 1]
+        BL[2, 4] = -self.dN3dXi * jMat[1, 0] + self.dN3dEta * jMat[0, 0]
+        BL[2, 5] = self.dN3dXi * jMat[1, 1] - self.dN3dEta * jMat[0, 1]
+        BL[2, 6] = -self.dN4dXi * jMat[1, 0] + self.dN4dEta * jMat[0, 0]
+        BL[2, 7] = self.dN4dXi * jMat[1, 1] - self.dN4dEta * jMat[0, 1]
+        BL[2, 8] = -self.dN5dXi * jMat[1, 0] + self.dN5dEta * jMat[0, 0]
+        BL[2, 9] = self.dN5dXi * jMat[1, 1] - self.dN5dEta * jMat[0, 1]
         
-        return BL
+        detJ = det(jMat)
+        BmatL = BL / detJ
+        
+        return BmatL
 
-    # create the first H matrix
-    def FirstHmatrix(self, x1, x2, x3, x4, x5):
+    # create the first H matrix from nonlinear strain
+    def HmatrixF(self, x1, x2, x3, x4, x5):
         HmatF = np.zeros((2, 10), dtype=float)
         BmatL = self.BLinear(x1, x2, x3, x4, x5)
                
@@ -524,8 +520,8 @@ class shapeFunction(object):
         return HmatF  
     
     
-    # create the  second H matrix
-    def SecondHmatrix(self, x1, x2, x3, x4, x5):
+    # create the  second H matrix from nonlinear strain
+    def HmatrixS(self, x1, x2, x3, x4, x5):
         HmatS = np.zeros((2, 10), dtype=float)
         BmatL = self.BLinear(x1, x2, x3, x4, x5)
                
@@ -542,19 +538,81 @@ class shapeFunction(object):
         HmatS[1, 7] = 2 * BmatL[0, 6]
         HmatS[1, 9] = 2 * BmatL[0, 8] 
 
-        return HmatS 
+        return HmatS
+    
+
+#    # create the Ap matrix
+#    def APmatrix(self, x1, x2, x3, x4, x5):
+#        APmat = np.zeros((3, 10), dtype=float)
+#        BmatL = self.BLinear(x1, x2, x3, x4, x5)
+#               
+#        # create the H matrix by differentiation of shape functions.
+#        APmat[0, 0] = - BmatL[0, 0]
+#        APmat[0, 1] = - 2 * BmatL[0, 0]
+#        APmat[0, 3] = - BmatL[0, 1]
+#        APmat[0, 4] = - BmatL[0, 2]
+#        APmat[0, 5] = - 2 * BmatL[0, 2]
+#        APmat[0, 7] = - BmatL[0, 3]
+#        APmat[0, 8] = - BmatL[0, 4]
+#        APmat[0, 9] = - 2 * BmatL[0, 4]
+#        APmat[0, 11] = - BmatL[0, 5]
+#        APmat[0, 12] = - BmatL[0, 6]
+#        APmat[0, 13] = - 2 * BmatL[0, 6]
+#        APmat[0, 15] = - BmatL[0, 7]
+#        APmat[0, 16] = - BmatL[0, 8]
+#        APmat[0, 17] = - 2 * BmatL[0, 8]
+#        APmat[0, 19] = - BmatL[0, 9]
+#        
+#        APmat[1, 0] = APmat[0, 0]
+#        APmat[1, 1] = - APmat[0, 1]
+#        APmat[1, 2] = APmat[1, 1]
+#        APmat[1, 3] = - APmat[0, 3]
+#        APmat[1, 4] = APmat[0, 4]
+#        APmat[1, 5] = - APmat[0, 5]
+#        APmat[1, 6] = APmat[1, 5]
+#        APmat[1, 7] = - APmat[0, 7]
+#        APmat[1, 8] = APmat[0, 8]
+#        APmat[1, 9] = - APmat[0, 9]
+#        APmat[1, 10] = APmat[1, 9]
+#        APmat[1, 11] = - APmat[0, 11]
+#        APmat[1, 12] = APmat[0, 12]
+#        APmat[1, 13] = - APmat[0, 13]
+#        APmat[1, 14] = APmat[1, 13]
+#        APmat[1, 15] = - APmat[0, 15]
+#        APmat[1, 16] = APmat[0, 16]
+#        APmat[1, 17] = - APmat[0, 17]
+#        APmat[1, 18] = APmat[1, 17]
+#        APmat[1, 19] = - APmat[0, 19]
+#        
+#        APmat[2, 0] = -4 * BmatL[0, 1]
+#        APmat[2, 2] = -4 * APmat[1, 2]
+#        APmat[2, 3] = 2 * APmat[1, 2]
+#        APmat[2, 4] = -4 * BmatL[0, 5]
+#        APmat[2, 6] = -4 * APmat[1, 6]
+#        APmat[2, 7] = 2 * APmat[1, 6]
+#        APmat[2, 8] = -4 * BmatL[0, 9]
+#        APmat[2, 10] = -4 * APmat[1, 10]
+#        APmat[2, 11] = 2 * APmat[1, 10]
+#        APmat[2, 12] = -4 * BmatL[0, 13]
+#        APmat[2, 14] = -4 * APmat[1, 14]
+#        APmat[2, 15] = 2 * APmat[1, 14]
+#        APmat[2, 16] = -4 * BmatL[0, 17]
+#        APmat[2, 18] = -4 * APmat[1, 18]
+#        APmat[2, 19] = 2 * APmat[1, 18]
+#        
+#        return APmat  
     
     # create the first nonlinear Bmatrix
     def FirstBNonLinear(self, x1, x2, x3, x4, x5, x01, x02, x03, x04, x05):
         AmatF = np.zeros((3, 2), dtype=float)
         Gmat = self.G(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-        HmatF = self.FirstHmatrix(x1, x2, x3, x4, x5)
+        HmatF = self.HmatrixF(x1, x2, x3, x4, x5)
         
         # create the A1 matrix from nonlinear part of strain
-        AmatF[0, 0] = - 1 / 2 * Gmat[0, 0]
-        AmatF[0, 1] = - 1 / 2 * Gmat[1, 1]
-        AmatF[1, 0] = - 1 / 2 * Gmat[0, 0]
-        AmatF[1, 1] = 1 / 2 * Gmat[1, 1]
+        AmatF[0, 0] = - Gmat[0, 0] / 2
+        AmatF[0, 1] = - Gmat[1, 1] / 2
+        AmatF[1, 0] = - Gmat[0, 0] / 2
+        AmatF[1, 1] = Gmat[1, 1] / 2
         AmatF[2, 0] = - 2 * Gmat[0, 1]
         AmatF[2, 1] = 2 * Gmat[1, 0]
         
@@ -567,7 +625,7 @@ class shapeFunction(object):
     def SecondBNonLinear(self, x1, x2, x3, x4, x5, x01, x02, x03, x04, x05):
         AmatS = np.zeros((3, 2), dtype=float)
         Gmat = self.G(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-        HmatS = self.SecondHmatrix(x1, x2, x3, x4, x5)
+        HmatS = self.HmatrixS(x1, x2, x3, x4, x5)
         
         # create the A2 matrix from nonlinear part of strain
         AmatS[0, 0] = - Gmat[1, 0]

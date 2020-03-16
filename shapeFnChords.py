@@ -25,7 +25,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "09-23-2019"
-__update__ = "02-10-2020"
+__update__ = "10-03-2019"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -132,7 +132,7 @@ class shapeFunction(object):
         # create the two, exported, derivatives of the shape functions
         self.dN1dXi = -0.5
         self.dN2dXi = 0.5
-
+        
         return  # the object
 
     # interpolate a field y known at nodes 1 and 2 to the Gauss point xi

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+from numpy.linalg import inv
+
 
 """
 Module shapeFnTetrahedra.py provides shape functions for interpolating a
@@ -72,13 +74,13 @@ methods
     returns
         y    is its interpolated value for field y at location (xi, eta, zeta)
 
-    det = sf.detJacobian(x1, x2, x3, x4)
+    det = sf.jacobian(x1, x2, x3, x4)
         x1    is a tuple of physical coordinates (x, y, z) located at vertex 1
         x2    is a tuple of physical coordinates (x, y, z) located at vertex 2
         x3    is a tuple of physical coordinates (x, y, z) located at vertex 3
         x4    is a tuple of physical coordinates (x, y, z) located at vertex 4
     returns
-        det   is the determinant of the Jacobian matrix
+        jacob   is the Jacobian matrix
     inputs are tuples of coordinates evaluated in a global coordinate system
 
     Gmtx = sf.G(x1, x2, x3, x4, x01, x02, x03, x04)
@@ -151,7 +153,7 @@ Reference
 """
 
 
-class shapeFunction(object):
+class tetraShapeFunction(object):
 
     def __init__(self, xi, eta, zeta):
         # create the four exported shape functions
@@ -190,7 +192,7 @@ class shapeFunction(object):
         y = self.N1 * y1 + self.N2 * y2 + self.N3 * y3 + self.N4 * y4
         return y
 
-    def detJacobian(self, x1, x2, x3, x4):
+    def jacobian(self, x1, x2, x3, x4):
         jacob = np.zeros((3, 3), dtype=float)
         if isinstance(x1, tuple):
             jacob[0, 0] = (self.dN1dXi * x1[0] + self.dN2dXi * x2[0] +
@@ -212,12 +214,11 @@ class shapeFunction(object):
             jacob[2, 2] = (self.dN1dZeta * x1[2] + self.dN2dZeta * x2[2] +
                            self.dN3dZeta * x3[2] + self.dN4dZeta * x4[2])
             # determine the determinant of the Jacobian of a tetrahedron
-            det = np.linalg.det(jacob)
         else:
-            raise RuntimeError("Each argument of shapeFunction.detJacobian " +
+            raise RuntimeError("Each argument of shapeFunction.jacobian " +
                                "must be a tuple of coordinates, " +
                                "e.g., (x, y, z).")
-        return det
+        return jacob
 
     def G(self, x1, x2, x3, x4, x01, x02, x03, x04):
         if isinstance(x1, tuple):
@@ -285,6 +286,319 @@ class shapeFunction(object):
             raise RuntimeError("Each argument of shapeFunction.G must be " +
                                "a tuple of coordinates, e.g., (x, y, z).")
         return Gmtx
+    
+    
+
+    # create the linear Bmatrix
+    def BLinear(self, x1, x2, x3, x4):
+        jMat = self.jacobian(x1, x2, x3, x4)
+        IJMat = np.zeros((3, 3), dtype=float)
+        IJMat = inv(jMat)
+        
+        BL = np.zeros((7, 12), dtype=float)
+        
+        BL[0, 0] = ((self.dN1dXi * IJMat[0, 0] + self.dN1dEta * IJMat[0, 1] + 
+                     self.dN1dZeta * IJMat[0, 2]) / 3)
+        BL[0, 1] = ((self.dN1dXi * IJMat[1, 0] + self.dN1dEta * IJMat[1, 1] + 
+                     self.dN1dZeta * IJMat[1, 2]) / 3)
+        BL[0, 2] = ((self.dN1dXi * IJMat[2, 0] + self.dN1dEta * IJMat[2, 1] + 
+                     self.dN1dZeta * IJMat[2, 2]) / 3)
+        BL[0, 3] = ((self.dN2dXi * IJMat[0, 0] + self.dN2dEta * IJMat[0, 1] + 
+                     self.dN2dZeta * IJMat[0, 2]) / 3)
+        BL[0, 4] = ((self.dN2dXi * IJMat[1, 0] + self.dN2dEta * IJMat[1, 1] + 
+                     self.dN2dZeta * IJMat[1, 2]) / 3)
+        BL[0, 5] = ((self.dN2dXi * IJMat[2, 0] + self.dN2dEta * IJMat[2, 1] + 
+                     self.dN2dZeta * IJMat[2, 2]) / 3)
+        BL[0, 6] = ((self.dN3dXi * IJMat[0, 0] + self.dN3dEta * IJMat[0, 1] + 
+                     self.dN3dZeta * IJMat[0, 2]) / 3)
+        BL[0, 7] = ((self.dN3dXi * IJMat[1, 0] + self.dN3dEta * IJMat[1, 1] + 
+                     self.dN3dZeta * IJMat[1, 2]) / 3)
+        BL[0, 8] = ((self.dN3dXi * IJMat[2, 0] + self.dN3dEta * IJMat[2, 1] + 
+                     self.dN3dZeta * IJMat[2, 2]) / 3)
+        BL[0, 9] = ((self.dN4dXi * IJMat[0, 0] + self.dN4dEta * IJMat[0, 1] + 
+                     self.dN4dZeta * IJMat[0, 2]) / 3)
+        BL[0, 10] = ((self.dN4dXi * IJMat[1, 0] + self.dN4dEta * IJMat[1, 1] + 
+                     self.dN4dZeta * IJMat[1, 2]) / 3)
+        BL[0, 11] = ((self.dN4dXi * IJMat[2, 0] + self.dN4dEta * IJMat[2, 1] + 
+                     self.dN4dZeta * IJMat[2, 2]) / 3)
+        
+        BL[1, 0] = ((self.dN1dXi * IJMat[0, 0] + self.dN1dEta * IJMat[0, 1] + 
+                     self.dN1dZeta * IJMat[0, 2]) / 3)
+        BL[1, 1] = (-(self.dN1dXi * IJMat[1, 0] + self.dN1dEta * IJMat[1, 1] + 
+                     self.dN1dZeta * IJMat[1, 2]) / 3)
+        BL[1, 3] = ((self.dN2dXi * IJMat[0, 0] + self.dN2dEta * IJMat[0, 1] + 
+                     self.dN2dZeta * IJMat[0, 2]) / 3)
+        BL[1, 4] = (-(self.dN2dXi * IJMat[1, 0] + self.dN2dEta * IJMat[1, 1] + 
+                     self.dN2dZeta * IJMat[1, 2]) / 3)
+        BL[1, 6] = ((self.dN3dXi * IJMat[0, 0] + self.dN3dEta * IJMat[0, 1] + 
+                     self.dN3dZeta * IJMat[0, 2]) / 3)
+        BL[1, 7] = (-(self.dN3dXi * IJMat[1, 0] + self.dN3dEta * IJMat[1, 1] + 
+                     self.dN3dZeta * IJMat[1, 2]) / 3)
+        BL[1, 9] = ((self.dN4dXi * IJMat[0, 0] + self.dN4dEta * IJMat[0, 1] + 
+                     self.dN4dZeta * IJMat[0, 2]) / 3)
+        BL[1, 10] = (-(self.dN4dXi * IJMat[1, 0] + self.dN4dEta * IJMat[1, 1] + 
+                     self.dN4dZeta * IJMat[1, 2]) / 3)
+        
+        BL[2, 1] = ((self.dN1dXi * IJMat[1, 0] + self.dN1dEta * IJMat[1, 1] + 
+                     self.dN1dZeta * IJMat[1, 2]) / 3)
+        BL[2, 2] = (-(self.dN1dXi * IJMat[2, 0] + self.dN1dEta * IJMat[2, 1] + 
+                     self.dN1dZeta * IJMat[2, 2]) / 3)
+        BL[2, 4] = ((self.dN2dXi * IJMat[1, 0] + self.dN2dEta * IJMat[1, 1] + 
+                     self.dN2dZeta * IJMat[1, 2]) / 3)
+        BL[2, 5] = (-(self.dN2dXi * IJMat[2, 0] + self.dN2dEta * IJMat[2, 1] + 
+                     self.dN2dZeta * IJMat[2, 2]) / 3)
+        BL[2, 7] = ((self.dN3dXi * IJMat[1, 0] + self.dN3dEta * IJMat[1, 1] + 
+                     self.dN3dZeta * IJMat[1, 2]) / 3)
+        BL[2, 8] = (-(self.dN3dXi * IJMat[2, 0] + self.dN3dEta * IJMat[2, 1] + 
+                     self.dN3dZeta * IJMat[2, 2]) / 3)
+        BL[2, 10] = ((self.dN4dXi * IJMat[1, 0] + self.dN4dEta * IJMat[1, 1] + 
+                     self.dN4dZeta * IJMat[1, 2]) / 3)
+        BL[2, 11] = (-(self.dN4dXi * IJMat[2, 0] + self.dN4dEta * IJMat[2, 1] + 
+                     self.dN4dZeta * IJMat[2, 2]) / 3)
+        
+        BL[3, 0] = (-(self.dN1dXi * IJMat[0, 0] + self.dN1dEta * IJMat[0, 1] + 
+                     self.dN1dZeta * IJMat[0, 2]) / 3)
+        BL[3, 2] = ((self.dN1dXi * IJMat[2, 0] + self.dN1dEta * IJMat[2, 1] + 
+                     self.dN1dZeta * IJMat[2, 2]) / 3)
+        BL[3, 3] = (-(self.dN2dXi * IJMat[0, 0] + self.dN2dEta * IJMat[0, 1] + 
+                     self.dN2dZeta * IJMat[0, 2]) / 3)
+        BL[3, 5] = ((self.dN2dXi * IJMat[2, 0] + self.dN2dEta * IJMat[2, 1] + 
+                     self.dN2dZeta * IJMat[2, 2]) / 3)
+        BL[3, 6] = (-(self.dN3dXi * IJMat[0, 0] + self.dN3dEta * IJMat[0, 1] + 
+                     self.dN3dZeta * IJMat[0, 2]) / 3)
+        BL[3, 8] = ((self.dN3dXi * IJMat[2, 0] + self.dN3dEta * IJMat[2, 1] + 
+                     self.dN3dZeta * IJMat[2, 2]) / 3)
+        BL[3, 9] = (-(self.dN4dXi * IJMat[0, 0] + self.dN4dEta * IJMat[0, 1] + 
+                     self.dN4dZeta * IJMat[0, 2]) / 3)
+        BL[3, 11] = ((self.dN4dXi * IJMat[2, 0] + self.dN4dEta * IJMat[2, 1] + 
+                     self.dN4dZeta * IJMat[2, 2]) / 3)
+        
+        BL[4, 1] = (self.dN1dXi * IJMat[2, 0] + self.dN1dEta * IJMat[2, 1] + 
+                     self.dN1dZeta * IJMat[2, 2]) 
+        BL[4, 2] = (self.dN1dXi * IJMat[1, 0] + self.dN1dEta * IJMat[1, 1] + 
+                     self.dN1dZeta * IJMat[1, 2]) 
+        BL[4, 4] = (self.dN2dXi * IJMat[2, 0] + self.dN2dEta * IJMat[2, 1] + 
+                     self.dN2dZeta * IJMat[2, 2])
+        BL[4, 5] = (self.dN2dXi * IJMat[1, 0] + self.dN2dEta * IJMat[1, 1] + 
+                     self.dN2dZeta * IJMat[1, 2])
+        BL[4, 7] = (self.dN3dXi * IJMat[2, 0] + self.dN3dEta * IJMat[2, 1] + 
+                     self.dN3dZeta * IJMat[2, 2]) 
+        BL[4, 8] = (self.dN3dXi * IJMat[1, 0] + self.dN3dEta * IJMat[1, 1] + 
+                     self.dN3dZeta * IJMat[1, 2]) 
+        BL[4, 10] = (self.dN4dXi * IJMat[2, 0] + self.dN4dEta * IJMat[2, 1] + 
+                     self.dN4dZeta * IJMat[2, 2]) 
+        BL[4, 11] = (self.dN4dXi * IJMat[1, 0] + self.dN4dEta * IJMat[1, 1] + 
+                     self.dN4dZeta * IJMat[1, 2])
+        
+        BL[5, 1] = (self.dN1dXi * IJMat[2, 0] + self.dN1dEta * IJMat[2, 1] + 
+                     self.dN1dZeta * IJMat[2, 2]) 
+        BL[5, 2] = (self.dN1dXi * IJMat[1, 0] + self.dN1dEta * IJMat[1, 1] + 
+                     self.dN1dZeta * IJMat[1, 2]) 
+        BL[5, 4] = (self.dN2dXi * IJMat[2, 0] + self.dN2dEta * IJMat[2, 1] + 
+                     self.dN2dZeta * IJMat[2, 2])
+        BL[5, 5] = (self.dN2dXi * IJMat[1, 0] + self.dN2dEta * IJMat[1, 1] + 
+                     self.dN2dZeta * IJMat[1, 2])
+        BL[5, 7] = (self.dN3dXi * IJMat[2, 0] + self.dN3dEta * IJMat[2, 1] + 
+                     self.dN3dZeta * IJMat[2, 2]) 
+        BL[5, 8] = (self.dN3dXi * IJMat[1, 0] + self.dN3dEta * IJMat[1, 1] + 
+                     self.dN3dZeta * IJMat[1, 2]) 
+        BL[5, 10] = (self.dN4dXi * IJMat[2, 0] + self.dN4dEta * IJMat[2, 1] + 
+                     self.dN4dZeta * IJMat[2, 2]) 
+        BL[5, 11] = (self.dN4dXi * IJMat[1, 0] + self.dN4dEta * IJMat[1, 1] + 
+                     self.dN4dZeta * IJMat[1, 2])
+
+        BL[6, 0] = (self.dN1dXi * IJMat[1, 0] + self.dN1dEta * IJMat[1, 1] + 
+                     self.dN1dZeta * IJMat[1, 2]) 
+        BL[6, 1] = (self.dN1dXi * IJMat[0, 0] + self.dN1dEta * IJMat[0, 1] + 
+                     self.dN1dZeta * IJMat[0, 2]) 
+        BL[6, 3] = (self.dN2dXi * IJMat[1, 0] + self.dN2dEta * IJMat[1, 1] + 
+                     self.dN2dZeta * IJMat[1, 2]) 
+        BL[6, 4] = (self.dN2dXi * IJMat[0, 0] + self.dN2dEta * IJMat[0, 1] + 
+                     self.dN2dZeta * IJMat[0, 2])
+        BL[6, 6] =  (self.dN3dXi * IJMat[1, 0] + self.dN3dEta * IJMat[1, 1] + 
+                     self.dN3dZeta * IJMat[1, 2]) 
+        BL[6, 7] = (self.dN3dXi * IJMat[0, 0] + self.dN3dEta * IJMat[0, 1] + 
+                     self.dN3dZeta * IJMat[0, 2])
+        BL[6, 9] = (self.dN4dXi * IJMat[1, 0] + self.dN4dEta * IJMat[1, 1] + 
+                     self.dN4dZeta * IJMat[1, 2])
+        BL[6, 10] = (self.dN4dXi * IJMat[0, 0] + self.dN4dEta * IJMat[0, 1] + 
+                     self.dN4dZeta * IJMat[0, 2]) 
+        
+        return BL   
+       
+    # create the first H matrix from nonlinear strain
+    def HmatrixF(self, x1, x2, x3, x4):
+        HF = np.zeros((3, 12), dtype=float)
+        BL = self.BLinear(x1, x2, x3, x4)
+               
+        # create the H1 matrix by differentiation of shape functions.
+        HF[0, 0] = 3 * BL[0, 0]
+        HF[0, 3] = 3 * BL[0, 3]
+        HF[0, 6] = 3 * BL[0, 6]
+        HF[0, 9] = 3 * BL[0, 9]
+        
+        HF[1, 1] = 3 * BL[0, 0]
+        HF[1, 4] = 3 * BL[0, 3]
+        HF[1, 7] = 3 * BL[0, 6]
+        HF[1, 10] = 3 * BL[0, 9]
+        
+        HF[2, 2] = 3 * BL[0, 0]
+        HF[2, 5] = 3 * BL[0, 3]
+        HF[2, 8] = 3 * BL[0, 6]
+        HF[2, 11] = 3 * BL[0, 9]
+
+        return HF      
+        
+    # create the second H matrix from nonlinear strain
+    def HmatrixS(self, x1, x2, x3, x4):
+        HS = np.zeros((3, 12), dtype=float)
+        BL = self.BLinear(x1, x2, x3, x4)
+               
+        # create the H1 matrix by differentiation of shape functions.
+        HS[0, 0] = 3 * BL[0, 1]
+        HS[0, 3] = 3 * BL[0, 4]
+        HS[0, 6] = 3 * BL[0, 7]
+        HS[0, 9] = 3 * BL[0, 10]
+        
+        HS[1, 1] = 3 * BL[0, 1]
+        HS[1, 4] = 3 * BL[0, 4]
+        HS[1, 7] = 3 * BL[0, 7]
+        HS[1, 10] = 3 * BL[0, 10]
+        
+        HS[2, 2] = 3 * BL[0, 1]
+        HS[2, 5] = 3 * BL[0, 4]
+        HS[2, 8] = 3 * BL[0, 7]
+        HS[2, 11] = 3 * BL[0, 10]
+
+        return HS      
+    
+    
+    # create the third H matrix from nonlinear strain
+    def HmatrixT(self, x1, x2, x3, x4):
+        HT = np.zeros((3, 12), dtype=float)
+        BL = self.BLinear(x1, x2, x3, x4)
+               
+        # create the H1 matrix by differentiation of shape functions.
+        HT[0, 0] = 3 * BL[0, 2]
+        HT[0, 3] = 3 * BL[0, 5]
+        HT[0, 6] = 3 * BL[0, 8]
+        HT[0, 9] = 3 * BL[0, 11]
+        
+        HT[1, 1] = 3 * BL[0, 2]
+        HT[1, 4] = 3 * BL[0, 5]
+        HT[1, 7] = 3 * BL[0, 8]
+        HT[1, 10] = 3 * BL[0, 11]
+        
+        HT[2, 2] = 3 * BL[0, 2]
+        HT[2, 5] = 3 * BL[0, 5]
+        HT[2, 8] = 3 * BL[0, 8]
+        HT[2, 11] = 3 * BL[0, 11]
+
+        return HT       
+    
+
+    # create the first nonlinear Bmatrix
+    def FirstBNonLinear(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        AF = np.zeros((7, 3), dtype=float)
+        G = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
+        HF = self.HmatrixF(x1, x2, x3, x4)
+        
+        # create the A1 matrix from nonlinear part of strain
+        AF[0, 0] = - G[0, 0] / 3
+        AF[0, 1] = - 2 * G[0, 1] / 3
+        AF[0, 2] = G[2, 0] / 3
+        
+        AF[1, 0] = - G[0, 0] / 3
+        AF[1, 1] = 2 * G[1, 0] / 3
+        AF[1, 2] = G[2, 0] / 3
+        
+        AF[2, 1] = - G[1, 0] / 3
+        
+        AF[3, 0] = G[0, 0] / 3
+        AF[3, 1] = - G[1, 0] / 3
+        AF[3, 2] = - G[2, 0] / 3
+        
+        AF[4, 0] = 4 * G[1, 2] 
+        AF[4, 1] = - 2 * G[0, 2]
+        AF[4, 2] = - 2 *  G[1, 0]
+        
+        AF[5, 0] = - 4 * G[1, 2] 
+        
+        AF[6, 0] = - 2 * G[0, 1] 
+        AF[6, 1] = - 4 * G[0, 0]
+        
+        BNF = np.zeros((7, 12), dtype=float)
+        BNF = np.dot(AF, HF)
+        
+        return BNF 
+    
+    
+    
+    # create the second nonlinear Bmatrix
+    def SecondBNonLinear(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        AS = np.zeros((7, 3), dtype=float)
+        G = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
+        HS = self.HmatrixS(x1, x2, x3, x4)
+        
+        # create the A2 matrix from nonlinear part of strain
+        AS[0, 1] = - G[1, 1] / 3
+        AS[0, 2] = G[2, 1] / 3
+        
+        AS[1, 0] = 2 * G[1, 0] / 3
+        AS[1, 1] = 2 * G[1, 1] / 3
+        AS[1, 2] = - G[2, 1] / 3
+        
+        AS[2, 0] = - 2 * G[1, 0] / 3
+        AS[2, 1] = - G[1, 1] / 3
+        AS[2, 2] = G[2, 1] 
+        
+        AS[3, 2] = - 2 * G[2, 1] / 3
+        
+        AS[4, 0] = - 2 * G[2, 0] 
+        AS[4, 1] = - 4 * G[2, 1]
+        AS[4, 2] = 2 *  G[2, 2]
+        
+        AS[5, 0] = 2 * G[0, 2] 
+        AS[5, 2] = - 4 * G[0, 0] 
+        
+        AS[6, 1] = 2 * G[1, 0] 
+        AS[6, 2] = 2 * G[2, 0]
+        
+        BNS = np.zeros((7, 12), dtype=float)
+        BNS = np.dot(AS, HS)
+        
+        return BNS
+
+    # create the third nonlinear Bmatrix
+    def ThirdBNonLinear(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        AT = np.zeros((7, 3), dtype=float)
+        G = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
+        HT = self.HmatrixS(x1, x2, x3, x4)
+        
+        # create the A3 matrix from nonlinear part of strain
+        AT[0, 0] = G[0, 2] / 3
+        AT[0, 1] = (- G[1, 2] - 4 * G[2, 1]) / 3
+        AT[0, 2] = - G[2, 2] / 3
+        
+        AT[2, 0] = - G[0, 2] / 3
+        AT[2, 1] = (G[1, 2] + 4 * G[2, 1]) / 3
+        AT[2, 2] = G[2, 2] / 3
+        
+        AT[3, 0] = G[0, 2] / 3
+        AT[3, 1] = (- G[1, 2] - 4 * G[2, 1]) / 3
+        AT[3, 2] = - G[2, 2] / 3
+        
+        AT[4, 1] = - 2 * G[1, 1]
+        
+        AT[5, 1] = 2 * G[1, 1] 
+        AT[5, 2] = 2 * G[2, 1] 
+        
+        BNT = np.zeros((7, 12), dtype=float)
+        BNT = np.dot(AT, HT)
+        
+        return BNT
+
+    
 
     def F(self, x1, x2, x3, x4, x01, x02, x03, x04):
         if isinstance(x1, tuple):
