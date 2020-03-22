@@ -1,13 +1,13 @@
 \part{Constitutive Theory}
 \label{partConstitutive}
 
-Roan \& Waters \cite{RoanWaters11} and Suki \textit{et~al}.\ \cite{Sukietal05,Sukietal11} have each written extensive review articles on the mechanics of parenchyma, have provided detailed information about the structural constituents of alveoli, and have discussed their influence on the overall mechanical response of parenchyma.  Of particular relevance, from a mechanics perspective, are the constituent building blocks of alveolar tissue: collagen (types I and III, predominantly), elastin, proteoglycans and other proteins, surfactant and cells (epithelial and endothelial, predominantly).  These constituents are assembled in such a manner so as to produce a variety of alveolar sub-structures that are essentially 1D (alveolar chords), 2D (alveolar septa) and 3D (alveolar sacs) in their geometric construction.
+Roan \& Waters \cite{RoanWaters11} and Suki \textit{et~al}.\ \cite{Sukietal05,Sukietal11} have each written extensive review articles on the mechanics of parenchyma, have provided detailed information about the structural constituents of alveoli, and have discussed their influence on the overall mechanical response of parenchyma.  Of particular relevance, from a mechanics perspective, are the constituent building blocks of alveolar tissue: collagen (types I and III, predominantly), elastin, proteoglycans and other proteins, surfactant and cells (epithelial and endothelial, predominantly).  These constituents are assembled in such a manner so as to produce a variety of alveolar sub-structures that are essentially 1D (alveolar chords), 2D (alveolar septa) and 3D (alveolar sacs) in their geometric construction.  Birzle \textit{et~al}.\ \cite{Birzleetal19} have performed an interesting set of experiments on rat parenchyma in an effort to delineate the separate effects of elastin, collagen and the ground substance (everything else) on the collective mechanical response of these tissues.
 
 A dodecahedron is used here as a geometric model for an alveolus \cite{FrankusLee74}, cf.\ Figs.~\ref{figRatLung} \& \ref{figDodecahedron}.  It is comprised of: thirty 1D rods that represent alvolar chords, twelve 2D membranes that represent alveolar septa, considered here to be pentagonal in shape, and one 3D cavity filled with air (or fluids in the case of a contusion caused by injury or an edema caused by disease), considered here to be dodecahedral in shape.  The thermo\-elastic constitutive equations presented in this chapter for these three spatial geometries are derived in \ref{appImplicitElasticity}.  Elastic behavior is sufficient for our intended application of studying alveoli being subjected to traveling waves.
 
 We recall from our kinematic study of a dodecahedron that the geometric strains of $e \defeq \ln ( L / L_0 )$ for the elongation of septal chords, $\xi \defeq \ln \sqrt{A / A_0}$ for the dilation of septal membranes, and $\Xi \defeq \ln \sqrt[3]{V / V_0}$ for the dilatation of alveolar volume are equivalent to one another under motions of uniform expansion.  These three, geometric, strain measures also exist as thermo\-dynamic strains, each associating with a distinct and unique conjugate stress.
 
-Constitutive equations are a derived consequence from physical laws governing thermo\-dynamic processes.  Here we derive constitutive equations applicable for 1D thermo\-elastic fibers (alveolar chords), 2D thermo\-elastic membranes (alveolar septa), and 3D thermo\-elastic volumes (alveolar sacs).  In \S\ref{secUniformCE}, we assume that the motions are uniform in their spatial dimension.  Later, in \S\ref{secNonuniform2D}, the non-uniform motions of shears associated with a membrane are included into this thermo\-dynamic framework.  Section~\ref{secAlveolus} pulls these results together, sufficient for the intended purpose of modeling the three structural facets that comprise an alveolous.  Specifically, all geometric entities (alveolar chords, alveolar septa, and alveolar sacs) are described in terms of stresses ($\text{dyne/cm}^2$) instead of their intensive thermo\-dynamic forces (force, surface tension, and stress).  This is done to facilitate implementation of these models into code, and to facilitate interpretations of their results by engineers and scientists.
+Constitutive equations are a derived consequence from physical laws governing thermo\-dynamic processes.  Here we derive constitutive equations applicable for 1D thermo\-elastic fibers (alveolar chords), 2D thermo\-elastic membranes (alveolar septa), and 3D thermo\-elastic volumes (alveolar sacs).  In \S\ref{secUniformCE}, we assume that the motions are uniform in their spatial dimension.  Later, in \S\ref{secNonuniform2D} \& \ref{secNonuniform3D}, the non-uniform motions of shears are included into our thermo\-dynamic framework for membranes and solids.  Section~\ref{secAlveolus} pulls these results together, sufficient for the intended purpose of modeling the three structural facets that comprise an alveolous.  Specifically, all geometric entities (alveolar chords, alveolar septa, and alveolar sacs) are now described in terms of stresses ($\text{dyne/cm}^2$) instead of their intensive thermo\-dynamic forces (force, surface tension, and stress).  This is done to facilitate implementation of these models into code, and to facilitate interpretations of their results by engineers and scientists.  The chapter closes with a discussion of their implementation into finite elements in \S\ref{secFE_CE} and a set of examples created to verify our code in \S\ref{secCE_verifyCode}.
 
 \section{Green Thermoelastic Solids Subjected to Uniform Motions in 1D, 2D \& 3D}
 \label{secUniformCE}
@@ -49,9 +49,9 @@ Because the internal energy density $U$ is a state function, its total derivativ
     -3P & = \rho_{3D} \, \partial_{\Xi} U ( \eta ,  \Xi)
     \end{align}
 \end{subequations}
-where we have used the geometric strain definitions $e \defeq \ln ( L / L_0 )$, $\xi \defeq \ln \sqrt{ A / \! A_0 }$ and $\Xi \defeq \sqrt[3]{V \! / V_0}$, in accordance with Part~\ref{partKinematics}. These constitutive equations govern Green thermo\-elastic solids undergoing uniform motions in adiabatic enclosures.  As a convenience, we employ the following notation $\partial_{\eta} U \defeq \partial U / \partial \eta$, etc.
+where we have used the geometric strain definitions $e \defeq \ln ( L / L_0 )$, $\xi \defeq \ln \sqrt{ A / \! A_0 }$ and $\Xi \defeq \ln \sqrt[3]{V \! / V_0}$, in accordance with Part~\ref{partKinematics}. These constitutive equations govern Green thermo\-elastic solids undergoing uniform motions in adiabatic enclosures.  As a convenience, we employ the notation $\partial_{\eta} U \defeq \partial U / \partial \eta$, etc.
 
-Consider the response variables for temperature and force\slash surface-tension\slash pressure to be $C^1$ functions of state (cf.\ Weinhold \cite{Weinhold75c} and Gilmore \cite{Gilmore84}) in a Green thermo\-elastic solid undergoing an uniform adiabatic motion.  One can then differentiate Eqn.~(\ref{GreenElasticCEs}), thereby producing the following collection of coupled differential equations
+Consider the response variables for temperature and force\slash surface-tension\slash pressure to be $C^1$ functions of state and, therefore, the internal energy $U$ is a $C^2$ function of state in a Green thermo\-elastic solid undergoing an uniform adiabatic motion (cf.\ Weinhold \cite{Weinhold75c} and Gilmore \cite{Gilmore84}).  One can then differentiate Eqn.~(\ref{GreenElasticCEs}), thereby producing the following collection of coupled, partial, differential equations
 \begin{subequations}
     \label{GreenElasticODEs}
     \begin{align}
@@ -75,7 +75,7 @@ Consider the response variables for temperature and force\slash surface-tension\
     -3 \, \mathrm{d} P \end{matrix} \right\} & = \begin{bmatrix}
     \partial_{\eta\eta} U & \partial_{\eta \Xi} U \\
     \rho_{3D} \, \partial_{\Xi\eta} U & \rho_{3D} \, \partial_{\Xi\Xi} U \end{bmatrix} \left\{ \begin{matrix} \mathrm{d} \eta \\
-    \mathrm{d} \Xi \end{matrix} \right\}
+    \mathrm{d} \Xi \end{matrix} \right\} \label{GreenSolid}
     \end{align}
 \end{subequations}
 where, from calculus, mixed partial derivatives obey $\partial_{e\eta} U = \partial^2 U / \partial e \partial \eta = \partial^2 U / \partial \eta \partial e = \partial_{\eta e} U$, etc., that in the thermo\-dynamics literature are known as Maxwell's relations; they are Silvester's criteria for integrability.
@@ -105,9 +105,9 @@ Changing cause and effect between entropy and temperature in Eqn.~(\ref{GreenEla
     \mathrm{d} \Xi \end{matrix} \right\}
     \end{align}
 \end{subequations}
-which are written above in a format that is more useful for our multi\-scale application.  In this process, a localization procedure pulls temperature and strain from the continuum scale down to the alveolar scale.  The alveolar entropy and stress are then determined via the above constitutive equations.  Afterwords, an homogenization procedure pushes the updated alveolar entropy and stress up to the continuum level.  We employ the independent variables of a Helmholtz free energy, but we do not adopt his potential, preferring to retain the internal energy potential to ensure a proper incorporation of Maxwell's constraint.  
+which are written above in a format that is more useful for our multi\-scale application.  In this process, a localization procedure pulls the temperature and deformation gradient rates down from the continuum scale to the alveolar scale.  These continuum rates are then mapped into their local thermo\-dynamic rates.  The alveolar entropy and stress are then determined via integrating the above constitutive equations.  Afterwords, an homogenization procedure pushes the updated alveolar entropy and stress up to the continuum level.  We employ the independent variables of a Helmholtz free energy, but we do not adopt his potential, preferring to retain the internal energy potential so as to ensure a proper incorporation of Maxwell's constraint.  
 
-Constitutive equations (\ref{GreenElasticODEs} \& \ref{HelmholtzElasticODEs}) take on the form of hypo-elastic material models \cite{Truesdell55}, which are ideal for numerical implementation whenever one uses numerical solution techniques like those presented in Part~\ref{partNumericalMethods}.
+Constitutive equations (\ref{GreenElasticODEs} \& \ref{HelmholtzElasticODEs}) take on the form of a hypo-elastic material model \cite{Truesdell55}, which is ideal for numerical implementation whenever one uses numerical solution techniques like those presented in Part~\ref{partNumericalMethods}.
 
 \subsection{Material Constants}
 
@@ -212,9 +212,9 @@ We now write down our constitutive formul\ae\ for quantifying uniform responses 
     \end{matrix} \right\} \label{Helmholtz3D}
     \end{align}
 \end{subequations}
-These constitutive formul\ae, derived from the First and Second Laws of Thermo\-dynamics, describe thermo\-elastic materials undergoing uniform motions through adibatic processes.
+These constitutive formul\ae, derived from the First and Second Laws of Thermo\-dynamics, describe thermo\-elastic materials undergoing uniform motions through adiabatic processes.
 
-The whole upper-left component in each matrix of Eqn.~(\ref{HelmholtzCEs}) represents a specific heat evaluated at constant strain, divided by temperature---a material property not easily measured.  Whereas, the specific heat evaluated at constant pressure, viz., $C$, is more amenable to experiments, and is the property that one typically finds in published data tables.  
+The upper-left element in each matrix of Eqn.~(\ref{HelmholtzCEs}) represents a specific heat evaluated at constant strain, divided by temperature---a material property not easily measured.  Whereas, the specific heat evaluated at constant pressure, viz., $C$, is more amenable to experiments, and is the property that one typically finds in published data tables.  
 
 There are four material constants for each dimension (e.g., for 1D materials they are: $\rho_{1D}$, $C$, $\alpha_f$ and $E_{\theta}$) with the latter three being defined according to Eqn.~(\ref{materialConstants}).  The differential equations in Eqn.~(\ref{HelmholtzCEs}) have mathematical forms of hypo-elastic materials \cite{Truesdell55}, which are preferred for incorporating constitutive equations into finite element packages.
 
@@ -231,43 +231,37 @@ The First and Second Laws of Thermo\-dynamics governing a reversible adiabatic p
 \mathcal{S}_{11} & \mathcal{S}_{12} \\
 \mathcal{S}_{21} & \mathcal{S}_{22}
 \end{bmatrix} \begin{bmatrix}
-\mathrm{d}a / a & a \, \mathrm{d} g / b \\
-0 & \mathrm{d}b / b 
+a^{-1} \, \mathrm{d}a & (a/b) \, \mathrm{d} g \\
+0 & b^{-1} \, \mathrm{d}b
 \end{bmatrix} \right) =  
 \pi \, \mathrm{d} \xi + \sigma \, \mathrm{d} \varepsilon + 
 \tau \, \mathrm{d} \gamma
 \label{convectedWorkRate} \\
-\intertext{wherein the $\mathcal{S}_{ij}$ are components of a surface tension evaluated in the co-ordinate frame of a membrane.  (In \S\ref{secAlveolus} they will be converted into components of the second Piola-Kirchhoff stress.)  Therefore, the First and Second Laws result in an exact differential equation of the form}
+\intertext{wherein the $\mathcal{S}_{ij}$ are components of a surface tension evaluated in the co-ordinate frame of a membrane.  (In \S\ref{secAlveolus} they will be converted into components of the Eulerian Kirchhoff stress and the Lagrangian, second, Piola-Kirchhoff stress.)  Therefore, the First and Second Laws result in an exact differential equation of the form}
 \mathrm{d} \hspace{1pt} U & = \theta \, \mathrm{d} \eta + \tfrac{1}{\rho_{2D}} 
 \bigl( \pi \, \mathrm{d} \xi + \sigma \, \mathrm{d} \varepsilon + 
 \tau \, \mathrm{d} \gamma \bigr)
 \label{membraneThermo}
 \end{align}
 \end{subequations} 
-where $\{ \pi , \sigma , \tau  \}$ describes a set of intensive scalar-valued stresses whose thermo\-dynamic conjugates $\{ \xi , \varepsilon , \gamma \}$ describe a set of extensive scalar-valued strains.  (This contrasts with the classic approach where the work done is decomposed into a scalar-valued isotropic part and a tensor-valued deviatoric part.)  Pair $( \xi , \pi )$ describes a dilation $\xi$ caused by a surface tension $T$; it is the uniform contribution to stress power discussed in \S\ref{secUniformCE} where $2 \, \mathrm{d} \xi \Leftarrow A^{-1} \, \mathrm{d} A$ and $\tfrac{1}{2} \pi \Leftarrow T$.  Pair $( \varepsilon , \sigma )$ describes a pure shear $\varepsilon$ or squeeze caused by a normal-stress difference $\sigma$.  And pair $( \gamma , \tau )$ describes an in-plane shear $\gamma$ caused by a shear stress $\tau$. Collectively, pairs $( \varepsilon , \sigma )$ and $( \gamma , \tau )$ account for any non-uniform contributions to stress power, i.e., contributions from other than uniform dilation.  These pairs are quantified in \S\ref{secConjugatePairs}.
+where $\{ \pi , \sigma , \tau  \}$ describes a set of intensive scalar-valued stresses whose thermo\-dynamic conjugates $\{ \xi , \varepsilon , \gamma \}$ describe a set of extensive scalar-valued strains.  This contrasts with the classic approach where the work done is decomposed into a scalar-valued isotropic part and a tensor-valued deviatoric part.  The above thermo\-dynamic strains are defined in \S\ref{secQR2D}, while their conjugate stresses and how they relate to the tensor components of stress are discussed in \S\ref{secFE_CE}. 
+
+Conjugate pair $( \xi , \pi )$ describes a dilation $\xi$ caused by a surface tension $T$; it is the uniform contribution to stress power discussed in \S\ref{secUniformCE} where $2 \, \mathrm{d} \xi \Leftarrow A^{-1} \, \mathrm{d} A$ and $\tfrac{1}{2} \pi \Leftarrow T$.  Pair $( \varepsilon , \sigma )$ describes a pure shear $\varepsilon$ or squeeze caused by a normal-stress difference $\sigma$.  And pair $( \gamma , \tau )$ describes an in-plane shear $\gamma$ caused by a shear stress $\tau$. Collectively, pairs $( \varepsilon , \sigma )$ and $( \gamma , \tau )$ account for any non-uniform contributions to stress power, i.e., contributions from other than uniform dilation.  These pairs are quantified in \S\ref{secConjugatePairs}.
 
 \subsection{Constitutive Equations}
 
-Because a change in the internal energy $\mathrm{d} \hspace{1pt} U$ governing a reversible adiabatic process is described by an exact differential \cite{Caratheodory09}, with $U( \eta, \xi, \varepsilon, \gamma )$ in the case of a planar membrane, it follows that a constitutive response for a Green thermo\-elastic membrane is given by
-\begin{subequations}
-    \label{GreenThermoelasticity}
-    \begin{align}
-    \theta & = \partial_{\eta} U(\eta, \xi, \varepsilon, \gamma) , \;
+Because a change in the internal energy $\mathrm{d} U$ governing a reversible adiabatic process is described by an exact differential \cite{Caratheodory09}, with $U( \eta, \xi, \varepsilon, \gamma )$ in the case of a planar membrane, it follows that a constitutive response for a Green thermo\-elastic membrane is given by
+\begin{equation}
+    \begin{aligned}
+    \theta & = \partial_{\eta} U(\eta, \xi, \varepsilon, \gamma) &
     \phantom{\rho}
-    \pi = \rho \, \partial_{\xi} U(\eta, \xi, \varepsilon, \gamma) ,
-    \notag \\
-    \sigma & = \rho \, \partial_{\varepsilon} U(\eta, \xi, \varepsilon, \gamma) , \;
-    \tau = \rho \, \partial_{\gamma} U(\eta, \xi, \varepsilon, \gamma)
-    \label{GreenThermoelasticMembrane} \\
-    \intertext{with strain symmetries requiring that}
-    U(\eta, \xi, \varepsilon, \gamma) & =
-    U(\eta, \xi, -\varepsilon, \gamma) = 
-    U(\eta, \xi, \varepsilon, -\gamma) = 
-    U(\eta, \xi, -\varepsilon, -\gamma) .
-    \label{internalEnergyInveriance}
-    \end{align}
-\end{subequations}
-Considering that each intensive variable, viz., $\theta$, $\pi$, $\sigma$ and $\tau$, is actually a $C^1$ function of the set of extensive variables ($\eta , \xi , \varepsilon , \gamma$), then the constitutive expressions in Eqn.~(\ref{GreenThermoelasticMembrane}) can be recast into the following system of differential equations
+    \pi & = \rho \, \partial_{\xi} U(\eta, \xi, \varepsilon, \gamma)  \\
+    \sigma & = \rho \, \partial_{\varepsilon} U(\eta, \xi, \varepsilon, \gamma) &
+    \tau & = \rho \, \partial_{\gamma} U(\eta, \xi, \varepsilon, \gamma) .
+    \end{aligned}
+    \label{GreenThermoelasticMembrane}
+\end{equation}
+Considering that each intensive variable, viz., $\theta$, $\pi$, $\sigma$ and $\tau$, is at least a $C^1$ function of the set of extensive variables ($\eta , \xi , \varepsilon , \gamma$), then the constitutive expressions in Eqn.~(\ref{GreenThermoelasticMembrane}) can be recast into the following system of differential equations
 \begin{equation}
 \label{energies2D}
 \left\{ \begin{matrix}
@@ -322,43 +316,53 @@ For our application, it is reasonable to assume that the presence of a non-unifo
 \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
 \end{matrix} \right\} 
 \end{displaymath}
-with $\partial_{\varepsilon\eta} U = \partial_{\gamma\eta} U = \partial_{\varepsilon\xi} U = \partial_{\gamma\xi} U = 0$ because of Maxwell's relations.  Converting the above internal energy formulation into its Helmholtz equivalent results in
-\begin{equation}
+with $\partial_{\varepsilon\eta} U = \partial_{\gamma\eta} U = \partial_{\varepsilon\xi} U = \partial_{\gamma\xi} U = 0$ because of Maxwell's relationships.  Furthermore, it is considered that the pure and simple shear responses act independently, too, so that $\partial_{\gamma\varepsilon} U = \partial_{\varepsilon\gamma} U = 0$.\footnote{
+    There is a second-order coupling that can exist between the modes of squeeze and shear in a 3D solid, it is the Poynting effect \cite{FreedZamani19}, but this effect cannot arise in a 2D membrane.
+}
+Converting the above internal energy formulation into its Helmholtz equivalent results in the following uncoupled set of matrix equations
+\begin{subequations}
+\label{Helmholtz2Duncoupled}
+\begin{align}
 \left\{ \begin{matrix}
-\mathrm{d} \eta \\ \mathrm{d} \pi \\
-\mathrm{d} \sigma \\ \mathrm{d} \tau
-\end{matrix} \right\} = \begin{bmatrix}
+\mathrm{d} \eta \\ \mathrm{d} \pi 
+\end{matrix} \right\} & = \begin{bmatrix}
 1 / \partial_{\eta\eta} U & 
--\partial_{\eta\xi} U / \partial_{\eta\eta} U & 
-0 & 0 \\ 
+-\partial_{\eta\xi} U / \partial_{\eta\eta} U \\ 
 \rho \, \partial_{\xi\eta} U / \partial_{\eta\eta} U & 
-\rho \bigl( \partial_{\xi\xi} U - \partial_{\xi\eta} U \!\cdot\! \partial_{\eta\xi} U / \partial_{\eta\eta} U \bigr) & 0 & 0 \\
-0 & 0 & \rho \, \partial_{\varepsilon\varepsilon} U & 
-\rho \, \partial_{\varepsilon\gamma} U \\
-0 & 0 & \rho \, \partial_{\gamma\varepsilon} U & 
-\rho \, \partial_{\gamma\gamma} U 
+\rho \bigl( \partial_{\xi\xi} U - \partial_{\xi\eta} U \!\cdot\! \partial_{\eta\xi} U / \partial_{\eta\eta} U \bigr)  
 \end{bmatrix} 
 \left\{ \begin{matrix}
-\mathrm{d}\theta \\ \mathrm{d} \xi \\
-\mathrm{d} \varepsilon \\ \mathrm{d} \gamma
-\end{matrix} \right\}  
-\label{Helmholtz2Duncoupled}
-\end{equation}
-which provides the general structure for a Green thermo\-elastic membrane appropriate for our application.  The uniform response (the upper-left $2 \times 2$ sub-matrix) and the non-uniform response (the lower-right $2 \times 2$ sub-matrix) are, by conjecture, decoupled in this constitutive construction.
+\mathrm{d}\theta \\ \mathrm{d} \xi 
+\end{matrix} \right\}
+\label{Helmholtz2Duniform} \\
+\intertext{and}
+\left\{ \begin{matrix}
+    \mathrm{d} \sigma \\ \mathrm{d} \tau
+\end{matrix} \right\} & = \rho \begin{bmatrix}
+    \partial_{\varepsilon\varepsilon} U & 0 \\
+    0 & \partial_{\gamma\gamma} U 
+\end{bmatrix} 
+\left\{ \begin{matrix}
+    \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
+\end{matrix} \right\}
+\label{Helmholtz2Dnonuniform}
+\end{align} 
+\end{subequations}
+that collectively provide the general structure for a Green thermo\-elastic membrane appropriate for our application.
 
 \medskip\noindent
-\textbf{Note}: There is experimental evidence that the bulk and shear moduli of parenchyma both depend upon transpulmonary pressure \cite{LaiFook79,Jahedetal90}.  It is conjectured that this is a structural effect of alveolar geometry; it is not a characteristic of the constituents that comprise an alveolus.  As such, we do not couple the uniform and non-uniform responses in Eqn.~(\ref{Helmholtz2Duncoupled}).
+\textbf{Note}:  The uniform response (Eqn.~\ref{Helmholtz2Duniform}) and the non-uniform response (Eqn.~\ref{Helmholtz2Dnonuniform}) are, by supposition, decoupled in this constitutive construction.  There is experimental evidence that the bulk and shear moduli of parenchyma both depend upon transpulmonary pressure \cite{LaiFook79,Jahedetal90}.  It is conjectured that this is a structural effect of alveolar geometry; it is not a characteristic of the constituents that comprise an alveolus.  As such, we do not couple the uniform and non-uniform responses in the constitutive framework of Eqn.~(\ref{Helmholtz2Duncoupled}).
 
-\subsection{Material Constants}
+\subsection{Material Response Functions}
 \label{secMaterialConstants}
 
-The material model put forward here for a thermo\-elastic membrane has six material constants: a mass density $\rho$, a specific heat $C$, a coefficient for areal thermal expansion at constant surface tension $\alpha_{\pi}$, an areal modulus at constant temperature $M_{\theta}$ (2D version of a bulk modulus), a squeeze modulus at constant shear $N_{\gamma}$, and a shear modulus at constant squeeze $G_{\varepsilon}$.  The specific heat $C$ is defined as
+The material model put forward here for a thermo\-elastic membrane has six material constants\slash functions: a mass density $\rho$, a specific heat $C$ at constant tension, a coefficient for areal thermal expansion at constant tension $\alpha_{\pi}$, an areal modulus at constant temperature $M_{\theta}$ (2D version of a bulk modulus), a squeeze modulus at constant shear $N_{\gamma}$, and a shear modulus at constant squeeze $G_{\varepsilon}$.  The specific heat $C$ is defined as
 \begin{subequations}
     \label{defineMaterialConstants}
     \begin{align}
     C & \defeq \theta \, \partial_{\theta} \eta |_{\mathcal{S}_{11} + \mathcal{S}_{22}} \! = \theta \, \partial_{\theta} \eta |_{\pi}
     \label{specificHeat2D} \\
-    \intertext{where $\theta$ is temperature, $\eta$ is entropy, and $\pi =  \mathcal{S}_{11} + \mathcal{S}_{22} = 2T$ is the surface tension in a membrane, while $C$ is commonly referred to in the literature as the specific heat at constant pressure.  The areal coefficient for thermal expansion $\alpha_{\pi} = \alpha_t$ is defined as}
+    \intertext{where $\theta$ is temperature, $\eta$ is entropy, and $\pi =  \mathcal{S}_{11} + \mathcal{S}_{22} = 2T$ is the surface tension in a membrane. $C$ is commonly referred to in the literature as the specific heat at constant pressure.  The areal coefficient for thermal expansion $\alpha_{\pi} = \alpha_t$ is defined as}
     \alpha_{\pi} & \defeq A^{-1} \, \partial_{\theta} A |_{\mathcal{S}_{11} + \mathcal{S}_{22}} \! = 2 \, \partial_{\theta} \xi |_{\pi}
     \label{thermalExpansionCoef2D} \\
     \intertext{where $A = ab$ is area and $\xi = \ln \sqrt{A / \! A_0}$ is dilation.  The areal modulus $M_{\theta}$ is defined as}
@@ -367,8 +371,8 @@ The material model put forward here for a thermo\-elastic membrane has six mater
     \intertext{The in-plane squeeze modulus $N_{\gamma}$ is defined as}
     N_{\gamma} & \defeq \Gamma \, \partial_{\Gamma} (\mathcal{S}_{11} - \mathcal{S}_{22}) |_g = \tfrac{1}{2} \, \partial_{\varepsilon} \pi |_{\gamma} 
     \label{arealSqueezeCompliance2D} \\
-    \intertext{where $\sigma = \mathcal{S}_{11} - \mathcal{S}_{22}$ is a normal-stress difference, and $\Gamma = a/b$ is the stretch of squeeze with $\varepsilon = \ln \sqrt{\Gamma \! / \Gamma_0}$ being the strain of squeeze.  Finally, the in-plane shear modulus $G_{\varepsilon}$ is defined as}
-    G_{\varepsilon} & \defeq \Gamma \, \partial_{g\,} \mathcal{S}_{21} |_{\Gamma} = \partial_{\gamma} s^{\tau} |_{\varepsilon} 
+    \intertext{where $\sigma = \mathcal{S}_{11} - \mathcal{S}_{22}$ is a normal-stress difference, and $\Gamma = a/b$ is the stretch of squeeze with $\varepsilon = \ln \sqrt{\Gamma \! / \Gamma_0}$ being the strain of squeeze.  Finally, an in-plane shear modulus $G_{\varepsilon}$ is defined as}
+    G_{\varepsilon} & \defeq \Gamma \, \partial_{g\,} \mathcal{S}_{21} |_{\Gamma} 
     \label{arealShearModulus2D}
     \end{align}
 \end{subequations}
@@ -376,43 +380,45 @@ where $\tau = \Gamma \mathcal{S}_{21}$ determines the shear stress with $\gamma 
 
 Because $\ln (L/L_0) = \ln \sqrt{A / \! A_0}$ for uniform dilation (see Part~\ref{partKinematics}), it necessarily follows then that if an axial coefficient for thermal expansion $\alpha_{1D}$ is available, viz., $\alpha_{1D} = L^{-1} \, \partial_{\theta} L |_F$, then set $\alpha_{\pi} = 2 \alpha_{1D}$.  Furthermore, because $\ln \sqrt[3]{V \! / V_0} = \ln \sqrt{A / \! A_0}$ under uniform dilatation, it also follows that if a volumetric coefficient for thermal expansion $\alpha_{3D}$ is available, viz., $\alpha_{3D} = V^{-1} \, \partial_{\theta} V |_P$, then set $\alpha_{\pi} = \tfrac{2}{3} \alpha_{3D}$. 
 
-In terms of these material constants, the thermo\-elastic membrane model of Eqn.~(\ref{Helmholtz2Duncoupled}) takes on the form of 
+In terms of these material constants, the uniform response of a thermo\-elastic membrane of Eqn.~(\ref{Helmholtz2Duniform}) takes on the form of 
 \begin{subequations}
     \label{HelmholtzMembraneODEs}
     \begin{align}
     \left\{ \begin{matrix}
-    \mathrm{d} \eta \\ \mathrm{d} \pi \\
-    \mathrm{d} \sigma \\ \mathrm{d} \tau
+    \mathrm{d} \eta \\ \mathrm{d} \pi 
     \end{matrix} \right\} & = \begin{bmatrix}
     C / \theta - M_{\theta} \alpha_{\pi}^2 / \rho_{2D} & 
-    2 M_{\theta} \alpha_{\pi} / \rho_{2D} & 0 & 0 \\
-    -2 M_{\theta} \alpha_{\pi} & 4 M_{\theta} & 0 & 0 \\
-    0 & 0 & 2 N_{\gamma} & 2 \tau \\
-    0 & 0 & 2 \tau & G_{\varepsilon}
+    2 M_{\theta} \alpha_{\pi} / \rho_{2D} \\
+    -2 M_{\theta} \alpha_{\pi} & 4 M_{\theta}
     \end{bmatrix} \left\{ \begin{matrix}
-    \mathrm{d} \theta \\ \mathrm{d} \xi \\
-    \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
-    \end{matrix} \right\} \label{HelmholtzMembraneODEsA} \\
-    \intertext{that when expressed in terms of a linear thermal expansion coefficient $\alpha \Leftarrow \alpha_{1D}$, which is what one typically finds in the literature, and denoting $\rho \Leftarrow \rho_{2D}$, it reduces to}
+    \mathrm{d} \theta \\ \mathrm{d} \xi 
+    \end{matrix} \right\} \notag \\
+    \intertext{that when expressed in terms of a linear thermal expansion coefficient $\alpha \Leftarrow \alpha_{1D}$, which is what one typically finds in the literature, and denoting $\rho \Leftarrow \rho_{2D}$, reduces to}
     \left\{ \begin{matrix}
-    \mathrm{d} \eta \\ \mathrm{d} \pi \\
-    \mathrm{d} \sigma \\ \mathrm{d} \tau
+    \mathrm{d} \eta \\ \mathrm{d} \pi
     \end{matrix} \right\} & = \begin{bmatrix}
     C / \theta - 4 M_{\theta} \alpha / \rho & 
-    4 M_{\theta} \alpha / \rho & 0 & 0 \\
-    -4 M_{\theta} \alpha & 4 M_{\theta} & 0 & 0 \\
-    0 & 0 & 2 N_{\gamma} & 2 \tau \\
-    0 & 0 & 2 \tau & G_{\varepsilon}
+    4 M_{\theta} \alpha / \rho \\
+    -4 M_{\theta} \alpha & 4 M_{\theta}
     \end{bmatrix} \left\{ \begin{matrix}
-    \mathrm{d} \theta \\ \mathrm{d} \xi \\
+    \mathrm{d} \theta \\ \mathrm{d} \xi
+    \end{matrix} \right\}
+    \label{HelmholtzMembraneODEsUniform}
+    \intertext{while the non-uniform or shear response is described quite simply by}
+    \left\{ \begin{matrix}
+    \mathrm{d} \sigma \\ \mathrm{d} \tau
+    \end{matrix} \right\} & = \begin{bmatrix}
+    2 N_{\gamma} & 0 \\
+    0 & G_{\varepsilon}
+    \end{bmatrix} \left\{ \begin{matrix}
     \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
     \end{matrix} \right\}
-    \label{HelmholtzMembraneODEsB}
+    \label{HelmholtzMembraneODEsNonUniform}
     \end{align}
 \end{subequations}
-which is the general form for a thermo\-elastic membrane that we shall use going forward.
+which is the general form for a thermo\-elastic membrane that we shall use going forward. 
 
-Here the upper-left $2 \times 2$ matrices in Eqn.~(\ref{HelmholtzMembraneODEs}) come from Eqn.~(\ref{Helmholtz2D}), which describes the uniform contribution to an overall planar response, while the lower-right $2 \times 2$ matrices come from the following discussion:  Given that $\Gamma \defeq a/b$ denotes the stretch of squeeze with $\varepsilon \defeq \ln \sqrt{\Gamma \! / \hspace{0.5pt} \Gamma_0}$ defining the strain of squeeze, it follows that $\mathrm{d} \Gamma = 2 \Gamma \, \mathrm{d} \varepsilon$.  Squeeze $\varepsilon$, like dilation $\xi$, is logarithmic.  By definition, $\tau \defeq \Gamma \mathcal{S}_{21}$ whose differential change is $\mathrm{d} \tau = \mathcal{S}_{21} \, \mathrm{d} \Gamma + \Gamma \, \mathrm{d} \mathcal{S}_{21}$ that, upon defining a shear modulus as $G_{\varepsilon} \defeq \Gamma \, \partial_{g\,} \mathcal{S}_{21} |_{\Gamma}$, becomes $\mathrm{d} \tau = 2 \tau \, \mathrm{d} \varepsilon + G_{\varepsilon} \, \mathrm{d} \gamma$ because $\mathrm{d} g = \mathrm{d} \gamma$, with $\mathrm{d} \tau = 2 \tau \, \mathrm{d} \varepsilon + G_{\varepsilon} \, \mathrm{d} \gamma$ being the bottom formula in Eqn.~(\ref{HelmholtzMembraneODEs}).  Maxwell's relation $\partial_{\gamma\varepsilon} U = \partial_{\varepsilon\gamma} U$ puts $2 \tau$ at $\partial_{\varepsilon\gamma} U$, while $N_{\gamma} \defeq \Gamma \, \partial_{\Gamma} ( \mathcal{S}_{11} - \mathcal{S}_{22} ) |_g$ establishes the squeeze modulus.
+The numerical method presented in \S\ref{sec:1stOrderPECE} is used to integrate the ODEs of Eqn.~(\ref{HelmholtzMembraneODEs}).
 
 \subsubsection{The Poisson Effect}
 
@@ -431,6 +437,318 @@ N_{\gamma} = \frac{1 - \nu}{1 + \nu} M_{\theta}
 and that temperature $\theta$ and shear $g$ are held constant.  Consequently, $\tfrac{1}{3} M_{\theta} \leq N_{\gamma} \leq M_{\theta}$ given that $0 \leq \nu \leq \textfrac{1}{2}$, so the squeeze modulus $N_{\gamma}$ plays an analogous role to the shear modulus $\mu$ of classical elasticity.  
 
 The conjugate pair approach presented here allows for a distinct shear modulus $G_{\varepsilon}$ that can take on any positive value.  This is important because shear experiments done on soft tissues, which are few in number, tend to produce moduli that are many orders in magnitude smaller than their effective bulk modulus, e.g., in parenchyma their ratio is $K/G \approx 10^{4}$ (150~MPa vs.\ 10--54~kPa \cite{Sarafetal07}).  Classically, such a result is used to argue that the material can be modeled, to  good approximation, as being incompressible---a 3D notion.
+
+\section{Green Thermoelastic 3D Solids Subjected to Non-Uniform Motions}
+\label{secNonuniform3D}
+
+The First and Second Laws of Thermo\-dynamics governing a reversible adiabatic process of a 3D body are described by the formula $\mathrm{d}\hspace{1pt}U = \theta \, \mathrm{d} \eta + \tfrac{1}{\rho} \, \mathrm{d}W$, where $\mathrm{d}W$ is the mechanical power expended by stressing a body with mass density $\rho$, specifically \cite{Freedetal17,FreedZamani19,Freedetal20}
+\begin{subequations}
+    \begin{align}
+    \mathrm{d} W & = \mathrm{tr} \left( 
+    \begin{bmatrix}
+    \mathcal{S}_{11} & \mathcal{S}_{12} & \mathcal{S}_{13} \\
+    \mathcal{S}_{21} & \mathcal{S}_{22} & \mathcal{S}_{23} \\
+    \mathcal{S}_{31} & \mathcal{S}_{32} & \mathcal{S}_{33}
+    \end{bmatrix} \begin{bmatrix}
+    a^{-1} \, \mathrm{d}a & (a/b) \, \mathrm{d} \gamma & 
+       (a/c) ( \mathrm{d} \beta - \alpha \, \mathrm{d} \gamma ) \\
+    0 & b^{-1} \, \mathrm{d}b & (b/c) \, \mathrm{d} \alpha \\
+    0 & 0 & c^{-1} \, \mathrm{d} c
+    \end{bmatrix} \right) \notag \\ 
+    & =  \Pi \, \mathrm{d} \Xi + \sum_{i=1}^3 \left( 
+    \sigma_i \, \mathrm{d} \varepsilon_i + \tau_i \, \mathrm{d} \gamma_i \right)
+    \label{convectedWorkRate3D} \\
+    \intertext{subject to constraints $\sigma_3 = -(\sigma_1 + \sigma_2)$ and $\mathrm{d} \varepsilon_3 = -(\mathrm{d} \varepsilon_1 + \mathrm{d}\varepsilon_2)$.  Stress components $\mathcal{S}_{ij}$ can be either rotated into the Kirchhoff stress of the Eulerian frame, or they can be pulled back into the second Piola-Kirchhoff stress of the Lagrangian frame, as established in \S\ref{secAlveolus}.  Thermo\-dynamics therefore produces an exact differential equation of the form}
+    \mathrm{d} \hspace{1pt} U & = \theta \, \mathrm{d} \eta + \frac{1}{\rho} 
+    \left( \Pi \, \mathrm{d} \Xi + \sum_{i=1}^2 \sigma_i \, \mathrm{d} \varepsilon_i + ( \sigma_1 + \sigma_2 ) ( \mathrm{d} \varepsilon_1 + 
+    \mathrm{d} \varepsilon_2 ) + \sum_{i=1}^3 \tau_i \, \mathrm{d} \gamma_i \right)
+    \label{solidThermo}
+    \end{align}
+\end{subequations} 
+where stresses $\{ \Pi , \sigma_1 , \sigma_2 , \tau_1 , \tau_2 , \tau_3  \}$ describe a set of independent, scalar-valued, intensive variables, and where strains $\{ \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 \}$ describe a set of independent, scalar-valued, extensive variables.  This contrasts with the classic approach where the work done decomposes into a scalar-valued isotropic part and a tensor-valued deviatoric part.  A direct consequence of adopting a triangular construction for strain rate is that the pure- and simple-shear contributions of a deviatoric response can be separated into independent scalar contributions; whereas, they remain coupled as a tensor contribution whenever a symmetric construction for strain rate is adopted.  The above thermo\-dynamic strains are defined in \S\ref{secQR3D}, while their conjugate stresses and how they relate to commonly used stress tensors are discussed later in \S\ref{secFE_CE}. 
+
+\subsection{Constitutive Equations}
+
+Because a change in the internal energy $\mathrm{d} U$ governing a reversible adiabatic process is described by an exact differential \cite{Caratheodory09}, with $U( \eta, \Xi, \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 )$ in three space, it follows that a constitutive response for a Green thermo\-elastic solid is governed by \cite{Freed17}
+\begin{subequations}
+    \label{GreenThermoelasticSolid}
+\begin{align}
+\theta & = \partial_{\eta} U( \eta, \Xi, \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 ) \\
+\Pi & = \rho \, \partial_{\Xi} U( \eta, \Xi, \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 )  \\
+\left\{ \begin{matrix}
+\sigma_1 \\ \sigma_2
+\end{matrix} \right\} & = \frac{1}{3} \begin{bmatrix}
+2 & -1 \\ -1 & 2
+\end{bmatrix} \left\{ \begin{matrix}
+\rho \, \partial_{\varepsilon_1} U( \eta, \Xi, \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 ) \\
+\rho \, \partial_{\varepsilon_2} U( \eta, \Xi, \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 )
+\end{matrix} \right\} \\
+\tau_1 & = \rho \, \partial_{\gamma_1} U( \eta, \Xi, \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 ) \\
+\tau_2 & = \rho \, \partial_{\gamma_2} U( \eta, \Xi, \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 ) \\
+\tau_3 & = \rho \, \partial_{\gamma_3} U( \eta, \Xi, \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 ) 
+\end{align}
+\end{subequations}
+where the coupled expression for the two squeeze stresses arises from the contribution
+\begin{displaymath}
+    \partial_{\varepsilon_1} U \, \mathrm{d} \varepsilon_1 +
+    \partial_{\varepsilon_2} U \, \mathrm{d} \varepsilon_2 = 
+    \sigma_1 \, \mathrm{d} \varepsilon_1 +
+    \sigma_2 \, \mathrm{d} \varepsilon_2 + 
+    (\sigma_1 + \sigma_2) (\mathrm{d} \varepsilon_1 + \mathrm{d} \varepsilon_2)
+\end{displaymath}
+that incorporates constraints $\sigma_3 = -(\sigma_1 + \sigma_2)$ and $\mathrm{d} \varepsilon_3 = -( \mathrm{d} \varepsilon_1 + \mathrm{d} \varepsilon_2 )$ into the work done.
+
+Considering that each independent intensive variable, viz., $\theta$, $\Pi$, $\sigma_1$, $\sigma_2$, $\tau_1$, $\tau_2$ and $\tau_3$, is at least a $C^1$ function of the set of independent extensive variables ($\eta , \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 $), then the constitutive expressions in Eqn.~(\ref{GreenThermoelasticSolid}) can be recast into the following system of ordinary differential equations
+\begin{equation}
+\left\{ \begin{matrix}
+\mathrm{d} \theta \\ \mathrm{d} \Pi \\
+\mathrm{d} \sigma_1 \\ \mathrm{d} \sigma_2 \\ 
+\mathrm{d} \tau_1 \\ \mathrm{d} \tau_2 \\ \mathrm{d} \tau_3
+\end{matrix} \right\} = \begin{bmatrix}
+\partial_{\eta\eta} U & 
+\partial_{\eta\Xi} U & 
+\partial_{\eta\varepsilon_1} U & 
+\partial_{\eta\varepsilon_2} U &
+\partial_{\eta\gamma_1} U &
+\partial_{\eta\gamma_2} U &
+\partial_{\eta\gamma_3} U \\ 
+\rho \, \partial_{\Xi\eta} U & 
+\rho \, \partial_{\Xi\Xi} U & 
+\rho \, \partial_{\Xi\varepsilon1} U &
+\rho \, \partial_{\Xi\varepsilon2} U &
+\rho \, \partial_{\Xi\gamma_1} U &
+\rho \, \partial_{\Xi\gamma_2} U &
+\rho \, \partial_{\Xi\gamma_3} U \\
+\rho \, M_{1\eta} & 
+\rho \, M_{1\Xi} & 
+\rho \, M_{1\varepsilon_1} & 
+\rho \, M_{1\varepsilon_2} &
+\rho \, M_{1\gamma_1} &
+\rho \, M_{1\gamma_2} &
+\rho \, M_{1\gamma_3} \\
+\rho \, M_{2\eta} & 
+\rho \, M_{2\Xi} & 
+\rho \, M_{2\varepsilon_1} & 
+\rho \, M_{2\varepsilon_2} &
+\rho \, M_{2\gamma_1} &
+\rho \, M_{2\gamma_2} &
+\rho \, M_{2\gamma_3} \\
+\rho \, \partial_{\gamma_1\eta} U & 
+\rho \, \partial_{\gamma_1\Xi} U & 
+\rho \, \partial_{\gamma_1\varepsilon_1} U & 
+\rho \, \partial_{\gamma_1\varepsilon_2} U &
+\rho \, \partial_{\gamma_1\gamma_1} U  &
+\rho \, \partial_{\gamma_1\gamma_2} U &
+\rho \, \partial_{\gamma_1\gamma_3} U \\
+\rho \, \partial_{\gamma_2\eta} U & 
+\rho \, \partial_{\gamma_2\Xi} U & 
+\rho \, \partial_{\gamma_2\varepsilon_1} U & 
+\rho \, \partial_{\gamma_2\varepsilon_2} U &
+\rho \, \partial_{\gamma_2\gamma_1} U  &
+\rho \, \partial_{\gamma_2\gamma_2} U &
+\rho \, \partial_{\gamma_2\gamma_3} U \\
+\rho \, \partial_{\gamma_3\eta} U & 
+\rho \, \partial_{\gamma_3\Xi} U & 
+\rho \, \partial_{\gamma_3\varepsilon_1} U & 
+\rho \, \partial_{\gamma_3\varepsilon_2} U &
+\rho \, \partial_{\gamma_3\gamma_1} U  &
+\rho \, \partial_{\gamma_3\gamma_2} U &
+\rho \, \partial_{\gamma_3\gamma_3} U
+\end{bmatrix}
+\left\{ \begin{matrix}
+\mathrm{d}\eta \\ \mathrm{d} \Xi \\
+\mathrm{d} \varepsilon_1 \\ \mathrm{d} \varepsilon_2 \\
+\mathrm{d} \gamma_1 \\ \mathrm{d} \gamma_2 \\ \mathrm{d} \gamma_3
+\end{matrix} \right\}
+\label{energies3D}
+\end{equation}
+whose upper-left $2\times 2$ sub-matrix also appears in Eqn.~(\ref{GreenSolid}), which governs the uniform contribution of a response.  The squeeze or pure-shear tangent moduli are defined as
+\begin{subequations}  
+    \label{shearEnergies}
+    \begin{align}
+    M_{1\eta} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_1 \eta} U -
+        \partial_{\varepsilon_2 \eta} U \bigr) &
+    M_{2\eta} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_2 \eta} U -
+    \partial_{\varepsilon_1 \eta} U \bigr) \\
+    M_{1\Xi} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_1 \Xi} U -
+    \partial_{\varepsilon_2 \Xi} U \bigr) &
+    M_{2\Xi} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_2 \Xi} U -
+    \partial_{\varepsilon_1 \Xi} U \bigr) \\
+    M_{1\varepsilon_1} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_1 \varepsilon_1} U -
+    \partial_{\varepsilon_2 \varepsilon_1} U \bigr) & 
+    M_{2\varepsilon_1} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_2 \varepsilon_1} U -
+    \partial_{\varepsilon_1 \varepsilon_1} U \bigr) \\
+    M_{1\varepsilon_2} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_1 \varepsilon_2} U -
+    \partial_{\varepsilon_2 \varepsilon_2} U \bigr) & 
+    M_{2\varepsilon_2} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_2 \varepsilon_2} U -
+    \partial_{\varepsilon_1 \varepsilon_2} U \bigr) \\
+    M_{1\gamma_1} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_1 \gamma_1} U -
+    \partial_{\varepsilon_2 \gamma_1} U \bigr) &
+    M_{2\gamma_1} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_2 \gamma_1} U -
+    \partial_{\varepsilon_1 \gamma_1} U \bigr) \\
+    M_{1\gamma_2} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_1 \gamma_2} U -
+    \partial_{\varepsilon_2 \gamma_2} U \bigr) &
+    M_{2\gamma_2} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_2 \gamma_2} U -
+    \partial_{\varepsilon_1 \gamma_2} U \bigr) \\
+    M_{1\gamma_3} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_1 \gamma_3} U -
+    \partial_{\varepsilon_2 \gamma_3} U \bigr) &
+    M_{2\gamma_3} & = \tfrac{1}{3} \bigl( 2 \partial_{\varepsilon_2 \gamma_3} U -
+    \partial_{\varepsilon_1 \gamma_3} U \bigr)
+    \end{align}
+\end{subequations}
+Collectively, the above set of formul\ae\ describe the full non-uniform response permissible by a Green thermo\-elastic solid expressed as a hypo-elastic material undergoing an adiabatic process.
+
+As in the case of membranes, it is reasonable to assume that the presence of a non-uniform motion will not cause an uniform response.  For our application, it is also reasonable to assume that there is no coupling between the modes of squeeze and shear.\footnote{
+   The Poynting effect is a second-order effect that couples squeeze and shear \cite{FreedZamani19}, which we ignore here.
+}
+Furthermore, it is assumed that there is no coupling betwixt the two independent squeeze modes, nor between the three independent shear modes.  Consequently, all mixed partial derivatives that associate with a non-uniform response are zero, and therefore Eqns.~(\ref{energies3D} \& \ref{shearEnergies}) simplify to
+\small
+\begin{equation}
+\left\{ \begin{matrix}
+\mathrm{d} \theta \\ \mathrm{d} \Pi \\
+\mathrm{d} \sigma_1 \\ \mathrm{d} \sigma_2 \\ 
+\mathrm{d} \tau_1 \\ \mathrm{d} \tau_2 \\ \mathrm{d} \tau_3
+\end{matrix} \right\} = \begin{bmatrix}
+\partial_{\eta\eta} U & \partial_{\eta\Xi} U & 0 & 0 & 0 & 0 & 0 \\
+\rho \, \partial_{\Xi\eta} U & \rho \, \partial_{\Xi\Xi} U & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & \rho \tfrac{2}{3} \partial_{\varepsilon_1 \varepsilon_1} U & -\rho \tfrac{1}{3} \partial_{\varepsilon_2 \varepsilon_2} U & 0 & 0 & 0 \\
+0 & 0 & -\rho \tfrac{1}{3} \partial_{\varepsilon_1 \varepsilon_1} U & \rho \tfrac{2}{3} \partial_{\varepsilon_2 \varepsilon_2} U & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & \rho \, \partial_{\gamma_1\gamma_1} U & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & \rho \, \partial_{\gamma_2\gamma_2} U & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 & \rho \, \partial_{\gamma_3\gamma_3} U
+\end{bmatrix}
+\left\{ \begin{matrix}
+\mathrm{d}\eta \\ \mathrm{d} \Xi \\
+\mathrm{d} \varepsilon_1 \\ \mathrm{d} \varepsilon_2 \\
+\mathrm{d} \gamma_1 \\ \mathrm{d} \gamma_2 \\ \mathrm{d} \gamma_3
+\end{matrix} \right\}
+\label{hypoelastic3D}
+\end{equation}
+\normalsize
+where what appears to be a coupling between $\mathrm{d} \sigma_1$ and $\mathrm{d} \sigma_2$ is actually a consequence arising from the constraints $\mathrm{d} \sigma_3 = -( \mathrm{d} \sigma_1 + \mathrm{d} \sigma_2 )$ and $\mathrm{d} \varepsilon_3 = -( \mathrm{d} \varepsilon_1 + \mathrm{d} \varepsilon_2 )$.
+
+Converting the above internal-energy formulation into its Helmholtz equivalent results in a pair of matrix equations.  The first matrix equation governs the isotropic response, i.e.,
+\begin{subequations}
+    \label{Helmholtz3Duncoupled}
+    \begin{align}
+\left\{ \begin{matrix}
+\mathrm{d} \eta \\ \mathrm{d} \Pi 
+\end{matrix} \right\} & = \begin{bmatrix}
+1 / \partial_{\eta\eta} U & -\partial_{\eta\xi} U / \partial_{\eta\eta} U \\ 
+\rho \, \partial_{\xi\eta} U / \partial_{\eta\eta} U & 
+\rho \bigl( \partial_{\xi\xi} U - \partial_{\xi\eta} U \!\cdot\! \partial_{\eta\xi} U / \partial_{\eta\eta} U \bigr)
+\end{bmatrix}
+\left\{ \begin{matrix}
+\mathrm{d} \theta \\ \mathrm{d} \Xi
+\end{matrix} \right\}
+\label{Helmholtz3Disotropic} \\
+\intertext{while the second matrix equation governs the deviatoric response, viz.,}
+\left\{ \begin{matrix}
+\mathrm{d} \sigma_1 \\ \mathrm{d} \sigma_2 \\ 
+\mathrm{d} \tau_1 \\ \mathrm{d} \tau_2 \\ \mathrm{d} \tau_3
+\end{matrix} \right\} & = \rho \begin{bmatrix}
+\tfrac{2}{3} \partial_{\varepsilon_1 \varepsilon_1} U & -\tfrac{1}{3} \partial_{\varepsilon_2 \varepsilon_2} U & 0 & 0 & 0 \\
+-\tfrac{1}{3} \partial_{\varepsilon_1 \varepsilon_1} U & \tfrac{2}{3} \partial_{\varepsilon_2 \varepsilon_2} U & 0 & 0 & 0 \\
+0 & 0 & \partial_{\gamma_1\gamma_1} U & 0 & 0 \\
+0 & 0 & 0 & \partial_{\gamma_2\gamma_2} U & 0 \\
+0 & 0 & 0 & 0 & \partial_{\gamma_3\gamma_3} U
+\end{bmatrix}
+\left\{ \begin{matrix}
+\mathrm{d} \varepsilon_1 \\ \mathrm{d} \varepsilon_2 \\
+\mathrm{d} \gamma_1 \\ \mathrm{d} \gamma_2 \\ \mathrm{d} \gamma_3
+\end{matrix} \right\}
+\label{Helmholtz3Ddeviatoric}
+\end{align}
+\end{subequations}
+which provide a general hypo-elastic structure for a Green thermo\-elastic solid appropriate for our application.
+
+\subsection{Material Response Functions}
+\label{secMaterialConstants3D}
+
+The material model put forward here is for a thermo\-elastic solid that has, at most, nine material constants\slash functions: a mass density $\rho$, a specific heat $C$ at constant pressure, a coefficient for areal thermal expansion at constant pressure $\alpha_{\Pi}$, a bulk modulus at constant temperature $K_{\theta}$, two squeeze moduli at constant shear $N_{\gamma}$, and three shear moduli at constant squeeze $G_{\varepsilon}$.  The specific heat $C$ is defined as
+\begin{subequations}
+    \label{defineMaterialConstants3D}
+    \begin{align}
+    C & \defeq \theta \, \partial_{\theta} \eta |_{\mathcal{S}_{11} + \mathcal{S}_{22} + \mathcal{S}_{33}} \! = \theta \, \partial_{\theta} \eta |_{\Pi}
+    \label{specificHeat3D} \\
+    \intertext{where $\theta$ is temperature, $\eta$ is entropy, $\Pi =  \mathcal{S}_{11} + \mathcal{S}_{22} + \mathcal{S}_{33} = -3P$ accounts for pressure, and $C$ is the specific heat at constant pressure.  The volumetric coefficient for thermal expansion $\alpha_{\Pi} = \alpha_p$ is defined as}
+    \alpha_{\Pi} & \defeq V^{-1} \, \partial_{\theta} V |_{\mathcal{S}_{11} + \mathcal{S}_{22} + \mathcal{S}_{33}} \! = 3 \, \partial_{\theta} \Xi |_{\Pi}
+    \label{thermalExpansionCoef3D} \\
+    \intertext{where $V = abc$ is volume and $\Xi = \ln \sqrt[3]{V \! / V_0}$ is dilatation.  The bulk modulus $K_{\theta}$ is defined as}
+    M_{\theta} & \defeq A \, \partial_A \tfrac{1}{2} (\mathcal{S}_{11} + \mathcal{S}_{22}) |_{\theta} = \tfrac{1}{4} \, \partial_{\xi} \pi |_{\theta} .
+    \label{bulkCompliance3D} \\
+    \intertext{The in-plane squeeze modulus $N_{\gamma}$ is defined as}
+    N_{\gamma} & \defeq \Gamma \, \partial_{\Gamma} (\mathcal{S}_{11} - \mathcal{S}_{22}) |_g = \tfrac{1}{2} \, \partial_{\varepsilon} \pi |_{\gamma} 
+    \label{squeezeCompliance3D} \\
+    \intertext{where $\sigma = \mathcal{S}_{11} - \mathcal{S}_{22}$ is a normal-stress difference, and $\Gamma = a/b$ is the stretch of squeeze with $\varepsilon = \ln \sqrt{\Gamma \! / \Gamma_0}$ being the strain of squeeze.  Finally, an in-plane shear modulus $G_{\varepsilon}$ is defined as}
+    G_{\varepsilon} & \defeq \Gamma \, \partial_{g\,} \mathcal{S}_{21} |_{\Gamma} 
+    \label{shearCompliance3D}
+    \end{align}
+\end{subequations}
+where $\tau = \Gamma \mathcal{S}_{21}$ determines the shear stress with $\gamma = g - g_0$ being the shear strain.  
+
+Because $\ln (L/L_0) = \ln \sqrt[3]{V \! / V_0}$ for uniform dilatation (see Part~\ref{partKinematics}), it necessarily follows then that if an axial coefficient for thermal expansion $\alpha_{1D}$ is available, viz., $\alpha_{1D} = L^{-1} \, \partial_{\theta} L |_F$, then set $\alpha_{\Pi} = 3 \alpha_{1D}$. 
+
+
+
+In terms of these material constants, the uniform response of a thermo\-elastic membrane of Eqn.~(\ref{Helmholtz2Duniform}) takes on the form of 
+\begin{subequations}
+    \label{HelmholtzMembraneODEs}
+    \begin{align}
+    \left\{ \begin{matrix}
+    \mathrm{d} \eta \\ \mathrm{d} \pi 
+    \end{matrix} \right\} & = \begin{bmatrix}
+    C / \theta - M_{\theta} \alpha_{\pi}^2 / \rho_{2D} & 
+    2 M_{\theta} \alpha_{\pi} / \rho_{2D} \\
+    -2 M_{\theta} \alpha_{\pi} & 4 M_{\theta}
+    \end{bmatrix} \left\{ \begin{matrix}
+    \mathrm{d} \theta \\ \mathrm{d} \xi 
+    \end{matrix} \right\} \notag \\
+    \intertext{that when expressed in terms of a linear thermal expansion coefficient $\alpha \Leftarrow \alpha_{1D}$, which is what one typically finds in the literature, and denoting $\rho \Leftarrow \rho_{2D}$, reduces to}
+    \left\{ \begin{matrix}
+    \mathrm{d} \eta \\ \mathrm{d} \pi
+    \end{matrix} \right\} & = \begin{bmatrix}
+    C / \theta - 4 M_{\theta} \alpha / \rho & 
+    4 M_{\theta} \alpha / \rho \\
+    -4 M_{\theta} \alpha & 4 M_{\theta}
+    \end{bmatrix} \left\{ \begin{matrix}
+    \mathrm{d} \theta \\ \mathrm{d} \xi
+    \end{matrix} \right\}
+    \label{HelmholtzMembraneODEsUniform}
+    \intertext{while the non-uniform or shear response is described quite simply by}
+    \left\{ \begin{matrix}
+    \mathrm{d} \sigma \\ \mathrm{d} \tau
+    \end{matrix} \right\} & = \begin{bmatrix}
+    2 N_{\gamma} & 0 \\
+    0 & G_{\varepsilon}
+    \end{bmatrix} \left\{ \begin{matrix}
+    \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
+    \end{matrix} \right\}
+    \label{HelmholtzMembraneODEsNonUniform}
+    \end{align}
+\end{subequations}
+which is the general form for a thermo\-elastic membrane that we shall use going forward. 
+
+The numerical method presented in \S\ref{sec:1stOrderPECE} is used to integrate the ODEs of Eqn.~(\ref{HelmholtzMembraneODEs}).
+
+\subsubsection{The Poisson Effect}
+
+The areal modulus $M_{\theta}$ is ideally determined from an equibiaxial experiment.  Assuming knowledge of its value, then given the following definition for Poisson's ratio
+\begin{displaymath}
+\nu \defeq - \frac{\mathrm{d}b / b}{\mathrm{d}a / a}
+\end{displaymath}
+it follows that the squeeze modulus $N_{\gamma}$ can be determined from an uniaxial experiment where traction is applied along that axis from which elongation $a$ is measured; specifically,
+\begin{displaymath}
+N_{\gamma} = \frac{1 - \nu}{1 + \nu} M_{\theta}
+\quad \text{provided that} \quad
+\mathcal{S}_{11} \neq 0 
+\quad \text{and} \quad
+\mathcal{S}_{21} = \mathcal{S}_{22} = 0 
+\end{displaymath}
+and that temperature $\theta$ and shear $g$ are held constant.  Consequently, $\tfrac{1}{3} M_{\theta} \leq N_{\gamma} \leq M_{\theta}$ given that $0 \leq \nu \leq \textfrac{1}{2}$, so the squeeze modulus $N_{\gamma}$ plays an analogous role to the shear modulus $\mu$ of classical elasticity.  
+
+The conjugate pair approach presented here allows for a distinct shear modulus $G_{\varepsilon}$ that can take on any positive value.  This is important because shear experiments done on soft tissues, which are few in number, tend to produce moduli that are many orders in magnitude smaller than their effective bulk modulus, e.g., in parenchyma their ratio is $K/G \approx 10^{4}$ (150~MPa vs.\ 10--54~kPa \cite{Sarafetal07}).  Classically, such a result is used to argue that the material can be modeled, to  good approximation, as being incompressible---a 3D notion.
+
 
 \section{Modeling an Alveolus}
 \label{secAlveolus}
@@ -750,68 +1068,130 @@ Pressure $P$ is mapped to nodal forces at the vertices of a dodecahedron via Eqn
 \section{Finite Element Implementation of Constitutive Equations}
 \label{secFE_CE}
 
-These constitutive models are implemented into our finite element model as hypo\-elastic material models \cite{Truesdell55} described by\footnote{
-    At present, the tangent modulus $\boldsymbol{M}$ is not considered to have an explicit dependence upon time.  In other words, visco\-elastic phenomena cannot be accounted for in the current formulation.
+These constitutive models are implemented into our finite element model as hypo-elastic material models \cite{Truesdell55} described by\footnote{
+    At present, the tangent modulus $\mathbf{M}$ is not considered to have an explicit dependence upon time.  In other words, visco\-elastic phenomena cannot be accounted for in the current formulation.
 }
 \begin{equation}
-\dot{\boldsymbol{\sigma}} = \mathbf{M} \bigl( \boldsymbol{\sigma}, \boldsymbol{\epsilon} ( \boldsymbol{\lambda} ) \bigr) \, \dot{\boldsymbol{\epsilon}} 
-\quad \text{or equivalently} \quad
-\dot{\boldsymbol{\sigma}} = 
-\mathbf{M} \bigl( \boldsymbol{\sigma} , \boldsymbol{\epsilon} ( \boldsymbol{\lambda} ) \bigr) \, \frac{\mathrm{d} \boldsymbol{\epsilon}}
-{\mathrm{d} \boldsymbol{\lambda}} \, \dot{\boldsymbol{\lambda}}
+\mathrm{d} \boldsymbol{\sigma} = \mathbf{M} ( \boldsymbol{\sigma}, \boldsymbol{\epsilon} ) \, \mathrm{d} \boldsymbol{\epsilon} 
+\quad \text{wherein} \quad
+\mathrm{d} \boldsymbol{\epsilon} = 
+\frac{\mathrm{d} \boldsymbol{\varepsilon} ( \boldsymbol{\lambda} )}
+{\mathrm{d} \boldsymbol{\lambda}} \, \mathrm{d} \boldsymbol{\lambda}
+\label{hypoelastic}
 \end{equation}
-where $\boldsymbol{\sigma}$, $\boldsymbol{\epsilon}$ and $\boldsymbol{\lambda}$ are arrays of stress, strain and stretch attributes, respectively, with matrix $\mathbf{M} ( \boldsymbol{\sigma}, \boldsymbol{\epsilon} )$ containing the tangent moduli, i.e., $\mathrm{d} \boldsymbol{\sigma} / \mathrm{d} \boldsymbol{\epsilon}$, that, in general, depend upon the currents states of stress $\boldsymbol{\sigma}$ and strain $\boldsymbol{\epsilon}$, with strain in turn depending upon stretch $\boldsymbol{\lambda}$.  The above constitutive equation is actually integrated for the stress attributes $\boldsymbol{\sigma}$ in the finite element equations themselves.
+where $\boldsymbol{\sigma}$, $\boldsymbol{\epsilon}$ and $\boldsymbol{\lambda}$ are arrays of stress, strain and stretch attributes, respectively, with matrix $\mathbf{M} ( \boldsymbol{\sigma}, \boldsymbol{\epsilon} )$ containing the constitutive tangent moduli, i.e., $\mathrm{d} \boldsymbol{\sigma} / \mathrm{d} \boldsymbol{\epsilon}$, that, in general, may depend upon both stress $\boldsymbol{\sigma}$ and strain $\boldsymbol{\epsilon}$, while strain depends solely upon stretch $\boldsymbol{\lambda}$. 
 
-The strain attributes, either $\boldsymbol{\epsilon}_{2D} ( \boldsymbol{\lambda}_{2D} )$ whereby $\boldsymbol{\lambda}_{2D} = \{ \theta , a , b , \gamma \}^{\mathsf{T}}$ or $\boldsymbol{\epsilon}_{3D} ( \boldsymbol{\lambda}_{3D} )$ whereby $\boldsymbol{\lambda}_{3D} = \{ \theta , a , b , c , \alpha , \beta , \gamma \}^{\mathsf{T}}$, as appropriate, have elements comprised of temperature $\theta$ and a set of physical stretches extracted from the components of Laplace stretch $\boldsymbol{U}$ via
+The two-step PECE algorithm presented in \S\ref{sec:1stOrderPECE} presumes the following information.  There is an initial condition for the thermo\-dynamic stresses $\boldsymbol{\sigma}_0$.  An initial far-field deformation gradient $\mathbfsf{F}_0$ is also known from which initial conditions for the thermo\-dynamic stretches $\boldsymbol{\lambda}_0$ and strains $\boldsymbol{\epsilon}_0$ are readily obtained.  All nodes of integration are to be spaced uniformly in time with $h$ designating their separation in time.  
+
+A far-field deformation gradient is considered to be known at the end of the first integration step, i.e., $\mathbfsf{F}_1$, from which the thermo\-dynamic stretches $\boldsymbol{\lambda}_1$ and strains $\boldsymbol{\epsilon}_1$ are readily calculated, with differential rates $\mathrm{d} \boldsymbol{\lambda}_0$ and $\mathrm{d} \boldsymbol{\lambda}_1$ coming from finite difference formul\ae, while $\mathrm{d} \boldsymbol{\epsilon}_0 = [ \mathrm{d} \boldsymbol{\varepsilon} ( \boldsymbol{\lambda}_0 ) / \mathrm{d} \boldsymbol{\lambda}_0 ] \, \mathrm{d} \boldsymbol{\lambda}_0$ and $\mathrm{d} \boldsymbol{\epsilon}_1 = [ \mathrm{d} \boldsymbol{\varepsilon} ( \boldsymbol{\lambda}_1 ) / \mathrm{d} \boldsymbol{\lambda}_1 ] \, \mathrm{d} \boldsymbol{\lambda}_1$.  Consequently, an initial stress rate can be established, i.e., $\mathrm{d} \boldsymbol{\sigma}_0 = \mathbf{M} ( \boldsymbol{\sigma}_0 , \boldsymbol{\epsilon}_0 ) \, \mathrm{d} \boldsymbol{\epsilon}_0$.  With this information, Heun's method (Eqn.~\ref{startUp1stOrderODEs}) can be called upon to integrate Eqn.~(\ref{hypoelastic}) to determine the thermo\-dynamic stresses and their differential rates out to the end of the first integration step, viz., $\boldsymbol{\sigma}_1$ from which it follows that $\mathrm{d} \boldsymbol{\sigma}_1 = \mathbf{M} ( \boldsymbol{\sigma}_1 , \boldsymbol{\epsilon}_1 ) \, \mathrm{d} \boldsymbol{\epsilon}_1$.    
+
+After this first step, the more stable two-step method of Eqn.~(\ref{1stOrderODEs}) can be called upon to advance a solution for the thermo\-dynamic stresses and their differential rates.  What needs to be stored are variables from the previous step, viz., $\boldsymbol{\sigma}_{n-1}$, $\boldsymbol{\lambda}_{n-1}$ and $\mathrm{d} \boldsymbol{\sigma}_{n-1}$, along with like variables from the current step, viz.,  $\boldsymbol{\sigma}_n$, $\boldsymbol{\lambda}_n$ and $\mathrm{d} \boldsymbol{\sigma}_n$.  Then, given a far-field deformation gradient for the next step, i.e., $\mathbfsf{F}_{n+1}$, one can determine $\boldsymbol{\lambda}_{n+1}$ and $\boldsymbol{\epsilon}_{n+1}$ along with a differential rate $\mathrm{d} \boldsymbol{\lambda}_{n+1}$ obtained from finite difference formul\ae, after which $\mathrm{d} \boldsymbol{\epsilon}_{n+1} = [ \mathrm{d} \boldsymbol{\varepsilon} ( \boldsymbol{\lambda}_{n+1} ) / \mathrm{d} \boldsymbol{\lambda}_{n+1} ] \, \mathrm{d} \boldsymbol{\lambda}_{n+1}$.  With this information, the PECE method (Eqn.~\ref{1stOrderODEs}) can be called upon to integrate Eqn.~(\ref{hypoelastic}) to determine the thermo\-dynamic stresses and their differential rates out to the end of the next integration step, viz., $\boldsymbol{\sigma}_{n+1}$ along with $\mathrm{d} \boldsymbol{\sigma}_{n+1} = \mathbf{M} ( \boldsymbol{\sigma}_{n+1} , \boldsymbol{\epsilon}_{n+1} ) \, \mathrm{d} \boldsymbol{\epsilon}_{n+1}$.
+
+\subsection{Laplace Stretch and Stretch Rates}
+
+The thermo\-dynamic strains in 1D are: $\boldsymbol{\epsilon}_{1D} ( \boldsymbol{\lambda}_{1D} )$ with stretches $\boldsymbol{\lambda}_{1D} = \{ \theta , \lambda \}^{\mathsf{T}}$; in 2D are: $\boldsymbol{\epsilon}_{2D} ( \boldsymbol{\lambda}_{2D} )$ with stretches $\boldsymbol{\lambda}_{2D} = \{ \theta , a , b , g \}^{\mathsf{T}}$; and in 3D are: $\boldsymbol{\epsilon}_{3D} ( \boldsymbol{\lambda}_{3D} )$ with stretches $\boldsymbol{\lambda}_{3D} = \{ \theta , a , b , c , \alpha , \beta , \gamma \}^{\mathsf{T}}$, which apply to the alveolar chords, septa and sac, respectively.  They have elements comprised of temperature $\theta$ and a set of physical stretches that, in the 2 and 3D cases are extracted from components of the Laplace stretch $\boldsymbol{\mathcal{U}}$ as
 \begin{equation}
-\boldsymbol{U}_{2D} = 
+\boldsymbol{\mathcal{U}}_{2D} = 
 \begin{bmatrix} 
-a & a \gamma \\ 0 & b 
+a & a g \\ 0 & b 
 \end{bmatrix}
-\quad \text{and} \quad 
-\boldsymbol{U}_{3D} = 
+\quad \text{or} \quad 
+\boldsymbol{\mathcal{U}}_{3D} = 
 \begin{bmatrix}
 a & a \gamma & a \beta \\ 0 & b & b \alpha \\ 0 & 0 & c
 \end{bmatrix}
 \label{LaplaceStretch}
 \end{equation}
-with components $U_{ij}$ evaluated according to the formul\ae\
+where the 3D components of $\mathcal{U}_{ij}$ are evaluated according to the formul\ae\
 \begin{equation}
 \begin{aligned}
-U_{11} & = \sqrt{C_{11}} & 
-U_{12} & = C_{12} / U_{11} &
-U_{13} & = C_{13} / U_{11} \\
-U_{21} & = 0 &
-U_{22} & = \sqrt{C_{22} - U_{12}^{\,2}} &
-U_{23} & = \bigl( C_{23} - U_{12\,}U_{13} \bigr) / U_{22} \\
-U_{31} & = 0 &
-U_{32} & = 0 & 
-U_{33} & = \sqrt{C_{33} - U_{13}^{\,2} - U_{23}^{\,2}}
+\mathcal{U}_{11} & = \sqrt{C_{11}} & 
+\mathcal{U}_{12} & = C_{12} / \, \mathcal{U}_{11} &
+\mathcal{U}_{13} & = C_{13} / \, \mathcal{U}_{11} \\
+\mathcal{U}_{21} & = 0 &
+\mathcal{U}_{22} & = \sqrt{C_{22} - \mathcal{U}_{12}^{\,2}} &
+\mathcal{U}_{23} & = \bigl( C_{23} - \mathcal{U}_{12\,} \mathcal{U}_{13} \bigr) / \, \mathcal{U}_{22} \\
+\mathcal{U}_{31} & = 0 &
+\mathcal{U}_{32} & = 0 & 
+\mathcal{U}_{33} & = \sqrt{C_{33} - \mathcal{U}_{13}^{\,2} - \mathcal{U}_{23}^{\,2}}
 \end{aligned}
 \label{LagrangianLaplaceStretch}
 \end{equation}
 so that
 \begin{equation}
-a \defeq U_{11} , \quad
-b \defeq U_{22} , \quad
-c \defeq U_{33} , \quad
-\alpha \defeq \frac{U_{23}}{U_{22}} , \quad
-\beta \defeq \frac{U_{13}}{U_{11}} , \quad
-\gamma \defeq \frac{U_{12}}{U_{11}}
+a \defeq \mathcal{U}_{11} , \quad
+b \defeq \mathcal{U}_{22} , \quad
+c \defeq \mathcal{U}_{33} , \quad
+\alpha \defeq \frac{\mathcal{U}_{23}}{\mathcal{U}_{22}} , \quad
+\beta \defeq \frac{\mathcal{U}_{13}}{\mathcal{U}_{11}} , \quad
+\gamma \defeq \frac{\mathcal{U}_{12}}{\mathcal{U}_{11}}
 \label{LagrangianPhysicalAttributes}
 \end{equation}
-wherein $\mathbf{C} = \mathbf{F}^{\mathsf{F}} \mathbf{F}$ is the right Cauchy-Green deformation tensor.  Attributes $a$, $b$ and $c$ are elongation ratios, while attributes $\alpha$, $\beta$ and $\gamma$ are extents of shear. Components for $\boldsymbol{U}_{2D}$ associate with the upper-left $2 \! \times \! 2$ submatrix of the above matrix elements. 
+wherein $\mathbfsf{C} = \mathbfsf{F}^{\mathsf{T}} \mathbfsf{F}$ is the right Cauchy-Green deformation tensor.  Attributes $a$, $b$ and $c$ are elongation ratios, while attributes $\alpha$, $\beta$ and $\gamma$ are extents of shear, cf.\ \S\ref{secQR3D}.  Components for $\boldsymbol{\mathcal{U}}_{2D}$ associate with the upper-left $2 \! \times \! 2$ sub-matrix of the above matrix, cf.\ \S\ref{secQR}. 
 
-\subsection{Thermodynamic Strains}
+The following differential rates for stretch $\{ \mathrm{d} a , \mathrm{d} b , \mathrm{d} g \}^{\mathsf{T}}$ and $\{ \mathrm{d} a , \mathrm{d} b , \mathrm{d} c , \mathrm{d} \alpha , \mathrm{d} \beta , \mathrm{d} \gamma \}^{\mathsf{T}}$ were derived by Freed \&\ Zamani \cite{FreedZamani18}.  They populate the right-hand vectors in Eqn.~(\ref{strainGradient}).
 
-In 2D, the strain attributes $\boldsymbol{\epsilon}_{2D}  = \{ \theta , \xi , \varepsilon , \gamma \}^{\mathsf{T}}$ that are used in our analysis are given by
+A forward difference formula is used to approximate the initial differential rates for stretch, as obtained from $\dot{\boldsymbol{\mathcal{U}}}_0 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / h + \mathcal{O}(h)$, thereby resulting in formul\ae\
+\begin{equation}
+\begin{aligned}
+\mathrm{d} a_0 & = \frac {a_1 - a_0}{h} \quad &
+\mathrm{d} \alpha_0 & 
+= \frac{b_1}{b_0} \left(\frac{\alpha_1 - \alpha_0}{h} \right) \\
+\mathrm{d} b_0 & = \frac {b_1 - b_0}{h} \quad & 
+\mathrm{d} \beta_0 & 
+= \frac{a_1}{a_0} \left( \frac{\beta_1 - \beta_0}{h} \right) \\
+\mathrm{d} c_0 & = \frac {c_1 - c_0}{h} \quad & 
+\mathrm{d} \gamma_0 & 
+= \frac{a_1}{a_0} \left( \frac{\gamma_1 - \gamma_0}{h} \right)
+\end{aligned}
+\label{forwardDifference1stOrder}
+\end{equation}
+while a backward difference formula $\dot{\boldsymbol{\mathcal{U}}}_1 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / h + \mathcal{O}(h)$ is used to estimate the differential rates for stretch at the end of its first integration step, from which it follows that
+\begin{equation}
+\begin{aligned}
+\mathrm{d} a_1 & = \frac {a_1 - a_0}{h} \;\; & 
+\mathrm{d} \alpha_1 & 
+= \frac {b_0}{b_1} \left( \frac{\alpha_1 - \alpha_0}{h} \right) \\
+\mathrm{d} b_1 & = \frac {b_1 - b_0}{h} \;\; & 
+\mathrm{d} \beta_1 & 
+= \frac {a_0} {a_1} \left( \frac{\beta_1 - \beta_0}{h} \right) \\
+\mathrm{d} c_1 & = \frac {c_1 - c_0}{h} \;\; & 
+\mathrm{d} \gamma_1 & 
+= \frac{a_0}{a_1} \left(\frac{\gamma_1 - \gamma_0}{h} \right)
+\end{aligned}
+\label{backwardDifference1stOrder}
+\end{equation}
+with there being a distinction in how the shear rates are approximated at the end points of this first interval of integration.  1D and 2D are special cases of 3D.
+
+Equations (\ref{forwardDifference1stOrder} \& \ref{backwardDifference1stOrder}) are first-order approximations for these derivatives.  Second-order approximations can be established whenever $n > 0$ provided the stepsize for step $[n, n+1]$ equals the stepsize for step $[n-1, n]$, where state $n=0$ associates with an initial condition.  The backward difference formula  $\dot{\boldsymbol{\mathcal{U}}}_{n+1} = ( 3 \, \boldsymbol{\mathcal{U}}_{n+1} -  4 \, \boldsymbol{\mathcal{U}}_{n} + \boldsymbol{\mathcal{U}}_{n-1} ) / 2h + \mathcal{O}(h^2)$ thereby produces the following differential rates for stretch
+\begin{equation}
+\begin{aligned}
+\mathrm{d} a_{n+1} & = \frac {3a_{n+1} - 4a_{n} +  a_{n-1}}{2h} \\ 
+\mathrm{d} b_{n+1} & = \frac {3b_{n+1} - 4b_{n} +  b_{n-1}}{2h} \\
+\mathrm{d} c_{n+1} & = \frac {3c_{n+1} - 4c_{n} +  c_{n-1}}{2h} \\
+\mathrm{d} \alpha_{n+1} & 
+= \frac{2b_{n}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n}}{h} \right) - \frac{b_{n-1}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n-1}}{2h} \right) \\
+\mathrm{d} \beta_{n+1} & 
+= \frac{2a_{n}}{a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n} }{h} \right) - \frac{a_{n-1}} {a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n-1}}{2h} \right) \\ 
+\mathrm{d} \gamma_{n+1} & 
+= \frac{2a_{n}} {a_{n+1}} \left(\frac{\gamma_{n+1} - \gamma_{n}}{h} \right) - \frac{a_{n-1}}{a_{n+1}} \left( \frac{\gamma_{n+1} - \gamma_{n-1}}{2h} \right) 
+\end{aligned}
+\label{backwardDifference2ndOrder}
+\end{equation}
+which require arrays $\boldsymbol{\lambda}_{n-1}$ and $\boldsymbol{\lambda}_n$ to be stored, with $\boldsymbol{\lambda}_{n+1}$ coming from $\boldsymbol{\mathcal{U}}_{n+1}$.
+
+\subsection{Thermodynamic Strains and Strain Rates}
+
+In 1D, the strain attribute $\boldsymbol{\epsilon}_{1D}  = \{ \theta , e \}^{\mathsf{T}}$ used in our analysis is
 \begin{subequations}
     \label{thermodynamicStrains}
     \begin{align}
+    \mbox{} & & e & = \ln ( L / L_0 ) & & \\
+    \intertext{where $\theta$ is temperature, $e$ is strain, and $L_0$ is a gage length.  In 2D, the strain attributes $\boldsymbol{\epsilon}_{2D}  = \{ \theta , \xi , \varepsilon , \gamma \}^{\mathsf{T}}$ used in our analysis are}
     \xi & = \ln \left( \sqrt{\frac{ab}{a_0 b_0}} \right) &
     \varepsilon & = \ln \left( \sqrt{ \frac{a}{a_0} \frac{b_0}{b} } \right) &
-    \gamma & = \gamma - \gamma_0 \\
-    \intertext{where $\theta$ denotes temperature, $\xi$ denotes dilation, $\varepsilon$ denotes pure shear, and $\gamma$ denotes simple shear.  In 3D, the strain attributes $\boldsymbol{\epsilon}_{3D} = \{ \theta , \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3  \}^{\mathsf{T}}$ become}
+    \gamma & = g - g_0 \\
+    \intertext{where $\theta$ denotes temperature, $\xi$ denotes dilation, $\varepsilon$ denotes pure shear, and $\gamma$ denotes simple shear.  In 3D, the strain attributes $\boldsymbol{\epsilon}_{3D} = \{ \theta , \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3  \}^{\mathsf{T}}$ used in our analysis are}
     \Xi & = \ln \left( \sqrt[3]{\frac{abc}{a_0 b_0 c_0}} \right) &
     \varepsilon_1 & = \ln \left( \sqrt[3]{\frac{a}{a_0} \frac{b_0}{b}} \right) &
     \varepsilon_2 & = \ln \left( \sqrt[3]{\frac{b}{b_0} \frac{c_0}{c}} \right) \notag \\
@@ -820,21 +1200,34 @@ In 2D, the strain attributes $\boldsymbol{\epsilon}_{2D}  = \{ \theta , \xi , \v
     \gamma_3 & = \gamma - \gamma_0
     \end{align}
 \end{subequations}
-where $\theta$ denotes temperature, $\Xi$ denotes dilatation, $\varepsilon_1$ denotes a squeeze in the 12~plane, $\varepsilon_2$ denotes a squeeze in the 23-plane, while $\gamma_1$, $\gamma_2$ and $\gamma_3$ are three orthogonal simple shears.  From these definitions for thermo\-dynamic strains, one determines that
+where $\theta$ denotes temperature, $\Xi$ denotes dilatation, $\varepsilon_1$ denotes a squeeze in the 12~plane, $\varepsilon_2$ denotes a squeeze in the 23-plane, while $\gamma_1$, $\gamma_2$ and $\gamma_3$ are three orthogonal simple shears.  
+
+From these definitions for thermo\-dynamic strain, one determines in the 1D case that
 \begin{subequations}
     \label{strainGradient}
     \begin{align}
     \left\{ \begin{matrix}
-    \dot{\theta} \\ \dot{\xi} \\ \dot{\varepsilon} \\ \dot{\gamma}
+    \mathrm{d} \theta \\ \mathrm{d} e
+    \end{matrix} \right\} & = \begin{bmatrix}
+    1 & 0 \\ 0 & 1/L
+    \end{bmatrix} \left\{ \begin{matrix}
+    \mathrm{d} \theta \\ \mathrm{d} L
+    \end{matrix} \right\} \\
+    \intertext{and in the 2D case that}
+    \left\{ \begin{matrix}
+    \mathrm{d} \theta \\ \mathrm{d} \xi \\ 
+    \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
     \end{matrix} \right\} & = \begin{bmatrix}
     1 & 0 & 0 & 0 \\ 0 & 1/2a & 1/2b & 0 \\ 0 & 1/2a & -1/2b & 0 \\ 0 & 0 & 0 & 1
     \end{bmatrix} \left\{ \begin{matrix}
-    \dot{\theta} \\ \dot{a} \\ \dot{b} \\ \dot{\gamma}
+    \mathrm{d} \theta \\ \mathrm{d} a \\ 
+    \mathrm{d} b \\ \mathrm{d} g
     \end{matrix} \right\} \\
-    \intertext{and}
+    \intertext{while in the 3D case}
     \left\{ \begin{matrix}
-    \dot{\theta} \\ \dot{\Xi} \\ \dot{\varepsilon}_1 \\ \dot{\varepsilon}_2 \\ 
-    \dot{\gamma}_1 \\ \dot{\gamma}_2 \\ \dot{\gamma}_3
+    \mathrm{d} \theta \\ \mathrm{d} \Xi \\ 
+    \mathrm{d} \varepsilon_1 \\ \mathrm{d} \varepsilon_2 \\ 
+    \mathrm{d} \gamma_1 \\ \mathrm{d} \gamma_2 \\ \mathrm{d} \gamma_3
     \end{matrix} \right\} & = \begin{bmatrix}
     1 & 0 & 0 & 0 & 0 & 0 & 0 \\
     0 & 1/3a & 1/3b & 1/3c & 0 & 0 & 0 \\ 
@@ -844,75 +1237,40 @@ where $\theta$ denotes temperature, $\Xi$ denotes dilatation, $\varepsilon_1$ de
     0 & 0 & 0 & 0 & 0 & 1 & 0 \\
     0 & 0 & 0 & 0 & 0 & 0 & 1
     \end{bmatrix} \left\{ \begin{matrix}
-    \dot{\theta} \\ \dot{a} \\ \dot{b} \\ \dot{c} \\ 
-    \dot{\alpha} \\ \dot{\beta} \\ \dot{\gamma}
+    \mathrm{d} \theta \\ \mathrm{d} a \\ \mathrm{d} b \\ 
+    \mathrm{d} c \\ \mathrm{d} \alpha \\ \mathrm{d} \beta \\ \mathrm{d} \gamma
     \end{matrix} \right\}
     \end{align}
 \end{subequations}
-where we see that the matrices $\mathrm{d} \boldsymbol{\epsilon} / \mathrm{d} \boldsymbol{\lambda}$ depend upon elongations $a$, $b$ and, in the 3D case, $c$.
+which establish $\mathrm{d} \boldsymbol{\epsilon} = [ \mathrm{d} \boldsymbol{\varepsilon} ( \boldsymbol{\lambda} ) / \mathrm{d} \boldsymbol{\lambda} ] \, \mathrm{d} \boldsymbol{\lambda}$, as they appear in our general, hypo-elastic, constitutive equation (\ref{hypoelastic}).  The matrices in these formul\ae\ depend upon various measures of length.
 
-\subsection{Stretch Rates}
+\subsection{Thermodynamic Stresses}
 
-The following approximations for stretch rates $\{ \dot{a} , \dot{b} , \dot{\gamma} \}^{\mathsf{T}}$ and $\{ \dot{a} , \dot{b} , \dot{c} , \dot{\alpha} , \dot{\beta} , \dot{\gamma} \}^{\mathsf{T}}$ were derived by Freed \&\ Zamani \cite{FreedZamani18}.  They populate the right-hand vectors in Eqn.~(\ref{strainGradient}).
+The thermo\-dynamic stresses are updated by integrating the constitutive equation (\ref{hypoelastic}).  
 
-A forward difference formula is used to approximate rates for the various stretch attributes, as obtained from $\dot{\boldsymbol{U}}_0 = ( \boldsymbol{U}_1 -  \boldsymbol{U}_0 ) / h + \mathcal{O}(h)$, thereby resulting in the following formul\ae\
+For 1D septal chords, this constitutive equation takes on the form of 
 \begin{equation}
-\begin{aligned}
-\dot{a}_0 &
-\approx \frac {a_1 - a_0}{h} \quad &
-\dot{\alpha}_0 & 
-\approx \frac{b_1}{b_0} \left(\frac{\alpha_1 - \alpha_0}{h} \right) \\
-\dot{b}_0 & 
-\approx \frac {b_1 - b_0}{h} \quad & 
-\dot{\beta}_0 & 
-\approx \frac{a_1}{a_0} \left( \frac{\beta_1 - \beta_0}{h} \right) \\
-\dot{c}_0 & 
-\approx \frac {c_1 - c_0}{h} \quad & 
-\dot{\gamma}_0 & \approx \frac{a_1}{a_0} \left( \frac{\gamma_1 - \gamma_0}{h}\right)
-\end{aligned}
-\label{forwardDifference1stOrder}
+    \left\{ \begin{matrix}
+    \mathrm{d} \eta \\ \mathrm{d} s
+    \end{matrix} \right\} = \begin{bmatrix}
+    C / \theta - E \alpha^2 / \rho & E \alpha / \rho \\
+    -E \alpha & E
+    \end{bmatrix} \left\{ \begin{matrix}
+    \mathrm{d} \theta \\ \mathrm{d} e
+    \end{matrix} \right\}
 \end{equation}
-while a backward difference formula $\dot{\boldsymbol{U}}_1 = ( \boldsymbol{U}_1 -  \boldsymbol{U}_0 ) / h + \mathcal{O}(h)$ is used to estimate rates for the various stretch attributes at the end of its first integration step, from which it follows that
+where $\theta$ is temperature, $\eta$ is entropy density, $e$ is chordal strain, and $s$ is chordal stress (per unit reference area).  These thermo\-dynamic variables are related via material parameters: $\rho$ is the mass density, $C$ is specific heat at constant pressure, $\alpha$ is the linear coefficient of thermal expansion, and $E$ is the elastic tangent modulus.  In general, $C$, $\alpha$ and $E$ vary with temperature $\theta$.  In addition, modulus $E$ can depend upon stress $s$ and strain $e$.  It follows that the Cauchy stress has components
 \begin{equation}
-\begin{aligned}
-\dot{a}_1 & 
-\approx \frac {a_1 - a_0}{h} \;\; & 
-\dot{\alpha}_1 & 
-\approx \frac {b_0}{b_1} \left( \frac{\alpha_1 - \alpha_0}{h} \right) \\
-\dot{b}_1 & 
-\approx \frac {b_1 - b_0}{h} \;\; & 
-\dot{\beta}_1 & 
-\approx \frac {a_0} {a_1} \left( \frac{\beta_1 - \beta_0}{h} \right) \\
-\dot{c}_1 & 
-\approx \frac {c_1 - c_0}{h} \;\; & 
-\dot{\gamma}_1 & 
-\approx \frac{a_0}{a_1} \left(\frac{\gamma_1 - \gamma_0}{h} \right)
-\end{aligned}
-\label{backwardDifference1stOrder}
+    \boldsymbol{\mathcal{T}} = \begin{bmatrix}
+    s & 0 & 0 \\
+    0 & 0 & 0 \\
+    0 & 0 & 0
+    \end{bmatrix}
 \end{equation}
-with there being a distinction in how the shear rates are approximated at the end points of this first interval of integration.  2D is an obvious special case of 3D.
-
-Equations (\ref{forwardDifference1stOrder} \& \ref{backwardDifference1stOrder}) are first-order approximations for these derivatives.  Second-order approximations can be established whenever $n > 0$ provided the stepsize for step $[n, n+1]$ equals the stepsize for step $[n-1, n]$, where state $n=0$ associates with an initial condition.  The backward difference formula  $\dot{\boldsymbol{U}}_{n+1} = ( 3 \, \boldsymbol{U}_{n+1} -  4 \, \boldsymbol{U}_{n} + \boldsymbol{U}_{n-1} ) / 2h + \mathcal{O}(h^2)$ produces stretch rates of
-\begin{equation}
-\begin{aligned}
-\dot{a}_{n+1} & 
-\approx \frac {3a_{n+1} - 4a_{n} +  a_{n-1}}{2h} \\ 
-\dot{b}_{n+1} & 
-\approx \frac {3b_{n+1} - 4b_{n} +  b_{n-1}}{2h} \\
-\dot{c}_{n+1} & 
-\approx \frac {3c_{n+1} - 4c_{n} +  c_{n-1}}{2h} \\
-\dot{\alpha}_{n+1} & 
-\approx \frac{2b_{n}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n}}{h} \right) - \frac{b_{n-1}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n-1}}{2h} \right) \\
-\dot{\beta}_{n+1} & 
-\approx \frac{2a_{n}}{a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n} }{h} \right) - \frac{a_{n-1}} {a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n-1}}{2h} \right) \\ 
-\dot{\gamma}_{n+1} & 
-\approx \frac{2a_{n}} {a_{n+1}} \left(\frac{\gamma_{n+1} - \gamma_{n}}{h} \right) - \frac{a_{n-1}}{a_{n+1}} \left( \frac{\gamma_{n+1} - \gamma_{n-1}}{2h} \right) 
-\end{aligned}
-\label{backwardDifference2ndOrder}
-\end{equation}
-which require $\boldsymbol{\lambda}_{n-1}$ to be stored.
+when evaluated in the co-ordinate frame of a septal chord, as illustrated in Fig.~\ref{figchord}.
 
 \section{Code Verification and Constitutive Parameterization}
+\label{secCE_verifyCode}
 
 All material parameters are assigned from their respective statistical distributions.  For example, there are thirty chords in a dodecahedron comprised of collagen and elastin fibers that are loaded in parallel.  Figure~\ref{figStressStrainFibers} presents a typical set of stress\slash strain response curves for the chords of a dodecahedron whose parameters are displayed in Table~\ref{tabStressStrainFibers}.
 

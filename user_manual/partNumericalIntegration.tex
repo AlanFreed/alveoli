@@ -10,6 +10,7 @@ The various constitutive equations that describe our alveolar model present them
 Time $t$ is considered to be the independent variable, discretized over an interval in time $[t_0, t_N]$ for which $N$ solutions are to be extracted at nodes $n=1, 2, \ldots, N$ spaced at uniform intervals in time with a common step size of $h = (t_N - t_0)/N$ separating them, where time $t_0$ associates with the initial conditions.  This is the \textit{global step size\/} at which solutions are to be gathered.  A dynamically controlled \textit{local step size}, whose size is adjusted on the fly to manage truncation error, is implemented into the code according to a scheme put forward in Ref.~\cite{Soderlind02}.  Solver interfaces are listed in \ref{appSolvers}.
 
 \subsection{PECE Solver for First-Order ODEs}
+\label{sec:1stOrderPECE}
 
 Let $\mathbf{x}$ be a vector of dependent variables obeying a differential equation of evolution $\mathrm{d} \mathbf{x}(t) / \mathrm{d} t = \dot{\mathbf{x}} = \mathbf{f} (t, \mathbf{x})$ subject to an initial condition $\mathbf{x}_0 = \mathbf{x}(t_0)$ where $t$ is the independent variable, typically time, but not in our case.
 
@@ -69,68 +70,71 @@ For both the predictor and corrector, solution $\mathbf{x}$ has a weight of 1, w
 
 \subsection{A Relevant Example}
 
-In our finite element implementation, a hypo\-elastic material model \cite{Truesdell55} is introduced to describe the constitutive response of an alveolus in that
+In our finite element implementation, a hypo-elastic material model \cite{Truesdell55} is introduced to describe the constitutive response of an alveolus in that
 \begin{displaymath}
-    \dot{\mathbf{T}} = \mathbf{M} ( \mathbf{E} , \mathbf{T} ) \, \dot{\mathbf{E}} 
+    \dot{\boldsymbol{\sigma}} = \mathbf{M} ( \boldsymbol{\sigma} , \boldsymbol{\epsilon} ) \, \dot{\boldsymbol{\epsilon}} 
     \quad \text{or equivalently \cite{Noll55}} \quad
-    \mathrm{d} \mathbf{T} = \mathbf{M} ( \mathbf{E} , \mathbf{T} ) \, \mathrm{d} \mathbf{E}
+    \mathrm{d} \boldsymbol{\sigma} = \mathbf{M} ( \boldsymbol{\sigma} , \boldsymbol{\epsilon} ) \, \mathrm{d} \boldsymbol{\epsilon}
 \end{displaymath} 
-where $\mathbf{E}$ is a vector of thermo\-dynamic strains, $\mathbf{T}$ is a vector of thermo\-dynamic stresses, and $\mathbf{M}$ is a square matrix comprised of their tangent moduli, which can depend both upon stress and strain.  In our application, the thermo\-dynamic stress attributes are 
+where $\boldsymbol{\epsilon}$ is a vector of thermo\-dynamic strains, $\boldsymbol{\sigma}$ is a vector of thermo\-dynamic stresses, and $\mathbf{M}$ is a square matrix comprised of their tangent moduli, which can depend both upon stress and strain.  In our application, the thermo\-dynamic stress attributes are 
 \begin{displaymath}
-   \mathbf{T}_{1D} = \{ \eta , s \} , \quad
-   \mathbf{T}_{2D} = \{ \eta , s^{\pi} , s^{\sigma} , s^{\tau} \}^{\mathsf{T}} , \quad
-   \mathbf{T}_{3D} = \{ \eta , s^{p} , s^{\sigma_1} , s^{\sigma_2} , s^{\tau_1} , s^{\tau_2} , s^{\tau_3} \}^{\mathsf{T}}
+   \boldsymbol{\sigma}_{1D} = \{ \eta , s \} , \quad
+   \boldsymbol{\sigma}_{2D} = \{ \eta , s^{\pi} , s^{\sigma} , s^{\tau} \}^{\mathsf{T}} , \quad
+   \boldsymbol{\sigma}_{3D} = \{ \eta , s^{p} , s^{\sigma_1} , s^{\sigma_2} , s^{\tau_1} , s^{\tau_2} , s^{\tau_3} \}^{\mathsf{T}}
 \end{displaymath}
 where $\eta$ is entropy and the $s$'s are stresses, whose thermo\-dynamic conjugates are the strain attributes
 \begin{displaymath}
-\mathbf{E}_{1D} = \{ \theta , e \} , \quad
-\mathbf{E}_{2D} = \{ \theta , e^{\xi} , e^{\varepsilon} , e^{\gamma} \}^{\mathsf{T}} , \quad
-\mathbf{E}_{3D} = \{ \theta , e^{\Xi} , e^{\varepsilon_1} , e^{\varepsilon_2} , e^{\gamma_1} , e^{\gamma_2} , e^{\gamma_3} \}^{\mathsf{T}}
+\boldsymbol{\epsilon}_{1D} = \{ \theta , e \} , \quad
+\boldsymbol{\epsilon}_{2D} = \{ \theta , e^{\xi} , e^{\varepsilon} , e^{\gamma} \}^{\mathsf{T}} , \quad
+\boldsymbol{\epsilon}_{3D} = \{ \theta , e^{\Xi} , e^{\varepsilon_1} , e^{\varepsilon_2} , e^{\gamma_1} , e^{\gamma_2} , e^{\gamma_3} \}^{\mathsf{T}}
 \end{displaymath}
-where $\theta$ is temperature and the $e$'s are strains.  In the 2- and 3-D cases, these stress-strain attributes arise from Gram-Schmidt decompositions of the deformation gradient (cf.\ \S\ref{secQR2D}, \S\ref{secConjugatePairs} and \S\ref{secFE_CE}).  Constructing tangent moduli $\mathbf{M} ( \mathbf{E} , \mathbf{T} )$ is the topic of Part~\ref{partConstitutive}.  In the above problem, the thermo\-dynamic strains $\mathbf{E}$ and their rates $\dot{\mathbf{E}}$ are known, it is their stresses $\mathbf{T}$ that must be integrated.  Both $\mathbf{T}$ and $\mathrm{d} \mathbf{T} = \mathbf{M} \, \mathrm{d} \mathbf{E}$ arise in the construction of our stiffness matrices, cf.\ \S\ref{secStiffnessMatrices}.
+where $\theta$ is temperature and the $e$'s are strains.  In the 2- and 3-D cases, these stress-strain attributes arise from Gram-Schmidt decompositions of the deformation gradient (cf.\ \S\ref{secQR2D}, \S\ref{secConjugatePairs} and \S\ref{secFE_CE}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\sigma} , \boldsymbol{\epsilon} )$ is the topic of Part~\ref{partConstitutive}.  In the above problem, the thermo\-dynamic strains $\boldsymbol{\epsilon}$ and their differential rates $\mathrm{d} \boldsymbol{\epsilon}$ are known, it is their stresses $\boldsymbol{\sigma}$ that must be integrated.  Both $\boldsymbol{\sigma}$ and $\mathrm{d} \boldsymbol{\sigma} = \mathbf{M} \, \mathrm{d} \boldsymbol{\epsilon}$ arise in the construction of our stiffness matrices, cf.\ \S\ref{secStiffnessMatrices}.
 
 Equation (\ref{startUp1stOrderODEs}) is used to take the first step of integration; specifcally, 
 \begin{subequations}
     \notag
     \begin{align}
     \mbox{} & \text{Predict} & 
-    \mathbf{T}_1^p & = \mathbf{T}_0 + h \dot{\mathbf{T}}_0 \\
+    \boldsymbol{\sigma}_1^p & = \boldsymbol{\sigma}_0 + h \, \mathrm{d} \boldsymbol{\sigma}_0 \\
     \mbox{} & \text{Evaluate} & 
-    \dot{\mathbf{T}}^p_1 & = \mathbf{M} ( \mathbf{E}_1 , \mathbf{T}_1^p ) \cdot 
-    \dot{\mathbf{E}}_1 \\
+    \mathrm{d} \boldsymbol{\sigma}^p_1 & = \mathbf{M} ( \boldsymbol{\sigma}_1^p ,
+    \boldsymbol{\epsilon} ) \, \mathrm{d} \boldsymbol{\epsilon}_1 \\
     \mbox{} & \text{Correct} &
-    \mathbf{T}_1 & = \mathbf{T}_0 + \tfrac{1}{2} h 
-    \bigl( \dot{\mathbf{T}}_1^p + \dot{\mathbf{T}}_0 \bigr) \\
+    \boldsymbol{\sigma}_1 & = \boldsymbol{\sigma}_0 + \tfrac{1}{2} h 
+    \bigl( \mathrm{d} \boldsymbol{\sigma}_1^p + 
+    \mathrm{d} \boldsymbol{\sigma}_0 \bigr) \\
     \mbox{} & \text{Re-Evaluate} & 
-    \dot{\mathbf{T}}_1 & = \mathbf{M} ( \mathbf{E}_1 , \mathbf{T}_1) \cdot 
-    \dot{\mathbf{E}}_1
+    \mathrm{d} \boldsymbol{\sigma}_1 & = \mathbf{M} ( \boldsymbol{\sigma}_1 , 
+    \boldsymbol{\epsilon}_1) \, \mathrm{d} \boldsymbol{\epsilon}_1
     \end{align}
 \end{subequations}
-where $\dot{\mathbf{T}}_0 = \mathbf{M} ( \mathbf{E}_0 , \mathbf{T}_0) \cdot 
-\dot{\mathbf{E}}_0$, with the remaining steps of integration following according to Eqn.~(\ref{1stOrderODEs}), specifically
+where $\mathrm{d} \boldsymbol{\sigma}_0 = \mathbf{M} ( \boldsymbol{\sigma}_0 , \boldsymbol{\epsilon}_0) \, \mathrm{d} \boldsymbol{\epsilon}_0$, with the remaining steps of integration following according to Eqn.~(\ref{1stOrderODEs}), specifically
 \begin{subequations}
     \notag
     \begin{align}
     \mbox{} & \text{Predict} & 
-    \mathbf{T}_{n+1}^p & = \tfrac{1}{3} 
-    \bigl( 4 \mathbf{T}_n - \mathbf{T}_{n-1} \bigr) + 
-    \tfrac{2}{3} h \bigl( 2 \dot{\mathbf{T}}_n - \dot{\mathbf{T}}_{n-1} 
-    \bigr) \\
+    \boldsymbol{\sigma}_{n+1}^p & = \tfrac{1}{3} 
+    \bigl( 4 \boldsymbol{\sigma}_n - \boldsymbol{\sigma}_{n-1} \bigr) + 
+    \tfrac{2}{3} h \bigl( 2 \, \mathrm{d} \boldsymbol{\sigma}_n - 
+    \mathrm{d} \boldsymbol{\sigma}_{n-1} \bigr) \\
     \mbox{} & \text{Evaluate} & 
-    \dot{\mathbf{T}}^p_{n+1} & = \mathbf{M} ( \mathbf{E}_{n+1} , \mathbf{T}_{n+1}^p ) \cdot \dot{\mathbf{E}}_{n+1} \\
+    \mathrm{d} \boldsymbol{\sigma}^p_{n+1} & = \mathbf{M} ( \boldsymbol{\sigma}_{n+1}^p , \boldsymbol{\epsilon}_{n+1} ) \, 
+    \mathrm{d} \boldsymbol{\epsilon}_{n+1} \\
     \mbox{} & \text{Correct} &
-    \mathbf{T}_{n+1} & = \tfrac{1}{3} 
-    \bigl( 4 \mathbf{T}_n - \mathbf{T}_{n-1} \bigr) + 
-    \tfrac{2}{3} h \dot{\mathbf{T}}^{p}_{n+1}  \\
+    \boldsymbol{\sigma}_{n+1} & = \tfrac{1}{3} 
+    \bigl( 4 \boldsymbol{\sigma}_n - \boldsymbol{\sigma}_{n-1} \bigr) + 
+    \tfrac{2}{3} h \, \mathrm{d} \boldsymbol{\sigma}^{p}_{n+1}  \\
     \mbox{} & \text{Re-Evaluate} & 
-    \dot{\mathbf{T}}_{n+1} & = \mathbf{M} ( \mathbf{E}_{n+1} , \mathbf{T}_{n+1} )  
-    \cdot \dot{\mathbf{E}}_{n+1}
+    \mathrm{d} \boldsymbol{\sigma}_{n+1} & = \mathbf{M} ( 
+    \boldsymbol{\sigma}_{n+1} , \boldsymbol{\epsilon}_{n+1} )  \,
+    \mathrm{d} \boldsymbol{\epsilon}_{n+1}
     \end{align}
 \end{subequations} 
-where the strain rates $\dot{\mathbf{E}}$ are approximated via finite differences according to \S\ref{secFE_CE}.
+where the differential strain rates $\mathrm{d} \boldsymbol{\epsilon}$ are computed via finite differences according to \S\ref{secFE_CE}.
 
 
 \subsection{PECE Solver for Second-Order ODEs}
+\label{sec:2ndOrderPECE}
 
 Let $\mathbf{x}$ be a vector of dependent variables obeying a differential equation of evolution $\mathrm{d}^2 \mathbf{x}(t) / \mathrm{d} t^2 = \ddot{\mathbf{x}} = \mathbf{f} (t, \mathbf{x}, \dot{\mathbf{x}})$ subject to initial conditions $\mathbf{x}_0 = \mathbf{x}(t_0)$ and $\dot{\mathbf{x}}_0 = \dot{\mathbf{x}}(t_0)$.  One may think of $\mathbf{x}$ as being displacements and their rates $\mathbf{v} = \dot{\mathbf{x}}$ as being velocities with $\mathbf{a} = \dot{\mathbf{v}} = \ddot{\mathbf{x}}$ representing accelerations. 
 
