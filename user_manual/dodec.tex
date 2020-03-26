@@ -126,11 +126,13 @@
    }}
 %
 %
-% Macro for typesetting ":=" in a nice manner.
+% Macros for typesetting ":=" and "=:" in a nice manner.
 %
-\newcommand*{\defeq}{\mathrel{\vcenter{\baselineskip0.5ex \lineskiplimit0pt
-                     \hbox{\scriptsize.}\hbox{\scriptsize.}}}%
-                     =}
+\newcommand*{\defeq}{\mathrel{\vcenter{\baselineskip0.4ex \lineskiplimit0pt
+            \hbox{\scriptsize.}\hbox{\scriptsize.}}}%
+    =}
+\newcommand*{\eqdef}{\mathrel{=\hspace{-3.5pt}\vcenter{\baselineskip0.4ex
+             \lineskiplimit0pt \hbox{\scriptsize.}\hbox{\scriptsize.}}}}%
 %
 %
 %% Create a rectangle that is used to denote squeeze
