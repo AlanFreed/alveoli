@@ -80,15 +80,15 @@ where $\boldsymbol{\epsilon}$ is a vector of thermo\-dynamic strains, $\boldsymb
 \begin{displaymath}
    \boldsymbol{\sigma}_{1D} = \{ \eta , s \} , \quad
    \boldsymbol{\sigma}_{2D} = \{ \eta , s^{\pi} , s^{\sigma} , s^{\tau} \}^{\mathsf{T}} , \quad
-   \boldsymbol{\sigma}_{3D} = \{ \eta , s^{p} , s^{\sigma_1} , s^{\sigma_2} , s^{\tau_1} , s^{\tau_2} , s^{\tau_3} \}^{\mathsf{T}}
+   \boldsymbol{\sigma}_{3D} = \{ \eta , \Pi , \sigma_1 , \sigma_2 , \tau_1 , \tau_2 , \tau_3 \}^{\mathsf{T}}
 \end{displaymath}
-where $\eta$ is entropy and the $s$'s are stresses, whose thermo\-dynamic conjugates are the strain attributes
+where $\eta$ is entropy and the rest are stresses, whose thermo\-dynamic conjugates are the strain attributes
 \begin{displaymath}
 \boldsymbol{\epsilon}_{1D} = \{ \theta , e \} , \quad
-\boldsymbol{\epsilon}_{2D} = \{ \theta , e^{\xi} , e^{\varepsilon} , e^{\gamma} \}^{\mathsf{T}} , \quad
-\boldsymbol{\epsilon}_{3D} = \{ \theta , e^{\Xi} , e^{\varepsilon_1} , e^{\varepsilon_2} , e^{\gamma_1} , e^{\gamma_2} , e^{\gamma_3} \}^{\mathsf{T}}
+\boldsymbol{\epsilon}_{2D} = \{ \theta , \xi , \varepsilon , \gamma \}^{\mathsf{T}} , \quad
+\boldsymbol{\epsilon}_{3D} = \{ \theta , \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 \}^{\mathsf{T}}
 \end{displaymath}
-where $\theta$ is temperature and the $e$'s are strains.  In the 2- and 3-D cases, these stress-strain attributes arise from Gram-Schmidt decompositions of the deformation gradient (cf.\ \S\ref{secQR2D}, \S\ref{secConjugatePairs} and \S\ref{secFE_CE}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\sigma} , \boldsymbol{\epsilon} )$ is the topic of Part~\ref{partConstitutive}.  In the above problem, the thermo\-dynamic strains $\boldsymbol{\epsilon}$ and their differential rates $\mathrm{d} \boldsymbol{\epsilon}$ are known, it is their stresses $\boldsymbol{\sigma}$ that must be integrated.  Both $\boldsymbol{\sigma}$ and $\mathrm{d} \boldsymbol{\sigma} = \mathbf{M} \, \mathrm{d} \boldsymbol{\epsilon}$ arise in the construction of our stiffness matrices, cf.\ \S\ref{secStiffnessMatrices}.
+where $\theta$ is temperature and the rest are strains.  In the 2- and 3-D cases, these stress-strain attributes arise from Gram-Schmidt decompositions of the deformation gradient (cf.\ \S\ref{secQR2D}, \S\ref{secConjugatePairs} and \S\ref{secFE_CE}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\sigma} , \boldsymbol{\epsilon} )$ is the topic of Part~\ref{partConstitutive}.  In the above problem, the thermo\-dynamic strains $\boldsymbol{\epsilon}$ and their differential rates $\mathrm{d} \boldsymbol{\epsilon}$ are known, it is their stresses $\boldsymbol{\sigma}$ that must be integrated.  Both $\boldsymbol{\sigma}$ and $\mathrm{d} \boldsymbol{\sigma} = \mathbf{M} \, \mathrm{d} \boldsymbol{\epsilon}$ arise in the construction of our stiffness matrices, cf.\ \S\ref{secStiffnessMatrices}.
 
 Equation (\ref{startUp1stOrderODEs}) is used to take the first step of integration; specifcally, 
 \begin{subequations}
