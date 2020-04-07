@@ -294,10 +294,42 @@ where, again, the CE steps of the PECE sequence can be iterated on to a user-spe
 
 We observe that the mass matrix must not be ill conditioned in order for this algorithm to work as intended.  Since the mass matrix does not change with time, it only needs to be evaluated and inverted once.  This is an advantage over using the popular Newmark \cite{Newmark59} integrator where matrix inversion is required at every step along a solution path.
 
-\section{Quadrature Rules for a Regular Pentagon}
+\section{Quadrature Rules for Spatial Integration}
 \label{secGauss}
 
-Three, Gauss, quadrature rules for a regular pentagon described in its natural coordinate system, i.e., oriented according to Fig.~\ref{figRegPentagon}, are presented in Table~\ref{tabQuadrature}.  These quadratures exactly integrate polynomials of order 1, 3 and 5, respectively.  They were supplied to the authors by Prof.\ N.\ Sukumar from the University of California at Davis, which he derived for us at our request using a methodology that he published in \cite{Mousavietal10}.  In that document, the authors derived formul\ae\ for determining the nodes and weights for a class of generalized, Gaussian, quadrature rules, which they then applied to pentagons, hexagons, heptagons and octagons, of which they only published their nodes and weights of quadrature for the hexagon, as it tiles two space.  The node for the $1^{\mathrm{st}}$ order method is located at the centroid of the pentagon.  Nodes for the $3^{\mathrm{rd}}$ and $5^{\mathrm{th}}$ order methods of Table~\ref{tabQuadrature} are displayed in Fig.~\ref{figQuadrature}.
+Three Gauss quadrature rules are given here for alveolar chords, alveolar septa and for tetrahedra that fill an alveolar sac.  These formul\ae\ integrate polynomials of $1^{\text{st}}$, $3^{\text{rd}}$ and $5^{\text{th}}$ degrees, exactly, for the chord and pentagon, and of $1^{\text{st}}$, $2^{\text{nd}}$ and $3^{\text{rd}}$ degrees, exactly, for a tetrahedron.  In all cases, integrating $1^{\text{st}}$ order polynomials takes place at their centroids.
+
+\subsection{Gauss Integration of Alveolar Chords}
+
+The quadrature rules that integrate a 1D chord in its natural co-ordinate system, which spans $-1 \leq \xi \leq 1$, are presented in Table~\ref{tabQuadrature1D}.  These formul\ae\ are well known and can be found in most finite element textbooks.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|c|rr|}
+        \hline
+        node & \centering $\xi$ co-ordinate \phantom{1}  & 
+        weight \phantom{123} \\ \hline
+        & \multicolumn{2}{|c|}{Exact for Polynomials of Degree $1^{\phantom{|^|}}$} \\ 
+        \hline
+        1 & 0.000000000000 & 2.000000000000 \\ 
+        \hline
+        & \multicolumn{2}{|c|}{Exact for Polynomials of Degree $3^{\phantom{|^|}}$} \\ \hline
+        1 & -0.577350269189 & 1.000000000000\\
+        2 & 0.577350269189 & 1.000000000000\\ 
+        \hline
+        & \multicolumn{2}{|c|}{Exact for Polynomials of Degree $5^{\phantom{|^|}}$} \\ \hline
+        1 & -0.774596669241 & 0.555555555556 \\
+        2 & 0.000000000000 & 0.888888888889\\
+        3 & 0.774596669241 & 0.555555555556\\ 
+        \hline
+    \end{tabular}
+    \caption{Generalized, Gaussian, quadrature weights and nodes for integrating over an alveolar chord in its natural co-ordinate system.  These weights sum to 2, the span of its natural co-ordinate.}
+    \label{tabQuadrature1D}
+\end{table}
+
+\subsection{Gauss Integration of Alveolar Septa}
+
+Three, Gauss, quadrature rules for a regular pentagon described in its natural coordinate system, i.e., oriented according to Fig.~\ref{figRegPentagon}, are presented in Table~\ref{tabQuadrature}.  These quadratures exactly integrate polynomials of order 1, 3 and 5, respectively.  They were supplied to the authors by Prof.\ N.\ Sukumar from the University of California at Davis, which he derived for us at our request using a methodology that he published in \cite{Mousavietal10}.  In that document, the authors derived formul\ae\ for determining the nodes and weights for a class of generalized, Gaussian, quadrature rules, which they then applied to pentagons, hexagons, heptagons and octagons, of which they only published their nodes and weights of quadrature for the hexagon, as it tiles two space.  The node for the $1^{\mathrm{st}}$ order method is located at the centroid.  Nodes for the $3^{\mathrm{rd}}$ and $5^{\mathrm{th}}$ order methods of Table~\ref{tabQuadrature} are displayed in Fig.~\ref{figQuadrature}.
 
 \begin{table}
     \centering
@@ -327,7 +359,7 @@ Three, Gauss, quadrature rules for a regular pentagon described in its natural c
         7 &  0.5337947578638855 &  0.4872045224587945 & 0.2642573384350463 \\
         \hline
     \end{tabular}
-    \caption{Generalized, Gaussian, quadrature, weights and nodes (a.k.a., cubature rules) for integrating over a regular pentagon in its natural coordinate system.  These weights sum to the area of a pentagon inscribing an unit circle.}
+    \caption{Generalized, Gaussian, quadrature weights and nodes (a.k.a., cubature rules) for integrating over a regular pentagon in its natural coordinate system.  These weights sum to the area of a pentagon inscribing an unit circle, the formula of which is given in Eqn.~(\ref{regPentagonArea}).}
     \label{tabQuadrature}
 \end{table}
 
@@ -335,9 +367,41 @@ The Gaussian quadrature rules of Mousavi, Xiao \& Sukumar \cite{Mousavietal10} p
 
 \begin{figure}
     \centering
-    \includegraphics[width=6cm]{figures/pentagon_degree3.pdf}
+    \includegraphics[width=4cm]{figures/pentagon_degree3.pdf}
     \hspace{1cm}
-    \includegraphics[width=6cm]{figures/pentagon_degree5.pdf}
+    \includegraphics[width=4cm]{figures/pentagon_degree5.pdf}
     \caption{Locations of generalized, Gaussian, quadrature nodes for the $3^{\mathrm{rd}}$ (left) and $5^{\mathrm{th}}$ (right) degree integration methods presented in Table~\ref{tabQuadrature}.  Vertex 1 is located at the top of the pentagon, cf.\ Fig.~\ref{figRegPentagon}, while the coordinate origin is located at its centroid (node 1 in the right figure).}
     \label{figQuadrature}
 \end{figure}
+
+\subsection{Gauss Integration of Alveolar Sacs}
+
+The quadrature rules that integrate a 2D tetrahedron in its natural co-ordinate system, where the apex is at the origin, and along its three axes: $0 \leq \xi \leq 1$, $0 \leq \eta \leq 1$ and $0 \leq \zeta \leq 1$.  These formul\ae\ integrate polynomials of $1^{\text{st}}$, $2^{\text{nd}}$ and $3^{\text{rd}}$ degrees, exactly, and can be found in most finite element textbooks.  
+
+\begin{table}
+    \centering
+    \begin{tabular}{|c|rrrr|}
+        \hline
+        node & \centering $\xi$ co-ordinate & $\eta$ co-ordinate & 
+        $\zeta$ co-ordinate & weight \\ \hline        
+        & \multicolumn{4}{|c|}{Exact for Polynomials of Degree $1^{\phantom{|^|}}$} \\ 
+        \hline
+        1 & 1/4 & 1/4 & 1/4 & 1/6 \\ 
+        \hline
+        & \multicolumn{4}{|c|}{Exact for Polynomials of Degree $2^{\phantom{|^|}}$} \\ \hline
+        1 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & 1/24\\
+        2 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & (5 + 3 $\sqrt{5}$)/20 & 1/24\\
+        3 & (5 - $\sqrt{5}$)/20 & (5 + 3 $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & 1/24\\ 
+        4 & (5 + 3 $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & 1/24\\ 
+        \hline
+        & \multicolumn{4}{|c|}{Exact for Polynomials of Degree $3^{\phantom{|^|}}$} \\ \hline
+        1 & 1/4 & 1/4 & 1/4 & -2/15 \\
+        2 & 1/2 & 1/6 & 1/6 & 3/40\\
+        3 & 1/6 & 1/2 & 1/6 & 3/40\\ 
+        4 & 1/6 & 1/6 & 1/2 & 3/40 \\
+        5 & 1/6 & 1/6 & 1/6 & 3/40 \\
+        \hline
+    \end{tabular}
+    \caption{Generalized, Gaussian, quadrature weights and nodes for integrating over a tetrahedron in its natural co-ordinate system.  These weights sum to \textfrac{1}{6}, which is the volume of a tetrahedron measured in its natural co-ordinate system.}
+    \label{tabQuadraturetetra}
+\end{table} 
