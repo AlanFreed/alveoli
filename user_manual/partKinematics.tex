@@ -36,6 +36,10 @@ The deformation gradient in this case is simply
 \end{equation}
 which is uniform over the length of a chord, i.e., it is independent of $\xi$.
 
+\section{2D Triangles}
+
+Triangular elements are needed in a support capacity in the construction of our alevolar model; specifically, the surfaces of a tetrahedron are triangles.  To compute the force acting across such a surface requires an ability to integrate over triangles.  In turn, shape functions to be able to apply Gauss quadrature rules. 
+
 \section{2D Irregular Pentagons}
 
 The kinematics of an irregular pentagon, on the other hand, are not trivial.  Shape functions are required from which deformation gradients can then be constructed.  Once a deformation gradient is in hand, the state of stretch occurring within a pentagon can finally be derived.  Several possible decompositions of the deformation gradient are possible, i.e., stretch is not unique in 2D (nor in 3D).  Here we employ the Laplace stretch \cite{Freedetal19}.
@@ -151,6 +155,7 @@ which are the same for all five shape functions.  Sums over the four cubic terms
 
 The first derivatives of Wachspress' shape functions for a pentagon are
 \begin{subequations}
+    \label{shapeFunctionGradients}
 	\begin{align}
 	N_{i+1,\xi} (\xi, \eta) & = \kappa_i \, \mathcal{N}_{i,\xi}(\xi, \eta) /
 	B^2(\xi, \eta) \\

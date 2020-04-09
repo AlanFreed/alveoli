@@ -14,13 +14,13 @@ A dodecahedron used to model an alveolar sac is our problem of interest.  The sh
     \{ x_i - x_{0i} , y_i - y_{0i} , z_i - z_{0i} \}^{\mathsf{T}} ,
     \quad i = 1, 2, \ldots , 20
 \end{equation}
-which contain co-ordinate differences at a dodecahedral vertex evaluated in the physical co-ordinate frame of this dodecahedron $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\mathbfit{k}} )$ with each vertex $i$ having reference co-ordinates denoted as $\{ x_{0i} , y_{0i} , z_{0i} \}^{\mathsf{T}}$ and current co-ordinates denoted as $\{ x_i , y_i , z_i \}^{\mathsf{T}}$.  The 20 vertices of a dodecahedron uniquely establish its 30 alveolar chords, its 12 alveolar septa, and the alveolar sac that these chords and septa envelop, as discussed in \S\ref{sec:indexingDodecahedra}.
+that contains co-ordinate differences at a dodecahedral vertex evaluated in the physical co-ordinate frame of this dodecahedron $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$, as established in \S\ref{reindexing3D}, with each vertex $i$ having reference co-ordinates denoted as $\{ x_{0i} , y_{0i} , z_{0i} \}^{\mathsf{T}}$ and current co-ordinates denoted as $\{ x_i , y_i , z_i \}^{\mathsf{T}}$.  The 20 vertices of a dodecahedron uniquely establish its 30 alveolar chords, its 12 alveolar septa, and the alveolar sac that these chords and septa envelop, cf.\ \S\ref{sec:indexingDodecahedra}.
 
-When assembled, vectors $\mathbf{f}$, $\mathbf{u}$ and $\ddot{\mathbf{u}}$ have lengths of 60 for the alveolar chord and septa models, and a length of 63 for the alveolar sac model, while matrices $\mathbf{M}$ and $\mathbf{K}$ have dimensions of $60 \! \times \! 60$ for the alveolar chord and septa models, and dimensions of $63 \! \times \! 63$ for the alveolar sac model.  The model for alveolar volume has an extra node located at the centroid of the dodecahedron, which is a node in common with all 60 tetrahedra used to fill the volume of a dodecahedron in our modeling of an alveolus. 
+When assembled, vectors $\mathbf{f}$, $\mathbf{u}$ and $\ddot{\mathbf{u}}$ have lengths of 60 for the alveolar chord and septa models, and a length of 63 for the alveolar sac model, while matrices $\mathbf{M}$ and $\mathbf{K}$ have dimensions of $60 \! \times \! 60$ for the alveolar chord and septa models, and dimensions of $63 \! \times \! 63$ for the alveolar sac model.  The model for alveolar volume has an extra node located at the centroid of the dodecahedron, which is a node in common betwixt the 60 tetrahedra needed to fill the volume of a dodecahedron in our modeling of an alveolus. 
 
-As a modeling simplification, the alveolar chords, the alveolar septa, and the alveolar sac are each modeled separately.  It is the forces resulting from these three, separate, finite-element models that are then summed.  These are obtained by interpolating the stresses at their Guass points out to their element nodes, which are vertices of the dodecahedron.  These three sources for vertex force can be added, from which a uniform (homogenized) state of stress can then be calculated for return.  
+As a modeling simplification, the alveolar chords, the alveolar septa, and the alveolar sac are each modeled separately.  It is the nodal forces resulting from these three, separate, finite-element models that then are summed.  These are obtained by interpolating the stresses integrated at their Guass points out to their nodes, which belong to the set dodecahedral vertices.  These three sources for vertex force can be added, from which an uniform (homogenized) state of stress can then be calculated for return.  
 
-Consequently, we are constructing three finite-element models governed by the following systems of hyperbolic differential equations
+Consequently, we are constructing three, individual, finite-element models governed by the following systems of hyperbolic differential equations
 \begin{subequations}
     \begin{align}
     \mathbf{M}_{1D} \ddot{\mathbf{u}} + \mathbf{K}_{1D} \mathbf{u} & 
@@ -41,13 +41,14 @@ A consistent mass matrix \cite{Archer65} for an element, established in its natu
 	\mathrm{d} V
 	\label{consistentMassMatrix}
 \end{equation}
-wherein $\mathbf{N}$ is the shape function matrix for an element whose mass density is $\rho$.  This mass matrix is said to be consistent in that it is calculated with the same shape functions that are used to create its stiffness matrix.  Consistent mass matrices are symmetric and, typically, they are singular, too, which is not a desirable feature for our chosen numerical approach.
+wherein $\mathbf{N}$ is the shape function matrix for an element whose mass density is $\rho$.  This mass matrix is said to be consistent in that it is calculated with the same shape functions that are used to create the stiffness matrix.  Consistent mass matrices are symmetric and, sometimes, they are singular, too, which is not a desirable feature for our chosen numerical approach.
 
-To construct a non-singular mass matrix, we consider a lumped mass matrix.  Specifically, the sum of all row elements from each row of a consistent mass matrix establishes a lumped mass matrix \cite{Reddy93} whose diagonal elements are
+To construct a non-singular mass matrix, we introduce a lumped mass matrix.  Specifically, the sum of all row elements from each row of a consistent mass matrix establishes the diagonal elements of a lumped mass matrix \cite{Reddy93} in that
 \begin{equation}
 \mathbf{M}_L = \sum_{i=1}^n M_{Li} 
 \quad \text{where} \quad
 M_{Li} = \sum_{j=1}^n \int_{V} \rho \, N_i \, N_j \, \mathrm{d} V 
+\label{lumpedMassMatrix}
 \end{equation}
 wherein $\sum_{j=1}^n N_j = 1$ with $i$ being a Gauss point out of the $n$ Gauss points in an element.
 
@@ -55,16 +56,16 @@ A lumped-consistent (or weighted) mass matrix $\mathbf{M}_W $ can then be define
 \begin{equation}
 \mathbf{M}_W  = (1 - \mu) \, \mathbf{M}_{C} + \mu \, \mathbf{M}_{L}
 \end{equation}
-wherein $\mu$ is a free scalar parameter for weighting the consistent and lumped mass matrices.  The reason for mixing $\mathbf{M}_C$ and $\mathbf{M}_L$ is that the weighted matrix $\mathbf{M}_W$ will not be singular.  Herein $\mu$ is taken to be a half, i.e., an averaged mass matrix is adopted, which has the property of minimizing low frequency dispersion.  Specifically,
+wherein $\mu$ is a free scalar parameter for weighting the consistent and lumped mass matrices.  The reason for mixing $\mathbf{M}_C$ and $\mathbf{M}_L$ is that the weighted matrix $\mathbf{M}_W$ will not be singular.  Herein $\mu$ is taken to be a half, i.e., an averaged mass matrix is adopted, which has a nice property of minimizing low frequency dispersion.  Specifically,
 \begin{equation}
 \mathbf{M}_A  = \tfrac{1}{2} \, (\mathbf{M}_{C} + \mathbf{M}_{L})
 \label{LumconsMass}
 \end{equation}
-is how we shall construct our mass matrices.  The averaged mass matrix $\mathbf{M}_A$ is invertible, which is a requirement of our numerical solution strategy presented in \S\ref{sec:solve2ndOrderODE}.
+is how we shall construct our mass matrices.  The averaged mass matrix $\mathbf{M}_A$ is invertible, which is a requirement of the selected numerical solution strategy presented in \S\ref{sec:solve2ndOrderODE}.
 
 \subsection{Mass Matrices for a Chord}
 
-A two-noded alveolar chord has shape functions $N_i$ that, when evaluated in its natural coordinate system, i.e., $-1 \leq \xi \leq 1$, defines a matrix of
+A two-noded alveolar chord has shape functions $N_i$ that, when evaluated in its natural co-ordinate system wherein $-1 \leq \xi \leq 1$, aggregate into a matrix of shape functions
 \begin{equation}
 \mathbf{N} = \begin{bmatrix} N_1 & N_2 \end{bmatrix} =
 \begin{bmatrix}
@@ -75,127 +76,79 @@ N_{1,\xi} = -\tfrac{1}{2}
 \quad \text{and} \quad
 N_{2,\xi} = \tfrac{1}{2}
 \end{equation}
-wherein $\xi$ is the abscissa associated with a specific Gauss integration rule, cf.\ Table~\ref{tabQuadrature1D}.
+where $\xi$ is the abscissa associated with a specific Gauss integration rule, cf.\ Table~\ref{tabQuadrature1D}.
 
-The Jacobian matrix $\mathbf{J}$ for a one-dimensional chord is used to transform the integral from its global coordinate system into its natural coordinate system; it is
+The Jacobian matrix $\mathbf{J}$ for a one-dimensional chord, which is also its Jacobian determinant $| \mathbf{J} |$, is used to transform the integrals in Eqns.~(\ref{consistentMassMatrix} \& \ref{lumpedMassMatrix}) from their global co-ordinate system into their natural co-ordinate system.  It has a value of
 \begin{equation}
-     \mathbf{J} = \sum\nolimits_{i=1}^2 N_{i,\xi} (\xi) \, x_i = 
+     \mathbf{J} \equiv | \mathbf{J} | = \sum\nolimits_{i=1}^2 N_{i,\xi} (\xi) \, x_i = 
      -\tfrac{1}{2} \cdot -\tfrac{1}{2} L + \tfrac{1}{2} \cdot \tfrac{1}{2} L = 
      \tfrac{1}{2} L
      \label{detJac1D}
 \end{equation}
-given that $x_1 = -\tfrac{1}{2} L$ and $x_2 = \tfrac{1}{2} L$ where $L$ is the length of our alveolar chord.  
+given nodal co-ordinates of $x_1 = -\tfrac{1}{2} L$ and $x_2 = \tfrac{1}{2} L$, where $L$ is the length of our alveolar chord.  The Jacobian matrix and the Jacobian determinant are equal in this case because the space is one dimensional. 
 
-\begin{table}
-    \centering
-    \begin{tabular}{|c|rr|}
-        \hline
-        node & \centering $\xi$ coordinate \phantom{12}  & 
-        weight \phantom{12} \\ \hline
-        & \multicolumn{2}{|c|}{Exact for Polynomials of Degree $1^{\phantom{|^|}}$} \\ 
-        \hline
-        1 & 0.0000000000000 & 2.0000000000000 \\ 
-        \hline
-        & \multicolumn{2}{|c|}{Exact for Polynomials of Degree $3^{\phantom{|^|}}$} \\ \hline
-        1 & -0.577350269189 & 1.000000000000\\
-        2 & 0.577350269189 & 1.000000000000\\ 
-        \hline
-        & \multicolumn{2}{|c|}{Exact for Polynomials of Degree $5^{\phantom{|^|}}$} \\ \hline
-        1 & -0.774596669241 & 0.555555555556 \\
-        2 & 0.000000000000 & 0.888888888889\\
-        3 & 0.774596669241 & 0.555555555556\\ 
-        \hline
-    \end{tabular}
-    \caption{Generalized, Gaussian, quadrature, weights and nodes for integrating over an alveolar chord in its natural coordinate system.}
-    \label{tabQuadrature1D}
-\end{table}
-
-The consistent mass matrix for a 1D alveolar chord modeled as a two-noded rod, when evaluated in its natural coordinate system, becomes
+The consistent mass matrix for a 1D alveolar chord modeled as a two-noded rod, when evaluated in its natural co-ordinate system, becomes
 \begin{equation}
     \begin{aligned}
-    \mathbf{M}_{1C} & = \int_0^L \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \, A \, \mathrm{d} x  = \int_{-1}^{1} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N}\, A \, \mathbf{J}\,  \mathrm{d} \xi \\
-    & = \sum_{i=1}^n  \rho  \, N_i^{\mathsf{T}} N_i \, A \, \mathbf{J} \, \mathrm{w}_i = \sum_{i=1}^n \frac{\rho A L w_i}{8} \begin{bmatrix}
+    \mathbf{M}_{1C} & = \int_0^L \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \, A \, \mathrm{d} x  = \int_{-1}^{1} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N}\, A \, | \mathbf{J} | \,  \mathrm{d} \xi \\
+    & = \sum_{i=1}^n  \rho  \, N_i^{\mathsf{T}} N_i \, A \, | \mathbf{J} | \, w_i = \sum_{i=1}^n \frac{\rho A L w_i}{8} \begin{bmatrix}
     1 - 2\xi_i + \xi_i^2 & 1 - \xi_i^2 \\
     1 - \xi_i^2 & 1 + 2 \xi_i + \xi_i^2
     \end{bmatrix}
     \end{aligned}
     \label{ConsMassMatrix1DA}
 \end{equation}
-with $N_i$ and $\mathrm{w}_i$ being the shape functions and quadrature weights for the selected Gauss integration rule evaluated at Gauss point $i$, while $A$ is the cross-sectional area of our alveolar chord. Table~\ref{tabQuadrature1D} presents values for the absciss\ae\ $\xi_i$ and weights $\mathrm{w}_i$ of integration for schemes where there are $n = 1, 2$ or $3$ nodes of integration.  
+with $N_i$ and $w_i$ being the shape functions and weights of quadrature for the selected Gauss integration rule evaluated at Gauss point $i$, while $A$ is the cross-sectional area of our alveolar chord. Table~\ref{tabQuadrature1D} presents values for the absciss\ae\ $\xi_i$ and weights $w_i$ of integration for schemes where there are $n = 1, 2$ or $3$ nodes of integration along an alveolar chord.  
 
-The lumped mass matrix for a 1D alveolar chord in its natural coordinate system becomes 
+The lumped mass matrix for a 1D alveolar chord in its natural co-ordinate system is 
 \begin{equation}
 \begin{aligned}
-\mathbf{M}_{1L} & = \sum_{i,j=1}^n \int_0^L \rho \, N_i \, N_j \, A \, \mathrm{d} x  = \sum_{i=1}^n \int_{-1}^{1} \rho \, N_i \, A \, \mathbf{J} \,  \mathrm{d} \xi \\
-& = \sum_{i=1}^n  \rho  \, N_i\, A\, \mathbf{J} \, \mathrm{w}_i = 
+\mathbf{M}_{1L} & = \sum_{i,j=1}^n \int_0^L \rho \, N_i \, N_j \, A \, \mathrm{d} x  = \sum_{i=1}^n \int_{-1}^{1} \rho \, N_i \, A \, | \mathbf{J} | \,  \mathrm{d} \xi \\
+& = \sum_{i=1}^n  \rho  \, N_i\, A \, | \mathbf{J} | \, w_i = 
 \sum_{i=1}^n \frac{\rho A L w_i}{4} \begin{bmatrix} 
 1 - \xi_i & 0 \\ 0 & 1 + \xi_i \end{bmatrix}
 \end{aligned}
 \label{LumconsMassMatrix1DA}
 \end{equation}
-wherein $\sum_{j=1}^n N_j = 1$.  It is readily apparent that the mass matrix in Eqn.~(\ref{ConsMassMatrix1DA}) is singular, whereas the mass matrix in Eqn.~(\ref{LumconsMassMatrix1DA}) has a reciprocal. 
+because $\sum_{j=1}^n N_j = 1$.  It is readily apparent that the mass matrix in Eqn.~(\ref{ConsMassMatrix1DA}) at a Gauss point is singular, whereas the mass matrix in Eqn.~(\ref{LumconsMassMatrix1DA}) has a reciprocal, except at $\xi = \pm 1$. 
 
-For instance, the consistent mass matrices for an alveolar chord with 2 Gauss integration points, viz., $n=2$ with nodes $\xi_i = \mp 1 / \sqrt{3}$ and weights $w_i = 1$, are described by matrices
+
+Chordal mass matrices associated with the Gauss quadratures listed in Table~\ref{tabQuadrature1D} become: The consistent mass matrices for a chord are
 \begin{subequations}
 \label{massMatrices1D}
 \begin{align}
-\left. \mathbf{M}_{1C} \right|_{\xi = \frac{-1}{\sqrt{3}}} & = 
-\frac{\rho A L}{12} 
-\begin{bmatrix}
-2 + \sqrt{3} & 1 \\
-1 & 2 - \sqrt{3}
-\end{bmatrix} & 
-\left. \mathbf{M}_{1C} \right|_{\xi = \frac{+1}{\sqrt{3}}} & = 
-\frac{\rho A L}{12} 
-\begin{bmatrix}
-2 - \sqrt{3} & 1 \\
-1 & 2 + \sqrt{3}
-\end{bmatrix}
-\label{ConsMassMatrix1D} \\
-\intertext{that result in lumped mass matrices with components}
-\left. \mathbf{M}_{1L} \right|_{\xi = \frac{-1}{\sqrt{3}}} & = 
-\frac{\rho A L}{12}\begin{bmatrix}
-3 + \sqrt{3} & 0 \\
-0 & 3 - \sqrt{3}
-\end{bmatrix} &
-\left. \mathbf{M}_{1L} \right|_{\xi = \frac{+1}{\sqrt{3}}} & = 
-\frac{\rho A L}{12}\begin{bmatrix}
-3 - \sqrt{3} & 0 \\
-0 & 3 + \sqrt{3}
-\end{bmatrix} 
-\label{LumMassMatrix1D} \\
-\intertext{so that when averaged they become}
-\left. \mathbf{M}_{1A} \right|_{\xi = \frac{-1}{\sqrt{3}}} & = \frac{\rho A L}{24} 
-\begin{bmatrix}
-5 + 2\sqrt{3} & 1 \\
-1 & 5 - 2\sqrt{3}
-\end{bmatrix} &
-\left. \mathbf{M}_{1A} \right|_{\xi = \frac{+1}{\sqrt{3}}} & = \frac{\rho A L}{24} 
-\begin{bmatrix}
-5 - 2\sqrt{3} & 1 \\
-1 & 5 + 2\sqrt{3}
-\end{bmatrix} .
-\label{LumconsMassMatrix1D} 
+    \mathbf{M}_{1C} & = \frac{\rho A L}{4} 
+    \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix} & 
+    \mathbf{M}_{1C} & = \frac{\rho A L}{6} 
+    \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} & 
+    \mathbf{M}_{1C} & = \frac{\rho A L}{6} 
+    \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix} 
+    \label{ConsMassMatrix1D} \\
+    \intertext{The lumped mass matrices for a chord are}
+    \mathbf{M}_{1L} & = \frac{\rho A L}{2} 
+    \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} & 
+    \mathbf{M}_{1L} & = \frac{\rho A L}{2} 
+    \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} & 
+    \mathbf{M}_{1L} & = \frac{\rho A L}{2} 
+    \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} 
+    \label{LumMassMatrix1D} \\
+    \intertext{When averaged these mass matrices become}
+    \mathbf{M}_{1A} & = \frac{\rho A L}{8} 
+    \begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix} & 
+    \mathbf{M}_{1A} & = \frac{\rho A L}{12} 
+    \begin{bmatrix} 5 & 1 \\ 1 & 5 \end{bmatrix} & 
+    \mathbf{M}_{1A} & = \frac{\rho A L}{12} 
+    \begin{bmatrix} 5 & 1 \\ 1 & 5 \end{bmatrix}
+    \label{avgMassMatrix1D}
 \end{align}
 \end{subequations}
-These two mass matrices are summed to get the governing mass matrix for a chord.
-
-The following three mass matrices apply for septal chords; they are,
-\begin{equation}
-\mathbf{M}_{1A} = \frac{\rho A L}{8} 
-\begin{bmatrix} 3 & 1 \\ 1 & 3 \end{bmatrix} , \quad
-\mathbf{M}_{1A} = \frac{\rho A L}{12} 
-\begin{bmatrix} 5 & 1 \\ 1 & 5 \end{bmatrix} , \quad
-\mathbf{M}_{1A} = \frac{\rho A L}{12} 
-\begin{bmatrix} 5 & 1 \\ 1 & 5 \end{bmatrix}
-\end{equation}
-where the first mass matrix applies whenever 1 Gauss point is used, the second mass matrix applies whenever 2 Gauss points are used, and the third mass matrix applies whenever 3 Gauss points are used that, in this case, equals the mass matrix for 2 Gauss points.  In the derivation of these matrices, it is assumed that the area and mass are both uniform along the length of a septal chord.  Furthermore, because septal chord volume $V$ is considered to be preserved, i.e., $V = V_0$ where $V_0 = A_0 L_0$ and $V = A L$, it follows that these mass matrices are constant; hence, their inverses need only be determined once.
+which are the mass matrices that we employ.  This collection of mass matrices pertain to one Gauss point (left set of mass matrices), two Gauss points (center set of mass matrices), and three Gauss points (right set of mass matrices).  For this element, there is no difference between the mass matrices for two and three Gauss points of integration.  In the derivation of these matrices, it is assumed that the cross-sectional area and mass density  are both uniform along the length of a septal chord.  Furthermore, because septal chord volume $V$ is considered to be preserved, i.e., $V = V_0$ where $V_0 = A_0 L_0$ and $V = A L$, it follows that these mass matrices are constant; hence, their inverses need only be determined once.
 
 \subsubsection{Assemble Mass Matrices for the Septal Chords}
 
 \subsection{Mass Matrices for a Pentagon}
 
-For an alveolar septa, the matrix of shape functions $\mathbf{N}$ is arranged as
+For an alveolar septa represented as an irregular pentagon, its matrix of shape functions $\mathbf{N}$ takes on the form of
  \begin{equation}
 	\mathbf{N} = 
 	\begin{bmatrix}
@@ -203,14 +156,14 @@ For an alveolar septa, the matrix of shape functions $\mathbf{N}$ is arranged as
 \end{bmatrix} 
 	\label{shape2D}
 \end{equation}
-where the $\mathrm{N}_i$ $(i = 1, 2, 3, 4, 5)$ are five shape functions corresponding to the five vertices of a pentagon, as established in Eqn.~(\ref{shapeFunctions}).
+where $\mathrm{N}_i$, $i = 1, \ldots, 5$, are the five shape functions that correspond with the five vertices of a pentagon, as established in Eqn.~(\ref{shapeFunctions}).
 
-A consistent mass matrix $\mathbf{M}_{2C}$ can be obtained by substituting the above shape function matrix into the following expression
+A consistent mass matrix $\mathbf{M}_{2C}$ is constructed by substituting the above matrix of shape functions into the following expression
 \begin{equation}
-    \mathbf{M}_{2C} = \int_{\pentagon} \int_{\pentagon} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,|\mathbf{J}| \, h \, \mathrm{d} \xi \, \mathrm{d} \eta
+    \mathbf{M}_{2C} = \iint_{\pentagon} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,|\mathbf{J}| \, h \, \mathrm{d} \xi \, \mathrm{d} \eta
     \label{massintegral2d}
 \end{equation}
-with $h$ denoting membrane thickness, and where $|\mathbf{J}|$ denotes a determinant of the Jacobian matrix for a pentagon.  In quadrilateral derivations, a Jacobian of two-dimensional transformations that connect the physical ${x, y}$ to natural ${\xi, \eta}$ coordinate systems is needed.  The components of this Jacobian matrix are calculated using derivatives of shape functions taken with respect to the local coordinates at the $i^{\mathrm{th}}$ vertex via
+with $h$ denoting membrane thickness, and where $|\mathbf{J}|$ denotes the determinant of a $2 \! \times \! 2$ Jacobian matrix for a pentagon.  In quadrilateral derivations, a Jacobian of two-dimensional transformations that connect the physical ${x, y}$ to natural ${\xi, \eta}$ co-ordinate systems is needed.  The components of this Jacobian matrix are calculated using derivatives of shape functions taken with respect to the local co-ordinates at the $i^{\mathrm{th}}$ vertex via
 \begin{equation}
 \mathbf{J} = 
 \begin{bmatrix}
@@ -222,52 +175,58 @@ with $h$ denoting membrane thickness, and where $|\mathbf{J}|$ denotes a determi
 \sum\nolimits_{i=1}^5 N_{i,\eta} (\xi,\eta) \, x_i & \sum\nolimits_{i=1}^5 N_{i,\eta} (\xi,\eta) \, y_i
 \end{bmatrix}
 \end{equation}
-with
+where the shape function gradients $N_{i,\xi}$ and $N_{i,\eta}$ have been established in Eqn.~(\ref{shapeFunctionGradients}), with
 \begin{equation}
 \mathbf{J}^{-1}  = \frac{1}{|\mathbf{J}|} \,
 \begin{bmatrix}
 \partial y / \partial\eta & - \partial y / \partial\xi \\
 - \partial x / \partial\eta & \partial x / \partial\xi
-\end{bmatrix} .
+\end{bmatrix} 
+\quad \text{wherein} \quad 
+| \mathbf{J} | = \frac{\partial x}{\partial \xi} \frac{\partial y}{\partial \eta} - 
+\frac{\partial x}{\partial \eta} \frac{\partial y}{\partial \xi}
 \label{jacobianpent}
 \end{equation}
-A numerical integration of Eqn.~(\ref{massintegral2d}) results in 
+providing its inverse and Jacobian determinant.  A numerical integration of Eqn.~(\ref{massintegral2d}) results in 
 \begin{equation}
-    \mathbf{M}_{2C} = \sum_{i=1}^{n} \sum_{j=1}^{n} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,|\mathbf{J}| \, h \, w_i \, w_j
+    \mathbf{M}_{2C} = \sum_{i=1}^{n} \rho \, \mathbf{N}^{\mathsf{T}} ( \xi_i , \eta_i ) \, \mathbf{N} ( \xi_i , \eta_i ) \,|\mathbf{J}| \, h \, w_i
 \end{equation}
-where $n$ stands for the number of Gauss points, $\mathrm{w}_i$ and $\mathrm{w}_j$ denote the natural weights of the element.  Three mass matrices have been constructed for a pentagon based upon the three, Gauss, quadrature rules given in Table~\ref{tabQuadrature}, which integrate polynomials of orders 1, 3 and 5 exactly, respectively. 
+where $n$ stands for the number of Gauss points, and where $w_i$ and $w_j$ denote the weights of quadrature in an element's natural co-ordinate system, which can be found in Table~\ref{tabQuadrature}.
 
 A lumped mass matrix for a pentagon gets its diagonal elements as follows
 \begin{equation}
-{M}_{2L} = \sum_{j=1}^n \int_{\pentagon} \int_{\pentagon} \rho \, N_i \, N_j \, |\mathbf{J}| \, h \,  \mathrm{d} \xi \, \mathrm{d} \eta =  \sum_{i=1}^n  \rho  \, N_i \, |\mathbf{J}| \, h \, \mathrm{w}_i
+{M}_{2Li} = \sum_{j=1}^n \iint_{\pentagon} \rho \, N_i \, N_j \, |\mathbf{J}| \, h \,  \mathrm{d} \xi \, \mathrm{d} \eta =  \sum_{i=1}^n  \rho  \, N ( \xi_i , \eta_i ) \, |\mathbf{J}| \, h \, w_i
 \label{LumMass2D}
 \end{equation}
-wherein $\sum_{j=1}^n N_j = 1$. 
+because $\sum_{j=1}^n N_j = 1$. 
 
-For instance, the lumped-consistent mass matrix for a pentagon with $1$ Gauss integration point located at the centroid of the pentagon is constructed by averaging its consistent and lumped mass matrices resulting in
+For instance, the averaged lumped-consistent mass matrix for a pentagon with $1$ Gauss point of integration located at its centroid is constructed by averaging its consistent and lumped mass matrices resulting in
 \begin{equation}
-\mathbf{M}_{2LC}  = \rho \, h
-\scalefont{0.75}{ \begin{bmatrix}
-1.0 & 0 & 0.16667 & 0 & 0.16667 & 0 & 0.16667 & 0 & 0.16667 & 0 \\
-0 & 1.0 & 0 & 0.16667 & 0 & 0.16667 & 0 & 0.16667 & 0 & 0.16667 \\
-0.16667 & 0 & 1.0 & 0 & 0.16667 & 0 & 0.16667 & 0 & 0.16667 & 0 \\
-0 & 0.16667 & 0 & 1.0 & 0 & 0.16667 & 0 & 0.16667 & 0 & 0.16667 \\
-0.16667 & 0 & 0.16667 & 0 & 1.0 & 0 & 0.16667 & 0 & 0.16667 & 0 \\
-0 & 0.16667 & 0 & 0.16667 & 0 & 1.0 & 0 & 0.16667 & 0 & 0.16667 \\
-0.16667 & 0 & 0.16667 & 0 & 0.16667 & 0 & 1.0 & 0 & 0.16667 & 0 \\
-0 & 0.16667 & 0 & 0.16667 & 0 & 0.16667 & 0 & 1.0 & 0 & 0.16667 \\
-0.16667 & 0 & 0.16667 & 0 & 0.16667 & 0 & 0.16667 & 0 & 1.0 & 0 \\
-0 & 0.16667 & 0 & 0.16667 & 0 & 0.16667 & 0 & 0.16667 & 0 & 1.0 \\
-\end{bmatrix} . }
+\mathbf{M}_{2A}  = \frac{\rho \, h A}{100}
+\begin{bmatrix}
+6 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 \\
+0 & 6 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 \\
+1 & 0 & 6 & 0 & 1 & 0 & 1 & 0 & 1 & 0 \\
+0 & 1 & 0 & 6 & 0 & 1 & 0 & 1 & 0 & 1 \\
+1 & 0 & 1 & 0 & 6 & 0 & 1 & 0 & 1 & 0 \\
+0 & 1 & 0 & 1 & 0 & 6 & 0 & 1 & 0 & 1 \\
+1 & 0 & 1 & 0 & 1 & 0 & 6 & 0 & 1 & 0 \\
+0 & 1 & 0 & 1 & 0 & 1 & 0 & 6 & 0 & 1 \\
+1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 6 & 0 \\
+0 & 1 & 0 & 1 & 0 & 1 & 0 & 1 & 0 & 6 
+\end{bmatrix} 
 \label{LumconsMassMatrix2D}
 \end{equation}
+where $h$ and $A$ are the thickness and area of the membrane.  It just so happens that, in this case, the mass matrix turns out nice.  Because septal volume $V$ is considered to be preserved, i.e., $V = V_0$ where $V_0 = h_0 A_0$ and $V = h A$, it follows that this mass matrix is constant; hence, its inverse need only be determined once.
+
+Three mass matrices have been constructed for a pentagon based upon the three, Gauss, quadrature rules presented in Table~\ref{tabQuadrature}, which integrate polynomials of orders 1, 3 and 5 exactly, respectively. 
 
 \subsubsection{Assemble Mass Matrices for the Alveolar Septa}
 
 
 \subsection{Mass Matrices for a Tetrahedron}
 
-A dodecahedron has 60 individual tetrahedra contained within it whose centroid is a common vertex to all 60 of these tetrahedra. Hence, an analysis to find the mass matrix of a tetrahedron is used as the building block needed to assemble the mass matrix for an alveolar sac.
+A dodecahedron has 60 individual tetrahedra contained within it, whose centroid is a common vertex to all 60 of these tetrahedra. Hence, an analysis to find the mass matrix of a tetrahedron is used as the building block needed to assemble the mass matrix for an alveolar sac.
 
 The matrix of shape functions $\mathbf{N}$ for a tetrahedon has the form of
 \begin{equation}
@@ -279,7 +238,7 @@ The matrix of shape functions $\mathbf{N}$ for a tetrahedon has the form of
 \end{bmatrix*} 
 	\label{shape3D}
 \end{equation}
-in which $\mathrm{N}_i (i = 1, 2, 3, 4)$ are four shape functions corresponding to the four vertices of a tetrahedron that are defined as follows
+in which $\mathrm{N}_i$, $i = 1, 2, 3, 4$, are the four shape functions corresponding to the four vertices of a tetrahedron that are defined as follows
 \begin{subequations}
 \begin{align}
 	N_1 & = 1 - \xi - \eta - \zeta \\
@@ -290,9 +249,11 @@ in which $\mathrm{N}_i (i = 1, 2, 3, 4)$ are four shape functions corresponding 
 \end{subequations}
 Numerical integration is used to obtain the mass matrix of a tetrahedron via
 \begin{equation}
-    \mathbf{M}_{3C} =  \sum_{i=1}^{n} \sum_{j=1}^{n} \sum_{k=1}^{n} \rho  \mathbf{N}^{\mathsf{T}} \mathbf{N} \,  \,|\mathbf{J}| \, w_i \, w_j \, w_k
+    \begin{aligned}
+    \mathbf{M}_{3C} & = \iiint_V \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \, \mathrm{d} \mathbf{x} \, \mathrm{d} \mathbf{y} \, \mathrm{d} \mathbf{z} = \int_0^1 \int_0^1 \int_0^1 \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \, | \mathbf{J} | \, \mathrm{d} \mathbf{\xi} \, \mathrm{d} \mathbf{\eta} \, \mathrm{d} \mathbf{\zeta} \\ & = \sum_{i=1}^n \rho \, \mathbf{N}^{\mathsf{T}} ( \xi_i , \eta_i , \zeta_i ) \, \mathbf{N} (\xi_i , \eta_i , \zeta_i ) \,|\mathbf{J}| \, w_i
+    \end{aligned}
 \end{equation}
-with $|\mathbf{J}|$ being the determinant of the Jacobian matrix for a tetrahedron.  This Jacobian is calculated using derivatives of the shape functions taken with respect to its local coordinates $(\xi, \eta, \zeta)$ and its current global coordinates $(x_i, y_i, z_i)$ via
+with $|\mathbf{J}|$ being the determinant of the Jacobian matrix, and $n$ denoting the number of Gauss points used for integration.  The Jacobian is calculated from derivatives of the shape functions taken with respect to its local co-ordinates $(\xi, \eta, \zeta)$ that associate with their current global co-ordinates $(x_i, y_i, z_i)$ according to
 \begin{equation}
 \begin{aligned}
  \mathbf{J}= &
@@ -300,7 +261,11 @@ with $|\mathbf{J}|$ being the determinant of the Jacobian matrix for a tetrahedr
 \partial x / \partial\xi & \partial y / \partial\xi & \partial z / \partial\xi\\
 \partial x / \partial\eta & \partial y / \partial\eta & \partial z / \partial\eta \\
 \partial x / \partial\zeta & \partial y / \partial\zeta & \partial z / \partial\zeta 
-\end{bmatrix}\\
+\end{bmatrix} = \begin{bmatrix} 
+    x_{,\xi} & y_{,\xi} & z_{,\xi} \\
+    x_{,\eta} & y_{\eta} & z_{,\eta} \\
+    x_{,\zeta} & y_{,\zeta} & z_{,\zeta}
+\end{bmatrix} \\
   = & \begin{bmatrix}
 \sum\nolimits_{i=1}^4 N_{i,\xi} (\xi,\eta,\zeta) \, x_i & \sum\nolimits_{i=1}^4 N_{i,\xi} (\xi,\eta,\zeta) \, y_i &
 \sum\nolimits_{i=1}^4 N_{i,\xi} (\xi,\eta,\zeta) \, z_i\\
@@ -308,7 +273,7 @@ with $|\mathbf{J}|$ being the determinant of the Jacobian matrix for a tetrahedr
 \sum\nolimits_{i=1}^4 N_{i,\eta} (\xi,\eta,\zeta) \, z_i\\
 \sum\nolimits_{i=1}^4 N_{i,\zeta} (\xi,\eta,\zeta) \, x_i & \sum\nolimits_{i=1}^4 N_{i,\zeta} (\xi,\eta,\zeta) \, y_i &
 \sum\nolimits_{i=1}^4 N_{i,\zeta} (\xi,\eta,\zeta) \, z_i
-\end{bmatrix} .
+\end{bmatrix} 
 \end{aligned}
 \label{jacobiantet}
 \end{equation}
@@ -319,42 +284,33 @@ with
 y_{,\eta} \, z_{,\zeta} - z_{,\eta} \, y_{,\zeta}  & z_{,\xi} \, y_{,\zeta} - y_{,\xi} \, z_{,\zeta} & y_{,\xi} \, z_{,\eta} - y_{,\eta} \, z_{,\xi} \\
 z_{,\eta} \, x_{,\zeta} - x_{,\eta} \, z_{,\zeta}  &  x_{,\xi} \, z_{,\zeta} - z_{,\xi} \, x_{,\zeta} & z_{,\xi} \, x_{,\eta} - x_{,\xi} \, z_{,\eta} \\
  x_{,\eta} \, y_{,\zeta} - y_{,\eta} \, x_{,\zeta}  & y_{,\xi} \, x_{,\zeta} - x_{,\xi} \, y_{,\zeta} & y_{,\eta} \, x_{,\xi} - y_{,\xi} \, x_{,\eta} \\
-\end{bmatrix} .
+\end{bmatrix} 
 \label{detjacobiantet}
 \end{equation}
+establishing its inverse.
 
-Three mass matrices for a tetrahedron are implemented based upon the three Gauss, quadrature rules in Table~\ref{tabQuadraturetetra}.  These integrate polynomials of order 1, 2 and 3, respectively. 
+For instance, the averaged lumped-consistent mass matrix for a tetrahedron with 1 Gauss point of integration located at its centroid is
+\begin{equation}
+\mathbf{M}_{3A} = \frac{\rho \, V}{96} \begin{bmatrix}
+5 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+0 & 5 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 \\
+0 & 0 & 5 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 \\
+1 & 0 & 0 & 5 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+0 & 1 & 0 & 0 & 5 & 0 & 0 & 1 & 0 & 0 & 1 & 0 \\
+0 & 0 & 1 & 0 & 0 & 5 & 0 & 0 & 1 & 0 & 0 & 1 \\
+1 & 0 & 0 & 1 & 0 & 0 & 5 & 0 & 0 & 1 & 0 & 0 \\
+0 & 1 & 0 & 0 & 1 & 0 & 0 & 5 & 0 & 0 & 1 & 0 \\
+0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 5 & 0 & 0 & 1 \\
+1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 5 & 0 & 0 \\
+0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 5 & 0 \\
+0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 5 
+\end{bmatrix}
+\end{equation}
+where the volume $V$ varies with deformation because air is compressible.  The other cases are not as simple.
 
-\begin{table}
-    \centering
-    \begin{tabular}{|c|rrrr|}
-        \hline
-        node & \centering $\xi$ coordinate \phantom{1234}  & 
-        $\eta$ coordinate \phantom{1234} & 
-        $\zeta$ coordinate \phantom{1234} & weight \phantom{12345} \\ \hline        
-        & \multicolumn{4}{|c|}{Exact for Polynomials of Degree $1^{\phantom{|^|}}$} \\ 
-        \hline
-        1 & 1/4 & 1/4 & 1/4 & 1/6 \\ 
-        \hline
-        & \multicolumn{4}{|c|}{Exact for Polynomials of Degree $2^{\phantom{|^|}}$} \\ \hline
-        1 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & 1/24\\
-        2 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & (5 + 3 $\sqrt{5}$)/20 & 1/24\\
-        3 & (5 - $\sqrt{5}$)/20 & (5 + 3 $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & 1/24\\ 
-        4 & (5 + 3 $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & 1/24\\ 
-        \hline
-        & \multicolumn{4}{|c|}{Exact for Polynomials of Degree $3^{\phantom{|^|}}$} \\ \hline
-        1 & 1/4 & 1/4 & 1/4 & -2/15 \\
-        2 & 1/2 & 1/6 & 1/6 & 3/40\\
-        3 & 1/6 & 1/2 & 1/6 & 3/40\\ 
-        4 & 1/6 & 1/6 & 1/2 & 3/40 \\
-        5 & 1/6 & 1/6 & 1/6 & 3/40 \\
-        \hline
-    \end{tabular}
-    \caption{Generalized, Gaussian, quadrature, weights and nodes  for integrating over a tetrahedron in its natural coordinate system.}
-    \label{tabQuadraturetetra}
-\end{table} 
+Three mass matrices for a tetrahedron are implemented based upon the three, Gauss, quadrature rules presented in Table~\ref{tabQuadraturetetra}.  These quadratures integrate polynomials of order 1, 2 and 3, respectively. 
 
-\subsubsection{Assemble Mass Matrices for the Alveolar Sac}
+\subsubsection{Assemble Tetrahedral Mass Matrices to Get Mass Matrix for an Alveolar Sac}
 
 
 \section{Stiffness Matrix}
@@ -400,7 +356,7 @@ where $\mathbf{B}_L$ is obtained from linear analysis, i.e., $\mathbf{E}_L = \ma
 \begin{equation}
 \mathbf{E}_N = \tfrac{1}{2} \, {\mathbf{A}} \,  \boldsymbol{\theta}
 \end{equation}
-with ${\mathbf{A}}$ being a matrix of derivatives of displacement, and $\boldsymbol{\theta}$ being a vector of derivatives of displacement that can be expressed as $\boldsymbol{\theta} = \mathbf{H} \, \boldsymbol{\Delta} $, or in rate form as $\mathrm{d} \boldsymbol{\theta} = \mathbf{H} \, \mathrm{d} \boldsymbol{\Delta}$, where $\mathbf{H}$ is the derivative of shape functions taken respect to the global coordinate system.  Thus, the derivative of strain takes on the form of
+with ${\mathbf{A}}$ being a matrix of derivatives of displacement, and $\boldsymbol{\theta}$ being a vector of derivatives of displacement that can be expressed as $\boldsymbol{\theta} = \mathbf{H} \, \boldsymbol{\Delta} $, or in rate form as $\mathrm{d} \boldsymbol{\theta} = \mathbf{H} \, \mathrm{d} \boldsymbol{\Delta}$, where $\mathbf{H}$ is the derivative of shape functions taken respect to the global co-ordinate system.  Thus, the derivative of strain takes on the form of
 \begin{equation}
 \mathrm{d} \mathbf{E} = \mathrm{d} (\mathbf{E}_L + \mathbf{E}_N) = \mathrm{d} \mathbf{E}_N = \tfrac{1}{2} \, (\mathrm{d} \mathbf{A} \, \boldsymbol{\theta} + \mathbf{A} \, \mathrm{d} \boldsymbol{\theta}) = \mathbf{A} \, \mathbf{H} \, \mathrm{d} \boldsymbol{\Delta} .
 \label{dstrain1}
@@ -409,7 +365,7 @@ Rewriting Eqn.~(\ref{straindis}) in incremental form yields $\mathrm{d} \bar{\ma
 \begin{equation}
 \mathbf{B}_N = \mathbf{A} \, \mathbf{H} \quad \text{with} \quad \mathrm{d} \mathbf{B}_N = \mathrm{d} \mathbf{A} \, \mathbf{H}
 \end{equation} 
- wherein $\mathrm{d} \mathbf{A} = \mathbf{A}^{'} \, \mathrm{d} \boldsymbol{\Delta} $.
+wherein $\mathrm{d} \mathbf{A} = \mathbf{A}^{'} \, \mathrm{d} \boldsymbol{\Delta} $.
 
 In order to satisfy the equilibrium, the first variation of the total potential energy, which is known as the residual force, should be zero \cite{Elseifi98}, viz.,
 \begin{equation}
@@ -522,12 +478,12 @@ wherein $\mathbf{T}$ is the stress carried by collagen and elastin fibers, as di
 \end{equation}
 where the Jacobian $\mathbf{J}$ is defined in Eqn.~\ref{detJac1D}.
 
-The small displacement stiffness matrix for a 1-D alveolar chord that is transformed from global coordinate system to the natural coordiante system by the determinant of the Jacobian matrix, i.e., Eq.~(\ref{detJac1D}) is evaluated numerically as 
+The small displacement stiffness matrix for a 1-D alveolar chord that is transformed from global co-ordinate system to the natural coordiante system by the determinant of the Jacobian matrix, i.e., Eq.~(\ref{detJac1D}) is evaluated numerically as 
 \begin{equation}
 \mathbf{K}_{L} = \int_{\Gamma} \, \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, A \, \mathrm{d} x  = \int_{-1}^{1} \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, \mathbf{J}  \, A \,  \mathrm{d} \xi =  \sum_{i=1}^{n}  \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, \mathbf{J} \, A \, \mathrm{w}_i
 \end{equation}
 with $\mathrm{w}_i$ being the  weighting coefficients of the Gauss integration rule, and $A$ being the cross section area of alveolar chord. The values of $\xi$ and $\mathrm{w}_i$ for $n = 1, 2$, and $3$ Gauss integration points are demonstrated in Table~\ref{tabQuadrature1D}.
-In calculation of the stiffness matrix for an element, the linear strain-displacement matrix $\mathbf{B}_L$ is required that is the derivatives of the shape functions with respect to the global coordinate system  
+In calculation of the stiffness matrix for an element, the linear strain-displacement matrix $\mathbf{B}_L$ is required that is the derivatives of the shape functions with respect to the global co-ordinate system  
 \begin{equation}
 \mathbf{B}_L = \begin{bmatrix}
  N_{1,x} &   N_{2,x}
@@ -1282,7 +1238,7 @@ with $ \mathbf{F} $ being the deformation gradient.
 
 \subsection{Force Vector for a Chord}
 
-The force vector of the 1-D alveolar chord that is evaluated numerically in its natural coordinate system can be described as
+The force vector of the 1-D alveolar chord that is evaluated numerically in its natural co-ordinate system can be described as
 \begin{equation}
 \mathbf{F}_{1D} = \int_{\Gamma} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} x  = \int_{-1}^{1} \mathbf{N}^{\mathsf{T}}\, \mathbf{t} \, \mathbf{J}\,  \mathrm{d} \xi =  \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathbf{J} \, \mathrm{w}_i
 \end{equation}
@@ -1331,8 +1287,8 @@ wherein $ \mathbf{N}$ being the shape function matrix for a triangle with the ma
 	\centering
 	\begin{tabular}{|c|rrr|}
 		\hline
-		node & $\xi$ coordinate   & 
-		$\eta$ coordinate & weight \\   \hline        
+		node & $\xi$ co-ordinate   & 
+		$\eta$ co-ordinate & weight \\   \hline        
 		& \multicolumn{3}{|c|}{Exact for Polynomials of Degree $1^{\phantom{|^|}}$} \\ 
 		\hline
 		1 & 1/3 & 1/3 & 1.0 \\ 
@@ -1350,7 +1306,7 @@ wherein $ \mathbf{N}$ being the shape function matrix for a triangle with the ma
 		4 & 1/5 & 3/5 & 25/48 \\
 		\hline
 	\end{tabular}
-	\caption{Generalized, Gaussian, weights and nodes for integrating over a triangle in its natural coordinate system.}
+	\caption{Generalized, Gaussian, weights and nodes for integrating over a triangle in its natural co-ordinate system.}
 	\label{tabGaussPointsTriangle}
 \end{table}
 
