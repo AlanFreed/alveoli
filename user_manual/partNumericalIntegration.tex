@@ -5,9 +5,9 @@ This analysis tool, which models the geometry of alveoli as a dodecahedron, requ
 
 \section{ODE Solvers}
 
-The various constitutive equations that describe our alveolar model present themselves as ordinary differential equations that need to be integrated.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} which are suitable for solving stiff systems of first- and second-order, ordinary, differential equations.  These methods are based upon Gear's well-known second-order backward difference formula (BDF2, which is Eqn.~\ref{1stOrderCorrector} below).
+The various constitutive equations that describe our alveolar model present themselves as ordinary differential equations that need to be integrated.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} which are suitable for solving stiff systems of first- and second-order, ordinary, differential equations.  These methods are based upon Gear's well-known second-order backward difference formula (BDF2, which is Eqns.~\ref{1stOrderCorrector} \& \ref{velocityCorrector} below).
 
-Time $t$ is considered to be the independent variable, discretized over an interval in time $[t_0, t_N]$ for which $N$ solutions are to be extracted at nodes $n=1, 2, \ldots, N$ spaced at uniform intervals in time with a common step size of $h = (t_N - t_0)/N$ separating them, where time $t_0$ associates with the initial conditions.  This is the \textit{global step size\/} at which solutions are to be gathered.  A dynamically controlled \textit{local step size}, whose size is adjusted on the fly to manage truncation error, is implemented into the code according to a scheme put forward in Ref.~\cite{Soderlind02}.  Solver interfaces are listed in \ref{appSolvers}.
+Time $t$ is considered to be the independent variable, discretized over an interval in time $[t_0, t_N]$ for which $N$ solutions are to be extracted at nodes $n=1, 2, \ldots, N$ spaced at uniform intervals in time with a common step size of $h = (t_N - t_0)/N$ separating them, where time $t_0$ associates with the initial conditions.  This is the \textit{global step size\/} at which solutions are to be gathered.  A dynamically controlled \textit{local step size}, whose size is adjusted on the fly via a PI controller to manage truncation error, is implemented into the code according to a scheme put forward in Ref.~\cite{Soderlind02}.  Solver interfaces are listed in \ref{appSolvers}.
 
 \subsection{PECE Solver for First-Order ODEs}
 \label{sec:1stOrderPECE}
@@ -66,11 +66,11 @@ The two-step method of Freed \cite{Freed17a} for solving $1^{\text{st}}$ order O
 \end{subequations} 
 where $t_{n+1} = t_n + h$.  This corrector is the well-known BDF2 formula of Gear to which Freed provided a predictor.  The correct\slash re-evaluate steps can be iterated over until a convergence criterion is satisfied, if need be.  Implementation of this integrator is found in \ref{app1stOrderODEs}.  
 
-For both the predictor and corrector, solution $\mathbf{x}$ has a weight of 1, while its rate $\dot{\mathbf{x}}$ has a weight of $\tfrac{2}{3} h$; hence, this predictor\slash corrector pair is consistent.
+For both the predictor and corrector, solution $\mathbf{x}$ has a weight of 1, while its rate $\dot{\mathbf{x}}$ has a weight of $\tfrac{2}{3} h$; hence, this predictor\slash corrector pair is internally consistent, i.e., the predictor and corrector produce the same result when integrating a constant velocity field.
 
 \subsection{A Relevant Example}
 
-In our finite element implementation, a hypo-elastic material model \cite{Truesdell55} is introduced to describe the constitutive response of an alveolus in that
+In our finite element implementation, a hypo-elastic material model \cite{Truesdell55} is introduced to describe the constitutive response of an alveolus whereby
 \begin{displaymath}
     \dot{\boldsymbol{\sigma}} = \mathbf{M} ( \boldsymbol{\sigma} , \boldsymbol{\epsilon} ) \, \dot{\boldsymbol{\epsilon}} 
     \quad \text{or equivalently \cite{Noll55}} \quad
@@ -82,7 +82,7 @@ where $\boldsymbol{\epsilon}$ is a vector of thermo\-dynamic strains, $\boldsymb
    \boldsymbol{\sigma}_{2D} = \{ \eta , s^{\pi} , s^{\sigma} , s^{\tau} \}^{\mathsf{T}} , \quad
    \boldsymbol{\sigma}_{3D} = \{ \eta , \Pi , \sigma_1 , \sigma_2 , \tau_1 , \tau_2 , \tau_3 \}^{\mathsf{T}}
 \end{displaymath}
-where $\eta$ is entropy and the rest are stresses, whose thermo\-dynamic conjugates are the strain attributes
+where $\eta$ is entropy and the rest are stresses.  Their thermo\-dynamic conjugates are the strain attributes
 \begin{displaymath}
 \boldsymbol{\epsilon}_{1D} = \{ \theta , e \} , \quad
 \boldsymbol{\epsilon}_{2D} = \{ \theta , \xi , \varepsilon , \gamma \}^{\mathsf{T}} , \quad
@@ -142,7 +142,7 @@ The two-step method put forward here incrementally solves such an ODE, returning
 
 \subsubsection{Start-Up Algorithm}
 
-Multi-step methods are not self starting, so a one-step method is needed to take the first step of integration, specifically
+Again, multi-step methods are not self starting, so a one-step method is needed to take the first step of integration, specifically
 \begin{subequations}
     \label{pairedStartUp}
     \begin{align}
@@ -222,7 +222,7 @@ The two-step method of Freed \cite{Freed17a} for solving $2^{\text{nd}}$ order O
 \end{subequations}
 where $t_{n+1} = t_n + h$.  An implementation of this integrator is described in \ref{app2ndOrderODEs}.  
 
-The above PECE solver for velocity $\dot{\mathbf{x}}$ is the same method presented in Eq.~(\ref{1stOrderODEs}), so this predictor\slash corrector pair is consistent.  Likewise, in both the predictor and corrector for displacement $\mathbf{x}$, contributions from the solution $\mathbf{x}$ have a weight of 1, contributions from the velocities $\dot{\mathbf{x}}$ have a weight of $\tfrac{2}{3} h$, and contributions from the accelerations $\ddot{\mathbf{x}}$ have a weight of $\tfrac{5}{6} h^2$; hence, this predictor\slash corrector pair is consistent, too.
+The above PECE solver for velocity $\dot{\mathbf{x}}$ is the same method presented in Eq.~(\ref{1stOrderODEs}), so this predictor\slash corrector pair is consistent.  Likewise, in both the predictor and corrector for displacement $\mathbf{x}$, contributions from the solution $\mathbf{x}$ have a weight of 1, contributions from the velocities $\dot{\mathbf{x}}$ have a weight of $\tfrac{2}{3} h$, and contributions from the accelerations $\ddot{\mathbf{x}}$ have a weight of $\tfrac{5}{6} h^2$; hence, this predictor\slash corrector pair is consistent, too.  In other words, these predictor\slash corrector pairs produce the same results when integrating a constant acceleration field.
 
 \subsection{A Relevant Example}
 \label{sec:solve2ndOrderODE}
@@ -297,46 +297,128 @@ We observe that the mass matrix must not be ill conditioned in order for this al
 \section{Quadrature Rules for Spatial Integration}
 \label{secGauss}
 
-Three Gauss quadrature rules are given here for alveolar chords, alveolar septa and for tetrahedra that fill an alveolar sac.  These formul\ae\ integrate polynomials of $1^{\text{st}}$, $3^{\text{rd}}$ and $5^{\text{th}}$ degrees, exactly, for the chord and pentagon, and of $1^{\text{st}}$, $2^{\text{nd}}$ and $3^{\text{rd}}$ degrees, exactly, for a tetrahedron.  In all cases, integrating $1^{\text{st}}$ order polynomials takes place at their centroids.
+Four, Gauss, quadrature rules are given here for 1D rods, 2D triangles, 2D pentagons and 3D tetrahedra, which are used in our modeling of alveoli.  The formul\ae\ provided can integrate $1^{\text{st}}$, $3^{\text{rd}}$ and $5^{\text{th}}$ order polynomials exactly for their respective geometries.  Integrating $1^{\text{st}}$ order polynomials takes place at their centroids.  All integrations occur in their natural co-ordinate systems.
 
-\subsection{Gauss Integration of Alveolar Chords}
+\subsection{Gauss Integration of a Rod}
 
-The quadrature rules that integrate a 1D chord in its natural co-ordinate system, which spans $-1 \leq \xi \leq 1$, are presented in Table~\ref{tabQuadrature1D}.  These formul\ae\ are well known and can be found in most finite element textbooks.
+Quadrature rules that integrate a 1D chord in its natural co-ordinate system, which spans $-1 \leq \xi \leq 1$, are presented in Table~\ref{tabQuadrature1D}.  These formul\ae\ are well known and can be found in any finite element textbook.  Here the integral of some function $f( \xi )$ is approximated via the quadrature rule
+\begin{equation}
+    I = \int_{-1}^1 f ( \xi ) \, \mathrm{d} \xi 
+    = \sum_{i=1}^n w_i f( \xi_i ) + E
+    \quad \text{where} \quad
+    \int_{-1}^1 \mathrm{d} \xi = \sum_{i=1}^n w_i = 2
+    \label{Gauss1D}
+\end{equation}
+wherein $\xi_i$ and $w_i$ are the nodes and weights of integration, of which there are $n$ pairs, with $E$ denoting the error of approximation.  The quadrature rules for Gauss integration are typically selected to integrate elements in a finite element model, because they have the smallest errors of approximation.
 
 \begin{table}
     \centering
     \begin{tabular}{|c|rr|}
         \hline
-        node & \centering $\xi$ co-ordinate \phantom{1}  & 
-        weight \phantom{123} \\ \hline
+        nodes & \centering $\xi$ co-ordinate \phantom{123}  & 
+        weight \phantom{123456} \\ \hline
         & \multicolumn{2}{|c|}{Exact for Polynomials of Degree $1^{\phantom{|^|}}$} \\ 
         \hline
-        1 & 0.000000000000 & 2.000000000000 \\ 
+        1 & 0.000000000000000 & 2.000000000000000 \\ 
         \hline
         & \multicolumn{2}{|c|}{Exact for Polynomials of Degree $3^{\phantom{|^|}}$} \\ \hline
-        1 & -0.577350269189 & 1.000000000000\\
-        2 & 0.577350269189 & 1.000000000000\\ 
+        1 & -0.577350269189626 & 1.000000000000000 \\
+        2 & 0.577350269189626 & 1.000000000000000 \\ 
         \hline
         & \multicolumn{2}{|c|}{Exact for Polynomials of Degree $5^{\phantom{|^|}}$} \\ \hline
-        1 & -0.774596669241 & 0.555555555556 \\
-        2 & 0.000000000000 & 0.888888888889\\
-        3 & 0.774596669241 & 0.555555555556\\ 
+        1 & -0.774596669241483 & 0.555555555555556 \\
+        2 & 0.000000000000000 & 0.888888888888889\\
+        3 & 0.774596669241483 & 0.555555555555556\\ 
         \hline
     \end{tabular}
-    \caption{Generalized, Gaussian, quadrature weights and nodes for integrating over an alveolar chord in its natural co-ordinate system.  These weights sum to 2, the span of its natural co-ordinate.  We note that $1/\sqrt{3} \approx 0.577350269189$ and that $\sqrt{3/5} \approx 0.774596669241$.}
+    \caption{Gauss quadrature weights and nodes for integrating over a line in its natural co-ordinate system $\xi$.  These weights sum to 2, which is the span of its natural co-ordinate.  We note that $1/\sqrt{3} \approx 0.577350269189626$ and that $\sqrt{3/5} \approx 0.774596669241483$.}
     \label{tabQuadrature1D}
 \end{table}
 
-\subsection{Gauss Integration of Alveolar Septa}
 
-Three, Gauss, quadrature rules for a regular pentagon described in its natural coordinate system, i.e., oriented according to Fig.~\ref{figRegPentagon}, are presented in Table~\ref{tabQuadrature}.  These quadratures exactly integrate polynomials of order 1, 3 and 5, respectively.  They were supplied to the authors by Prof.\ N.\ Sukumar from the University of California at Davis, which he derived for us at our request using a methodology that he published in \cite{Mousavietal10}.  In that document, the authors derived formul\ae\ for determining the nodes and weights for a class of generalized, Gaussian, quadrature rules, which they then applied to pentagons, hexagons, heptagons and octagons, of which they only published their nodes and weights of quadrature for the hexagon, as it tiles two space.  The node for the $1^{\mathrm{st}}$ order method is located at the centroid.  Nodes for the $3^{\mathrm{rd}}$ and $5^{\mathrm{th}}$ order methods of Table~\ref{tabQuadrature} are displayed in Fig.~\ref{figQuadrature}.
+\subsection{Multi-Dimensional Integration}
+
+When integrating a function $f$ over, e.g., a square, one often introduces tensor products of the 1D formul\ae\ (\ref{Gauss1D}) listed in Table~\ref{tabQuadrature1D}; specifically, one might construct integration quadratures that look like
+\begin{displaymath}
+    I = \int_{-1}^1 \int_{-1}^1 f ( \xi , \eta ) \, \mathrm{d} \xi \, \mathrm{d} \eta =
+    \int_{-1}^1 \sum_{i=1}^n w_i f ( \xi_i , \eta ) \, \mathrm{d} \eta + E =
+    \sum_{i=1}^n \sum_{j=1}^n w_i w_j f ( \xi_i , \eta_ j ) + E 
+\end{displaymath}
+which is the integration scheme presented in many textbooks on finite elements.  However, these formul\ae\ are not optimal, because they require many more function evaluations than are necessary in order to secure a quadrature at a specified accuracy.  It is much more efficient to adopt non-tensor product quadratures where, when integrating over a square, one has
+\begin{displaymath}
+    I = \int_{-1}^1 \int_{-1}^1 f ( \xi , \eta ) \, \mathrm{d} \xi \, \mathrm{d} \eta =
+    \sum_{i=1}^n w_i f ( \xi_i , \eta_i ) + E
+    \quad \text{where} \quad
+    \int_{-1}^1 \int_{-1}^1 \mathrm{d} \xi \, \mathrm{d} \eta = 
+    \sum_{i=1}^n w_i = 4
+\end{displaymath}
+with co-ordinates $\xi_i$ and $\eta_i$ placing the $i^{\text{th}}$ node of integration inside a square of area 4 whose corresponding weight of integration is $w_i$, with their being $n$ pairs of nodes and weights.  
+
+It is this latter formula that we employ for our multi-dimensional integrations.
+
+\subsection{Gauss Integration of a Triangle}
+
+The triangle considered has natural co-ordinates $( \xi , \eta )$ that span $0 \leq \xi \leq 1-\eta$ and $0 \leq \eta \leq 1$ so that the integral of interest becomes
+\begin{equation}
+I = \int_0^1 \int_{\xi =0}^{1-\eta} f ( \xi , \eta ) \, \mathrm{d} \xi \, \mathrm{d} \eta =
+\sum_{i=1}^n w_i f ( \xi_i , \eta_i ) + E
+\quad \text{where} \quad
+\int_0^1 \int_{\xi =0}^{1-\eta} \mathrm{d} \xi \, \mathrm{d} \eta = 
+\sum_{i=1}^n w_i = \frac{1}{2}
+\label{GaussTriangle}
+\end{equation}
+with co-ordinates $\xi_i$ and $\eta_i$ placing the $i^{\text{th}}$ node of integration inside the triangle whose corresponding weight of integration is $w_i$, with their being $n$ pairs of nodes and weights.  The area of this triangle is \textfrac{1}{2}, the sum of its weights. Table~\ref{tabQuadrature2D} provides a selection of quadratures for such triangles.  This table can be found in some finite element textbooks.
 
 \begin{table}
     \centering
     \begin{tabular}{|c|rrr|}
         \hline
-        node & \centering $\xi$ coordinate \phantom{123}  & 
-        $\eta$ coordinate \phantom{123} & weight \phantom{12345} \\ \hline
+        nodes & \centering $\xi$ co-ordinate \phantom{123} & 
+        \centering $\eta$ co-ordinate \phantom{123} &
+        weight \phantom{123456} \\ \hline
+        & \multicolumn{3}{|c|}{Exact for Polynomials of Degree $1^{\phantom{|^|}}$} \\ 
+        \hline
+        1 & 0.333333333333333 & 0.333333333333333 & 0.500000000000000 \\ 
+        \hline
+        & \multicolumn{3}{|c|}{Exact for Polynomials of Degree $3^{\phantom{|^|}}$} \\ \hline
+        1 & 0.333333333333333 & 0.333333333333333 & -0.281250000000000 \\
+        2 & 0.200000000000000 & 0.600000000000000 & 0.260416666666667 \\ 
+        3 & 0.200000000000000 & 0.200000000000000 & 0.260416666666667 \\
+        4 & 0.600000000000000 & 0.200000000000000 & 0.260416666666667 \\ 
+        \hline
+        & \multicolumn{3}{|c|}{Exact for Polynomials of Degree $5^{\phantom{|^|}}$} \\ \hline
+        1 & 0.333333333333333 & 0.333333333333333 & 0.112500000000000 \\
+        2 & 0.101286507323456 & 0.797426985353087 & 0.062969590272413 \\ 
+        3 & 0.101286507323456 & 0.101286507323456 & 0.062969590272413 \\
+        4 & 0.797426985353087 & 0.101286507323456 & 0.062969590272413 \\
+        5 & 0.470142064105115 & 0.059715871789770 & 0.066197076394253 \\ 
+        6 & 0.470142064105115 & 0.470142064105115 & 0.066197076394253 \\
+        7 & 0.059715871789770 & 0.470142064105115 & 0.066197076394253 \\
+        \hline
+    \end{tabular}
+    \caption{Gauss quadrature weights and nodes for integrating over a triangle in its natural co-ordinate system $( \xi , \eta )$, where $0 \leq \xi \leq 1 - \eta$ and $0 \leq \eta \leq 1$.  These weights sum to \textfrac{1}{2}, which is the area of a triangle when evaluated in its natural co-ordinate system.}
+    \label{tabQuadrature2D}
+\end{table}
+
+
+\subsection{Gauss Integration of a Pentagon}
+
+Gauss quadrature rules for a regular pentagon described in its natural coordinate system, i.e., oriented according to Fig.~\ref{figRegPentagon}, are presented in Table~\ref{tabQuadrature}, which describe integrations of the type
+\begin{multline}
+    \iint_{\pentagon} f ( \xi , \eta) \, \mathrm{d} \xi \, \mathrm{d} \eta = 
+    \sum_{i=1}^n w_i f ( \xi_i , \eta_i ) + E \\
+    \text{with} \quad
+    \iint_{\pentagon} \mathrm{d} \xi \, \mathrm{d} \eta = \sum_{i=1}^n w_i =
+    A^p = 5 \sin \omega \cos \omega = 2.3776412907378837 
+\end{multline}
+where co-ordinates $\xi_i$ and $\eta_i$ place the $i^{\text{th}}$ node inside the pentagon whose corresponding weight of integration is $w_i$, with their being $n$ pairs of nodes and weights, and where $A^p$ is the area of this pentagon with $2 \omega = 108^{\circ}$ being an inside angle of this regular pentagon. 
+
+\begin{table}
+    \centering
+    \begin{tabular}{|c|rrr|}
+        \hline
+        node & \centering $\xi$ co-ordinate \phantom{123}  & 
+        $\eta$ co-ordinate \phantom{123} & weight \phantom{12345} \\ \hline
         & \multicolumn{3}{|c|}{Exact for Polynomials of Degree $1^{\phantom{|^|}}$} \\ \hline
         1 & 0.0000000000000000 & 0.0000000000000000 &
         2.3776412907378837\vphantom{$|^{|^|}$} \\ 
@@ -359,11 +441,11 @@ Three, Gauss, quadrature rules for a regular pentagon described in its natural c
         7 &  0.5337947578638855 &  0.4872045224587945 & 0.2642573384350463 \\
         \hline
     \end{tabular}
-    \caption{Generalized, Gaussian, quadrature weights and nodes (a.k.a., cubature rules) for integrating over a regular pentagon in its natural coordinate system.  These weights sum to the area of a pentagon inscribing an unit circle, the formula of which is given in Eqn.~(\ref{regPentagonArea}).}
+    \caption{Gauss quadrature weights and nodes (a.k.a., cubature rules) for integrating over a regular pentagon in its natural coordinate system $( \xi , \eta )$.  These weights sum to the area of a pentagon inscribing an unit circle, the formula of which is given in Eqn.~(\ref{regPentagonArea}).}
     \label{tabQuadrature}
 \end{table}
 
-The Gaussian quadrature rules of Mousavi, Xiao \& Sukumar \cite{Mousavietal10} presented in Table~\ref{tabQuadrature} are compatible with the shape functions of Wachspress \cite{Wachspress75,Wachspress16} and Dasgupta \cite{Dasgupta03} presented in \S\ref{secShapeFns}.
+The quadratures presented in Table~\ref{tabQuadrature} were supplied to the authors by Prof.\ N.\ Sukumar from the University of California at Davis, which he derived for us at our request using a methodology that he published in Ref.~\cite{Mousavietal10}.  In that document, the authors derived formul\ae\ for determining the nodes and weights for a class of generalized, Gaussian, quadrature rules, which they then applied to pentagons, hexagons, heptagons and octagons, of which they only published their nodes and weights of quadrature for the hexagon, as it tiles two space.  The node for the $1^{\mathrm{st}}$ order method is located at the centroid.  Nodes for the $3^{\mathrm{rd}}$ and $5^{\mathrm{th}}$ order methods of Table~\ref{tabQuadrature} are displayed in Fig.~\ref{figQuadrature}.
 
 \begin{figure}
     \centering
@@ -374,34 +456,78 @@ The Gaussian quadrature rules of Mousavi, Xiao \& Sukumar \cite{Mousavietal10} p
     \label{figQuadrature}
 \end{figure}
 
-\subsection{Gauss Integration of Alveolar Sacs}
+The Gaussian quadrature rules of Mousavi, Xiao \& Sukumar \cite{Mousavietal10} presented in Table~\ref{tabQuadrature} are compatible with the shape functions of Wachspress \cite{Wachspress75,Wachspress16} and Dasgupta \cite{Dasgupta03} presented in \S\ref{secShapeFns}.
 
-The quadrature rules that integrate a 2D tetrahedron in its natural co-ordinate system, where the apex is at the origin, and along its three axes: $0 \leq \xi \leq 1$, $0 \leq \eta \leq 1$ and $0 \leq \zeta \leq 1$.  These formul\ae\ integrate polynomials of $1^{\text{st}}$, $2^{\text{nd}}$ and $3^{\text{rd}}$ degrees, exactly, and can be found in most finite element textbooks.  
+\subsection{Gauss Integration of a Tetrahedron}
+
+Integrating over the volume of a tetrahedron, when expressed in its natural co-ordinates $( \xi , \eta , \zeta )$ that span $0 \leq \xi \leq 1 - \eta - \zeta$, $0 \leq \eta \leq 1 - \zeta$ and $0 \leq \zeta \leq 1$ so that the integral of interest becomes
+\begin{multline}
+     I = \int_0^1 \int_{\eta=0}^{1-\zeta} \int_{\xi = 0}^{1 - \eta - \zeta} 
+     f ( \xi , \eta , \zeta ) \, \mathrm{d} \xi \, \mathrm{d} \eta \, 
+     \mathrm{d} \zeta = \sum_{i=1}^n w_i f( \xi_i , \eta_i , \zeta_i ) + E \\
+     \text{where} \quad 
+     \int_0^1 \int_{\eta=0}^{1-\zeta} \int_{\xi = 0}^{1 - \eta - \zeta} 
+     \mathrm{d} \xi \, \mathrm{d} \eta \, \mathrm{d} \zeta = \sum_{i=1}^n w_i = 
+     \frac{1}{6}
+\end{multline}
+with co-ordinates $\xi_i$, $\eta_i$ and $\zeta_i$ placing the $i^{\text{th}}$ node of integration inside the tetrahedron whose corresponding weight of integration is $w_i$, with there being $n$ pairs of nodes and weights.  The volume of this tetradedron is \textfrac{1}{6}.  Table~\ref{tabQuadraturetetra} provides a selection of quadratures for tetrahedra when mapped into their natural co-ordinate system.  This table can be found in some finite element textbooks.
 
 \begin{table}
     \centering
     \begin{tabular}{|c|rrrr|}
         \hline
-        node & \centering $\xi$ co-ordinate & $\eta$ co-ordinate & 
-        $\zeta$ co-ordinate & weight \\ \hline        
+        node & \centering $\xi$ co-ordinate \phantom{12} & $\eta$ co-ordinate \phantom{12} & 
+        $\zeta$ co-ordinate \phantom{12} & weight \phantom{12345} \\ \hline        
         & \multicolumn{4}{|c|}{Exact for Polynomials of Degree $1^{\phantom{|^|}}$} \\ 
         \hline
-        1 & 1/4 & 1/4 & 1/4 & 1/6 \\ 
-        \hline
-        & \multicolumn{4}{|c|}{Exact for Polynomials of Degree $2^{\phantom{|^|}}$} \\ \hline
-        1 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & 1/24\\
-        2 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & (5 + 3 $\sqrt{5}$)/20 & 1/24\\
-        3 & (5 - $\sqrt{5}$)/20 & (5 + 3 $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & 1/24\\ 
-        4 & (5 + 3 $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & (5 - $\sqrt{5}$)/20 & 1/24\\ 
+        1 & 0.250000000000000 & 0.250000000000000 & 0.250000000000000 & 
+            0.166666666666667 \\ 
         \hline
         & \multicolumn{4}{|c|}{Exact for Polynomials of Degree $3^{\phantom{|^|}}$} \\ \hline
-        1 & 1/4 & 1/4 & 1/4 & -2/15 \\
-        2 & 1/2 & 1/6 & 1/6 & 3/40\\
-        3 & 1/6 & 1/2 & 1/6 & 3/40\\ 
-        4 & 1/6 & 1/6 & 1/2 & 3/40 \\
-        5 & 1/6 & 1/6 & 1/6 & 3/40 \\
+        1 & 0.250000000000000 & 0.250000000000000 & 0.250000000000000 & 
+           -0.133333333333333 \\
+        2 & 0.500000000000000 & 0.166666666666667 & 0.166666666666667 &  
+            0.075000000000000 \\
+        3 & 0.166666666666667 & 0.500000000000000 & 0.166666666666667 &  
+            0.075000000000000 \\ 
+        4 & 0.166666666666667 & 0.166666666666667 & 0.500000000000000 & 
+            0.075000000000000 \\
+        5 & 0.166666666666667 & 0.166666666666667 & 0.166666666666667 & 
+            0.075000000000000 \\
+        \hline
+        & \multicolumn{4}{|c|}{Exact for Polynomials of Degree $5^{\phantom{|^|}}$} \\ \hline
+        1 & 0.250000000000000 & 0.250000000000000 & 0.250000000000000 &    
+            0.030283678097089 \\
+        2 & 0.000000000000000 & 0.333333333333333 & 0.333333333333333 & 
+            0.006026785714286 \\
+        3 & 0.333333333333333 & 0.000000000000000 & 0.333333333333333 & 
+            0.006026785714286 \\ 
+        4 & 0.333333333333333 & 0.333333333333333 & 0.000000000000000 & 
+            0.006026785714286 \\
+        5 & 0.333333333333333 & 0.333333333333333 & 0.333333333333333 & 
+            0.006026785714286 \\
+        6 & 0.727272727272727 & 0.090909090909091 & 0.090909090909091 & 
+            0.011645249086029 \\
+        7 & 0.090909090909091 & 0.727272727272727 & 0.090909090909091 & 
+            0.011645249086029 \\
+        8 & 0.090909090909091 & 0.090909090909091 & 0.727272727272727 & 
+            0.011645249086029 \\ 
+        9 & 0.090909090909091 & 0.090909090909091 & 0.090909090909091 & 
+            0.011645249086029 \\
+        10 & 0.066550153573664 & 0.433449846426336 & 0.433449846426336 & 
+             0.010949141561386 \\
+        11 & 0.433449846426336 & 0.066550153573664 & 0.433449846426336 & 
+             0.010949141561386 \\
+        12 & 0.433449846426336 & 0.433449846426336 & 0.066550153573664 & 
+             0.010949141561386 \\
+        13 & 0.433449846426336 & 0.066550153573664 & 0.066550153573664 & 
+             0.010949141561386 \\ 
+        14 & 0.066550153573664 & 0.433449846426336 & 0.066550153573664 & 
+             0.010949141561386 \\
+        15 & 0.066550153573664 & 0.066550153573664 & 0.433449846426336 & 
+             0.010949141561386 \\ 
         \hline
     \end{tabular}
-    \caption{Generalized, Gaussian, quadrature weights and nodes for integrating over a tetrahedron in its natural co-ordinate system.  These weights sum to \textfrac{1}{6}, which is the volume of a tetrahedron measured in its natural co-ordinate system.}
+    \caption{Gauss quadrature weights and nodes for integrating over a tetrahedron in its natural co-ordinate system $(\xi , \eta , \zeta)$, where $0 \leq \xi \leq 1 - \eta - \zeta$, $0 \leq \eta \leq 1 - \zeta$ and $0 \leq \zeta \leq 1$.  These weights sum to \textfrac{1}{6}, which is the volume of a tetrahedron measured in its natural co-ordinate system.}
     \label{tabQuadraturetetra}
-\end{table} 
+\end{table}

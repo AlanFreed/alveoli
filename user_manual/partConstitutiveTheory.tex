@@ -482,7 +482,22 @@ N = 2M \, \frac{1 - \nu}{1 + \nu}
 \quad \text{and} \quad
 \mathcal{S}_{21} = \mathcal{S}_{22} = 0 
 \end{displaymath}
-provided that temperature $\theta$ is held constant.  Consequently, $\tfrac{2}{3} M_{\theta} \leq N \leq 2M$ provided that $0 \leq \nu \leq \textfrac{1}{2}$, so the squeeze modulus $N$ plays an analogous role to the shear modulus $\mu$ found in the classical theory of elasticity.  
+provided that temperature $\theta$ is held constant.  Consequently, $\tfrac{2}{3} M \leq N \leq 2M$ provided that $0 \leq \nu \leq \textfrac{1}{2}$, so the squeeze modulus $N$ plays an analogous role to the shear modulus $\mu$ found in the classical theory of elasticity.  
+
+If one were to consider such a membrane as having uniform thickness $h$ that varies with deformation so as to preserve its volume, then $\nu = \textfrac{1}{2}$ and Eqn.~(\ref{HelmholtzMembraneODEsNonUniform}) would become
+\begin{equation}
+\left\{ \begin{matrix}
+\mathrm{d} \sigma \\ \mathrm{d} \tau
+\end{matrix} \right\} = \begin{bmatrix}
+4 M / 3 & 0 \\
+0 & G
+\end{bmatrix} \left\{ \begin{matrix}
+\mathrm{d} \varepsilon \\ \mathrm{d} \gamma
+\end{matrix} \right\}
+\label{HelmholtzMembraneODEsNonUniformCV}
+    \tag{\ref{HelmholtzMembraneODEs}c}
+\end{equation}
+which is the general constitutive structure we adopt for describing alveolar membranes.
 
 \medskip\noindent
 \textbf{Note}: 
@@ -979,7 +994,7 @@ The material properties needed to model septal chords are listed in Tables~\ref{
 \subsection{Modeling Alveolar Septa Subjected to Shock Waves}
 \label{secConjugatePairs}
 
-The thermo\-elastic response of a planar membrane used to model alveolar septa, as described in Eqn.~(\ref{HelmholtzMembraneODEs}), is governed by the following pair of differential equations.  The first set of ODEs establishes the uniform response in Eqn.~(\ref{Helmholtz2Duniform}) for a membrane described by
+The thermo\-elastic response of a planar membrane used to model alveolar septa, as described in Eqn.~(\ref{HelmholtzMembraneODEs}), is governed by the following pair of differential equations.  The first set of ODEs establishes the uniform response in Eqn.~(\ref{HelmholtzMembraneODEsUniform}) for a membrane described by
 \begin{displaymath}
     \left\{ \begin{matrix}
     \mathrm{d} \eta \\ \mathrm{d} s^{\pi}
@@ -991,18 +1006,18 @@ The thermo\-elastic response of a planar membrane used to model alveolar septa, 
     \mathrm{d} \theta \\ \mathrm{d} \xi
     \end{matrix} \right\} 
 \end{displaymath}
-while the second set of ODEs establishes the non-uniform response in Eqn.~(\ref{Helmholtz2Dnonuniform}) for a membrane described by
+while the second set of ODEs establishes the non-uniform response in Eqn.~(\ref{HelmholtzMembraneODEsNonUniformCV}) for a membrane described by
 \begin{displaymath}
     \left\{ \begin{matrix}
     \mathrm{d} s^{\sigma} \\ \mathrm{d} s^{\tau}
     \end{matrix} \right\} = \begin{bmatrix}
-    2 N & 0 \\
+    4 M / 3 & 0 \\
     0 & G
     \end{bmatrix} \left\{ \begin{matrix}
     \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
     \end{matrix} \right\}
 \end{displaymath}
-where $s^{\pi} \defeq \pi / w$, $s^{\sigma} \defeq \sigma / w$ and $s^{\tau} \defeq \tau / w$ have units of stress (dyne/$\text{cm}^2$) with $w$ denoting the width or thickness of a spetal membrane that, assuming the volume of a septal membrane remains constant, is described by $w = w_0 \exp ( -2 \xi )$ where $w_0$ is its traction-free thickness.
+where $s^{\pi} \defeq \pi / h$, $s^{\sigma} \defeq \sigma / h$ and $s^{\tau} \defeq \tau / h$ have units of stress (dyne/$\text{cm}^2$) with $h$ denoting the height or thickness of a spetal membrane that, assuming the volume of a septal membrane remains constant, it is described by $h = h_0 \exp ( -2 \xi )$ where $h_0$ is its traction-free thickness.
 
 From a mechanics perspective, we know a great deal more about alveolar chords than we know about alveolar septa.  More judgment will therefore be required in our construction and parameterization of a material model for alveolar membranes.  
 
@@ -1014,16 +1029,14 @@ It is not known how much of the mechanical load is actually carried by the cells
     \centering
     \begin{tabular}{|l|l|}
         \hline
+        Property & Value \\ \hline
         $\rho$ \hfill [$\textrm{gr/cm}^{3^{\phantom{|}}}$] & $1.1$ \\
         $\eta_0$ \hfill [erg/gr.K] & $5.0 \times 10^6$ \\
         $C$ \hfill [erg/gr.K] & $2.1 \times 10^7$ \\
-        $\alpha$ \hfill [1/C] & $1.2 \times 10^{-4}$ \\
+        $\alpha$ \hfill [1/C] & $1.2 \times 10^{-4}$ \\ \hline
         $\xi_t$ & $0.24$ \\
         $M_1$ \hfill [barye] & $8.0 \times 10^2$ \\
-        $M_2$ \hfill [barye] & $2.2 \times 10^5$ \\ 
-        $\varepsilon_t$ & $0.06$ \\
-        $N_1$ \hfill [barye] & $6.0 \times 10^2$ \\
-        $N_2$ \hfill [barye] & $2.9 \times 10^5$ \\ 
+        $M_2$ \hfill [barye] & $2.2 \times 10^5$ \\ \hline
         $\gamma_t$ & $0.4$ \\
         $G_1$ \hfill [barye] & $5.0 \times 10^2$ \\
         $G_2$ \hfill [barye] & $1.5 \times 10^4$ \\ \hline
@@ -1039,15 +1052,12 @@ Collagen and elastin appear as thin filaments randomly oriented and somewhat uni
     \frac{1}{M} & = \frac{\xi_t - \xi_1}{M_1 \xi_t + s^{\pi} / 2} + \frac{1}{M_2} &
     \xi_1 & = \xi - \alpha ( \theta - \theta_0 ) - \frac{s^{\pi}}{4M_2}
     \label{septalDilationCompliance} \\
-    \frac{1}{N} & = 2 \left( \frac{ \varepsilon_t - | \varepsilon_1 |}{N_1 \varepsilon_t + 2 \gamma s^{\tau}} + \frac{1}{N_2} \right) & 
-    \varepsilon_1 & = \varepsilon - \frac{s^{\sigma} - 2 \gamma s^{\tau}}{N_2}
-    \label{septalSqueezeCompliance} \\
     \frac{1}{G} & = \Gamma \left( \frac{\gamma_t - 2\varepsilon \gamma - | \gamma_1 |}{G_1 \gamma_t + 2 \varepsilon s^{\tau}} + \frac{1-2\varepsilon}{G_2} \right) & 
     \gamma_1 & = \gamma - \frac{(1 - 2\varepsilon) s^{\tau}}{G_2}
     \label{septalShearCompliance}
     \end{align}
 \end{subequations}
-where the compliant tangent moduli of $M_1, N_1$ and $G_1$ and the stiff, terminal, tangent moduli of $M_2 , N_2$ and $G_2$ bound their responses in that $M_1 \leq M \leq M_2$, $N_1 \leq N \leq N_2$ and $G_1 \leq G \leq G_2$, with gradual transitions between their asymptotic bounds being centered around strains of $\xi_t , \varepsilon_t$ and $\gamma_t$.
+where the compliant tangent moduli of $M_1$ and $G_1$ and the stiff, terminal, tangent moduli of $M_2$ and $G_2$ bound their responses in that $M_1 \leq M \leq M_2$ and $G_1 \leq G \leq G_2$, with gradual transitions between their asymptotic bounds being centered around strains of $\xi_t$ and $\gamma_t$.
 
 Finite element technology is used to interpolate the entropy and these stresses, integrated at the Gauss points, to entropies and forces at the vertices of a pentagon, cf.\ Part~\ref{partVariational}.  The actual entropies and forces interpolated to these nodes are halved, because each septal plane belongs to two adjoining alveoli. 
 
