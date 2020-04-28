@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from gaussQuadratures import gaussQuadChord1, gaussQuadChord3, gaussQuadChord5
 import materialProperties as mp
 import math as m
 import numpy as np
+from peceVtoX import pece
 from ridder import findRoot
 from shapeFnChords import shapeFunction
 import spin as spinMtx
@@ -30,13 +32,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 __date__ = "08-08-2019"
-__update__ = "10-06-2019"
+__update__ = "04-17-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
 """
+A listing of changes made wrt version release can be found at the end of file.
+
+
 Class chord in file chords.py allows for the creation of objects that are to
 be used to represent chords that connect vertices in a polyhedron.  A chord is
 assigned an unique number, two distinct vertices that serve as end points, the
@@ -65,16 +70,22 @@ take on any of the following values:
     'p', 'prev', 'previous'      gets the value for a previous configuration
     'r', 'ref', 'reference'      gets the value for the reference configuration
 
+
 class chord
+
+A chord object, say c, can be printed out to the command window using the
+following command.  The objected printed associates with the current state.
+
+    print(c)
 
 constructor
 
-    c = chord(number, vertex1, vertex2, h, gaussPts)
+    c = chord(number, vertex1, vertex2, h, degree)
         number    immutable value that is unique to this chord
         vertex1   an end point of the chord, an instance of class vertex
         vertex2   an end point of the chord, an instance of class vertex
         h         timestep size between two successive calls to 'advance'
-        gaussPts  number of Gauss points to be used: must be 1, 2 or 3
+        degree    order of polynomials integrated exactly: must be 1, 3 or 5
 
 methods
 
@@ -108,8 +119,8 @@ methods
         next-fields in preparation for an advancment of the solution along its
         path
 
-    Material properties that associate with this chord.  Except for the mass
-    density, all are drawn randomly from a statistical distribution.
+    Material properties that associate with this chord.  The areas are drawn
+    from a random statistical distribution.
 
     rho = c.massDensity()
         returns the mass density of the chord (collagen and elastin fibers)
@@ -122,11 +133,17 @@ methods
         returns the cross-sectional area of the elastin fiber in
         configuration 'state'
 
-    E1, E2, e_t = c.matPropCollagen()
-        returns the constitutive properties for the collagen fiber
+    E = c.tangentModulusCollagen(fiberStress, fiberStrain)
+        returns the elastic tangent modulus for the collagen fiber
 
-    E1, E2, e_t = c.matPropElastin()
-        returns the constitutive properties for the elastin fiber
+    E = c.tangentModulusElastin(fiberStress, fiberStrain)
+        returns the elastic tangent modulus for the elastin fiber
+
+    stressRate = c.odeCollagen(time, stress)
+        called by the PECE integrator for stress in the collagen fiber
+
+    stressRate = c.odeElastin(time, stress)
+        called by the PECE integrator for stress in the elastin fiber
 
     Geometric fields associated with a chord in 3 space are:
 
@@ -170,13 +187,19 @@ methods
         system about the fixed coordinate system of the dodecahedron.  The
         returned matrix associates with configuration 'state'
 
-    Thermodynamic strain and strain-rate fields associated with a chord are:
+    Thermodynamic fields associated with a chord are:
 
     epsilon = c.strain(state)
         returns the logarithmic strain of the chord in configuration 'state'
 
     dEpsilon = c.dStrain(state)
         returns the logarithmic strain rate of the chord in 'state'
+
+    sigma = c.stress(state)
+        returns the stress carried by the chord in configuration 'state'
+
+    f = c.force(state)
+        returns the force carried by the chord in configuration 'state'
 
     The fundamental kinematic fields are:
 
@@ -197,11 +220,14 @@ methods
     sf = c.shapeFunction(gaussPt):
         returns the shape function associated with the specified Gauss point.
 
+    gq = c.gaussQuadrature()
+        returns the Gauss quadrature rule being used for integration.
+
     mMtx = c.massMatrix()
         returns an average of the lumped and consistent mass matrices (ensures
         the mass matrix is not singular) for the chosen number of Gauss points
         for a chord whose mass density, rho, and whose cross-sectional area
-        are specified.
+        are considered to be uniform over the length of the chord.
 
     kMtx = c.stiffnessMatrix()
         returns a tangent stiffness matrix for the chosen number of Gauss
@@ -215,7 +241,7 @@ methods
 
 class chord(object):
 
-    def __init__(self, number, vertex1, vertex2, h, gaussPts):
+    def __init__(self, number, vertex1, vertex2, h, degree):
         self._number = int(number)
 
         # verify the input
@@ -225,6 +251,7 @@ class chord(object):
         if not isinstance(vertex2, vertex):
             raise RuntimeError('vertex2 sent to the chord ' +
                                'constructor was not of type vertex.')
+
         # save the vertices in a dictionary
         if vertex1.number() < vertex2.number():
             self._vertex = {
@@ -238,18 +265,29 @@ class chord(object):
             }
         else:
             raise RuntimeError('A chord must have two distinct vertices.')
+
+        # create the time variables
         if h > np.finfo(float).eps:
             self._h = float(h)
         else:
             raise RuntimeError("The stepsize sent to the chord " +
                                "constructor must exceed machine precision.")
-        # check the number of Gauss points to use
-        if gaussPts == 1 or gaussPts == 2 or gaussPts == 3:
-            self._gaussPts = gaussPts
+        self._tp = -self._h
+        self._tc = 0.0
+        self._tn = self._h
+
+        # assign the Gauss quadrature rule to be used
+        if degree == 1:
+            self._gq = gaussQuadChord1
+        elif degree == 3:
+            self._gq = gaussQuadChord3
+        elif degree == 5:
+            self._gq = gaussQuadChord5
         else:
-            raise RuntimeError('{} Gauss points were '.format(gaussPts) +
-                               'specified in a call to the chord ' +
-                               'constructor; it must be 1, 2 or 3.')
+            raise RuntimeError('A Gauss quadrature capable of integrating ' +
+                               'polynomials up to degree {}'.format(degree) +
+                               '\nwas specified in a call to the chord ' +
+                               'constructor; degree must be 1, 3 or 5.')
 
         # create the four rotation matrices
         self._Pr3D = np.identity(3, dtype=float)
@@ -258,18 +296,19 @@ class chord(object):
         self._Pn3D = np.identity(3, dtype=float)
 
         # initialize the chordal lengths for all configurations
-        x1, y1, z1 = self._vertex[1].coordinates('ref')
-        x2, y2, z2 = self._vertex[2].coordinates('ref')
-        L0 = m.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+        x1 = self._vertex[1].coordinates('ref')
+        x2 = self._vertex[2].coordinates('ref')
+        L0 = m.sqrt((x2[0] - x1[0])**2 + (x2[1] - x1[1])**2 +
+                    (x2[2] - x1[2])**2)
         self._L0 = L0
         self._Lp = L0
         self._Lc = L0
         self._Ln = L0
 
         # initialize the centroids for all configurations
-        self._centroidX0 = (x1 + x2) / 2.0
-        self._centroidY0 = (y1 + y2) / 2.0
-        self._centroidZ0 = (z1 + z2) / 2.0
+        self._centroidX0 = (x1[0] + x2[0]) / 2.0
+        self._centroidY0 = (x1[1] + x2[1]) / 2.0
+        self._centroidZ0 = (x1[2] + x2[2]) / 2.0
         self._centroidXp = self._centroidX0
         self._centroidYp = self._centroidY0
         self._centroidZp = self._centroidZ0
@@ -281,9 +320,9 @@ class chord(object):
         self._centroidZn = self._centroidZ0
 
         # base vector 1: aligns with the axis of the chord
-        x = x2 - x1
-        y = y2 - y1
-        z = z2 - z1
+        x = x2[0] - x1[0]
+        y = x2[1] - x1[1]
+        z = x2[2] - x1[2]
         mag = m.sqrt(x * x + y * y + z * z)
         n1x = x / mag
         n1y = y / mag
@@ -291,9 +330,9 @@ class chord(object):
 
         # base vector 2: goes from the coordinate origin to the chord
         # initial guess: base vector 2 points to the midpoint of the chord
-        x = (x1 + x2) / 2.0
-        y = (y1 + y2) / 2.0
-        z = (z1 + z2) / 2.0
+        x = (x1[0] + x2[0]) / 2.0
+        y = (x1[1] + x2[1]) / 2.0
+        z = (x1[2] + x2[2]) / 2.0
         mag = m.sqrt(x * x + y * y + z * z)
         ex = x / mag
         ey = y / mag
@@ -343,37 +382,33 @@ class chord(object):
         self._Pn3D[:, :] = self._Pr3D[:, :]
 
         # establish the shape functions located at the various Gauss points
-        if gaussPts == 1:
-            # this single Gauss point has a weight of 2
-            xi = 0.0
-            sf1 = shapeFunction(xi)
+        if degree == 1:
+            # this quadrature rule has a single Gauss point
+            atGaussPt = 1
+            sf1 = shapeFunction(self._gq.coordinates(atGaussPt))
 
             self._shapeFns = {
                 1: sf1
             }
-        elif gaussPts == 2:
-            # each of these two Gauss points has a weight of 1
-            xi1 = -0.577350269189626
-            sf1 = shapeFunction(xi1)
-
-            xi2 = 0.577350269189626
-            sf2 = shapeFunction(xi2)
+        elif degree == 3:
+            # this quadrature rule has two Gauss points
+            atGaussPt = 1
+            sf1 = shapeFunction(self._gq.coordinates(atGaussPt))
+            atGaussPt = 2
+            sf2 = shapeFunction(self._gq.coordinates(atGaussPt))
 
             self._shapeFns = {
                 1: sf1,
                 2: sf2
             }
-        else:  # gaussPts = 3
-            # Gauss points 1 & 3 have weights of 5/9
-            xi1 = -0.7745966692414834
-            sf1 = shapeFunction(xi1)
-
-            # Gauss point 2 (the centroid) has a weight of 8/9
-            xi2 = 0.0
-            sf2 = shapeFunction(xi2)
-
-            xi3 = 0.7745966692414834
-            sf3 = shapeFunction(xi3)
+        else:  # degree == 5
+            # this quadrature rule has three Gauss points
+            atGaussPt = 1
+            sf1 = shapeFunction(self._gq.coordinates(atGaussPt))
+            atGaussPt = 2
+            sf2 = shapeFunction(self._gq.coordinates(atGaussPt))
+            atGaussPt = 3
+            sf3 = shapeFunction(self._gq.coordinates(atGaussPt))
 
             self._shapeFns = {
                 1: sf1,
@@ -383,113 +418,113 @@ class chord(object):
 
         # create chord gradients at their Gauss points via dictionaries
         # 'p' implies previous, 'c' implies current, 'n' implies next
-        if gaussPts == 1:
+        if degree == 1:
             # displacement gradients located at the Gauss points of a chord
             self._G0 = {
-                1: 0.0
+                1: np.zeros((1, 1), dtype=float)
             }
             self._Gp = {
-                1: 0.0
+                1: np.zeros((1, 1), dtype=float)
             }
             self._Gc = {
-                1: 0.0
+                1: np.zeros((1, 1), dtype=float)
             }
             self._Gn = {
-                1: 0.0
+                1: np.zeros((1, 1), dtype=float)
             }
             # deformation gradients located at the Gauss points of a chord
             self._F0 = {
-                1: 1.0
+                1: np.ones((1, 1), dtype=float)
             }
             self._Fp = {
-                1: 1.0
+                1: np.ones((1, 1), dtype=float)
             }
             self._Fc = {
-                1: 1.0
+                1: np.ones((1, 1), dtype=float)
             }
             self._Fn = {
-                1: 1.0
+                1: np.ones((1, 1), dtype=float)
             }
-        elif gaussPts == 2:
+        elif degree == 3:
             # displacement gradients located at the Gauss points of a chord
             self._G0 = {
-                1: 0.0,
-                2: 0.0
+                1: np.zeros((1, 1), dtype=float),
+                2: np.zeros((1, 1), dtype=float)
             }
             self._Gp = {
-                1: 0.0,
-                2: 0.0
+                1: np.zeros((1, 1), dtype=float),
+                2: np.zeros((1, 1), dtype=float)
             }
             self._Gc = {
-                1: 0.0,
-                2: 0.0
+                1: np.zeros((1, 1), dtype=float),
+                2: np.zeros((1, 1), dtype=float)
             }
             self._Gn = {
-                1: 0.0,
-                2: 0.0
+                1: np.zeros((1, 1), dtype=float),
+                2: np.zeros((1, 1), dtype=float)
             }
             # deformation gradients located at the Gauss points of a chord
             self._F0 = {
-                1: 1.0,
-                2: 1.0
+                1: np.ones((1, 1), dtype=float),
+                2: np.ones((1, 1), dtype=float)
             }
             self._Fp = {
-                1: 1.0,
-                2: 1.0
+                1: np.ones((1, 1), dtype=float),
+                2: np.ones((1, 1), dtype=float)
             }
             self._Fc = {
-                1: 1.0,
-                2: 1.0
+                1: np.ones((1, 1), dtype=float),
+                2: np.ones((1, 1), dtype=float)
             }
             self._Fn = {
-                1: 1.0,
-                2: 1.0
+                1: np.ones((1, 1), dtype=float),
+                2: np.ones((1, 1), dtype=float)
             }
-        else:  # gaussPts = 3
+        else:  # degree == 5
             # displacement gradients located at the Gauss points of a chord
             self._G0 = {
-                1: 0.0,
-                2: 0.0,
-                3: 0.0
+                1: np.zeros((1, 1), dtype=float),
+                2: np.zeros((1, 1), dtype=float),
+                3: np.zeros((1, 1), dtype=float)
             }
             self._Gp = {
-                1: 0.0,
-                2: 0.0,
-                3: 0.0
+                1: np.zeros((1, 1), dtype=float),
+                2: np.zeros((1, 1), dtype=float),
+                3: np.zeros((1, 1), dtype=float)
             }
             self._Gc = {
-                1: 0.0,
-                2: 0.0,
-                3: 0.0
+                1: np.zeros((1, 1), dtype=float),
+                2: np.zeros((1, 1), dtype=float),
+                3: np.zeros((1, 1), dtype=float)
             }
             self._Gn = {
-                1: 0.0,
-                2: 0.0,
-                3: 0.0
+                1: np.zeros((1, 1), dtype=float),
+                2: np.zeros((1, 1), dtype=float),
+                3: np.zeros((1, 1), dtype=float)
             }
             # deformation gradients located at the Gauss points of a chord
             self._F0 = {
-                1: 1.0,
-                2: 1.0,
-                3: 1.0
+                1: np.ones((1, 1), dtype=float),
+                2: np.ones((1, 1), dtype=float),
+                3: np.ones((1, 1), dtype=float)
             }
             self._Fp = {
-                1: 1.0,
-                2: 1.0,
-                3: 1.0
+                1: np.ones((1, 1), dtype=float),
+                2: np.ones((1, 1), dtype=float),
+                3: np.ones((1, 1), dtype=float)
             }
             self._Fc = {
-                1: 1.0,
-                2: 1.0,
-                3: 1.0
+                1: np.ones((1, 1), dtype=float),
+                2: np.ones((1, 1), dtype=float),
+                3: np.ones((1, 1), dtype=float)
             }
             self._Fn = {
-                1: 1.0,
-                2: 1.0,
-                3: 1.0
+                1: np.ones((1, 1), dtype=float),
+                2: np.ones((1, 1), dtype=float),
+                3: np.ones((1, 1), dtype=float)
             }
 
-        # establish the material properties for this chord
+        # establish the physical properties for this chord
         dia = mp.fiberDiameterCollagen()
         self._areaC = np.pi * dia**2 / 4.0
         dia = mp.fiberDiameterElastin()
@@ -497,8 +532,25 @@ class chord(object):
         self._rho = ((self._areaC * mp.rhoCollagen() +
                       self._areaE * mp.rhoElastin()) /
                      (self._areaC + self._areaE))
-        self._E1c, self._E2c, self._e_tc = mp.collagenFiber()
-        self._E1e, self._E2e, self._e_te = mp.elastinFiber()
+
+        # create the ODE solvers for the two fiber constitutive equations
+        time0 = 0.0
+        stress0 = np.array([0.0])
+        self._peceC = pece(self.odeCollagen, time0, stress0, h)
+        self._peceE = pece(self.odeElastin, time0, stress0, h)
+
+        # create the fiber stresses
+        self._stressCp = stress0[0]
+        self._stressCc = stress0[0]
+        self._stressCn = stress0[0]
+        self._stressEp = stress0[0]
+        self._stressEc = stress0[0]
+        self._stressEn = stress0[0]
+
+        return  # a new chord object
+
+    def __str__(self):
+        return self.toString('curr')
 
     def toString(self, state):
         if self._number < 10:
@@ -539,23 +591,24 @@ class chord(object):
                                'belong to chord {}.'.format(self._number))
 
     def gaussPoints(self):
-        return self._gaussPts
+        return self._gq.nodes
 
     def update(self):
         # determine length of the chord in the next configuration
-        x1, y1, z1 = self._vertex[1].coordinates('next')
-        x2, y2, z2 = self._vertex[2].coordinates('next')
-        self._Ln = m.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+        x1 = self._vertex[1].coordinates('next')
+        x2 = self._vertex[2].coordinates('next')
+        self._Ln = m.sqrt((x2[0] - x1[0])**2 + (x2[1] - x1[1])**2 +
+                          (x2[2] - x1[2])**2)
 
         # determine the centroid of this chord
-        self._centroidXn = (x1 + x2) / 2.0
-        self._centroidYn = (y1 + y2) / 2.0
-        self._centroidZn = (z1 + z2) / 2.0
+        self._centroidXn = (x1[0] + x2[0]) / 2.0
+        self._centroidYn = (x1[1] + x2[1]) / 2.0
+        self._centroidZn = (x1[2] + x2[2]) / 2.0
 
         # base vector 1: aligns with the axis of the chord
-        x = x2 - x1
-        y = y2 - y1
-        z = z2 - z1
+        x = x2[0] - x1[0]
+        y = x2[1] - x1[1]
+        z = x2[2] - x1[2]
         mag = m.sqrt(x * x + y * y + z * z)
         n1x = x / mag
         n1y = y / mag
@@ -563,9 +616,9 @@ class chord(object):
 
         # base vector 2: goes from the coordinate origin to the chord
         # initial guess: base vector 2 points to the midpoint of the chord
-        x = (x1 + x2) / 2.0
-        y = (y1 + y2) / 2.0
-        z = (z1 + z2) / 2.0
+        x = (x1[0] + x2[0]) / 2.0
+        y = (x1[1] + x2[1]) / 2.0
+        z = (x1[2] + x2[2]) / 2.0
         mag = m.sqrt(x * x + y * y + z * z)
         ex = x / mag
         ey = y / mag
@@ -612,25 +665,25 @@ class chord(object):
         self._Pn3D[2, 2] = n3z
 
         # chordal coordinates for the chords
-        x10 = -self._L0 / 2.0
-        x20 = self._L0 / 2.0
-        x1n = -self._Ln / 2.0
-        x2n = self._Ln / 2.0
+        x10 = (-self._L0 / 2.0,)
+        x20 = (self._L0 / 2.0,)
+        x1n = (-self._Ln / 2.0,)
+        x2n = (self._Ln / 2.0,)
 
         # quantify the displacement and deformation gradients of the chord
-        if self._gaussPts == 1:
+        if self.gaussPoints() == 1:
             # displacement gradient located at the Gauss point of the chord
             self._Gn[1] = self._shapeFns[1].G(x1n, x2n, x10, x20)
             # deformation gradient located at the Gauss point of the chord
             self._Fn[1] = self._shapeFns[1].F(x1n, x2n, x10, x20)
-        elif self._gaussPts == 2:
+        elif self.gaussPoints() == 2:
             # displacement gradients located at the Gauss points of a chord
             self._Gn[1] = self._shapeFns[1].G(x1n, x2n, x10, x20)
             self._Gn[2] = self._shapeFns[2].G(x1n, x2n, x10, x20)
             # deformation gradients located at the Gauss points of a chord
             self._Fn[1] = self._shapeFns[1].F(x1n, x2n, x10, x20)
             self._Fn[2] = self._shapeFns[2].F(x1n, x2n, x10, x20)
-        else:  # gaussPts = 3
+        else:  # gaussPoints == 3
             # displacement gradients located at the Gauss points of a chord
             self._Gn[1] = self._shapeFns[1].G(x1n, x2n, x10, x20)
             self._Gn[2] = self._shapeFns[2].G(x1n, x2n, x10, x20)
@@ -639,6 +692,15 @@ class chord(object):
             self._Fn[1] = self._shapeFns[1].F(x1n, x2n, x10, x20)
             self._Fn[2] = self._shapeFns[2].F(x1n, x2n, x10, x20)
             self._Fn[3] = self._shapeFns[3].F(x1n, x2n, x10, x20)
+
+        # integrate the constitutive equations
+        stress = np.array([0.0])
+        self._peceC.integrate()
+        stress = self._peceC.getX()
+        self._stressCn = stress[0]
+        self._peceE.integrate()
+        stress = self._peceE.getX()
+        self._stressEn = stress[0]
 
         return  # nothing, the data structure has been updated
 
@@ -656,11 +718,26 @@ class chord(object):
         self._Pc3D[:, :] = self._Pn3D[:, :]
 
         # advance the matrix fields associated with each Gauss point
-        for i in range(1, self._gaussPts+1):
+        for i in range(1, self.gaussPoints()+1):
             self._Fp[i] = self._Fc[i]
             self._Fc[i] = self._Fn[i]
             self._Gp[i] = self._Gc[i]
             self._Gc[i] = self._Gn[i]
+
+        # advance the independent variable of integration, i.e., time
+        self._tp = self._tc
+        self._tc = self._tn
+        self._tn += self._h
+
+        # advance the dependent variables of integration, i.e., the stresses
+        self._stressCp = self._stressCc
+        self._stressEp = self._stressEc
+        self._stressCc = self._stressCn
+        self._stressEc = self._stressEn
+
+        # advance the integrators
+        self._peceC.advance()
+        self._peceE.advance()
 
     # Material properties that associate with this chord.  Except for the mass
     # density, all are drawn randomly from a statistical distribution.
@@ -682,11 +759,11 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return self._areaC
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.areaCollagen.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.areaCollagen.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in call a to chord.areaCollagen.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in call a to chord.areaCollagen.")
 
     def areaElastin(self, state):
         # returns the cross-sectional area of the elastin fiber assuming
@@ -701,19 +778,81 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return self._areaE
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.areaElastin.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.areaElastin.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in call a to chord.areaElastin.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in call a to chord.areaElastin.")
 
-    def matPropCollagen(self):
-        # returns the constitutive properties for the collagen fiber
-        return self._E1c, self._E2c, self._e_tc
+    def tangentModulusCollagen(self, fiberStress, fiberStrain):
+        # returns the tangent modulus of Freed & Rajagopal for elastic fibers
+        E1, E2, e_t = mp.collagenFiber()
+        nonLinStrain = fiberStrain - fiberStress / E2
+        if nonLinStrain < e_t:
+            compliance = ((e_t - nonLinStrain) /
+                          (E1 * e_t + 2.0 * fiberStress) + 1.0 / E2)
+            return 1 / compliance
+        else:
+            return E2
 
-    def matPropElastin(self):
-        # returns the constitutive properties for the elastin fiber
-        return self._E1e, self._E2e, self._e_te
+    def tangentModulusElastin(self, fiberStress, fiberStrain):
+        # returns the tangent modulus of Freed & Rajagopal for elastic fibers
+        E1, E2, e_t = mp.elastinFiber()
+        nonLinStrain = fiberStrain - fiberStress / E2
+        if nonLinStrain < e_t:
+            compliance = ((e_t - nonLinStrain) /
+                          (E1 * e_t + 2.0 * fiberStress) + 1.0 / E2)
+            return 1 / compliance
+        else:
+            return E2
+
+    def odeCollagen(self, time, stress):
+        if (time < 0.99999 * self._tp) or (time > 1.00001 * self._tn):
+            raise RuntimeError("Time is being extrapolated instead of being " +
+                               "interpolated in a call to chord.odeCollagen.")
+        # obtain the Lagrange interpolation weights
+        wp = ((time - self._tc)*(time - self._tn) /
+              ((self._tp - self._tc)*(self._tp - self._tn)))
+        wc = ((time - self._tp)*(time - self._tn) /
+              ((self._tc - self._tp)*(self._tc - self._tn)))
+        wn = ((time - self._tp)*(time - self._tc) /
+              ((self._tn - self._tp)*(self._tn - self._tc)))
+
+        # interpolate strain and its rate
+        strain = (wp * self.strain("prev") + wc * self.strain("curr") +
+                  wn * self.strain("next"))
+        strainRate = (wp * self.dStrain("prev") +
+                      wc * self.dStrain("curr") +
+                      wn * self.dStrain("next"))
+
+        # construct the governing ODE to be integrated by the PECE method
+        dStressdStrain = self.tangentModulusCollagen(stress, strain)
+        stressRate = dStressdStrain * strainRate
+        return stressRate
+
+    def odeElastin(self, time, stress):
+        if (time < 0.99999 * self._tp) or (time > 1.00001 * self._tn):
+            raise RuntimeError("Time is being extrapolated instead of being " +
+                               "interpolated in a call to chord.odeElastin.")
+        # obtain the Lagrange interpolation weights
+        wp = ((time - self._tc)*(time - self._tn) /
+              ((self._tp - self._tc)*(self._tp - self._tn)))
+        wc = ((time - self._tp)*(time - self._tn) /
+              ((self._tc - self._tp)*(self._tc - self._tn)))
+        wn = ((time - self._tp)*(time - self._tc) /
+              ((self._tn - self._tp)*(self._tn - self._tc)))
+
+        # interpolate strain and its rate
+        strain = (wp * self.strain("prev") + wc * self.strain("curr") +
+                  wn * self.strain("next"))
+        strainRate = (wp * self.dStrain("prev") +
+                      wc * self.dStrain("curr") +
+                      wn * self.dStrain("next"))
+
+        # construct the governing ODE to be integrated by the PECE method
+        dStressdStrain = self.tangentModulusElastin(stress, strain)
+        stressRate = dStressdStrain * strainRate
+        return stressRate
 
     # geometric properties of the chord
 
@@ -728,11 +867,11 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return self._areaC + self._areaE
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.area.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.area.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in call a to chord.area.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in call a to chord.area.")
 
     def length(self, state):
         if isinstance(state, str):
@@ -745,11 +884,11 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return self._L0
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.length.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.length.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in call a to chord.length.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in call a to chord.length.")
 
     def stretch(self, state):
         if isinstance(state, str):
@@ -762,11 +901,11 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 1.0
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.stretch.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.stretch.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in a call to chord.stretch.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in a call to chord.stretch.")
 
     def centroid(self, state):
         if isinstance(state, str):
@@ -787,70 +926,61 @@ class chord(object):
                 cy = self._centroidY0
                 cz = self._centroidZ0
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.centroid.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.centroid.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in a call to chord.centroid.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in a call to chord.centroid.")
         return np.array([cx, cy, cz])
 
     def displacement(self, state):
-        x0, y0, z0 = self.centroid('ref')
-        x, y, z = self.centroid(state)
-        return np.array([x - x0, y - y0, z - z0])
+        x0 = self.centroid('ref')
+        x = self.centroid(state)
+        u = x - x0
+        return u
 
     def velocity(self, state):
-        h = 2.0 * self._h
-        xp, yp, zp = self.centroid('prev')
-        xc, yc, zc = self.centroid('curr')
-        xn, yn, zn = self.centroid('next')
+        twoH = 2.0 * self._h
+        xp = self.centroid('prev')
+        xc = self.centroid('curr')
+        xn = self.centroid('next')
         if isinstance(state, str):
+            v = np.zeros(3, dtype=float)
             if state == 'c' or state == 'curr' or state == 'current':
                 # use second-order central difference formula
-                vx = (xn - xp) / h
-                vy = (yn - yp) / h
-                vz = (zn - zp) / h
+                v = (xn - xp) / twoH
             elif state == 'n' or state == 'next':
                 # use second-order backward difference formula
-                vx = (3.0 * xn - 4.0 * xc + xp) / h
-                vy = (3.0 * yn - 4.0 * yc + yp) / h
-                vz = (3.0 * zn - 4.0 * zc + zp) / h
+                v = (3.0 * xn - 4.0 * xc + xp) / twoH
             elif state == 'p' or state == 'prev' or state == 'previous':
                 # use second-order forward difference formula
-                vx = (-xn + 4.0 * xc - 3.0 * xp) / h
-                vy = (-yn + 4.0 * yc - 3.0 * yp) / h
-                vz = (-zn + 4.0 * zc - 3.0 * zp) / h
+                v = (-xn + 4.0 * xc - 3.0 * xp) / twoH
             elif state == 'r' or state == 'ref' or state == 'reference':
-                vx = 0.0
-                vy = 0.0
-                vz = 0.0
+                pass
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.velocity.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.velocity.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in call a to chord.velocity.")
-        return np.array([vx, vy, vz])
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in call a to chord.velocity.")
+        return v
 
     def acceleration(self, state):
         if isinstance(state, str):
+            a = np.zeros(3, dtype=float)
             if state == 'r' or state == 'ref' or state == 'reference':
-                ax = 0.0
-                ay = 0.0
-                az = 0.0
+                pass
             else:
                 h2 = self._h**2
-                xp, yp, zp = self.centroid('prev')
-                xc, yc, zc = self.centroid('curr')
-                xn, yn, zn = self.centroid('next')
+                xp = self.centroid('prev')
+                xc = self.centroid('curr')
+                xn = self.centroid('next')
                 # use second-order central differenc formula
-                ax = (xn - 2.0 * xc + xp) / h2
-                ay = (yn - 2.0 * yc + yp) / h2
-                az = (zn - 2.0 * zc + zp) / h2
+                a = (xn - 2.0 * xc + xp) / h2
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in a call to chord.acceleration.")
-        return np.array([ax, ay, az])
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in a call to chord.acceleration.")
+        return a
 
     def rotation(self, state):
         if isinstance(state, str):
@@ -863,11 +993,11 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.copy(self._Pr3D)
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.rotation.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.rotation.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in a call to chord.rotation.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in a call to chord.rotation.")
 
     def spin(self, state):
         if isinstance(state, str):
@@ -883,11 +1013,13 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.zeros((3, 3), dtype=float)
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.spin.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.spin.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in a call to chord.spin.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in a call to chord.spin.")
+
+    # thermodynamic fields associated with a chord
 
     def strain(self, state):
         if isinstance(state, str):
@@ -900,11 +1032,11 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.strain.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.strain.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in a call to chord.strain.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in a call to chord.strain.")
 
     def dStrain(self, state):
         if isinstance(state, str):
@@ -919,22 +1051,60 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "sent in a call to chord.dStrain.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.dStrain.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "sent in a call to chord.dStrain.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in a call to chord.dStrain.")
+
+    def stress(self, state):
+        if isinstance(state, str):
+            ac = self.areaCollagen(state)
+            ae = self.areaElastin(state)
+            if state == 'c' or state == 'curr' or state == 'current':
+                return (self._stressCc * ac + self._stressEc * ae) / (ac + ae)
+            elif state == 'n' or state == 'next':
+                return (self._stressCn * ac + self._stressEn * ae) / (ac + ae)
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return (self._stressCp * ac + self._stressEp * ae) / (ac + ae)
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return 0.0
+            else:
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.stress.")
+        else:
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in a call to chord.stress.")
+
+    def force(self, state):
+        if isinstance(state, str):
+            ac = self.areaCollagen(state)
+            ae = self.areaElastin(state)
+            if state == 'c' or state == 'curr' or state == 'current':
+                return (self._stressCc * ac + self._stressEc * ae)
+            elif state == 'n' or state == 'next':
+                return (self._stressCn * ac + self._stressEn * ae)
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return (self._stressCp * ac + self._stressEp * ae)
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return 0.0
+            else:
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was sent in a call to chord.force.")
+        else:
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was sent in a call to chord.force.")
 
     # displacement gradient at a Gauss point
     def G(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
+        if (gaussPt < 1) or (gaussPt > self.gaussPoints()):
+            if self.gaussPoints() == 1:
                 raise RuntimeError("gaussPt can only be 1 in a call to " +
                                    "chord.G and you sent " +
                                    "{}.".format(gaussPt))
             else:
                 raise RuntimeError("gaussPt must be in the range of " +
-                                   "[1, {}] ".format(self._gaussPts) +
+                                   "[1, {}] ".format(self.gaussPoints()) +
                                    "in a call to chord.G and you sent " +
                                    "{}.".format(gaussPt))
         if isinstance(state, str):
@@ -953,16 +1123,17 @@ class chord(object):
             raise RuntimeError("An unknown state {} ".format(str(state)) +
                                "sent in a call to chord.G.")
 
-    # deformation gradient at a Gauss point
+    # fundamental kinematic fields
+
     def F(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
+        if (gaussPt < 1) or (gaussPt > self.gaussPoints()):
+            if self.gaussPoints() == 1:
                 raise RuntimeError("gaussPt can only be 1 in a call to " +
                                    "chord.F and you sent " +
                                    "{}.".format(gaussPt))
             else:
                 raise RuntimeError("gaussPt must be in the range of " +
-                                   "[1, {}] ".format(self._gaussPts) +
+                                   "[1, {}] ".format(self.gaussPoints()) +
                                    "in a call to chord.F and you sent " +
                                    "{}.".format(gaussPt))
         if isinstance(state, str):
@@ -983,14 +1154,14 @@ class chord(object):
 
     # velocity gradient at a Gauss point in a specified state
     def L(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
+        if (gaussPt < 1) or (gaussPt > self.gaussPoints()):
             if self._gaussPts == 1:
                 raise RuntimeError("gaussPt can only be 1 in a call to " +
                                    "chord.L and you sent " +
                                    "{}.".format(gaussPt))
             else:
                 raise RuntimeError("gaussPt must be in the range of " +
-                                   "[1, {}] ".format(self._gaussPts) +
+                                   "[1, {}] ".format(self.gaussPoints()) +
                                    "in a call to chord.L and you sent " +
                                    "{}.".format(gaussPt))
         if isinstance(state, str):
@@ -1011,129 +1182,62 @@ class chord(object):
             elif state == 'r' or state == 'ref' or state == 'reference':
                 velGrad = 0.0
             else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "in a call to chord.L.")
+                raise RuntimeError("An unknown state of {} ".format(state) +
+                                   "was in a call to chord.L.")
         else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "in a call to chord.L.")
+            raise RuntimeError("An unknown state of {} ".format(str(state)) +
+                               "was in a call to chord.L.")
         return velGrad
 
+    # fields needed to construct a finite element solution strategy
+
     def shapeFunction(self, gaussPt):
-        if (gaussPt < 1) or (gaussPt > self._gaussPts):
-            if self._gaussPts == 1:
+        if (gaussPt < 1) or (gaussPt > self.gaussPoints()):
+            if self.gaussPoints() == 1:
                 raise RuntimeError("gaussPt can only be 1 in a call to " +
                                    "chord.shapeFunction and you sent " +
                                    "{}.".format(gaussPt))
             else:
                 raise RuntimeError("gaussPt must be in the range of " +
-                                   "[1, {}] ".format(self._gaussPts) +
+                                   "[1, {}] ".format(self.gaussPoints()) +
                                    "in a call to chord.shapeFunction " +
                                    "and you sent {}.".format(gaussPt))
             sf = self._shapeFns[gaussPt]
         return sf
 
+    def gaussQuadrature(self):
+        return self._gq
+
     def massMatrix(self):
-        # cross-sectional area of the chord (both collagen and elastin fibers)
-        area = self._areaC + self._areaE
+        # use the following rule for Gauss quadrature
+        gq = self.gaussQuadrature()
 
         # initial natural coordinates for a chord
-        xn1 = -self._Ln / 2.0
-        xn2 = self._Ln / 2.0
+        xn1 = -self.length("ref") / 2.0
+        xn2 = self.length("ref") / 2.0
 
-        # determine the mass matrix
-        if self._gaussPts == 1:
-            # 'natural' weight of the element
-            wgt = 2.0
-            w = np.array([wgt])
+        # construct the consistent mass matrix assuming conservation of volume
+        NtN = np.zeros((2, 2), dtype=float)
+        for i in range(self.gaussPoints()):
+            sf = self.shapeFunction(i+1)
+            NtN += gq.weight(i+1) * np.matmul(np.transpose(sf.Nmtx), sf.Nmtx)
+        Jdet = sf.jacobianDet(xn1, xn2)
+        massC = np.zeros((2, 2), dtype=float)
+        massC = (self.massDensity() * self.area("ref") * Jdet) * NtN
 
-            N1 = self._shapeFns[1].N1
-            N2 = self._shapeFns[1].N2
-            nn1 = np.array([[N1*N1, N1*N2],
-                            [N2*N1, N2*N2]])
+        # construct the lumped mass matrix
+        massL = np.zeros((2, 2), dtype=float)
+        row, col = np.diag_indices_from(massC)
+        massL[row, col] = massC.sum(axis=1)
 
-            J = self._shapeFns[1].jacobian(xn1, xn2)
+        # construct the mass matrix
+        # an average of the consistent and lumped mass matrices
+        mass = np.zeros((2, 2), dtype=float)
+        mass = 0.5 * (massC + massL)
 
-            # the consistent mass matrix for 1 Gauss point
-            massC = self._rho * area * J * w[0] * nn1
-
-            # the lumped mass matrix for 1 Gauss point
-            massL = np.zeros((2, 2), dtype=float)
-            row, col = np.diag_indices_from(massC)
-            massL[row, col] = massC.sum(axis=1)
-
-            # the mass matrix is the average of the above two mass matrices
-            mass = 0.5 * (massC + massL)
-        elif self._gaussPts == 2:
-            # 'natural' weights of the element
-            wgt = 1.0
-            w = np.array([wgt, wgt])
-
-            # at Gauss point 1
-            N1 = self._shapeFns[1].N1
-            N2 = self._shapeFns[1].N2
-            nn1 = np.array([[N1*N1, N1*N2],
-                            [N2*N1, N2*N2]])
-
-            # at Gauss point 2
-            N1 = self._shapeFns[2].N1
-            N2 = self._shapeFns[2].N2
-            nn2 = np.array([[N1*N1, N1*N2],
-                            [N2*N1, N2*N2]])
-
-            J1 = self._shapeFns[1].jacobian(xn1, xn2)
-            J2 = self._shapeFns[2].jacobian(xn1, xn2)
-
-            # the consistent mass matrix for 2 Gauss points
-            massC = self._rho * area * (J1 * w[0] * nn1 + J2 * w[1] * nn2)
-
-            # the lumped mass matrix for 2 Gauss points
-            massL = np.zeros((2, 2), dtype=float)
-            row, col = np.diag_indices_from(massC)
-            massL[row, col] = massC.sum(axis=1)
-
-            # the mass matrix is the average of the above two mass matrices
-            mass = 0.5 * (massC + massL)
-        else:  # gaussPts = 3
-            # 'natural' weights of the element
-            wgt1 = 5.0 / 9.0
-            wgt2 = 8.0 / 9.0
-            w = np.array([wgt1, wgt2, wgt1])
-
-            # at Gauss point 1
-            N1 = self._shapeFns[1].N1
-            N2 = self._shapeFns[1].N2
-            nn1 = np.array([[N1*N1, N1*N2],
-                            [N2*N1, N2*N2]])
-
-            # at Gauss point 2
-            N1 = self._shapeFns[2].N1
-            N2 = self._shapeFns[2].N2
-            nn2 = np.array([[N1*N1, N1*N2],
-                            [N2*N1, N2*N2]])
-
-            # at Gauss point 3
-            N1 = self._shapeFns[3].N1
-            N2 = self._shapeFns[3].N2
-            nn3 = np.array([[N1*N1, N1*N2],
-                            [N2*N1, N2*N2]])
-
-            J1 = self._shapeFns[1].jacobian(xn1, xn2)
-            J2 = self._shapeFns[2].jacobian(xn1, xn2)
-            J3 = self._shapeFns[3].jacobian(xn1, xn2)
-
-            # the consistent mass matrix for 3 Gauss points
-            massC = self._rho * area * (J1 * w[0] * nn1 + J2 * w[1] * nn2 +
-                                        J3 * w[2] * nn3)
-
-            # the lumped mass matrix for 3 Gauss points
-            massL = np.zeros((2, 2), dtype=float)
-            row, col = np.diag_indices_from(massC)
-            massL[row, col] = massC.sum(axis=1)
-
-            # the mass matrix is the average of the above two mass matrices
-            mass = 0.5 * (massC + massL)
         return mass
 
+    """
     def stiffnessMatrix(self, M, se, sc):
         # cross-sectional area of the chord (both collagen and elastin fibers)
         area = self._areaC + self._areaE
@@ -1143,54 +1247,54 @@ class chord(object):
         x02 = self._L0 / 2.0
         xn1 = -self._Ln / 2.0
         xn2 = self._Ln / 2.0
-        
+
         # creat the stress matrix
-        T = se + sc        
-               
-        # determine the stiffness matrix        
+        T = se + sc
+
+        # determine the stiffness matrix
         if self._gaussPts == 1:
             # 'natural' weight of the element
             wgt = 2.0
             w = np.array([wgt])
-            
+
             # Jacobian matrix for
             J = self._shapeFns[1].jacobian(xn1, xn2)
-            
+
             # create the linear Bmatrix
-            BL = self._shapeFns[1].dNdximat() / J 
+            BL = self._shapeFns[1].dNdximat() / J
             # the linear stiffness matrix for 1 Gauss point
             KL = area * (J * w[0] * BL.T.dot(M).dot(BL))
-            
+
             # create the matrix of derivative of shape functions (H matrix)
             H = self._shapeFns[1].dNdximat() / J
             # create the matrix of derivative of displacements (A matrix)
-            A = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J            
+            A = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J
             # create the nonlinear Bmatrix
-            BN = np.dot(A, H) 
+            BN = np.dot(A, H)
             # the nonlinear stiffness matrix for 1 Gauss point
-            KN = (area * J * w[0] * (BL.T.dot(M).dot(BN) + 
+            KN = (area * J * w[0] * (BL.T.dot(M).dot(BN) +
                   BN.T.dot(M).dot(BL) + BN.T.dot(M).dot(BN) ))
-            
+
             # the stress stiffness matrix for 1 Gauss point
             KS = area * (J * w[0] * H.T.dot(T).dot(H))
-            
+
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS
-            
+
         elif self._gaussPts == 2:
             # 'natural' weights of the element
             wgt = 1.0
             w = np.array([wgt, wgt])
 
-            # at Gauss point 1         
-            J1 = self._shapeFns[1].jacobian(xn1, xn2)            
+            # at Gauss point 1
+            J1 = self._shapeFns[1].jacobian(xn1, xn2)
             # create the linear Bmatrix
             BL1 = self._shapeFns[1].dNdximat() / J1
 
             # at Gauss point 2
-            J2 = self._shapeFns[2].jacobian(xn1, xn2)           
+            J2 = self._shapeFns[2].jacobian(xn1, xn2)
             # create the linear  Bmatrix
-            BL2 = self._shapeFns[2].dNdximat() / J2   
+            BL2 = self._shapeFns[2].dNdximat() / J2
 
             # the linear stiffness matrix for 2 Gauss points
             KL = (area * (J1 * w[0] * BL1.T.dot(M).dot(BL1) +
@@ -1200,25 +1304,25 @@ class chord(object):
             H1 = self._shapeFns[1].dNdximat() / J
             H2 = self._shapeFns[2].dNdximat() / J
             # create the matrix of derivative of displacements (A matrix)
-            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J1  
-            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) / J2 
+            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J1
+            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) / J2
             # create the nonlinear Bmatrix
-            BN1 = np.dot(A1, H1) 
-            BN2 = np.dot(A2, H2) 
+            BN1 = np.dot(A1, H1)
+            BN2 = np.dot(A2, H2)
 
             # the nonlinear stiffness matrix for 2 Gauss point
             KN = (area * (J1 * w[0] * (BL1.T.dot(M).dot(BN1) +
-                         BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) + 
+                         BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) +
                          J2 * w[1] * (BL2.T.dot(M).dot(BN2) +
                          BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2))))
-            
+
             # the stress stiffness matrix for 1 Gauss point
             KS = (area * (J1 * w[0] * H1.T.dot(T).dot(H1) +
                           J2 * w[1] * H2.T.dot(T).dot(H2)))
-            
+
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS
-            
+
         else:  # gaussPts = 3
             # 'natural' weights of the element
             wgt1 = 5.0 / 9.0
@@ -1226,35 +1330,35 @@ class chord(object):
             w = np.array([wgt1, wgt2, wgt1])
 
             # at Gauss point 1
-            J1 = self._shapeFns[1].jacobian(xn1, xn2)            
+            J1 = self._shapeFns[1].jacobian(xn1, xn2)
             # create the linear Bmatrix
             BL1 = self._shapeFns[1].dNdximat() / J1
 
             # at Gauss point 2
-            J2 = self._shapeFns[2].jacobian(xn1, xn2)            
+            J2 = self._shapeFns[2].jacobian(xn1, xn2)
             # create the linear Bmatrix
             BL2 = self._shapeFns[2].dNdximat() / J2
 
             # at Gauss point 3
-            J3 = self._shapeFns[3].jacobian(xn1, xn2)            
+            J3 = self._shapeFns[3].jacobian(xn1, xn2)
             # create the linear Bmatrix
             BL3 = self._shapeFns[3].dNdximat() / J3
 
             # the linear stiffness matrix for 3 Gauss points
             KL = (area * (J1 * w[0] * BL1.T.dot(M).dot(BL1) +
                           J2 * w[1] * BL2.T.dot(M).dot(BL2) +
-                          J3 * w[2] * BL3.T.dot(M).dot(BL3)))            
+                          J3 * w[2] * BL3.T.dot(M).dot(BL3)))
 
             # create the matrix of derivative of shape functions (H matrix)
             H1 = self._shapeFns[1].dNdximat() / J1
             H2 = self._shapeFns[2].dNdximat() / J2
             H3 = self._shapeFns[3].dNdximat() / J3
             # create the matrix of derivative of displacements (A matrix)
-            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J1  
-            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) / J2 
-            A3 = - self._shapeFns[3].G(xn1, xn2, x01, x02) / J3 
+            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J1
+            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) / J2
+            A3 = - self._shapeFns[3].G(xn1, xn2, x01, x02) / J3
             # create the nonlinear Bmatrix
-            BN1 = np.dot(A1, H1) 
+            BN1 = np.dot(A1, H1)
             BN2 = np.dot(A2, H2)
             BN3 = np.dot(A3, H3)
 
@@ -1270,18 +1374,18 @@ class chord(object):
             KS = (area * (J1 * w[0] * H1.T.dot(T).dot(H1) +
                           J2 * w[1] * H2.T.dot(T).dot(H2) +
                           J3 * w[2] * H3.T.dot(T).dot(H3)))
-                                
+
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS
-                        
+
         return stiffT
 
     def forcingFunction(self, se, sc):
-        
-        # create the traction 
+
+        # create the traction
         T = sc + se
         t = T
-        
+
         # initial natural coordinates for a chord
         xn1 = -self._Ln / 2.0
         xn2 = self._Ln / 2.0
@@ -1357,6 +1461,53 @@ class chord(object):
             FVec = (J1 * we[0] * nMat1 * t + J2 * we[1] * nMat2 * t +
                     J3 * we[2] * nMat3 * t)
 
-        return FVec      
+        return FVec
+    """
 
 
+"""
+Changes made in version "1.4.0":
+
+
+A chord object can now be printed using the print(object) command.
+
+
+The interface for the constructor was changed from
+
+    c = chord(number, vertex1, vertex2, h, gaussPts)
+
+to
+
+    c = chord(number, vertex1, vertex2, h, degree)
+
+in an effort to make the constructors of all geometric types the same.
+
+New methods that allow for solving the constitutive equations
+
+    E = c.tangentModulusCollagen(fiberStress, fiberStrain)
+
+    stressRate = c.odeCollagen(time, stress)
+
+    E = c.tangentModulusElastin(fiberStress, fiberStrain)
+
+    stressRate = c.odeElastin(time, stress)
+
+Other methods added
+
+    gq = c.gaussQuadrature()
+
+    sigma = c.stress(state)
+
+    f = c.force(state)
+
+Removed methods
+
+    E1, E2, e_t = c.matPropCollagen()
+
+    E1, E2, e_t = c.matPropElastin()
+
+Methods c.G and c.F now return 1x1 matrices instead of floats
+
+
+Changes made were not kept track of prior to version "1.3.0":
+"""

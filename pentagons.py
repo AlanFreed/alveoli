@@ -1,5 +1,5 @@
-#!/usr/bin/env python3       
-# -*- coding: utf-8 -*-     
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 from chords import chord
 import materialProperties as mp
@@ -444,7 +444,7 @@ class pentagon(object):
             raise RuntimeError('There were not 5 unique vertices ' +
                                'in this pentagon.')
 
-        # establish the shape functions located at the pentagon Gauss points 
+        # establish the shape functions located at the pentagon Gauss points
         # (xi, eta)
         if pentGaussPts == 1:
             xi = 0.0000000000000000
@@ -454,11 +454,11 @@ class pentagon(object):
             self._pentShapeFns = {
                 11: sf11
             }
-        elif pentGaussPts == 4:            
+        elif pentGaussPts == 4:
             xi1 = -0.0349156305831802
             eta1 = 0.6469731019095136
             sf11 = pentShapeFunction(xi1, eta1)
-            
+
             xi1 = -0.0349156305831802
             eta2 = -0.0321196846022659
             sf12 = pentShapeFunction(xi1, eta2)
@@ -470,13 +470,13 @@ class pentagon(object):
             xi1 = -0.0349156305831802
             eta4 = 0.0321196846022661
             sf14 = pentShapeFunction(xi1, eta4)
-            
-            
-            
+
+
+
             xi2 = -0.5951653065516678
             eta1 = 0.6469731019095136
             sf21 = pentShapeFunction(xi2, eta1)
-            
+
             xi2 = -0.5951653065516678
             eta2 = -0.0321196846022659
             sf22 = pentShapeFunction(xi2, eta2)
@@ -488,9 +488,9 @@ class pentagon(object):
             xi2 = -0.5951653065516678
             eta4 = 0.0321196846022661
             sf24 = pentShapeFunction(xi2, eta4)
-            
-            
-            
+
+
+
             xi3 = 0.0349156305831798
             eta1 = 0.6469731019095136
             sf31 = pentShapeFunction(xi3, eta1)
@@ -498,7 +498,7 @@ class pentagon(object):
             xi3 = 0.0349156305831798
             eta2 = -0.0321196846022659
             sf32 = pentShapeFunction(xi3, eta2)
-            
+
             xi3 = 0.0349156305831798
             eta3 = -0.6469731019095134
             sf33 = pentShapeFunction(xi3, eta3)
@@ -506,8 +506,8 @@ class pentagon(object):
             xi3 = 0.0349156305831798
             eta4 = 0.0321196846022661
             sf34 = pentShapeFunction(xi3, eta4)
-            
-            
+
+
 
             xi4 = 0.5951653065516677
             eta1 = 0.6469731019095136
@@ -520,7 +520,7 @@ class pentagon(object):
             xi4 = 0.5951653065516677
             eta3 = -0.6469731019095134
             sf43 = pentShapeFunction(xi4, eta3)
-            
+
             xi4 = 0.5951653065516677
             eta4 = 0.0321196846022661
             sf44 = pentShapeFunction(xi4, eta4)
@@ -572,10 +572,10 @@ class pentagon(object):
             xi1 = -0.0000000000000000
             eta7 = 0.4872045224587945
             sf17 = pentShapeFunction(xi1, eta7)
-            
-            
-            
-            
+
+
+
+
             xi2 = -0.1351253857178451
             eta1 = -0.0000000000000002
             sf21 = pentShapeFunction(xi2, eta1)
@@ -603,10 +603,10 @@ class pentagon(object):
             xi2 = -0.1351253857178451
             eta7 = 0.4872045224587945
             sf27 = pentShapeFunction(xi2, eta7)
-            
-            
-                        
-            
+
+
+
+
             xi3 = -0.6970858746672087
             eta1 = -0.0000000000000002
             sf31 = pentShapeFunction(xi3, eta1)
@@ -634,10 +634,10 @@ class pentagon(object):
             xi3 = -0.6970858746672087
             eta7 = 0.4872045224587945
             sf37 = pentShapeFunction(xi3, eta7)
-            
-            
-            
-            
+
+
+
+
             xi4 = -0.4651171392611024
             eta1 = -0.0000000000000002
             sf41 = pentShapeFunction(xi4, eta1)
@@ -665,10 +665,10 @@ class pentagon(object):
             xi4 = -0.4651171392611024
             eta7 = 0.4872045224587945
             sf47 = pentShapeFunction(xi4, eta7)
-            
-                        
-            
-            
+
+
+
+
             xi5 = 0.2842948078559476
             eta1 = -0.0000000000000002
             sf51 = pentShapeFunction(xi5, eta1)
@@ -696,10 +696,10 @@ class pentagon(object):
             xi5 = 0.2842948078559476
             eta7 = 0.4872045224587945
             sf57 = pentShapeFunction(xi5, eta7)
-            
-            
-            
-            
+
+
+
+
             xi6 = 0.7117958231685716
             eta1 = -0.0000000000000002
             sf61 = pentShapeFunction(xi6, eta1)
@@ -727,10 +727,10 @@ class pentagon(object):
             xi6 = 0.7117958231685716
             eta7 = 0.4872045224587945
             sf67 = pentShapeFunction(xi6, eta7)
-            
-            
-            
-            
+
+
+
+
             xi7 = 0.5337947578638855
             eta1 = -0.0000000000000002
             sf71 = pentShapeFunction(xi7, eta1)
@@ -817,7 +817,7 @@ class pentagon(object):
         x3, y3, z3 = v3.coordinates('ref')
         x4, y4, z4 = v4.coordinates('ref')
         x5, y5, z5 = v5.coordinates('ref')
-                
+
         # base vector 1: connects the two shoulders of a pentagon
         x = x5 - x2
         y = y5 - y2
@@ -909,14 +909,14 @@ class pentagon(object):
         self._v4y = self._v4y0
         self._v5x = self._v5x0
         self._v5y = self._v5y0
- 
+
         # z offsets for the pentagonal plane (which should all be the same)
         self._v1z = n3x * x1 + n3y * y1 + n3z * z1
         self._v2z = n3x * x2 + n3y * y2 + n3z * z2
         self._v3z = n3x * x3 + n3y * y3 + n3z * z3
         self._v4z = n3x * x4 + n3y * y4 + n3z * z4
         self._v5z = n3x * x5 + n3y * y5 + n3z * z5
-        self._vz0 = ((self._v1z + self._v2z + self._v3z + self._v4z + 
+        self._vz0 = ((self._v1z + self._v2z + self._v3z + self._v4z +
                       self._v5z) / 5.0)
 
         # determine the initial areas of this irregular pentagon
@@ -1806,7 +1806,7 @@ class pentagon(object):
 
     def triaGaussPoints(self):
         return self._triaGaussPts
-    
+
     def update(self):
         # computes the fields positioned at the next time step
 
@@ -1907,29 +1907,29 @@ class pentagon(object):
         # the area will be positive if the vertices index counter clockwise
 
         # determine the centroid of this pentagon in pentagonal coordinates
-        self._cx = ((self._v1x + self._v2x) * 
+        self._cx = ((self._v1x + self._v2x) *
                     (self._v1x * self._v2y - self._v2x * self._v1y) +
-                    (self._v2x + self._v3x) * 
+                    (self._v2x + self._v3x) *
                     (self._v2x * self._v3y - self._v3x * self._v2y) +
-                    (self._v3x + self._v4x) * 
+                    (self._v3x + self._v4x) *
                     (self._v3x * self._v4y - self._v4x * self._v3y) +
-                    (self._v4x + self._v5x) * 
+                    (self._v4x + self._v5x) *
                     (self._v4x * self._v5y - self._v5x * self._v4y) +
-                    (self._v5x + self._v1x) * 
-                    (self._v5x * self._v1y - 
+                    (self._v5x + self._v1x) *
+                    (self._v5x * self._v1y -
                      self._v1x * self._v5y)) / (6.0 * self._An)
-        self._cy = ((self._v1y + self._v2y) * 
+        self._cy = ((self._v1y + self._v2y) *
                     (self._v1x * self._v2y - self._v2x * self._v1y) +
-                    (self._v2y + self._v3y) * 
+                    (self._v2y + self._v3y) *
                     (self._v2x * self._v3y - self._v3x * self._v2y) +
-                    (self._v3y + self._v4y) * 
+                    (self._v3y + self._v4y) *
                     (self._v3x * self._v4y - self._v4x * self._v3y) +
-                    (self._v4y + self._v5y) * 
+                    (self._v4y + self._v5y) *
                     (self._v4x * self._v5y - self._v5x * self._v4y) +
-                    (self._v5y + self._v1y) * 
-                    (self._v5x * self._v1y - 
+                    (self._v5y + self._v1y) *
+                    (self._v5x * self._v1y -
                      self._v1x * self._v5y)) / (6.0 * self._An)
-        self._cz = ((self._v1z + self._v2z + self._v3z + self._v4z + 
+        self._cz = ((self._v1z + self._v2z + self._v3z + self._v4z +
                      self._v5z) / 5.0)
 
         # rotate this centroid back into the reference coordinate system
@@ -1971,7 +1971,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Gn[14] = self._pentShapeFns[14].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Gn[21] = self._pentShapeFns[21].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Gn[22] = self._pentShapeFns[22].G(x1, x2, x3, x4, x5,
@@ -1980,7 +1980,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Gn[24] = self._pentShapeFns[24].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Gn[31] = self._pentShapeFns[31].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Gn[32] = self._pentShapeFns[32].G(x1, x2, x3, x4, x5,
@@ -1989,7 +1989,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Gn[34] = self._pentShapeFns[34].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Gn[41] = self._pentShapeFns[41].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Gn[42] = self._pentShapeFns[42].G(x1, x2, x3, x4, x5,
@@ -2007,7 +2007,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Fn[14] = self._pentShapeFns[14].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Fn[21] = self._pentShapeFns[21].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Fn[22] = self._pentShapeFns[22].F(x1, x2, x3, x4, x5,
@@ -2016,7 +2016,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Fn[24] = self._pentShapeFns[24].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Fn[31] = self._pentShapeFns[31].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Fn[32] = self._pentShapeFns[32].F(x1, x2, x3, x4, x5,
@@ -2025,7 +2025,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Fn[34] = self._pentShapeFns[34].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Fn[41] = self._pentShapeFns[41].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Fn[42] = self._pentShapeFns[42].F(x1, x2, x3, x4, x5,
@@ -2050,7 +2050,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Gn[17] = self._pentShapeFns[17].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Gn[21] = self._pentShapeFns[21].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Gn[22] = self._pentShapeFns[22].G(x1, x2, x3, x4, x5,
@@ -2065,7 +2065,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Gn[27] = self._pentShapeFns[27].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Gn[31] = self._pentShapeFns[31].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Gn[32] = self._pentShapeFns[32].G(x1, x2, x3, x4, x5,
@@ -2080,7 +2080,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Gn[37] = self._pentShapeFns[37].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Gn[41] = self._pentShapeFns[41].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Gn[42] = self._pentShapeFns[42].G(x1, x2, x3, x4, x5,
@@ -2095,7 +2095,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Gn[47] = self._pentShapeFns[47].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Gn[51] = self._pentShapeFns[51].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Gn[52] = self._pentShapeFns[52].G(x1, x2, x3, x4, x5,
@@ -2110,7 +2110,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Gn[57] = self._pentShapeFns[57].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Gn[61] = self._pentShapeFns[61].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Gn[62] = self._pentShapeFns[62].G(x1, x2, x3, x4, x5,
@@ -2125,7 +2125,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Gn[67] = self._pentShapeFns[67].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Gn[71] = self._pentShapeFns[71].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Gn[72] = self._pentShapeFns[72].G(x1, x2, x3, x4, x5,
@@ -2140,7 +2140,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Gn[77] = self._pentShapeFns[77].G(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             # deformation gradients located at the Gauss points of pentagon
             self._Fn[11] = self._pentShapeFns[11].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
@@ -2156,7 +2156,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Fn[17] = self._pentShapeFns[17].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Fn[21] = self._pentShapeFns[21].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Fn[22] = self._pentShapeFns[22].F(x1, x2, x3, x4, x5,
@@ -2171,7 +2171,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Fn[27] = self._pentShapeFns[27].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Fn[31] = self._pentShapeFns[31].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Fn[32] = self._pentShapeFns[32].F(x1, x2, x3, x4, x5,
@@ -2186,7 +2186,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Fn[37] = self._pentShapeFns[37].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Fn[41] = self._pentShapeFns[41].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Fn[42] = self._pentShapeFns[42].F(x1, x2, x3, x4, x5,
@@ -2201,7 +2201,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Fn[47] = self._pentShapeFns[47].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Fn[51] = self._pentShapeFns[51].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Fn[52] = self._pentShapeFns[52].F(x1, x2, x3, x4, x5,
@@ -2216,7 +2216,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Fn[57] = self._pentShapeFns[57].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Fn[61] = self._pentShapeFns[61].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Fn[62] = self._pentShapeFns[62].F(x1, x2, x3, x4, x5,
@@ -2231,7 +2231,7 @@ class pentagon(object):
                                                x10, x20, x30, x40, x50)
             self._Fn[67] = self._pentShapeFns[67].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
-            
+
             self._Fn[71] = self._pentShapeFns[71].F(x1, x2, x3, x4, x5,
                                                x10, x20, x30, x40, x50)
             self._Fn[72] = self._pentShapeFns[72].F(x1, x2, x3, x4, x5,
@@ -2251,33 +2251,33 @@ class pentagon(object):
         if self._pentGaussPts == 1:
             for i in range(11, self._pentGaussPts+11):
                 self._septum[i].update(self._Fn[i])
-                
-        elif self._pentGaussPts == 4:   
+
+        elif self._pentGaussPts == 4:
             for i in range(11, self._pentGaussPts+11):
-                self._septum[i].update(self._Fn[i])            
+                self._septum[i].update(self._Fn[i])
             for i in range(21, self._pentGaussPts+21):
-                self._septum[i].update(self._Fn[i])                
+                self._septum[i].update(self._Fn[i])
             for i in range(31, self._pentGaussPts+31):
-                self._septum[i].update(self._Fn[i])                
+                self._septum[i].update(self._Fn[i])
             for i in range(41, self._pentGaussPts+41):
                 self._septum[i].update(self._Fn[i])
-                
+
         else:  # pentGaussPts = 7
             for i in range(11, self._pentGaussPts+11):
-                self._septum[i].update(self._Fn[i])            
+                self._septum[i].update(self._Fn[i])
             for i in range(21, self._pentGaussPts+21):
-                self._septum[i].update(self._Fn[i])                
+                self._septum[i].update(self._Fn[i])
             for i in range(31, self._pentGaussPts+31):
-                self._septum[i].update(self._Fn[i])                
+                self._septum[i].update(self._Fn[i])
             for i in range(41, self._pentGaussPts+41):
                 self._septum[i].update(self._Fn[i])
             for i in range(51, self._pentGaussPts+51):
-                self._septum[i].update(self._Fn[i])                
+                self._septum[i].update(self._Fn[i])
             for i in range(61, self._pentGaussPts+61):
-                self._septum[i].update(self._Fn[i])                
+                self._septum[i].update(self._Fn[i])
             for i in range(71, self._pentGaussPts+71):
                 self._septum[i].update(self._Fn[i])
-            
+
         return  # nothing
 
     def advance(self):
@@ -2302,45 +2302,45 @@ class pentagon(object):
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
                 self._Gc[i][:, :] = self._Gn[i][:, :]
-                
-        elif self._pentGaussPts == 4:   
+
+        elif self._pentGaussPts == 4:
             for i in range(11, self._pentGaussPts+11):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]         
+                self._Gc[i][:, :] = self._Gn[i][:, :]
             for i in range(21, self._pentGaussPts+21):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]             
+                self._Gc[i][:, :] = self._Gn[i][:, :]
             for i in range(31, self._pentGaussPts+31):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]             
+                self._Gc[i][:, :] = self._Gn[i][:, :]
             for i in range(41, self._pentGaussPts+41):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
                 self._Gc[i][:, :] = self._Gn[i][:, :]
-                
+
         else:  # pentGaussPts = 7
             for i in range(11, self._pentGaussPts+11):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]           
+                self._Gc[i][:, :] = self._Gn[i][:, :]
             for i in range(21, self._pentGaussPts+21):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]              
+                self._Gc[i][:, :] = self._Gn[i][:, :]
             for i in range(31, self._pentGaussPts+31):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]               
+                self._Gc[i][:, :] = self._Gn[i][:, :]
             for i in range(41, self._pentGaussPts+41):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
@@ -2350,25 +2350,25 @@ class pentagon(object):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]               
+                self._Gc[i][:, :] = self._Gn[i][:, :]
             for i in range(61, self._pentGaussPts+61):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]              
+                self._Gc[i][:, :] = self._Gn[i][:, :]
             for i in range(71, self._pentGaussPts+71):
                 self._Fp[i][:, :] = self._Fc[i][:, :]
                 self._Fc[i][:, :] = self._Fn[i][:, :]
                 self._Gp[i][:, :] = self._Gc[i][:, :]
                 self._Gc[i][:, :] = self._Gn[i][:, :]
-        
+
 
         # advance the membrane objects at each Gauss point
         if self._pentGaussPts == 1:
             for i in range(11, self._pentGaussPts+11):
                 self._septum[i].advance()
-                
-        elif self._pentGaussPts == 4:   
+
+        elif self._pentGaussPts == 4:
             for i in range(11, self._pentGaussPts+11):
                 self._septum[i].advance()
             for i in range(21, self._pentGaussPts+21):
@@ -2377,7 +2377,7 @@ class pentagon(object):
                 self._septum[i].advance()
             for i in range(41, self._pentGaussPts+41):
                 self._septum[i].advance()
-                
+
         else:  # pentGaussPts = 7
             for i in range(11, self._pentGaussPts+11):
                 self._septum[i].advance()
@@ -2922,10 +2922,10 @@ class pentagon(object):
             w = np.array([2.3776412907378837])
 
             jacob = self._pentShapeFns[11].jacobian(x1, x2, x3, x4, x5)
-            
+
             # determinant of the Jacobian matrix
             detJ = det(jacob)
-            
+
             nn1 = np.dot(np.transpose(self._pentShapeFns[11].Nmatx),
                          self._pentShapeFns[11].Nmatx)
 
@@ -2942,48 +2942,48 @@ class pentagon(object):
         elif self._pentGaussPts == 4:
             # 'natural' weights of the element
             w = np.array([0.5449124407446143, 0.6439082046243272,
-                            0.5449124407446146, 0.6439082046243275])
+                          0.5449124407446146, 0.6439082046243275])
 
             jacob11 = self._pentShapeFns[11].jacobian(x1, x2, x3, x4, x5)
             jacob12 = self._pentShapeFns[12].jacobian(x1, x2, x3, x4, x5)
             jacob13 = self._pentShapeFns[13].jacobian(x1, x2, x3, x4, x5)
             jacob14 = self._pentShapeFns[14].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob21 = self._pentShapeFns[21].jacobian(x1, x2, x3, x4, x5)
             jacob22 = self._pentShapeFns[22].jacobian(x1, x2, x3, x4, x5)
             jacob23 = self._pentShapeFns[23].jacobian(x1, x2, x3, x4, x5)
             jacob24 = self._pentShapeFns[24].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob31 = self._pentShapeFns[31].jacobian(x1, x2, x3, x4, x5)
             jacob32 = self._pentShapeFns[32].jacobian(x1, x2, x3, x4, x5)
             jacob33 = self._pentShapeFns[33].jacobian(x1, x2, x3, x4, x5)
             jacob34 = self._pentShapeFns[34].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob41 = self._pentShapeFns[41].jacobian(x1, x2, x3, x4, x5)
             jacob42 = self._pentShapeFns[42].jacobian(x1, x2, x3, x4, x5)
             jacob43 = self._pentShapeFns[43].jacobian(x1, x2, x3, x4, x5)
             jacob44 = self._pentShapeFns[44].jacobian(x1, x2, x3, x4, x5)
-            
+
 
             # determinant of the Jacobian matrix
             detJ11 = det(jacob11)
             detJ12 = det(jacob12)
-            detJ13 = det(jacob13)            
+            detJ13 = det(jacob13)
             detJ14 = det(jacob14)
-            
+
             detJ21 = det(jacob21)
             detJ22 = det(jacob22)
-            detJ23 = det(jacob23)            
+            detJ23 = det(jacob23)
             detJ24 = det(jacob24)
-            
+
             detJ31 = det(jacob31)
             detJ32 = det(jacob32)
-            detJ33 = det(jacob33)            
+            detJ33 = det(jacob33)
             detJ34 = det(jacob34)
-            
+
             detJ41 = det(jacob41)
             detJ42 = det(jacob42)
-            detJ43 = det(jacob43)            
+            detJ43 = det(jacob43)
             detJ44 = det(jacob44)
 
             nn11 = np.dot(np.transpose(self._pentShapeFns[11].Nmatx),
@@ -2994,7 +2994,7 @@ class pentagon(object):
                          self._pentShapeFns[13].Nmatx)
             nn14 = np.dot(np.transpose(self._pentShapeFns[14].Nmatx),
                          self._pentShapeFns[14].Nmatx)
-            
+
             nn21 = np.dot(np.transpose(self._pentShapeFns[21].Nmatx),
                          self._pentShapeFns[21].Nmatx)
             nn22 = np.dot(np.transpose(self._pentShapeFns[22].Nmatx),
@@ -3003,7 +3003,7 @@ class pentagon(object):
                          self._pentShapeFns[23].Nmatx)
             nn24 = np.dot(np.transpose(self._pentShapeFns[24].Nmatx),
                          self._pentShapeFns[24].Nmatx)
-            
+
             nn31 = np.dot(np.transpose(self._pentShapeFns[31].Nmatx),
                          self._pentShapeFns[31].Nmatx)
             nn32 = np.dot(np.transpose(self._pentShapeFns[32].Nmatx),
@@ -3012,7 +3012,7 @@ class pentagon(object):
                          self._pentShapeFns[33].Nmatx)
             nn34 = np.dot(np.transpose(self._pentShapeFns[34].Nmatx),
                          self._pentShapeFns[34].Nmatx)
-            
+
             nn41 = np.dot(np.transpose(self._pentShapeFns[41].Nmatx),
                          self._pentShapeFns[41].Nmatx)
             nn42 = np.dot(np.transpose(self._pentShapeFns[42].Nmatx),
@@ -3061,7 +3061,7 @@ class pentagon(object):
             jacob15 = self._pentShapeFns[15].jacobian(x1, x2, x3, x4, x5)
             jacob16 = self._pentShapeFns[16].jacobian(x1, x2, x3, x4, x5)
             jacob17 = self._pentShapeFns[17].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob21 = self._pentShapeFns[21].jacobian(x1, x2, x3, x4, x5)
             jacob22 = self._pentShapeFns[22].jacobian(x1, x2, x3, x4, x5)
             jacob23 = self._pentShapeFns[23].jacobian(x1, x2, x3, x4, x5)
@@ -3069,7 +3069,7 @@ class pentagon(object):
             jacob25 = self._pentShapeFns[25].jacobian(x1, x2, x3, x4, x5)
             jacob26 = self._pentShapeFns[26].jacobian(x1, x2, x3, x4, x5)
             jacob27 = self._pentShapeFns[27].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob31 = self._pentShapeFns[31].jacobian(x1, x2, x3, x4, x5)
             jacob32 = self._pentShapeFns[32].jacobian(x1, x2, x3, x4, x5)
             jacob33 = self._pentShapeFns[33].jacobian(x1, x2, x3, x4, x5)
@@ -3077,7 +3077,7 @@ class pentagon(object):
             jacob35 = self._pentShapeFns[35].jacobian(x1, x2, x3, x4, x5)
             jacob36 = self._pentShapeFns[36].jacobian(x1, x2, x3, x4, x5)
             jacob37 = self._pentShapeFns[37].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob41 = self._pentShapeFns[41].jacobian(x1, x2, x3, x4, x5)
             jacob42 = self._pentShapeFns[42].jacobian(x1, x2, x3, x4, x5)
             jacob43 = self._pentShapeFns[43].jacobian(x1, x2, x3, x4, x5)
@@ -3085,7 +3085,7 @@ class pentagon(object):
             jacob45 = self._pentShapeFns[45].jacobian(x1, x2, x3, x4, x5)
             jacob46 = self._pentShapeFns[46].jacobian(x1, x2, x3, x4, x5)
             jacob47 = self._pentShapeFns[47].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob51 = self._pentShapeFns[51].jacobian(x1, x2, x3, x4, x5)
             jacob52 = self._pentShapeFns[52].jacobian(x1, x2, x3, x4, x5)
             jacob53 = self._pentShapeFns[53].jacobian(x1, x2, x3, x4, x5)
@@ -3093,7 +3093,7 @@ class pentagon(object):
             jacob55 = self._pentShapeFns[55].jacobian(x1, x2, x3, x4, x5)
             jacob56 = self._pentShapeFns[56].jacobian(x1, x2, x3, x4, x5)
             jacob57 = self._pentShapeFns[57].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob61 = self._pentShapeFns[61].jacobian(x1, x2, x3, x4, x5)
             jacob62 = self._pentShapeFns[62].jacobian(x1, x2, x3, x4, x5)
             jacob63 = self._pentShapeFns[63].jacobian(x1, x2, x3, x4, x5)
@@ -3101,7 +3101,7 @@ class pentagon(object):
             jacob65 = self._pentShapeFns[65].jacobian(x1, x2, x3, x4, x5)
             jacob66 = self._pentShapeFns[66].jacobian(x1, x2, x3, x4, x5)
             jacob67 = self._pentShapeFns[67].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob71 = self._pentShapeFns[71].jacobian(x1, x2, x3, x4, x5)
             jacob72 = self._pentShapeFns[72].jacobian(x1, x2, x3, x4, x5)
             jacob73 = self._pentShapeFns[73].jacobian(x1, x2, x3, x4, x5)
@@ -3113,60 +3113,60 @@ class pentagon(object):
             # determinant of the Jacobian matrix
             detJ11 = det(jacob11)
             detJ12 = det(jacob12)
-            detJ13 = det(jacob13)            
+            detJ13 = det(jacob13)
             detJ14 = det(jacob14)
             detJ15 = det(jacob15)
-            detJ16 = det(jacob16)            
+            detJ16 = det(jacob16)
             detJ17 = det(jacob17)
-            
+
             detJ21 = det(jacob21)
             detJ22 = det(jacob22)
-            detJ23 = det(jacob23)            
+            detJ23 = det(jacob23)
             detJ24 = det(jacob24)
             detJ25 = det(jacob25)
-            detJ26 = det(jacob26)            
+            detJ26 = det(jacob26)
             detJ27 = det(jacob27)
-            
+
             detJ31 = det(jacob31)
             detJ32 = det(jacob32)
-            detJ33 = det(jacob33)            
+            detJ33 = det(jacob33)
             detJ34 = det(jacob34)
             detJ35 = det(jacob35)
-            detJ36 = det(jacob36)            
+            detJ36 = det(jacob36)
             detJ37 = det(jacob37)
-            
+
             detJ41 = det(jacob41)
             detJ42 = det(jacob42)
-            detJ43 = det(jacob43)            
+            detJ43 = det(jacob43)
             detJ44 = det(jacob44)
             detJ45 = det(jacob45)
-            detJ46 = det(jacob46)            
+            detJ46 = det(jacob46)
             detJ47 = det(jacob47)
-            
+
             detJ51 = det(jacob51)
             detJ52 = det(jacob52)
-            detJ53 = det(jacob53)            
+            detJ53 = det(jacob53)
             detJ54 = det(jacob54)
             detJ55 = det(jacob55)
-            detJ56 = det(jacob56)            
+            detJ56 = det(jacob56)
             detJ57 = det(jacob57)
-            
+
             detJ61 = det(jacob61)
             detJ62 = det(jacob62)
-            detJ63 = det(jacob63)            
+            detJ63 = det(jacob63)
             detJ64 = det(jacob64)
             detJ65 = det(jacob65)
-            detJ66 = det(jacob66)            
+            detJ66 = det(jacob66)
             detJ67 = det(jacob67)
-            
+
             detJ71 = det(jacob71)
             detJ72 = det(jacob72)
-            detJ73 = det(jacob73)            
+            detJ73 = det(jacob73)
             detJ74 = det(jacob74)
             detJ75 = det(jacob75)
-            detJ76 = det(jacob76)            
+            detJ76 = det(jacob76)
             detJ77 = det(jacob77)
-            
+
             nn11 = np.dot(np.transpose(self._pentShapeFns[11].Nmatx),
                          self._pentShapeFns[11].Nmatx)
             nn12 = np.dot(np.transpose(self._pentShapeFns[12].Nmatx),
@@ -3181,7 +3181,7 @@ class pentagon(object):
                          self._pentShapeFns[16].Nmatx)
             nn17 = np.dot(np.transpose(self._pentShapeFns[17].Nmatx),
                          self._pentShapeFns[17].Nmatx)
-            
+
             nn21 = np.dot(np.transpose(self._pentShapeFns[21].Nmatx),
                          self._pentShapeFns[21].Nmatx)
             nn22 = np.dot(np.transpose(self._pentShapeFns[22].Nmatx),
@@ -3196,7 +3196,7 @@ class pentagon(object):
                          self._pentShapeFns[26].Nmatx)
             nn27 = np.dot(np.transpose(self._pentShapeFns[27].Nmatx),
                          self._pentShapeFns[27].Nmatx)
-            
+
             nn31 = np.dot(np.transpose(self._pentShapeFns[31].Nmatx),
                          self._pentShapeFns[31].Nmatx)
             nn32 = np.dot(np.transpose(self._pentShapeFns[32].Nmatx),
@@ -3211,7 +3211,7 @@ class pentagon(object):
                          self._pentShapeFns[36].Nmatx)
             nn37 = np.dot(np.transpose(self._pentShapeFns[37].Nmatx),
                          self._pentShapeFns[37].Nmatx)
-            
+
             nn41 = np.dot(np.transpose(self._pentShapeFns[41].Nmatx),
                          self._pentShapeFns[41].Nmatx)
             nn42 = np.dot(np.transpose(self._pentShapeFns[42].Nmatx),
@@ -3226,7 +3226,7 @@ class pentagon(object):
                          self._pentShapeFns[46].Nmatx)
             nn47 = np.dot(np.transpose(self._pentShapeFns[47].Nmatx),
                          self._pentShapeFns[47].Nmatx)
-            
+
             nn51 = np.dot(np.transpose(self._pentShapeFns[51].Nmatx),
                          self._pentShapeFns[51].Nmatx)
             nn52 = np.dot(np.transpose(self._pentShapeFns[52].Nmatx),
@@ -3241,7 +3241,7 @@ class pentagon(object):
                          self._pentShapeFns[56].Nmatx)
             nn57 = np.dot(np.transpose(self._pentShapeFns[57].Nmatx),
                          self._pentShapeFns[57].Nmatx)
-            
+
             nn61 = np.dot(np.transpose(self._pentShapeFns[61].Nmatx),
                          self._pentShapeFns[61].Nmatx)
             nn62 = np.dot(np.transpose(self._pentShapeFns[62].Nmatx),
@@ -3256,7 +3256,7 @@ class pentagon(object):
                          self._pentShapeFns[66].Nmatx)
             nn67 = np.dot(np.transpose(self._pentShapeFns[67].Nmatx),
                          self._pentShapeFns[67].Nmatx)
-            
+
             nn71 = np.dot(np.transpose(self._pentShapeFns[71].Nmatx),
                          self._pentShapeFns[71].Nmatx)
             nn72 = np.dot(np.transpose(self._pentShapeFns[72].Nmatx),
@@ -3346,53 +3346,53 @@ class pentagon(object):
         x03 = (self._v3x0, self._v3y0)
         x04 = (self._v4x0, self._v4y0)
         x05 = (self._v5x0, self._v5y0)
-        
+
         # create the stress matrix
         T = np.zeros((2, 2), dtype=float)
         T[0, 0] = sp
         T[0, 1] = st
         T[1, 0] = st
         T[1, 1] = ss
-                    
+
         # determine the stiffness matrix
         if self._pentGaussPts == 1:
             # 'natural' weight of the element
             w = np.array([2.3776412907378837])
-            
+
             jacob = self._pentShapeFns[11].jacobian(x1, x2, x3, x4, x5)
-            
+
             # determinant of the Jacobian matrix
             detJ = det(jacob)
-            
+
             # create the linear Bmatrix
             BL = self._pentShapeFns[11].BLinear(x1, x2, x3, x4, x5)
             # the linear stiffness matrix for 1 Gauss point
             KL = self._width * (detJ * w[0] * w[0] * BL.T.dot(M).dot(BL))
-            
+
             # create the nonlinear Bmatrix
-            BNF = self._pentShapeFns[11].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF = self._pentShapeFns[11].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS = self._pentShapeFns[11].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS = self._pentShapeFns[11].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
             # total nonlinear Bmatrix
             BN = np.add(BNF, BNS)
-            
+
             # creat the H1 matrix
             HF = self._pentShapeFns[11].HmatrixF(x1, x2, x3, x4, x5)
             # creat the H2 matrix
             HS = self._pentShapeFns[11].HmatrixS(x1, x2, x3, x4, x5)
-            
+
             # the nonlinear stiffness matrix for 1 Gauss point
             KN = self._width * (detJ * w[0] * w[0] * (BL.T.dot(M).dot(BN) +
                                 BN.T.dot(M).dot(BL) + BN.T.dot(M).dot(BN)))
-            
-            # create the stress stiffness matrix            
+
+            # create the stress stiffness matrix
             KS = self._width * (detJ * w[0] * w[0] * HF.T.dot(T).dot(HF) +
                                 detJ * w[0] * w[0] * HS.T.dot(T).dot(HS))
-            
+
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS
-            
+
         elif self._pentGaussPts == 4:
             # 'natural' weights of the element
             w = np.array([0.5449124407446143, 0.6439082046243272,
@@ -3402,17 +3402,17 @@ class pentagon(object):
             jacob12 = self._pentShapeFns[12].jacobian(x1, x2, x3, x4, x5)
             jacob13 = self._pentShapeFns[13].jacobian(x1, x2, x3, x4, x5)
             jacob14 = self._pentShapeFns[14].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob21 = self._pentShapeFns[21].jacobian(x1, x2, x3, x4, x5)
             jacob22 = self._pentShapeFns[22].jacobian(x1, x2, x3, x4, x5)
             jacob23 = self._pentShapeFns[23].jacobian(x1, x2, x3, x4, x5)
             jacob24 = self._pentShapeFns[24].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob31 = self._pentShapeFns[31].jacobian(x1, x2, x3, x4, x5)
             jacob32 = self._pentShapeFns[32].jacobian(x1, x2, x3, x4, x5)
             jacob33 = self._pentShapeFns[33].jacobian(x1, x2, x3, x4, x5)
             jacob34 = self._pentShapeFns[34].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob41 = self._pentShapeFns[41].jacobian(x1, x2, x3, x4, x5)
             jacob42 = self._pentShapeFns[42].jacobian(x1, x2, x3, x4, x5)
             jacob43 = self._pentShapeFns[43].jacobian(x1, x2, x3, x4, x5)
@@ -3421,44 +3421,44 @@ class pentagon(object):
             # determinant of the Jacobian matrix
             detJ11 = det(jacob11)
             detJ12 = det(jacob12)
-            detJ13 = det(jacob13)            
+            detJ13 = det(jacob13)
             detJ14 = det(jacob14)
-            
+
             detJ21 = det(jacob21)
             detJ22 = det(jacob22)
-            detJ23 = det(jacob23)            
+            detJ23 = det(jacob23)
             detJ24 = det(jacob24)
-            
+
             detJ31 = det(jacob31)
             detJ32 = det(jacob32)
-            detJ33 = det(jacob33)            
+            detJ33 = det(jacob33)
             detJ34 = det(jacob34)
-            
+
             detJ41 = det(jacob41)
             detJ42 = det(jacob42)
-            detJ43 = det(jacob43)            
+            detJ43 = det(jacob43)
             detJ44 = det(jacob44)
 
             # create the linear Bmatrix
-            BL11 = self._pentShapeFns[11].BLinear(x1, x2, x3, x4, x5) 
-            BL12 = self._pentShapeFns[12].BLinear(x1, x2, x3, x4, x5) 
+            BL11 = self._pentShapeFns[11].BLinear(x1, x2, x3, x4, x5)
+            BL12 = self._pentShapeFns[12].BLinear(x1, x2, x3, x4, x5)
             BL13 = self._pentShapeFns[13].BLinear(x1, x2, x3, x4, x5)
-            BL14 = self._pentShapeFns[14].BLinear(x1, x2, x3, x4, x5) 
-            
+            BL14 = self._pentShapeFns[14].BLinear(x1, x2, x3, x4, x5)
+
             BL21 = self._pentShapeFns[21].BLinear(x1, x2, x3, x4, x5)
-            BL22 = self._pentShapeFns[22].BLinear(x1, x2, x3, x4, x5) 
-            BL23 = self._pentShapeFns[23].BLinear(x1, x2, x3, x4, x5) 
-            BL24 = self._pentShapeFns[24].BLinear(x1, x2, x3, x4, x5) 
-            
-            BL31 = self._pentShapeFns[31].BLinear(x1, x2, x3, x4, x5) 
-            BL32 = self._pentShapeFns[32].BLinear(x1, x2, x3, x4, x5) 
-            BL33 = self._pentShapeFns[33].BLinear(x1, x2, x3, x4, x5) 
-            BL34 = self._pentShapeFns[34].BLinear(x1, x2, x3, x4, x5) 
-            
+            BL22 = self._pentShapeFns[22].BLinear(x1, x2, x3, x4, x5)
+            BL23 = self._pentShapeFns[23].BLinear(x1, x2, x3, x4, x5)
+            BL24 = self._pentShapeFns[24].BLinear(x1, x2, x3, x4, x5)
+
+            BL31 = self._pentShapeFns[31].BLinear(x1, x2, x3, x4, x5)
+            BL32 = self._pentShapeFns[32].BLinear(x1, x2, x3, x4, x5)
+            BL33 = self._pentShapeFns[33].BLinear(x1, x2, x3, x4, x5)
+            BL34 = self._pentShapeFns[34].BLinear(x1, x2, x3, x4, x5)
+
             BL41 = self._pentShapeFns[41].BLinear(x1, x2, x3, x4, x5)
-            BL42 = self._pentShapeFns[42].BLinear(x1, x2, x3, x4, x5) 
-            BL43 = self._pentShapeFns[43].BLinear(x1, x2, x3, x4, x5) 
-            BL44 = self._pentShapeFns[44].BLinear(x1, x2, x3, x4, x5) 
+            BL42 = self._pentShapeFns[42].BLinear(x1, x2, x3, x4, x5)
+            BL43 = self._pentShapeFns[43].BLinear(x1, x2, x3, x4, x5)
+            BL44 = self._pentShapeFns[44].BLinear(x1, x2, x3, x4, x5)
 
             # the linear stiffness matrix for 4 Gauss points
             KL = self._width * (detJ11 * w[0] * w[0] * BL11.T.dot(M).dot(BL11)+
@@ -3477,97 +3477,97 @@ class pentagon(object):
                                 detJ42 * w[3] * w[1] * BL42.T.dot(M).dot(BL42)+
                                 detJ43 * w[3] * w[2] * BL43.T.dot(M).dot(BL43)+
                                 detJ44 * w[3] * w[3] * BL44.T.dot(M).dot(BL44))
-            
+
             # create the first nonlinear Bmatrix
-            BNF11 = self._pentShapeFns[11].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF11 = self._pentShapeFns[11].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF12 = self._pentShapeFns[12].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF12 = self._pentShapeFns[12].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF13 = self._pentShapeFns[13].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF13 = self._pentShapeFns[13].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF14 = self._pentShapeFns[14].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF14 = self._pentShapeFns[14].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNF21 = self._pentShapeFns[21].FirstBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNF21 = self._pentShapeFns[21].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF22 = self._pentShapeFns[22].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF22 = self._pentShapeFns[22].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF23 = self._pentShapeFns[23].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF23 = self._pentShapeFns[23].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF24 = self._pentShapeFns[24].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF24 = self._pentShapeFns[24].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNF31 = self._pentShapeFns[31].FirstBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNF31 = self._pentShapeFns[31].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF32 = self._pentShapeFns[32].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF32 = self._pentShapeFns[32].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF33 = self._pentShapeFns[33].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF33 = self._pentShapeFns[33].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF34 = self._pentShapeFns[34].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF34 = self._pentShapeFns[34].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
+
             BNF41 = self._pentShapeFns[41].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF42 = self._pentShapeFns[42].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF42 = self._pentShapeFns[42].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
             BNF43 = self._pentShapeFns[43].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF44 = self._pentShapeFns[44].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF44 = self._pentShapeFns[44].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
+
             # create the second nonlinear Bmatrix
-            BNS11 = self._pentShapeFns[11].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS11 = self._pentShapeFns[11].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
             BNS12 = self._pentShapeFns[12].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS13 = self._pentShapeFns[13].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS13 = self._pentShapeFns[13].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
             BNS14 = self._pentShapeFns[14].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
+
             BNS21 = self._pentShapeFns[21].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS22 = self._pentShapeFns[22].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS22 = self._pentShapeFns[22].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS23 = self._pentShapeFns[23].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS23 = self._pentShapeFns[23].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS24 = self._pentShapeFns[24].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS24 = self._pentShapeFns[24].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
+
             BNS31 = self._pentShapeFns[31].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS32 = self._pentShapeFns[32].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS32 = self._pentShapeFns[32].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS33 = self._pentShapeFns[33].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS33 = self._pentShapeFns[33].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS34 = self._pentShapeFns[34].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS34 = self._pentShapeFns[34].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
+
             BNS41 = self._pentShapeFns[41].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS42 = self._pentShapeFns[42].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS42 = self._pentShapeFns[42].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS43 = self._pentShapeFns[43].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS43 = self._pentShapeFns[43].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS44 = self._pentShapeFns[44].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS44 = self._pentShapeFns[44].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
+
             # total nonlinear Bmatrix
             BN11 = np.add(BNF11, BNS11)
             BN12 = np.add(BNF12, BNS12)
             BN13 = np.add(BNF13, BNS13)
             BN14 = np.add(BNF14, BNS14)
-            
+
             BN21 = np.add(BNF21, BNS21)
             BN22 = np.add(BNF22, BNS22)
             BN23 = np.add(BNF23, BNS23)
             BN24 = np.add(BNF24, BNS24)
-            
+
             BN31 = np.add(BNF31, BNS31)
             BN32 = np.add(BNF32, BNS32)
             BN33 = np.add(BNF33, BNS33)
             BN34 = np.add(BNF34, BNS34)
-            
+
             BN41 = np.add(BNF41, BNS41)
             BN42 = np.add(BNF42, BNS42)
             BN43 = np.add(BNF43, BNS43)
@@ -3578,17 +3578,17 @@ class pentagon(object):
             HF12 = self._pentShapeFns[12].HmatrixF(x1, x2, x3, x4, x5)
             HF13 = self._pentShapeFns[13].HmatrixF(x1, x2, x3, x4, x5)
             HF14 = self._pentShapeFns[14].HmatrixF(x1, x2, x3, x4, x5)
-            
+
             HF21 = self._pentShapeFns[21].HmatrixF(x1, x2, x3, x4, x5)
             HF22 = self._pentShapeFns[22].HmatrixF(x1, x2, x3, x4, x5)
             HF23 = self._pentShapeFns[23].HmatrixF(x1, x2, x3, x4, x5)
             HF24 = self._pentShapeFns[24].HmatrixF(x1, x2, x3, x4, x5)
-            
+
             HF31 = self._pentShapeFns[31].HmatrixF(x1, x2, x3, x4, x5)
             HF32 = self._pentShapeFns[32].HmatrixF(x1, x2, x3, x4, x5)
             HF33 = self._pentShapeFns[33].HmatrixF(x1, x2, x3, x4, x5)
             HF34 = self._pentShapeFns[34].HmatrixF(x1, x2, x3, x4, x5)
-            
+
             HF41 = self._pentShapeFns[41].HmatrixF(x1, x2, x3, x4, x5)
             HF42 = self._pentShapeFns[42].HmatrixF(x1, x2, x3, x4, x5)
             HF43 = self._pentShapeFns[43].HmatrixF(x1, x2, x3, x4, x5)
@@ -3599,61 +3599,61 @@ class pentagon(object):
             HS12 = self._pentShapeFns[12].HmatrixS(x1, x2, x3, x4, x5)
             HS13 = self._pentShapeFns[13].HmatrixS(x1, x2, x3, x4, x5)
             HS14 = self._pentShapeFns[14].HmatrixS(x1, x2, x3, x4, x5)
-            
+
             HS21 = self._pentShapeFns[21].HmatrixS(x1, x2, x3, x4, x5)
             HS22 = self._pentShapeFns[22].HmatrixS(x1, x2, x3, x4, x5)
             HS23 = self._pentShapeFns[23].HmatrixS(x1, x2, x3, x4, x5)
             HS24 = self._pentShapeFns[24].HmatrixS(x1, x2, x3, x4, x5)
-            
+
             HS31 = self._pentShapeFns[31].HmatrixS(x1, x2, x3, x4, x5)
             HS32 = self._pentShapeFns[32].HmatrixS(x1, x2, x3, x4, x5)
             HS33 = self._pentShapeFns[33].HmatrixS(x1, x2, x3, x4, x5)
             HS34 = self._pentShapeFns[34].HmatrixS(x1, x2, x3, x4, x5)
-            
+
             HS41 = self._pentShapeFns[41].HmatrixS(x1, x2, x3, x4, x5)
             HS42 = self._pentShapeFns[42].HmatrixS(x1, x2, x3, x4, x5)
             HS43 = self._pentShapeFns[43].HmatrixS(x1, x2, x3, x4, x5)
             HS44 = self._pentShapeFns[44].HmatrixS(x1, x2, x3, x4, x5)
-         
-            
+
+
             # the nonlinear stiffness matrix for 4 Gauss point
-            f11 = (BL11.T.dot(M).dot(BN11) + BN11.T.dot(M).dot(BL11) + 
+            f11 = (BL11.T.dot(M).dot(BN11) + BN11.T.dot(M).dot(BL11) +
                    BN11.T.dot(M).dot(BN11))
-            f12 = (BL12.T.dot(M).dot(BN12) + BN12.T.dot(M).dot(BL12) + 
+            f12 = (BL12.T.dot(M).dot(BN12) + BN12.T.dot(M).dot(BL12) +
                    BN12.T.dot(M).dot(BN12))
-            f13 = (BL13.T.dot(M).dot(BN13) + BN13.T.dot(M).dot(BL13) + 
+            f13 = (BL13.T.dot(M).dot(BN13) + BN13.T.dot(M).dot(BL13) +
                    BN13.T.dot(M).dot(BN13))
-            f14 = (BL14.T.dot(M).dot(BN14) + BN14.T.dot(M).dot(BL14) + 
+            f14 = (BL14.T.dot(M).dot(BN14) + BN14.T.dot(M).dot(BL14) +
                    BN14.T.dot(M).dot(BN14))
-            
-            f21 = (BL21.T.dot(M).dot(BN21) + BN21.T.dot(M).dot(BL21) + 
+
+            f21 = (BL21.T.dot(M).dot(BN21) + BN21.T.dot(M).dot(BL21) +
                    BN21.T.dot(M).dot(BN21))
-            f22 = (BL22.T.dot(M).dot(BN22) + BN22.T.dot(M).dot(BL22) + 
+            f22 = (BL22.T.dot(M).dot(BN22) + BN22.T.dot(M).dot(BL22) +
                    BN22.T.dot(M).dot(BN22))
-            f23 = (BL23.T.dot(M).dot(BN23) + BN23.T.dot(M).dot(BL23) + 
+            f23 = (BL23.T.dot(M).dot(BN23) + BN23.T.dot(M).dot(BL23) +
                    BN23.T.dot(M).dot(BN23))
-            f24 = (BL24.T.dot(M).dot(BN24) + BN24.T.dot(M).dot(BL24) + 
+            f24 = (BL24.T.dot(M).dot(BN24) + BN24.T.dot(M).dot(BL24) +
                    BN24.T.dot(M).dot(BN24))
-            
-            f31 = (BL31.T.dot(M).dot(BN31) + BN31.T.dot(M).dot(BL31) + 
+
+            f31 = (BL31.T.dot(M).dot(BN31) + BN31.T.dot(M).dot(BL31) +
                    BN31.T.dot(M).dot(BN31))
-            f32 = (BL32.T.dot(M).dot(BN32) + BN32.T.dot(M).dot(BL32) + 
+            f32 = (BL32.T.dot(M).dot(BN32) + BN32.T.dot(M).dot(BL32) +
                    BN32.T.dot(M).dot(BN32))
-            f33 = (BL33.T.dot(M).dot(BN33) + BN33.T.dot(M).dot(BL33) + 
+            f33 = (BL33.T.dot(M).dot(BN33) + BN33.T.dot(M).dot(BL33) +
                    BN33.T.dot(M).dot(BN33))
-            f34 = (BL34.T.dot(M).dot(BN34) + BN34.T.dot(M).dot(BL34) + 
+            f34 = (BL34.T.dot(M).dot(BN34) + BN34.T.dot(M).dot(BL34) +
                    BN34.T.dot(M).dot(BN34))
-            
-            f41 = (BL41.T.dot(M).dot(BN41) + BN41.T.dot(M).dot(BL41) + 
+
+            f41 = (BL41.T.dot(M).dot(BN41) + BN41.T.dot(M).dot(BL41) +
                    BN41.T.dot(M).dot(BN41))
-            f42 = (BL42.T.dot(M).dot(BN42) + BN42.T.dot(M).dot(BL42) + 
+            f42 = (BL42.T.dot(M).dot(BN42) + BN42.T.dot(M).dot(BL42) +
                    BN42.T.dot(M).dot(BN42))
-            f43 = (BL43.T.dot(M).dot(BN43) + BN43.T.dot(M).dot(BL43) + 
+            f43 = (BL43.T.dot(M).dot(BN43) + BN43.T.dot(M).dot(BL43) +
                    BN43.T.dot(M).dot(BN43))
-            f44 = (BL44.T.dot(M).dot(BN44) + BN44.T.dot(M).dot(BL44) + 
+            f44 = (BL44.T.dot(M).dot(BN44) + BN44.T.dot(M).dot(BL44) +
                    BN44.T.dot(M).dot(BN44))
-                                
-            
+
+
             KN = (self._width * (detJ11 * w[0] * w[0] * f11 +
                                  detJ12 * w[0] * w[1] * f12 +
                                  detJ13 * w[0] * w[2] * f13 +
@@ -3703,8 +3703,8 @@ class pentagon(object):
                                 detJ41 * w[3] * w[0] * HS41.T.dot(T).dot(HS41)+
                                 detJ42 * w[3] * w[1] * HS42.T.dot(T).dot(HS42)+
                                 detJ43 * w[3] * w[2] * HS43.T.dot(T).dot(HS43)+
-                                detJ44 * w[3] * w[3] * HS44.T.dot(T).dot(HS44))            
-            
+                                detJ44 * w[3] * w[3] * HS44.T.dot(T).dot(HS44))
+
             # determine the total tangent stiffness matrix
             stiffT = KL + KN + KS
 
@@ -3722,7 +3722,7 @@ class pentagon(object):
             jacob15 = self._pentShapeFns[15].jacobian(x1, x2, x3, x4, x5)
             jacob16 = self._pentShapeFns[16].jacobian(x1, x2, x3, x4, x5)
             jacob17 = self._pentShapeFns[17].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob21 = self._pentShapeFns[21].jacobian(x1, x2, x3, x4, x5)
             jacob22 = self._pentShapeFns[22].jacobian(x1, x2, x3, x4, x5)
             jacob23 = self._pentShapeFns[23].jacobian(x1, x2, x3, x4, x5)
@@ -3730,7 +3730,7 @@ class pentagon(object):
             jacob25 = self._pentShapeFns[25].jacobian(x1, x2, x3, x4, x5)
             jacob26 = self._pentShapeFns[26].jacobian(x1, x2, x3, x4, x5)
             jacob27 = self._pentShapeFns[27].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob31 = self._pentShapeFns[31].jacobian(x1, x2, x3, x4, x5)
             jacob32 = self._pentShapeFns[32].jacobian(x1, x2, x3, x4, x5)
             jacob33 = self._pentShapeFns[33].jacobian(x1, x2, x3, x4, x5)
@@ -3738,7 +3738,7 @@ class pentagon(object):
             jacob35 = self._pentShapeFns[35].jacobian(x1, x2, x3, x4, x5)
             jacob36 = self._pentShapeFns[36].jacobian(x1, x2, x3, x4, x5)
             jacob37 = self._pentShapeFns[37].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob41 = self._pentShapeFns[41].jacobian(x1, x2, x3, x4, x5)
             jacob42 = self._pentShapeFns[42].jacobian(x1, x2, x3, x4, x5)
             jacob43 = self._pentShapeFns[43].jacobian(x1, x2, x3, x4, x5)
@@ -3746,7 +3746,7 @@ class pentagon(object):
             jacob45 = self._pentShapeFns[45].jacobian(x1, x2, x3, x4, x5)
             jacob46 = self._pentShapeFns[46].jacobian(x1, x2, x3, x4, x5)
             jacob47 = self._pentShapeFns[47].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob51 = self._pentShapeFns[51].jacobian(x1, x2, x3, x4, x5)
             jacob52 = self._pentShapeFns[52].jacobian(x1, x2, x3, x4, x5)
             jacob53 = self._pentShapeFns[53].jacobian(x1, x2, x3, x4, x5)
@@ -3754,7 +3754,7 @@ class pentagon(object):
             jacob55 = self._pentShapeFns[55].jacobian(x1, x2, x3, x4, x5)
             jacob56 = self._pentShapeFns[56].jacobian(x1, x2, x3, x4, x5)
             jacob57 = self._pentShapeFns[57].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob61 = self._pentShapeFns[61].jacobian(x1, x2, x3, x4, x5)
             jacob62 = self._pentShapeFns[62].jacobian(x1, x2, x3, x4, x5)
             jacob63 = self._pentShapeFns[63].jacobian(x1, x2, x3, x4, x5)
@@ -3762,7 +3762,7 @@ class pentagon(object):
             jacob65 = self._pentShapeFns[65].jacobian(x1, x2, x3, x4, x5)
             jacob66 = self._pentShapeFns[66].jacobian(x1, x2, x3, x4, x5)
             jacob67 = self._pentShapeFns[67].jacobian(x1, x2, x3, x4, x5)
-            
+
             jacob71 = self._pentShapeFns[71].jacobian(x1, x2, x3, x4, x5)
             jacob72 = self._pentShapeFns[72].jacobian(x1, x2, x3, x4, x5)
             jacob73 = self._pentShapeFns[73].jacobian(x1, x2, x3, x4, x5)
@@ -3774,116 +3774,116 @@ class pentagon(object):
             # determinant of the Jacobian matrix
             detJ11 = det(jacob11)
             detJ12 = det(jacob12)
-            detJ13 = det(jacob13)            
+            detJ13 = det(jacob13)
             detJ14 = det(jacob14)
             detJ15 = det(jacob15)
-            detJ16 = det(jacob16)            
+            detJ16 = det(jacob16)
             detJ17 = det(jacob17)
-            
+
             detJ21 = det(jacob21)
             detJ22 = det(jacob22)
-            detJ23 = det(jacob23)            
+            detJ23 = det(jacob23)
             detJ24 = det(jacob24)
             detJ25 = det(jacob25)
-            detJ26 = det(jacob26)            
+            detJ26 = det(jacob26)
             detJ27 = det(jacob27)
-            
+
             detJ31 = det(jacob31)
             detJ32 = det(jacob32)
-            detJ33 = det(jacob33)            
+            detJ33 = det(jacob33)
             detJ34 = det(jacob34)
             detJ35 = det(jacob35)
-            detJ36 = det(jacob36)            
+            detJ36 = det(jacob36)
             detJ37 = det(jacob37)
-            
+
             detJ41 = det(jacob41)
             detJ42 = det(jacob42)
-            detJ43 = det(jacob43)            
+            detJ43 = det(jacob43)
             detJ44 = det(jacob44)
             detJ45 = det(jacob45)
-            detJ46 = det(jacob46)            
+            detJ46 = det(jacob46)
             detJ47 = det(jacob47)
-            
+
             detJ51 = det(jacob51)
             detJ52 = det(jacob52)
-            detJ53 = det(jacob53)            
+            detJ53 = det(jacob53)
             detJ54 = det(jacob54)
             detJ55 = det(jacob55)
-            detJ56 = det(jacob56)            
+            detJ56 = det(jacob56)
             detJ57 = det(jacob57)
-            
+
             detJ61 = det(jacob61)
             detJ62 = det(jacob62)
-            detJ63 = det(jacob63)            
+            detJ63 = det(jacob63)
             detJ64 = det(jacob64)
             detJ65 = det(jacob65)
-            detJ66 = det(jacob66)            
+            detJ66 = det(jacob66)
             detJ67 = det(jacob67)
-            
+
             detJ71 = det(jacob71)
             detJ72 = det(jacob72)
-            detJ73 = det(jacob73)            
+            detJ73 = det(jacob73)
             detJ74 = det(jacob74)
             detJ75 = det(jacob75)
-            detJ76 = det(jacob76)            
+            detJ76 = det(jacob76)
             detJ77 = det(jacob77)
-            
+
             # create the linear Bmatrix
             BL11 = self._pentShapeFns[11].BLinear(x1, x2, x3, x4, x5)
-            BL12 = self._pentShapeFns[12].BLinear(x1, x2, x3, x4, x5)        
-            BL13 = self._pentShapeFns[13].BLinear(x1, x2, x3, x4, x5) 
-            BL14 = self._pentShapeFns[14].BLinear(x1, x2, x3, x4, x5) 
-            BL15 = self._pentShapeFns[15].BLinear(x1, x2, x3, x4, x5)      
-            BL16 = self._pentShapeFns[16].BLinear(x1, x2, x3, x4, x5) 
-            BL17 = self._pentShapeFns[17].BLinear(x1, x2, x3, x4, x5) 
-            
-            BL21 = self._pentShapeFns[21].BLinear(x1, x2, x3, x4, x5) 
-            BL22 = self._pentShapeFns[22].BLinear(x1, x2, x3, x4, x5)        
-            BL23 = self._pentShapeFns[23].BLinear(x1, x2, x3, x4, x5) 
-            BL24 = self._pentShapeFns[24].BLinear(x1, x2, x3, x4, x5) 
-            BL25 = self._pentShapeFns[25].BLinear(x1, x2, x3, x4, x5)     
-            BL26 = self._pentShapeFns[26].BLinear(x1, x2, x3, x4, x5) 
-            BL27 = self._pentShapeFns[27].BLinear(x1, x2, x3, x4, x5) 
-            
-            BL31 = self._pentShapeFns[31].BLinear(x1, x2, x3, x4, x5) 
-            BL32 = self._pentShapeFns[32].BLinear(x1, x2, x3, x4, x5)        
+            BL12 = self._pentShapeFns[12].BLinear(x1, x2, x3, x4, x5)
+            BL13 = self._pentShapeFns[13].BLinear(x1, x2, x3, x4, x5)
+            BL14 = self._pentShapeFns[14].BLinear(x1, x2, x3, x4, x5)
+            BL15 = self._pentShapeFns[15].BLinear(x1, x2, x3, x4, x5)
+            BL16 = self._pentShapeFns[16].BLinear(x1, x2, x3, x4, x5)
+            BL17 = self._pentShapeFns[17].BLinear(x1, x2, x3, x4, x5)
+
+            BL21 = self._pentShapeFns[21].BLinear(x1, x2, x3, x4, x5)
+            BL22 = self._pentShapeFns[22].BLinear(x1, x2, x3, x4, x5)
+            BL23 = self._pentShapeFns[23].BLinear(x1, x2, x3, x4, x5)
+            BL24 = self._pentShapeFns[24].BLinear(x1, x2, x3, x4, x5)
+            BL25 = self._pentShapeFns[25].BLinear(x1, x2, x3, x4, x5)
+            BL26 = self._pentShapeFns[26].BLinear(x1, x2, x3, x4, x5)
+            BL27 = self._pentShapeFns[27].BLinear(x1, x2, x3, x4, x5)
+
+            BL31 = self._pentShapeFns[31].BLinear(x1, x2, x3, x4, x5)
+            BL32 = self._pentShapeFns[32].BLinear(x1, x2, x3, x4, x5)
             BL33 = self._pentShapeFns[33].BLinear(x1, x2, x3, x4, x5)
             BL34 = self._pentShapeFns[34].BLinear(x1, x2, x3, x4, x5)
-            BL35 = self._pentShapeFns[35].BLinear(x1, x2, x3, x4, x5)      
-            BL36 = self._pentShapeFns[36].BLinear(x1, x2, x3, x4, x5) 
-            BL37 = self._pentShapeFns[37].BLinear(x1, x2, x3, x4, x5) 
-            
-            BL41 = self._pentShapeFns[41].BLinear(x1, x2, x3, x4, x5) 
-            BL42 = self._pentShapeFns[42].BLinear(x1, x2, x3, x4, x5)    
-            BL43 = self._pentShapeFns[43].BLinear(x1, x2, x3, x4, x5) 
-            BL44 = self._pentShapeFns[44].BLinear(x1, x2, x3, x4, x5) 
-            BL45 = self._pentShapeFns[45].BLinear(x1, x2, x3, x4, x5)     
-            BL46 = self._pentShapeFns[46].BLinear(x1, x2, x3, x4, x5) 
-            BL47 = self._pentShapeFns[47].BLinear(x1, x2, x3, x4, x5) 
-            
+            BL35 = self._pentShapeFns[35].BLinear(x1, x2, x3, x4, x5)
+            BL36 = self._pentShapeFns[36].BLinear(x1, x2, x3, x4, x5)
+            BL37 = self._pentShapeFns[37].BLinear(x1, x2, x3, x4, x5)
+
+            BL41 = self._pentShapeFns[41].BLinear(x1, x2, x3, x4, x5)
+            BL42 = self._pentShapeFns[42].BLinear(x1, x2, x3, x4, x5)
+            BL43 = self._pentShapeFns[43].BLinear(x1, x2, x3, x4, x5)
+            BL44 = self._pentShapeFns[44].BLinear(x1, x2, x3, x4, x5)
+            BL45 = self._pentShapeFns[45].BLinear(x1, x2, x3, x4, x5)
+            BL46 = self._pentShapeFns[46].BLinear(x1, x2, x3, x4, x5)
+            BL47 = self._pentShapeFns[47].BLinear(x1, x2, x3, x4, x5)
+
             BL51 = self._pentShapeFns[51].BLinear(x1, x2, x3, x4, x5)
-            BL52 = self._pentShapeFns[52].BLinear(x1, x2, x3, x4, x5)        
-            BL53 = self._pentShapeFns[53].BLinear(x1, x2, x3, x4, x5) 
-            BL54 = self._pentShapeFns[54].BLinear(x1, x2, x3, x4, x5) 
-            BL55 = self._pentShapeFns[55].BLinear(x1, x2, x3, x4, x5)     
-            BL56 = self._pentShapeFns[56].BLinear(x1, x2, x3, x4, x5) 
-            BL57 = self._pentShapeFns[57].BLinear(x1, x2, x3, x4, x5) 
-            
+            BL52 = self._pentShapeFns[52].BLinear(x1, x2, x3, x4, x5)
+            BL53 = self._pentShapeFns[53].BLinear(x1, x2, x3, x4, x5)
+            BL54 = self._pentShapeFns[54].BLinear(x1, x2, x3, x4, x5)
+            BL55 = self._pentShapeFns[55].BLinear(x1, x2, x3, x4, x5)
+            BL56 = self._pentShapeFns[56].BLinear(x1, x2, x3, x4, x5)
+            BL57 = self._pentShapeFns[57].BLinear(x1, x2, x3, x4, x5)
+
             BL61 = self._pentShapeFns[61].BLinear(x1, x2, x3, x4, x5)
-            BL62 = self._pentShapeFns[62].BLinear(x1, x2, x3, x4, x5)         
-            BL63 = self._pentShapeFns[63].BLinear(x1, x2, x3, x4, x5) 
-            BL64 = self._pentShapeFns[64].BLinear(x1, x2, x3, x4, x5) 
-            BL65 = self._pentShapeFns[65].BLinear(x1, x2, x3, x4, x5)      
-            BL66 = self._pentShapeFns[66].BLinear(x1, x2, x3, x4, x5) 
-            BL67 = self._pentShapeFns[67].BLinear(x1, x2, x3, x4, x5) 
-            
-            BL71 = self._pentShapeFns[71].BLinear(x1, x2, x3, x4, x5) 
-            BL72 = self._pentShapeFns[72].BLinear(x1, x2, x3, x4, x5)        
-            BL73 = self._pentShapeFns[73].BLinear(x1, x2, x3, x4, x5) 
+            BL62 = self._pentShapeFns[62].BLinear(x1, x2, x3, x4, x5)
+            BL63 = self._pentShapeFns[63].BLinear(x1, x2, x3, x4, x5)
+            BL64 = self._pentShapeFns[64].BLinear(x1, x2, x3, x4, x5)
+            BL65 = self._pentShapeFns[65].BLinear(x1, x2, x3, x4, x5)
+            BL66 = self._pentShapeFns[66].BLinear(x1, x2, x3, x4, x5)
+            BL67 = self._pentShapeFns[67].BLinear(x1, x2, x3, x4, x5)
+
+            BL71 = self._pentShapeFns[71].BLinear(x1, x2, x3, x4, x5)
+            BL72 = self._pentShapeFns[72].BLinear(x1, x2, x3, x4, x5)
+            BL73 = self._pentShapeFns[73].BLinear(x1, x2, x3, x4, x5)
             BL74 = self._pentShapeFns[74].BLinear(x1, x2, x3, x4, x5)
-            BL75 = self._pentShapeFns[75].BLinear(x1, x2, x3, x4, x5)    
+            BL75 = self._pentShapeFns[75].BLinear(x1, x2, x3, x4, x5)
             BL76 = self._pentShapeFns[76].BLinear(x1, x2, x3, x4, x5)
-            BL77 = self._pentShapeFns[77].BLinear(x1, x2, x3, x4, x5) 
+            BL77 = self._pentShapeFns[77].BLinear(x1, x2, x3, x4, x5)
 
             # the consistent mass matrix for 7 Gauss points
             KL = self._width * (detJ11 * w[0] * w[0] * BL11.T.dot(M).dot(BL11)+
@@ -3937,215 +3937,215 @@ class pentagon(object):
                                 detJ77 * w[6] * w[6] * BL77.T.dot(M).dot(BL77))
 
             # create the first nonlinear Bmatrix
-            BNF11 = self._pentShapeFns[11].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF11 = self._pentShapeFns[11].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
             BNF12 = self._pentShapeFns[12].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF13 = self._pentShapeFns[13].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF13 = self._pentShapeFns[13].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF14 = self._pentShapeFns[14].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF14 = self._pentShapeFns[14].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF15 = self._pentShapeFns[15].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF15 = self._pentShapeFns[15].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF16 = self._pentShapeFns[16].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF16 = self._pentShapeFns[16].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF17 = self._pentShapeFns[17].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF17 = self._pentShapeFns[17].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNF21 = self._pentShapeFns[21].FirstBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNF21 = self._pentShapeFns[21].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF22 = self._pentShapeFns[22].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF22 = self._pentShapeFns[22].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF23 = self._pentShapeFns[23].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF23 = self._pentShapeFns[23].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF24 = self._pentShapeFns[24].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF24 = self._pentShapeFns[24].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF25 = self._pentShapeFns[25].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF25 = self._pentShapeFns[25].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF26 = self._pentShapeFns[26].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF26 = self._pentShapeFns[26].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF27 = self._pentShapeFns[27].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF27 = self._pentShapeFns[27].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNF31 = self._pentShapeFns[31].FirstBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNF31 = self._pentShapeFns[31].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF32 = self._pentShapeFns[32].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF32 = self._pentShapeFns[32].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF33 = self._pentShapeFns[33].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF33 = self._pentShapeFns[33].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF34 = self._pentShapeFns[34].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF34 = self._pentShapeFns[34].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF35 = self._pentShapeFns[35].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF35 = self._pentShapeFns[35].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF36 = self._pentShapeFns[36].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF36 = self._pentShapeFns[36].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF37 = self._pentShapeFns[37].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF37 = self._pentShapeFns[37].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNF41 = self._pentShapeFns[41].FirstBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNF41 = self._pentShapeFns[41].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF42 = self._pentShapeFns[42].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF42 = self._pentShapeFns[42].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF43 = self._pentShapeFns[43].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF43 = self._pentShapeFns[43].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF44 = self._pentShapeFns[44].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF44 = self._pentShapeFns[44].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF45 = self._pentShapeFns[45].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF45 = self._pentShapeFns[45].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF46 = self._pentShapeFns[46].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF46 = self._pentShapeFns[46].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF47 = self._pentShapeFns[47].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF47 = self._pentShapeFns[47].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNF51 = self._pentShapeFns[51].FirstBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNF51 = self._pentShapeFns[51].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF52 = self._pentShapeFns[52].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF52 = self._pentShapeFns[52].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF53 = self._pentShapeFns[53].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF53 = self._pentShapeFns[53].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF54 = self._pentShapeFns[54].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF54 = self._pentShapeFns[54].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF55 = self._pentShapeFns[55].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF55 = self._pentShapeFns[55].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF56 = self._pentShapeFns[56].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF56 = self._pentShapeFns[56].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF57 = self._pentShapeFns[57].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF57 = self._pentShapeFns[57].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNF61 = self._pentShapeFns[61].FirstBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNF61 = self._pentShapeFns[61].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF62 = self._pentShapeFns[62].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF62 = self._pentShapeFns[62].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF63 = self._pentShapeFns[63].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF63 = self._pentShapeFns[63].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF64 = self._pentShapeFns[64].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF64 = self._pentShapeFns[64].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF65 = self._pentShapeFns[65].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF65 = self._pentShapeFns[65].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF66 = self._pentShapeFns[66].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF66 = self._pentShapeFns[66].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF67 = self._pentShapeFns[67].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF67 = self._pentShapeFns[67].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNF71 = self._pentShapeFns[71].FirstBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNF71 = self._pentShapeFns[71].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF72 = self._pentShapeFns[72].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF72 = self._pentShapeFns[72].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF73 = self._pentShapeFns[73].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF73 = self._pentShapeFns[73].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF74 = self._pentShapeFns[74].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF74 = self._pentShapeFns[74].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF75 = self._pentShapeFns[75].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF75 = self._pentShapeFns[75].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF76 = self._pentShapeFns[76].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF76 = self._pentShapeFns[76].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNF77 = self._pentShapeFns[77].FirstBNonLinear(x1, x2, x3, x4, x5, 
+            BNF77 = self._pentShapeFns[77].FirstBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
 
             # create the first nonlinear Bmatrix
-            BNS11 = self._pentShapeFns[11].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS11 = self._pentShapeFns[11].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS12 = self._pentShapeFns[12].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS12 = self._pentShapeFns[12].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS13 = self._pentShapeFns[13].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS13 = self._pentShapeFns[13].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS14 = self._pentShapeFns[14].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS14 = self._pentShapeFns[14].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS15 = self._pentShapeFns[15].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS15 = self._pentShapeFns[15].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS16 = self._pentShapeFns[16].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS16 = self._pentShapeFns[16].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS17 = self._pentShapeFns[17].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS17 = self._pentShapeFns[17].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNS21 = self._pentShapeFns[21].SecondBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNS21 = self._pentShapeFns[21].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS22 = self._pentShapeFns[22].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS22 = self._pentShapeFns[22].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS23 = self._pentShapeFns[23].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS23 = self._pentShapeFns[23].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS24 = self._pentShapeFns[24].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS24 = self._pentShapeFns[24].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS25 = self._pentShapeFns[25].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS25 = self._pentShapeFns[25].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS26 = self._pentShapeFns[26].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS26 = self._pentShapeFns[26].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS27 = self._pentShapeFns[27].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS27 = self._pentShapeFns[27].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNS31 = self._pentShapeFns[31].SecondBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNS31 = self._pentShapeFns[31].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS32 = self._pentShapeFns[32].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS32 = self._pentShapeFns[32].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS33 = self._pentShapeFns[33].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS33 = self._pentShapeFns[33].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS34 = self._pentShapeFns[34].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS34 = self._pentShapeFns[34].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS35 = self._pentShapeFns[35].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS35 = self._pentShapeFns[35].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS36 = self._pentShapeFns[36].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS36 = self._pentShapeFns[36].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS37 = self._pentShapeFns[37].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS37 = self._pentShapeFns[37].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNS41 = self._pentShapeFns[41].SecondBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNS41 = self._pentShapeFns[41].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS42 = self._pentShapeFns[42].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS42 = self._pentShapeFns[42].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS43 = self._pentShapeFns[43].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS43 = self._pentShapeFns[43].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS44 = self._pentShapeFns[44].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS44 = self._pentShapeFns[44].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS45 = self._pentShapeFns[45].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS45 = self._pentShapeFns[45].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS46 = self._pentShapeFns[46].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS46 = self._pentShapeFns[46].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS47 = self._pentShapeFns[47].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS47 = self._pentShapeFns[47].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNS51 = self._pentShapeFns[51].SecondBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNS51 = self._pentShapeFns[51].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS52 = self._pentShapeFns[52].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS52 = self._pentShapeFns[52].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS53 = self._pentShapeFns[53].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS53 = self._pentShapeFns[53].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS54 = self._pentShapeFns[54].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS54 = self._pentShapeFns[54].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS55 = self._pentShapeFns[55].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS55 = self._pentShapeFns[55].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS56 = self._pentShapeFns[56].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS56 = self._pentShapeFns[56].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS57 = self._pentShapeFns[57].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS57 = self._pentShapeFns[57].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNS61 = self._pentShapeFns[61].SecondBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNS61 = self._pentShapeFns[61].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS62 = self._pentShapeFns[62].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS62 = self._pentShapeFns[62].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS63 = self._pentShapeFns[63].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS63 = self._pentShapeFns[63].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS64 = self._pentShapeFns[64].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS64 = self._pentShapeFns[64].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS65 = self._pentShapeFns[65].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS65 = self._pentShapeFns[65].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS66 = self._pentShapeFns[66].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS66 = self._pentShapeFns[66].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS67 = self._pentShapeFns[67].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS67 = self._pentShapeFns[67].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            
-            BNS71 = self._pentShapeFns[71].SecondBNonLinear(x1, x2, x3, x4, x5, 
+
+            BNS71 = self._pentShapeFns[71].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS72 = self._pentShapeFns[72].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS72 = self._pentShapeFns[72].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS73 = self._pentShapeFns[73].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS73 = self._pentShapeFns[73].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS74 = self._pentShapeFns[74].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS74 = self._pentShapeFns[74].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS75 = self._pentShapeFns[75].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS75 = self._pentShapeFns[75].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS76 = self._pentShapeFns[76].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS76 = self._pentShapeFns[76].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
-            BNS77 = self._pentShapeFns[77].SecondBNonLinear(x1, x2, x3, x4, x5, 
+            BNS77 = self._pentShapeFns[77].SecondBNonLinear(x1, x2, x3, x4, x5,
                                   x01, x02, x03, x04, x05)
 
             # total nonlinear Bmatrix
@@ -4156,7 +4156,7 @@ class pentagon(object):
             BN15 = np.add(BNF15, BNS15)
             BN16 = np.add(BNF16, BNS16)
             BN17 = np.add(BNF17, BNS17)
-            
+
             BN21 = np.add(BNF21, BNS21)
             BN22 = np.add(BNF22, BNS22)
             BN23 = np.add(BNF23, BNS23)
@@ -4164,7 +4164,7 @@ class pentagon(object):
             BN25 = np.add(BNF25, BNS25)
             BN26 = np.add(BNF26, BNS26)
             BN27 = np.add(BNF27, BNS27)
-            
+
             BN31 = np.add(BNF31, BNS31)
             BN32 = np.add(BNF32, BNS32)
             BN33 = np.add(BNF33, BNS33)
@@ -4172,7 +4172,7 @@ class pentagon(object):
             BN35 = np.add(BNF35, BNS35)
             BN36 = np.add(BNF36, BNS36)
             BN37 = np.add(BNF37, BNS37)
-            
+
             BN41 = np.add(BNF41, BNS41)
             BN42 = np.add(BNF42, BNS42)
             BN43 = np.add(BNF43, BNS43)
@@ -4180,7 +4180,7 @@ class pentagon(object):
             BN45 = np.add(BNF45, BNS45)
             BN46 = np.add(BNF46, BNS46)
             BN47 = np.add(BNF47, BNS47)
-            
+
             BN51 = np.add(BNF51, BNS51)
             BN52 = np.add(BNF52, BNS52)
             BN53 = np.add(BNF53, BNS53)
@@ -4188,7 +4188,7 @@ class pentagon(object):
             BN55 = np.add(BNF55, BNS55)
             BN56 = np.add(BNF56, BNS56)
             BN57 = np.add(BNF57, BNS57)
-            
+
             BN61 = np.add(BNF61, BNS61)
             BN62 = np.add(BNF62, BNS62)
             BN63 = np.add(BNF63, BNS63)
@@ -4196,7 +4196,7 @@ class pentagon(object):
             BN65 = np.add(BNF65, BNS65)
             BN66 = np.add(BNF66, BNS66)
             BN67 = np.add(BNF67, BNS67)
-            
+
             BN71 = np.add(BNF71, BNS71)
             BN72 = np.add(BNF72, BNS72)
             BN73 = np.add(BNF73, BNS73)
@@ -4213,7 +4213,7 @@ class pentagon(object):
             HF15 = self._pentShapeFns[15].HmatrixF(x1, x2, x3, x4, x5)
             HF16 = self._pentShapeFns[16].HmatrixF(x1, x2, x3, x4, x5)
             HF17 = self._pentShapeFns[17].HmatrixF(x1, x2, x3, x4, x5)
-            
+
             HF21 = self._pentShapeFns[21].HmatrixF(x1, x2, x3, x4, x5)
             HF22 = self._pentShapeFns[22].HmatrixF(x1, x2, x3, x4, x5)
             HF23 = self._pentShapeFns[23].HmatrixF(x1, x2, x3, x4, x5)
@@ -4221,7 +4221,7 @@ class pentagon(object):
             HF25 = self._pentShapeFns[25].HmatrixF(x1, x2, x3, x4, x5)
             HF26 = self._pentShapeFns[26].HmatrixF(x1, x2, x3, x4, x5)
             HF27 = self._pentShapeFns[27].HmatrixF(x1, x2, x3, x4, x5)
-            
+
             HF31 = self._pentShapeFns[31].HmatrixF(x1, x2, x3, x4, x5)
             HF32 = self._pentShapeFns[32].HmatrixF(x1, x2, x3, x4, x5)
             HF33 = self._pentShapeFns[33].HmatrixF(x1, x2, x3, x4, x5)
@@ -4229,7 +4229,7 @@ class pentagon(object):
             HF35 = self._pentShapeFns[35].HmatrixF(x1, x2, x3, x4, x5)
             HF36 = self._pentShapeFns[36].HmatrixF(x1, x2, x3, x4, x5)
             HF37 = self._pentShapeFns[37].HmatrixF(x1, x2, x3, x4, x5)
-            
+
             HF41 = self._pentShapeFns[41].HmatrixF(x1, x2, x3, x4, x5)
             HF42 = self._pentShapeFns[42].HmatrixF(x1, x2, x3, x4, x5)
             HF43 = self._pentShapeFns[43].HmatrixF(x1, x2, x3, x4, x5)
@@ -4237,7 +4237,7 @@ class pentagon(object):
             HF45 = self._pentShapeFns[45].HmatrixF(x1, x2, x3, x4, x5)
             HF46 = self._pentShapeFns[46].HmatrixF(x1, x2, x3, x4, x5)
             HF47 = self._pentShapeFns[47].HmatrixF(x1, x2, x3, x4, x5)
-            
+
             HF51 = self._pentShapeFns[51].HmatrixF(x1, x2, x3, x4, x5)
             HF52 = self._pentShapeFns[52].HmatrixF(x1, x2, x3, x4, x5)
             HF53 = self._pentShapeFns[53].HmatrixF(x1, x2, x3, x4, x5)
@@ -4245,7 +4245,7 @@ class pentagon(object):
             HF55 = self._pentShapeFns[55].HmatrixF(x1, x2, x3, x4, x5)
             HF56 = self._pentShapeFns[56].HmatrixF(x1, x2, x3, x4, x5)
             HF57 = self._pentShapeFns[57].HmatrixF(x1, x2, x3, x4, x5)
-            
+
             HF61 = self._pentShapeFns[61].HmatrixF(x1, x2, x3, x4, x5)
             HF62 = self._pentShapeFns[62].HmatrixF(x1, x2, x3, x4, x5)
             HF63 = self._pentShapeFns[63].HmatrixF(x1, x2, x3, x4, x5)
@@ -4253,7 +4253,7 @@ class pentagon(object):
             HF65 = self._pentShapeFns[65].HmatrixF(x1, x2, x3, x4, x5)
             HF66 = self._pentShapeFns[66].HmatrixF(x1, x2, x3, x4, x5)
             HF67 = self._pentShapeFns[67].HmatrixF(x1, x2, x3, x4, x5)
-            
+
             HF71 = self._pentShapeFns[71].HmatrixF(x1, x2, x3, x4, x5)
             HF72 = self._pentShapeFns[72].HmatrixF(x1, x2, x3, x4, x5)
             HF73 = self._pentShapeFns[73].HmatrixF(x1, x2, x3, x4, x5)
@@ -4269,8 +4269,8 @@ class pentagon(object):
             HS14 = self._pentShapeFns[14].HmatrixS(x1, x2, x3, x4, x5)
             HS15 = self._pentShapeFns[15].HmatrixS(x1, x2, x3, x4, x5)
             HS16 = self._pentShapeFns[16].HmatrixS(x1, x2, x3, x4, x5)
-            HS17 = self._pentShapeFns[17].HmatrixS(x1, x2, x3, x4, x5)   
-            
+            HS17 = self._pentShapeFns[17].HmatrixS(x1, x2, x3, x4, x5)
+
             HS21 = self._pentShapeFns[21].HmatrixS(x1, x2, x3, x4, x5)
             HS22 = self._pentShapeFns[22].HmatrixS(x1, x2, x3, x4, x5)
             HS23 = self._pentShapeFns[23].HmatrixS(x1, x2, x3, x4, x5)
@@ -4278,154 +4278,154 @@ class pentagon(object):
             HS25 = self._pentShapeFns[25].HmatrixS(x1, x2, x3, x4, x5)
             HS26 = self._pentShapeFns[26].HmatrixS(x1, x2, x3, x4, x5)
             HS27 = self._pentShapeFns[27].HmatrixS(x1, x2, x3, x4, x5)
-            
+
             HS31 = self._pentShapeFns[31].HmatrixS(x1, x2, x3, x4, x5)
             HS32 = self._pentShapeFns[32].HmatrixS(x1, x2, x3, x4, x5)
             HS33 = self._pentShapeFns[33].HmatrixS(x1, x2, x3, x4, x5)
             HS34 = self._pentShapeFns[34].HmatrixS(x1, x2, x3, x4, x5)
             HS35 = self._pentShapeFns[35].HmatrixS(x1, x2, x3, x4, x5)
             HS36 = self._pentShapeFns[36].HmatrixS(x1, x2, x3, x4, x5)
-            HS37 = self._pentShapeFns[37].HmatrixS(x1, x2, x3, x4, x5) 
-            
+            HS37 = self._pentShapeFns[37].HmatrixS(x1, x2, x3, x4, x5)
+
             HS41 = self._pentShapeFns[41].HmatrixS(x1, x2, x3, x4, x5)
             HS42 = self._pentShapeFns[42].HmatrixS(x1, x2, x3, x4, x5)
             HS43 = self._pentShapeFns[43].HmatrixS(x1, x2, x3, x4, x5)
             HS44 = self._pentShapeFns[44].HmatrixS(x1, x2, x3, x4, x5)
             HS45 = self._pentShapeFns[45].HmatrixS(x1, x2, x3, x4, x5)
             HS46 = self._pentShapeFns[46].HmatrixS(x1, x2, x3, x4, x5)
-            HS47 = self._pentShapeFns[47].HmatrixS(x1, x2, x3, x4, x5) 
-            
+            HS47 = self._pentShapeFns[47].HmatrixS(x1, x2, x3, x4, x5)
+
             HS51 = self._pentShapeFns[51].HmatrixS(x1, x2, x3, x4, x5)
             HS52 = self._pentShapeFns[52].HmatrixS(x1, x2, x3, x4, x5)
             HS53 = self._pentShapeFns[53].HmatrixS(x1, x2, x3, x4, x5)
             HS54 = self._pentShapeFns[54].HmatrixS(x1, x2, x3, x4, x5)
             HS55 = self._pentShapeFns[55].HmatrixS(x1, x2, x3, x4, x5)
             HS56 = self._pentShapeFns[56].HmatrixS(x1, x2, x3, x4, x5)
-            HS57 = self._pentShapeFns[57].HmatrixS(x1, x2, x3, x4, x5) 
-            
+            HS57 = self._pentShapeFns[57].HmatrixS(x1, x2, x3, x4, x5)
+
             HS61 = self._pentShapeFns[61].HmatrixS(x1, x2, x3, x4, x5)
             HS62 = self._pentShapeFns[62].HmatrixS(x1, x2, x3, x4, x5)
             HS63 = self._pentShapeFns[63].HmatrixS(x1, x2, x3, x4, x5)
             HS64 = self._pentShapeFns[64].HmatrixS(x1, x2, x3, x4, x5)
             HS65 = self._pentShapeFns[65].HmatrixS(x1, x2, x3, x4, x5)
             HS66 = self._pentShapeFns[66].HmatrixS(x1, x2, x3, x4, x5)
-            HS67 = self._pentShapeFns[67].HmatrixS(x1, x2, x3, x4, x5) 
-            
+            HS67 = self._pentShapeFns[67].HmatrixS(x1, x2, x3, x4, x5)
+
             HS71 = self._pentShapeFns[71].HmatrixS(x1, x2, x3, x4, x5)
             HS72 = self._pentShapeFns[72].HmatrixS(x1, x2, x3, x4, x5)
             HS73 = self._pentShapeFns[73].HmatrixS(x1, x2, x3, x4, x5)
             HS74 = self._pentShapeFns[74].HmatrixS(x1, x2, x3, x4, x5)
             HS75 = self._pentShapeFns[75].HmatrixS(x1, x2, x3, x4, x5)
             HS76 = self._pentShapeFns[76].HmatrixS(x1, x2, x3, x4, x5)
-            HS77 = self._pentShapeFns[77].HmatrixS(x1, x2, x3, x4, x5) 
-            
-            
+            HS77 = self._pentShapeFns[77].HmatrixS(x1, x2, x3, x4, x5)
+
+
             # the nonlinear stiffness matrix for 7 Gauss point
-            f11 = (BL11.T.dot(M).dot(BN11) + BN11.T.dot(M).dot(BL11) + 
+            f11 = (BL11.T.dot(M).dot(BN11) + BN11.T.dot(M).dot(BL11) +
                    BN11.T.dot(M).dot(BN11))
-            f12 = (BL12.T.dot(M).dot(BN12) + BN12.T.dot(M).dot(BL12) + 
+            f12 = (BL12.T.dot(M).dot(BN12) + BN12.T.dot(M).dot(BL12) +
                    BN12.T.dot(M).dot(BN12))
-            f13 = (BL13.T.dot(M).dot(BN13) + BN13.T.dot(M).dot(BL13) + 
+            f13 = (BL13.T.dot(M).dot(BN13) + BN13.T.dot(M).dot(BL13) +
                    BN13.T.dot(M).dot(BN13))
             f14 = (BL14.T.dot(M).dot(BN14) + BN14.T.dot(M).dot(BL14) +
                    BN14.T.dot(M).dot(BN14))
-            f15 = (BL15.T.dot(M).dot(BN15) + BN15.T.dot(M).dot(BL15) + 
+            f15 = (BL15.T.dot(M).dot(BN15) + BN15.T.dot(M).dot(BL15) +
                    BN15.T.dot(M).dot(BN15))
-            f16 = (BL16.T.dot(M).dot(BN16) + BN16.T.dot(M).dot(BL16) + 
+            f16 = (BL16.T.dot(M).dot(BN16) + BN16.T.dot(M).dot(BL16) +
                    BN16.T.dot(M).dot(BN16))
-            f17 = (BL17.T.dot(M).dot(BN17) + BN17.T.dot(M).dot(BL17) + 
+            f17 = (BL17.T.dot(M).dot(BN17) + BN17.T.dot(M).dot(BL17) +
                    BN17.T.dot(M).dot(BN17))
-            
-            f21 = (BL21.T.dot(M).dot(BN21) + BN21.T.dot(M).dot(BL21) + 
+
+            f21 = (BL21.T.dot(M).dot(BN21) + BN21.T.dot(M).dot(BL21) +
                    BN21.T.dot(M).dot(BN21))
-            f22 = (BL22.T.dot(M).dot(BN22) + BN22.T.dot(M).dot(BL22) + 
+            f22 = (BL22.T.dot(M).dot(BN22) + BN22.T.dot(M).dot(BL22) +
                    BN22.T.dot(M).dot(BN22))
-            f23 = (BL23.T.dot(M).dot(BN23) + BN23.T.dot(M).dot(BL23) + 
+            f23 = (BL23.T.dot(M).dot(BN23) + BN23.T.dot(M).dot(BL23) +
                    BN23.T.dot(M).dot(BN23))
             f24 = (BL24.T.dot(M).dot(BN24) + BN24.T.dot(M).dot(BL24) +
                    BN24.T.dot(M).dot(BN24))
-            f25 = (BL25.T.dot(M).dot(BN25) + BN25.T.dot(M).dot(BL25) + 
+            f25 = (BL25.T.dot(M).dot(BN25) + BN25.T.dot(M).dot(BL25) +
                    BN25.T.dot(M).dot(BN25))
-            f26 = (BL26.T.dot(M).dot(BN26) + BN26.T.dot(M).dot(BL26) + 
+            f26 = (BL26.T.dot(M).dot(BN26) + BN26.T.dot(M).dot(BL26) +
                    BN26.T.dot(M).dot(BN26))
-            f27 = (BL27.T.dot(M).dot(BN27) + BN27.T.dot(M).dot(BL27) + 
+            f27 = (BL27.T.dot(M).dot(BN27) + BN27.T.dot(M).dot(BL27) +
                    BN27.T.dot(M).dot(BN27))
-            
-            f31 = (BL31.T.dot(M).dot(BN31) + BN31.T.dot(M).dot(BL31) + 
+
+            f31 = (BL31.T.dot(M).dot(BN31) + BN31.T.dot(M).dot(BL31) +
                    BN31.T.dot(M).dot(BN31))
-            f32 = (BL32.T.dot(M).dot(BN32) + BN32.T.dot(M).dot(BL32) + 
+            f32 = (BL32.T.dot(M).dot(BN32) + BN32.T.dot(M).dot(BL32) +
                    BN32.T.dot(M).dot(BN32))
-            f33 = (BL33.T.dot(M).dot(BN33) + BN33.T.dot(M).dot(BL33) + 
+            f33 = (BL33.T.dot(M).dot(BN33) + BN33.T.dot(M).dot(BL33) +
                    BN33.T.dot(M).dot(BN33))
             f34 = (BL34.T.dot(M).dot(BN34) + BN34.T.dot(M).dot(BL34) +
                    BN34.T.dot(M).dot(BN34))
-            f35 = (BL35.T.dot(M).dot(BN35) + BN35.T.dot(M).dot(BL35) + 
+            f35 = (BL35.T.dot(M).dot(BN35) + BN35.T.dot(M).dot(BL35) +
                    BN35.T.dot(M).dot(BN35))
-            f36 = (BL36.T.dot(M).dot(BN36) + BN36.T.dot(M).dot(BL36) + 
+            f36 = (BL36.T.dot(M).dot(BN36) + BN36.T.dot(M).dot(BL36) +
                    BN36.T.dot(M).dot(BN36))
-            f37 = (BL37.T.dot(M).dot(BN37) + BN37.T.dot(M).dot(BL37) + 
+            f37 = (BL37.T.dot(M).dot(BN37) + BN37.T.dot(M).dot(BL37) +
                    BN37.T.dot(M).dot(BN37))
-            
-            f41 = (BL41.T.dot(M).dot(BN41) + BN41.T.dot(M).dot(BL41) + 
+
+            f41 = (BL41.T.dot(M).dot(BN41) + BN41.T.dot(M).dot(BL41) +
                    BN41.T.dot(M).dot(BN41))
-            f42 = (BL42.T.dot(M).dot(BN42) + BN42.T.dot(M).dot(BL42) + 
+            f42 = (BL42.T.dot(M).dot(BN42) + BN42.T.dot(M).dot(BL42) +
                    BN42.T.dot(M).dot(BN42))
-            f43 = (BL43.T.dot(M).dot(BN43) + BN43.T.dot(M).dot(BL43) + 
+            f43 = (BL43.T.dot(M).dot(BN43) + BN43.T.dot(M).dot(BL43) +
                    BN43.T.dot(M).dot(BN43))
             f44 = (BL44.T.dot(M).dot(BN44) + BN44.T.dot(M).dot(BL44) +
                    BN44.T.dot(M).dot(BN44))
-            f45 = (BL45.T.dot(M).dot(BN45) + BN45.T.dot(M).dot(BL45) + 
+            f45 = (BL45.T.dot(M).dot(BN45) + BN45.T.dot(M).dot(BL45) +
                    BN45.T.dot(M).dot(BN45))
-            f46 = (BL46.T.dot(M).dot(BN46) + BN46.T.dot(M).dot(BL46) + 
+            f46 = (BL46.T.dot(M).dot(BN46) + BN46.T.dot(M).dot(BL46) +
                    BN46.T.dot(M).dot(BN46))
-            f47 = (BL47.T.dot(M).dot(BN47) + BN47.T.dot(M).dot(BL47) + 
+            f47 = (BL47.T.dot(M).dot(BN47) + BN47.T.dot(M).dot(BL47) +
                    BN47.T.dot(M).dot(BN47))
-            
-            f51 = (BL51.T.dot(M).dot(BN51) + BN51.T.dot(M).dot(BL51) + 
+
+            f51 = (BL51.T.dot(M).dot(BN51) + BN51.T.dot(M).dot(BL51) +
                    BN51.T.dot(M).dot(BN51))
-            f52 = (BL52.T.dot(M).dot(BN52) + BN52.T.dot(M).dot(BL52) + 
+            f52 = (BL52.T.dot(M).dot(BN52) + BN52.T.dot(M).dot(BL52) +
                    BN52.T.dot(M).dot(BN52))
-            f53 = (BL53.T.dot(M).dot(BN53) + BN53.T.dot(M).dot(BL53) + 
+            f53 = (BL53.T.dot(M).dot(BN53) + BN53.T.dot(M).dot(BL53) +
                    BN53.T.dot(M).dot(BN53))
             f54 = (BL54.T.dot(M).dot(BN54) + BN54.T.dot(M).dot(BL54) +
                    BN54.T.dot(M).dot(BN54))
-            f55 = (BL55.T.dot(M).dot(BN55) + BN55.T.dot(M).dot(BL55) + 
+            f55 = (BL55.T.dot(M).dot(BN55) + BN55.T.dot(M).dot(BL55) +
                    BN55.T.dot(M).dot(BN55))
-            f56 = (BL56.T.dot(M).dot(BN56) + BN56.T.dot(M).dot(BL56) + 
+            f56 = (BL56.T.dot(M).dot(BN56) + BN56.T.dot(M).dot(BL56) +
                    BN56.T.dot(M).dot(BN56))
-            f57 = (BL57.T.dot(M).dot(BN57) + BN57.T.dot(M).dot(BL57) + 
+            f57 = (BL57.T.dot(M).dot(BN57) + BN57.T.dot(M).dot(BL57) +
                    BN57.T.dot(M).dot(BN57))
-            
-            f61 = (BL61.T.dot(M).dot(BN61) + BN61.T.dot(M).dot(BL61) + 
+
+            f61 = (BL61.T.dot(M).dot(BN61) + BN61.T.dot(M).dot(BL61) +
                    BN61.T.dot(M).dot(BN61))
-            f62 = (BL62.T.dot(M).dot(BN62) + BN62.T.dot(M).dot(BL62) + 
+            f62 = (BL62.T.dot(M).dot(BN62) + BN62.T.dot(M).dot(BL62) +
                    BN62.T.dot(M).dot(BN62))
-            f63 = (BL63.T.dot(M).dot(BN63) + BN63.T.dot(M).dot(BL63) + 
+            f63 = (BL63.T.dot(M).dot(BN63) + BN63.T.dot(M).dot(BL63) +
                    BN63.T.dot(M).dot(BN63))
             f64 = (BL64.T.dot(M).dot(BN64) + BN64.T.dot(M).dot(BL64) +
                    BN64.T.dot(M).dot(BN64))
-            f65 = (BL65.T.dot(M).dot(BN65) + BN65.T.dot(M).dot(BL65) + 
+            f65 = (BL65.T.dot(M).dot(BN65) + BN65.T.dot(M).dot(BL65) +
                    BN65.T.dot(M).dot(BN65))
-            f66 = (BL66.T.dot(M).dot(BN66) + BN66.T.dot(M).dot(BL66) + 
+            f66 = (BL66.T.dot(M).dot(BN66) + BN66.T.dot(M).dot(BL66) +
                    BN66.T.dot(M).dot(BN66))
-            f67 = (BL67.T.dot(M).dot(BN67) + BN67.T.dot(M).dot(BL67) + 
+            f67 = (BL67.T.dot(M).dot(BN67) + BN67.T.dot(M).dot(BL67) +
                    BN67.T.dot(M).dot(BN67))
-            
-            f71 = (BL71.T.dot(M).dot(BN71) + BN71.T.dot(M).dot(BL71) + 
+
+            f71 = (BL71.T.dot(M).dot(BN71) + BN71.T.dot(M).dot(BL71) +
                    BN71.T.dot(M).dot(BN71))
-            f72 = (BL72.T.dot(M).dot(BN72) + BN72.T.dot(M).dot(BL72) + 
+            f72 = (BL72.T.dot(M).dot(BN72) + BN72.T.dot(M).dot(BL72) +
                    BN72.T.dot(M).dot(BN72))
-            f73 = (BL73.T.dot(M).dot(BN73) + BN73.T.dot(M).dot(BL73) + 
+            f73 = (BL73.T.dot(M).dot(BN73) + BN73.T.dot(M).dot(BL73) +
                    BN73.T.dot(M).dot(BN73))
             f74 = (BL74.T.dot(M).dot(BN74) + BN74.T.dot(M).dot(BL74) +
                    BN74.T.dot(M).dot(BN74))
-            f75 = (BL75.T.dot(M).dot(BN75) + BN75.T.dot(M).dot(BL75) + 
+            f75 = (BL75.T.dot(M).dot(BN75) + BN75.T.dot(M).dot(BL75) +
                    BN75.T.dot(M).dot(BN75))
-            f76 = (BL76.T.dot(M).dot(BN76) + BN76.T.dot(M).dot(BL76) + 
+            f76 = (BL76.T.dot(M).dot(BN76) + BN76.T.dot(M).dot(BL76) +
                    BN76.T.dot(M).dot(BN76))
-            f77 = (BL77.T.dot(M).dot(BN77) + BN77.T.dot(M).dot(BL77) + 
+            f77 = (BL77.T.dot(M).dot(BN77) + BN77.T.dot(M).dot(BL77) +
                    BN77.T.dot(M).dot(BN77))
-            
+
             KN = self._width * (detJ11 * w[0] * w[0] * f11 +
                                 detJ12 * w[0] * w[1] * f12 +
                                 detJ13 * w[0] * w[2] * f13 +
@@ -4474,10 +4474,10 @@ class pentagon(object):
                                 detJ74 * w[6] * w[3] * f74 +
                                 detJ75 * w[6] * w[4] * f75 +
                                 detJ76 * w[6] * w[5] * f76 +
-                                detJ77 * w[6] * w[6] * f77)          
+                                detJ77 * w[6] * w[6] * f77)
 
-            
-            # create the stress stiffness matrix            
+
+            # create the stress stiffness matrix
             KS = self._width * (detJ11 * w[0] * w[0] * HF11.T.dot(T).dot(HF11)+
                                 detJ12 * w[0] * w[1] * HF12.T.dot(T).dot(HF12)+
                                 detJ13 * w[0] * w[2] * HF13.T.dot(T).dot(HF13)+
@@ -4575,8 +4575,8 @@ class pentagon(object):
                                 detJ74 * w[6] * w[3] * HS74.T.dot(T).dot(HS74)+
                                 detJ75 * w[6] * w[4] * HS75.T.dot(T).dot(HS75)+
                                 detJ76 * w[6] * w[5] * HS76.T.dot(T).dot(HS76)+
-                                detJ77 * w[6] * w[6] * HS77.T.dot(T).dot(HS77))   
-            
+                                detJ77 * w[6] * w[6] * HS77.T.dot(T).dot(HS77))
+
             # determine the total tangent stiffness matrix
-            stiffT = KL + KN + KS                        
+            stiffT = KL + KN + KS
         return stiffT

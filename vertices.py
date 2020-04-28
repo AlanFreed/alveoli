@@ -23,13 +23,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 __date__ = "04-27-2019"
-__update__ = "04-27-2019"
+__update__ = "04-20-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
 """
+A listing of changes made wrt version release can be found at the end of file.
+
+
 Class vertex in file vertices.py allows for the creation of objects that are
 to be used to locate a vertex in a polyhedron, specifically, an irregular
 dodecahedron.  A vertex can have its coordinates reassigned but not its number.
@@ -66,6 +69,11 @@ s = coordinatesToString(x, y, z)
 
 class vertex
 
+A vertex object, say v, can be printed out to the command window using the
+following command.  The objected printed associates with the current state.
+
+    print(v)
+
 constructor
 
     v = vertex(number, x0, y0, z0, h)
@@ -83,8 +91,8 @@ methods
     n = v.number()
         returns unique number affiated with this vertex
 
-    x, y, z = v.coordinates(state)
-        returns the location of this vertex for configuration 'state'
+    (x, y, z) = v.coordinates(state)
+        returns a tuple locating this vertex in configuration 'state'
 
     v.update(x, y, z)
         assigns new coordinate values to the vertex for its next location,
@@ -152,6 +160,9 @@ class vertex(object):
         self._yn = self._y0
         self._zn = self._z0
 
+    def __str__(self):
+        return self.toString('curr')
+
     def toString(self, state):
         if self._number < 10:
             s = 'vertex[0'
@@ -182,13 +193,13 @@ class vertex(object):
     def coordinates(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
-                return self._xc, self._yc, self._zc
+                return np.array([self._xc, self._yc, self._zc])
             elif state == 'n' or state == 'next':
-                return self._xn, self._yn, self._zn
+                return np.array([self._xn, self._yn, self._zn])
             elif state == 'p' or state == 'prev' or state == 'previous':
-                return self._xp, self._yp, self._zp
+                return np.array([self._xp, self._yp, self._zp])
             elif state == 'r' or state == 'ref' or state == 'reference':
-                return self._x0, self._y0, self._z0
+                return np.array([self._x0, self._y0, self._z0])
             else:
                 raise RuntimeError(
                        "Error: unknown state {} in call to vertex.coordinates."
@@ -290,3 +301,14 @@ class vertex(object):
                       "Error: unknown state {} in call to vertex.acceleration."
                       .format(str(state)))
         return np.array([ax, ay, az])
+
+
+"""
+Changes made in version "1.4.0":
+
+
+A vertex object can now be printed using the print(object) command.
+
+
+Changes made were not kept track of prior to version "1.3.0":
+"""
