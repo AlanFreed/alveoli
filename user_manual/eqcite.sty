@@ -1,0 +1,193 @@
+\ProvidesPackage {eqcite} [2014/07/01 v1.10]
+%
+% by Steven B. Segletes, for the public domain.
+%
+% eqcite prints out the preferred reference format for equation
+% citations, e.g., equation 1 as opposed to eqn(1), eq.(1), etc. 
+%
+% Advantages of using eqcite:
+% 1) Ability to quickly change from `equation x' to `eqn(x)' through
+%    whole document, with a single line change (\EqTypeB).  This is 
+%    useful when converting from tech report to manuscript formats;
+% 2) Saves typing:
+%    With the eqcite package, type        `\eqcite{eq:myeqn}'
+%    vs. the traditional LaTeX approach of `equation~\ref{eq:myeqn}'  .
+%
+%
+% A number of format types are predefined:
+%
+% EqTypeA : equation x, equations x and y	(old ARL report standard)
+% EqTypeB : eqn(x)    , eqns (x) and (y)
+% EqTypeC : eq(x)     , eqs (x) and (y)
+% EqTypeD : eqn.(x)   , eqns. (x) and (y)
+% EqTypeE : eq.(x)    , eqs. (x) and (y)
+% EqTypeF : eqn (x)   , eqns (x) and (y)
+% EqTypeG : eq (x)    , eqs (x) and (y)
+% EqTypeH : Equation x and Eq. y, Eqs. x and y	(ARL report standard)
+%
+% Other format types are easily added.
+%
+% Usage:
+%
+% % In Preamble:
+% \usepackage{eqcite}
+% \EqTypex	% where `x' is A, B, etc.  defaults to EqTypeA
+%
+% % In Document:
+% \Eqcite{ref} ...
+% ... \eqcite{ref} ...
+% \Eqcites{ref1}, \andeqcite{ref2}, and \andeqcite{ref3} ...
+% ... \eqcites{ref1}, \andeqcite{ref2}, and \andeqcite{ref3}...
+%
+% where ref is the LaTeX reference, for example, eq:myeqn  .
+%
+% A literal option [l] is available to use the the argument as the
+% actual equation number, rather than as an equation reference:
+%
+% \eqcite[l]{13}
+%
+% This literal option can be used with the following calls:
+% \Eqcite, \eqcite, \Eqcites, \eqcites and \andeqcite.
+%
+%
+% EqTypeA : equation x, equations x and y
+\newcommand\EqTypeA{
+  \def\Eqname{Equation}
+  \def\eqname{equation}
+  \def\Eqsname{Equations}
+  \def\eqsname{equations}
+  \def\eqsep{~}
+  \def\eqssep{~}
+  \def\eqldelimit{}
+  \def\eqrdelimit{}
+}
+% EqTypeB : eqn(x), eqns (x) and (y)
+\newcommand\EqTypeB{
+  \def\Eqname{Eqn}
+  \def\eqname{eqn}
+  \def\Eqsname{Eqns}
+  \def\eqsname{eqns}
+  \def\eqsep{}
+  \def\eqssep{~}
+  \def\eqldelimit{(}
+  \def\eqrdelimit{)}
+}
+% EqTypeC : eq(x), eqs (x) and (y)
+\newcommand\EqTypeC{
+  \def\Eqname{Eq}
+  \def\eqname{eq}
+  \def\Eqsname{Eqs}
+  \def\eqsname{eqs}
+  \def\eqsep{}
+  \def\eqssep{~}
+  \def\eqldelimit{(}
+  \def\eqrdelimit{)}
+}
+% EqTypeD : eqn.(x), eqns. (x) and (y)
+\newcommand\EqTypeD{
+  \def\Eqname{Eqn.}
+  \def\eqname{eqn.}
+  \def\Eqsname{Eqns.}
+  \def\eqsname{eqns.}
+  \def\eqsep{}
+  \def\eqssep{~}
+  \def\eqldelimit{(}
+  \def\eqrdelimit{)}
+}
+% EqTypeE : eq.(x), eqs. (x) and (y)
+\newcommand\EqTypeE{
+  \def\Eqname{Eq.}
+  \def\eqname{eq.}
+  \def\Eqsname{Eqs.}
+  \def\eqsname{eqs.}
+  \def\eqsep{}
+  \def\eqssep{~}
+  \def\eqldelimit{(}
+  \def\eqrdelimit{)}
+}
+% EqTypeF : eqn (x), eqns (x) and (y)
+\newcommand\EqTypeF{
+  \def\Eqname{Eqn}
+  \def\eqname{eqn}
+  \def\Eqsname{Eqns}
+  \def\eqsname{eqns}
+  \def\eqsep{~}
+  \def\eqssep{~}
+  \def\eqldelimit{(}
+  \def\eqrdelimit{)}
+}
+% EqTypeG : eq (x), eqs (x) and (y)
+\newcommand\EqTypeG{
+  \def\Eqname{Eq}
+  \def\eqname{eq}
+  \def\Eqsname{Eqs}
+  \def\eqsname{eqs}
+  \def\eqsep{~}
+  \def\eqssep{~}
+  \def\eqldelimit{(}
+  \def\eqrdelimit{)}
+}
+% EqTypeH : Eq. x, Eqs. x and y
+\newcommand\EqTypeH{
+  \def\Eqname{Equation}
+  \def\eqname{Eq.}
+  \def\Eqsname{Equations}
+  \def\eqsname{Eqs.}
+  \def\eqsep{~}
+  \def\eqssep{~}
+  \def\eqldelimit{}
+  \def\eqrdelimit{}
+}
+% Default to Equation Type H format
+\EqTypeH
+%
+% For citing an equation at the beginning of a sentence
+\newcommand\Eqcite[2][]{%
+  \if l#1%
+    \Eqname\eqsep\eqldelimit#2\eqrdelimit
+  \else%
+    \Eqname\eqsep\eqldelimit\ref{#2}\eqrdelimit
+  \fi
+}
+% For citing an equation in the middle of a sentence
+\newcommand\eqcite[2][]{%
+  \if l#1%
+    \eqname\eqsep\eqldelimit#2\eqrdelimit
+  \else%
+    \eqname\eqsep\eqldelimit\ref{#2}\eqrdelimit
+  \fi
+}
+% For citing the first of multiple equations at the beginning of a sentence
+\newcommand\Eqcites[2][]{%
+  \if l#1%
+    \Eqsname\eqssep\eqldelimit#2\eqrdelimit
+  \else%
+    \Eqsname\eqssep\eqldelimit\ref{#2}\eqrdelimit
+  \fi
+}
+% For citing the first of multiple equations in the middle of a sentence
+\newcommand\eqcites[2][]{%
+  \if l#1%
+    \eqsname\eqssep\eqldelimit#2\eqrdelimit
+  \else%
+    \eqsname\eqssep\eqldelimit\ref{#2}\eqrdelimit
+  \fi
+}
+% For citing an equation number without the leading word equation, eqn, etc.
+% Used in conjuction with \Eqcites and \eqcites
+\newcommand\andeqcite[2][]{%
+  \if l#1%
+    \eqldelimit#2\eqrdelimit
+  \else%
+    \eqldelimit\ref{#2}\eqrdelimit
+  \fi
+}
+%
+% For backward compatibility to equagen.sty
+\let\equagen\eqcite
+\let\Equagen\Eqcite
+\let\equagens\eqcites
+\let\Equagens\Eqcites
+\let\andequagen\andeqcite
+
+\endinput

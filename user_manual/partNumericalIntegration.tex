@@ -1,13 +1,13 @@
 \part{Numerical Integrators}
 \label{partNumericalMethods}
 
-This analysis tool, which models the geometry of alveoli as a dodecahedron, requires numerical methods to integrate the constitutive equations (systems of first-order ODEs), the governing equations of motion (systems of second-order ODEs), and that integrate the length, area or volume of the finite elements (handled using Gaussian quadrature).  The numerical methods used in this work are discussed below.
+This analysis tool, which models alveolar geometry as a dodecahedron, requires numerical methods to integrate its constitutive equations (systems of first-order ODEs), their governing equations of motion (systems of second-order ODEs), and that integrate the length, area and volume of the various finite-element geometries used.  The numerical methods used in this work are discussed below.
 
 \section{ODE Solvers}
 
-The various constitutive equations that describe our alveolar model present themselves as ordinary differential equations that need to be integrated.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} which are suitable for solving stiff systems of first- and second-order, ordinary, differential equations.  These methods are based upon Gear's well-known second-order backward difference formula (BDF2, which is Eqns.~\ref{1stOrderCorrector} \& \ref{velocityCorrector} below).
+The various constitutive equations that describe our alveolar model present themselves as ordinary differential equations that need to be integrated, cf.\ \S\ref{secFE_CE}.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} suitable for solving stiff systems of first- and second-order differential equations.  These methods are based upon Gear's well-known, second-order, backward, difference formula (BDF2) that appears in Eqns.~\ref{1stOrderCorrector} \& \ref{velocityCorrector} below.
 
-Time $t$ is considered to be the independent variable, discretized over an interval in time $[t_0, t_N]$ for which $N$ solutions are to be extracted at nodes $n=1, 2, \ldots, N$ spaced at uniform intervals in time with a common step size of $h = (t_N - t_0)/N$ separating them, where time $t_0$ associates with the initial conditions.  This is the \textit{global step size\/} at which solutions are to be gathered.  A dynamically controlled \textit{local step size}, whose size is adjusted on the fly via a PI controller to manage truncation error, is implemented into the code according to a scheme put forward in Ref.~\cite{Soderlind02}.  Solver interfaces are listed in \ref{appSolvers}.
+Time $t$ is considered to be the independent variable, discretized over an interval in time $[t_0, t_N]$ for which $N$ solutions are to be extracted at nodes $n=1, 2, \ldots, N$ spaced at uniform intervals in time with a common step size of $h = (t_N - t_0)/N$ separating them, where time $t_0$ associates with the initial conditions.  This is the \textit{global step size\/} at which solutions are to be gathered.  A dynamically controlled \textit{local step size}, whose size is adjusted on the fly via a PI controller used to manage truncation error, is implemented into code according to the scheme of Soderlind. \cite{Soderlind02} 
 
 \subsection{PECE Solver for First-Order ODEs}
 \label{sec:1stOrderPECE}
@@ -18,7 +18,7 @@ The two-step method put forward here incrementally solves such an ODE, returning
 
 \subsubsection{Start-Up Algorithm}
 
-Multi-step methods are not self starting; consequently, Heun's method (a forward-Euler predictor with a trapezoidal corrector) is used here to start our integrator; specifically,
+Multi-step methods are not self starting; consequently, Heun's method (a forward-Euler predictor with a trapezoidal corrector) is used here to start this integrator; specifically,
 \begin{subequations}
     \label{startUp1stOrderODEs}
     \begin{align}
@@ -37,11 +37,11 @@ Multi-step methods are not self starting; consequently, Heun's method (a forward
     \label{startUp1stReEvaluate}
     \end{align}
 \end{subequations}
-wherein $\dot{\mathbf{x}}_0 = \mathbf{f}(t_0, \mathbf{x}_0)$ and $t_1 = t_0 + h$.  The correct\slash re-evaluate steps can be iterated over until a convergence criterion is satisfied, if need be.
+wherein $\dot{\mathbf{x}}_0 = \mathbf{f}(t_0, \mathbf{x}_0)$ and $t_1 = t_0 + h$.  The correct\slash re-evaluate steps of this PECE method can be iterated over until a convergence criterion is satisfied, if need be.
 
 \subsubsection{Two-Step ODE Solver}
 
-The two-step method of Freed \cite{Freed17a} for solving $1^{\text{st}}$ order ODEs is
+The two-step method of Freed \cite{Freed17a} for solving first-order ODEs is
 \begin{subequations}
     \label{1stOrderODEs}
     \begin{align}
@@ -64,10 +64,11 @@ The two-step method of Freed \cite{Freed17a} for solving $1^{\text{st}}$ order O
     \label{1stOrderReEvaluate}
     \end{align}
 \end{subequations} 
-where $t_{n+1} = t_n + h$.  This corrector is the well-known BDF2 formula of Gear to which Freed provided a predictor.  The correct\slash re-evaluate steps can be iterated over until a convergence criterion is satisfied, if need be.  Implementation of this integrator is found in \ref{app1stOrderODEs}.  
+where $t_{n+1} = t_n + h$.  This corrector is the well-known BDF2 formula of Gear for which Freed has provided a predictor.  The correct\slash re-evaluate steps of this PECE method can be iterated over until a convergence criterion is satisfied, if need be. 
 
-For both the predictor and corrector, solution $\mathbf{x}$ has a weight of 1, while its rate $\dot{\mathbf{x}}$ has a weight of $\tfrac{2}{3} h$; hence, this predictor\slash corrector pair is internally consistent, i.e., the predictor and corrector produce the same result when integrating a constant velocity field.
+For both the predictor and corrector, solution $\mathbf{x}$ has a weight of 1, while its rate $\dot{\mathbf{x}}$ has a weight of $\tfrac{2}{3} h$; hence, this predictor\slash corrector pair is internally consistent, i.e., the predictor and corrector produce the same result when integrating over a constant velocity field.
 
+\newpage
 \subsection{A Relevant Example}
 
 In our finite element implementation, a hypo-elastic material model \cite{Truesdell55} is introduced to describe the constitutive response of an alveolus whereby
@@ -88,7 +89,7 @@ where $\eta$ is entropy and the rest are stresses.  Their thermo\-dynamic conjug
 \boldsymbol{\epsilon}_{2D} = \{ \theta , \xi , \varepsilon , \gamma \}^{\mathsf{T}} , \quad
 \boldsymbol{\epsilon}_{3D} = \{ \theta , \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 \}^{\mathsf{T}}
 \end{displaymath}
-where $\theta$ is temperature and the rest are strains.  In the 2- and 3-D cases, these stress-strain attributes arise from Gram-Schmidt decompositions of the deformation gradient (cf.\ \S\ref{secQR2D}, \S\ref{secConjugatePairs} and \S\ref{secFE_CE}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\sigma} , \boldsymbol{\epsilon} )$ is the topic of Part~\ref{partConstitutive}.  In the above problem, the thermo\-dynamic strains $\boldsymbol{\epsilon}$ and their differential rates $\mathrm{d} \boldsymbol{\epsilon}$ are known, it is their stresses $\boldsymbol{\sigma}$ that must be integrated.  Both $\boldsymbol{\sigma}$ and $\mathrm{d} \boldsymbol{\sigma} = \mathbf{M} \, \mathrm{d} \boldsymbol{\epsilon}$ arise in the construction of our stiffness matrices, cf.\ \S\ref{secStiffnessMatrices}.
+where $\theta$ is temperature and the rest are strains.  In the 2- and 3-D cases, these stress-strain attributes arise from Gram-Schmidt decompositions of the deformation gradient (cf.\ Sections~\ref{secQR2D}, \ref{secConjugatePairs} and \ref{secFE_CE}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\sigma} , \boldsymbol{\epsilon} )$ is the topic of Part~\ref{partConstitutive}.  In the above problem, the thermo\-dynamic strains $\boldsymbol{\epsilon}$ and their differential rates $\mathrm{d} \boldsymbol{\epsilon}$ are known, it is their stresses $\boldsymbol{\sigma}$ that must be integrated.  Both $\boldsymbol{\sigma}$ and $\mathrm{d} \boldsymbol{\sigma} = \mathbf{M} \, \mathrm{d} \boldsymbol{\epsilon}$ arise in the construction of our stiffness matrices, cf.\ \S\ref{secStiffnessMatrices}.
 
 Equation (\ref{startUp1stOrderODEs}) is used to take the first step of integration; specifcally, 
 \begin{subequations}
@@ -130,19 +131,19 @@ where $\mathrm{d} \boldsymbol{\sigma}_0 = \mathbf{M} ( \boldsymbol{\sigma}_0 , \
     \mathrm{d} \boldsymbol{\epsilon}_{n+1}
     \end{align}
 \end{subequations} 
-where the differential strain rates $\mathrm{d} \boldsymbol{\epsilon}$ are computed via finite differences according to \S\ref{secFE_CE}.
+where differential strain rates $\mathrm{d} \boldsymbol{\epsilon}$ being computed according to \S\ref{secFE_CE}.
 
 
 \subsection{PECE Solver for Second-Order ODEs}
 \label{sec:2ndOrderPECE}
 
-Let $\mathbf{x}$ be a vector of dependent variables obeying a differential equation of evolution $\mathrm{d}^2 \mathbf{x}(t) / \mathrm{d} t^2 = \ddot{\mathbf{x}} = \mathbf{f} (t, \mathbf{x}, \dot{\mathbf{x}})$ subject to initial conditions $\mathbf{x}_0 = \mathbf{x}(t_0)$ and $\dot{\mathbf{x}}_0 = \dot{\mathbf{x}}(t_0)$.  One may think of $\mathbf{x}$ as being displacements and their rates $\mathbf{v} = \dot{\mathbf{x}}$ as being velocities with $\mathbf{a} = \dot{\mathbf{v}} = \ddot{\mathbf{x}}$ representing accelerations. 
+Let $\mathbf{x}$ be a vector of dependent variables obeying a differential equation of evolution $\mathrm{d}^2 \mathbf{x}(t) / \mathrm{d} t^2 = \ddot{\mathbf{x}} = \mathbf{f} (t, \mathbf{x}, \dot{\mathbf{x}})$ subject to the two initial conditions $\mathbf{x}_0 = \mathbf{x}(t_0)$ and $\dot{\mathbf{x}}_0 = \dot{\mathbf{x}}(t_0)$.  One may think of $\mathbf{x}$ as being displacements whose rates $\dot{\mathbf{x}}$ are velocities $\mathbf{v}$, with $\dot{\mathbf{v}} = \ddot{\mathbf{x}}$ representing accelerations $\mathbf{a}$. 
 
-The two-step method put forward here incrementally solves such an ODE, returning solutions associated with the next moment in time $t_{n+1}$, i.e., it acquires $\mathbf{x}_{n+1}$ \& $\dot{\mathbf{x}}_{n+1}$ given knowledge of the previous $\mathbf{x}_{n-1}$ \& $\dot{\mathbf{x}}_{n-1}$ and current $\mathbf{x}_n$ \& $\dot{\mathbf{x}}_n$ solutions plus their accelerations $\ddot{\mathbf{x}}_{n-1}$ and $\ddot{\mathbf{x}}_n$ with the corrector also depending upon $\ddot{\mathbf{x}}_{n+1}$, i.e., the corrector is an implicit method.
+The two-step method put forward here incrementally solves such an ODE, returning solutions associated with the next moment in time $t_{n+1}$ for both displacement $\mathbf{x}_{n+1}$ and velocity $\dot{\mathbf{x}}_{n+1}$.  To update the displacement to $\mathbf{x}_{n+1}$, the predictor requires knowledge of the previous fields $\mathbf{x}_{n-1}$, $\dot{\mathbf{x}}_{n-1}$ and $\ddot{\mathbf{x}}_{n-1}$ plus the current fields $\mathbf{x}_n$, $\dot{\mathbf{x}}_n$ and $\ddot{\mathbf{x}}_n$, with the corrector also requiring knowledge of $\dot{\mathbf{x}}_{n+1}$ and $\ddot{\mathbf{x}}_{n+1}$.  Likewise, to update the velocity to $\dot{\mathbf{x}}_{n+1}$, the predictor requires knowledge of the previous fields $\dot{\mathbf{x}}_{n-1}$ and $\ddot{\mathbf{x}}_{n-1}$ plus the current fields $\dot{\mathbf{x}}_n$ and $\ddot{\mathbf{x}}_n$, with the corrector also requiring knowledge of $\ddot{\mathbf{x}}_{n+1}$.  Both predictors are explicit, and both correctors are implicit.
 
 \subsubsection{Start-Up Algorithm}
 
-Again, multi-step methods are not self starting, so a one-step method is needed to take the first step of integration, specifically
+Again, multi-step methods are not self starting, so a one-step method is needed to take the first step of integration; specifically, we employ
 \begin{subequations}
     \label{pairedStartUp}
     \begin{align}
@@ -177,7 +178,7 @@ wherein $\ddot{\mathbf{x}}_0 = \mathbf{f}(t_0, \mathbf{x}_0, \dot{\mathbf{x}}_0)
 
 \subsubsection{Two-Step ODE Solver}
 
-The two-step method of Freed \cite{Freed17a} for solving $2^{\text{nd}}$ order ODEs is
+The two-step method of Freed \cite{Freed17a} for solving second-order ODEs is
 \begin{subequations}
     \label{pairedMethods}
     \begin{align}
@@ -186,7 +187,7 @@ The two-step method of Freed \cite{Freed17a} for solving $2^{\text{nd}}$ order O
     4 \mathbf{x}_n - \mathbf{x}_{n-1} \bigr) + 
     \tfrac{1}{6} h \bigl( 3 \dot{\mathbf{x}}_n + 
     \dot{\mathbf{x}}_{n-1} \bigr) \notag \\ 
-    \mbox{} & & & \hspace{3.175cm} + 
+    \mbox{} & & & \qquad + 
     \tfrac{1}{36} h^2 \bigl( 31 \ddot{\mathbf{x}}_n - 
     \ddot{\mathbf{x}}_{n-1} \bigr) + \mathcal{O} (h^4) 
     \label{displacementPredictor} \\
@@ -205,7 +206,7 @@ The two-step method of Freed \cite{Freed17a} for solving $2^{\text{nd}}$ order O
     \tfrac{1}{24} h \bigl( \dot{\mathbf{x}}^p_{n+1} +
     14 \dot{\mathbf{x}}_n + \dot{\mathbf{x}}_{n-1} \bigr) 
     \notag \\
-    \mbox{} & & & \hspace{3.175cm} +
+    \mbox{} & & & \qquad +
     \tfrac{1}{72} h^2 \bigl( 10 \ddot{\mathbf{x}}^p_{n+1} + 
     51 \ddot{\mathbf{x}}_n - \ddot{\mathbf{x}}_{n-1} \bigr) + 
     \mathcal{O} (h^4)
@@ -220,14 +221,16 @@ The two-step method of Freed \cite{Freed17a} for solving $2^{\text{nd}}$ order O
     \label{2ndReEvaluate}
     \end{align}
 \end{subequations}
-where $t_{n+1} = t_n + h$.  An implementation of this integrator is described in \ref{app2ndOrderODEs}.  
+where $t_{n+1} = t_n + h$.
 
-The above PECE solver for velocity $\dot{\mathbf{x}}$ is the same method presented in Eq.~(\ref{1stOrderODEs}), so this predictor\slash corrector pair is consistent.  Likewise, in both the predictor and corrector for displacement $\mathbf{x}$, contributions from the solution $\mathbf{x}$ have a weight of 1, contributions from the velocities $\dot{\mathbf{x}}$ have a weight of $\tfrac{2}{3} h$, and contributions from the accelerations $\ddot{\mathbf{x}}$ have a weight of $\tfrac{5}{6} h^2$; hence, this predictor\slash corrector pair is consistent, too.  In other words, these predictor\slash corrector pairs produce the same results when integrating a constant acceleration field.
+The above PECE solver for velocity $\dot{\mathbf{x}}$ is the same method presented in Eq.~(\ref{1stOrderODEs}), so this predictor\slash corrector pair is consistent.  Likewise, in both the predictor and corrector for displacement $\mathbf{x}$, contributions from the solution $\mathbf{x}$ have a weight of 1, contributions from the velocities $\dot{\mathbf{x}}$ have a weight of $\tfrac{2}{3} h$, and contributions from the accelerations $\ddot{\mathbf{x}}$ have a weight of $\tfrac{5}{6} h^2$; hence, this predictor\slash corrector pair is internally consistent, too.
 
 \subsection{A Relevant Example}
 \label{sec:solve2ndOrderODE}
 
-The finite element problem that we consider here requires solutions for
+The finite element problem that we consider here requires solutions for the second-order ODE\footnote{
+    This solver can also get solutions to the system of equations $\mathbf{M} \ddot{\mathbf{u}} + \mathbf{C} \dot{\mathbf{u}} + \mathbf{K} \mathbf{u} = \mathbf{f}(t)$ wherein $\mathbf{M}$ is a mass matrix, $\mathbf{C}$ is a damping matrix, and $\mathbf{K}$ is a stiffness matrix.
+}
 \begin{displaymath}
     \mathbf{M} \ddot{\mathbf{u}} + \mathbf{K}\mathbf{u} = \mathbf{f}(t)
 \end{displaymath}
@@ -255,7 +258,7 @@ where $\mathbf{u}$ is a generalized displacement vector, $\ddot{\mathbf{u}}$ is 
     \mathbf{K} \mathbf{u}_1 \bigr)
     \end{align}
 \end{subequations}
-where the CE steps of the PECE sequence can be iterated on to a user-specified tolerance, which increases the methods stability as the corrector is implicit.  Continued solution steps are then governed by algorithm (\ref{pairedMethods}), which takes on the form of
+where the correct\slash re-evaluate steps of the PECE sequence can be iterated upon to achieve a user-specified tolerance, which increases the methods stability as the corrector is implicit.  Continued solution steps are then governed by algorithm (\ref{pairedMethods}), which takes on the form of
 \begin{subequations}
     \notag
     \begin{align}
@@ -263,7 +266,7 @@ where the CE steps of the PECE sequence can be iterated on to a user-specified t
     \mathbf{u}_{n+1}^p & = \tfrac{1}{3} \bigl(
     4 \mathbf{u}_n - \mathbf{u}_{n-1} \bigr) + 
     \tfrac{1}{6} h \bigl( 3 \dot{\mathbf{u}}_n + 
-    \dot{\mathbf{u}}_{n-1} \bigr) + 
+    \dot{\mathbf{u}}_{n-1} \bigr) \\ & & & \qquad + 
     \tfrac{1}{36} h^2 \bigl( 31 \ddot{\mathbf{u}}_n - 
     \ddot{\mathbf{u}}_{n-1} \bigr) \\
     \mbox{} & &
@@ -278,7 +281,7 @@ where the CE steps of the PECE sequence can be iterated on to a user-specified t
     4  \mathbf{u}_n - \mathbf{u}_{n-1} \bigr) +
     \tfrac{1}{24} h \bigl( \dot{\mathbf{u}}^p_{n+1} +
     14 \dot{\mathbf{u}}_n + \dot{\mathbf{u}}_{n-1} \bigr)  \\
-    \mbox{} & & & \hspace{3.175cm} +
+    \mbox{} & & & \qquad +
     \tfrac{1}{72} h^2 \bigl( 10 \ddot{\mathbf{u}}^p_{n+1} + 
     51 \ddot{\mathbf{u}}_n - \ddot{\mathbf{u}}_{n-1} \bigr) \\ 
     \mbox{} & &
@@ -290,26 +293,26 @@ where the CE steps of the PECE sequence can be iterated on to a user-specified t
     \mathbf{K} \mathbf{u}_{n+1} \bigr) 
     \end{align}
 \end{subequations}
-where, again, the CE steps of the PECE sequence can be iterated on to a user-specified tolerance.  In this problem, velocities $\dot{\mathbf{u}}$ are not needed for the evaluation steps, but they are required by the prediction and correction steps of integration.
+where, again, the correct\slash re-evaluate steps of the PECE sequence can be iterated upon to achieve a user-specified tolerance.  In this problem, velocities $\dot{\mathbf{u}}$ are not needed for the evaluation steps, but they are required by the prediction and correction steps of integration.
 
-We observe that the mass matrix must not be ill conditioned in order for this algorithm to work as intended.  Since the mass matrix does not change with time, it only needs to be evaluated and inverted once.  This is an advantage over using the popular Newmark \cite{Newmark59} integrator where matrix inversion is required at every step along a solution path.
+We observe that the mass matrix must not be ill conditioned in order for this algorithm to work as intended.  Because the mass matrix does not change with time, it only needs to be evaluated and inverted once.  This is an advantage over using the popular Newmark \cite{Newmark59} integrator where matrix re-evaluation and inversion is required at every step along a solution path.
 
 \section{Quadrature Rules for Spatial Integration}
 \label{secGauss}
 
-Four, Gauss, quadrature rules are given here for 1D rods, 2D triangles, 2D pentagons and 3D tetrahedra, which are used in our modeling of alveoli.  The formul\ae\ provided can integrate $1^{\text{st}}$, $3^{\text{rd}}$ and $5^{\text{th}}$ order polynomials exactly for their respective geometries.  Integrating $1^{\text{st}}$ order polynomials takes place at their centroids.  All integrations occur in their natural co-ordinate systems.
+Four, Gauss, quadrature rules are given here for 1D rods, 2D triangles, 2D pentagons, and 3D tetrahedra, which are used as finite elements in our modeling of alveoli.  The formul\ae\ provided can integrate $1^{\text{st}}$, $3^{\text{rd}}$ and $5^{\text{th}}$ order polynomials exactly in their respective geometries.  Integrating $1^{\text{st}}$ order polynomials takes place at their centroids.  All integrations occur in their natural co-ordinate systems.  The quadrature rules for Gauss integration are usually selected to integrate elements in a finite element model, because they have the smallest errors of approximation.
 
 \subsection{Gauss Integration of a Rod}
 
-Quadrature rules that integrate a 1D chord in its natural co-ordinate system, which spans $-1 \leq \xi \leq 1$, are presented in Table~\ref{tabQuadrature1D}.  These formul\ae\ are well known and can be found in any finite element textbook.  Here the integral of some function $f( \xi )$ is approximated via the quadrature rule
+Quadrature rules that integrate a 1D chord in its natural co-ordinate system, which spans the interval $-1 \leq \xi \leq 1$, are presented in Table~\ref{tabQuadrature1D}.  These formul\ae\ are well known and can be found in any finite element textbook.  Here the integral of some function $f( \xi )$ is approximated via the quadrature rule
 \begin{equation}
     I = \int_{-1}^1 f ( \xi ) \, \mathrm{d} \xi 
     = \sum_{i=1}^n w_i f( \xi_i ) + E
-    \quad \text{where} \quad
+    \quad \text{with} \quad
     \int_{-1}^1 \mathrm{d} \xi = \sum_{i=1}^n w_i = 2
     \label{Gauss1D}
 \end{equation}
-wherein $\xi_i$ and $w_i$ are the nodes and weights of integration, of which there are $n$ pairs, with $E$ denoting the error of approximation.  The quadrature rules for Gauss integration are typically selected to integrate elements in a finite element model, because they have the smallest errors of approximation.
+where $\xi_i$ and $w_i$ are the nodes and weights of integration, for which there are $n$ pairs, with $E$ denoting the error of approximation.
 
 \begin{table}
     \centering
@@ -327,8 +330,8 @@ wherein $\xi_i$ and $w_i$ are the nodes and weights of integration, of which the
         \hline
         & \multicolumn{2}{|c|}{Exact for Polynomials of Degree $5^{\phantom{|^|}}$} \\ \hline
         1 & -0.774596669241483 & 0.555555555555556 \\
-        2 & 0.000000000000000 & 0.888888888888889\\
-        3 & 0.774596669241483 & 0.555555555555556\\ 
+        2 & 0.000000000000000 & 0.888888888888889 \\
+        3 & 0.774596669241483 & 0.555555555555556 \\ 
         \hline
     \end{tabular}
     \caption{Gauss quadrature weights and nodes for integrating over a line in its natural co-ordinate system $\xi$.  These weights sum to 2, which is the span of its natural co-ordinate.  We note that $1/\sqrt{3} \approx 0.577350269189626$ and that $\sqrt{3/5} \approx 0.774596669241483$.}
@@ -338,36 +341,39 @@ wherein $\xi_i$ and $w_i$ are the nodes and weights of integration, of which the
 
 \subsection{Multi-Dimensional Integration}
 
-When integrating a function $f$ over, e.g., a square, one often introduces tensor products of the 1D formul\ae\ (\ref{Gauss1D}) listed in Table~\ref{tabQuadrature1D}; specifically, one might construct integration quadratures that look like
-\begin{displaymath}
+When integrating some function $f$ over, e.g., a square, one often introduces tensor products of the 1D formul\ae\ (\ref{Gauss1D}) listed in Table~\ref{tabQuadrature1D}; specifically, one might construct a quadrature rule that looks like
+\begin{multline*}
     I = \int_{-1}^1 \int_{-1}^1 f ( \xi , \eta ) \, \mathrm{d} \xi \, \mathrm{d} \eta =
-    \int_{-1}^1 \sum_{i=1}^n w_i f ( \xi_i , \eta ) \, \mathrm{d} \eta + E =
-    \sum_{i=1}^n \sum_{j=1}^n w_i w_j f ( \xi_i , \eta_ j ) + E 
-\end{displaymath}
-which is the integration scheme presented in many textbooks on finite elements.  However, these formul\ae\ are not optimal, because they require many more function evaluations than are necessary in order to secure a quadrature at a specified accuracy.  It is much more efficient to adopt non-tensor product quadratures where, when integrating over a square, one has
-\begin{displaymath}
+    \int_{-1}^1 \sum_{i=1}^n w_i f ( \xi_i , \eta ) \, \mathrm{d} \eta + E \\ =
+    \sum_{i=1}^n \sum_{j=1}^n w_i w_j f ( \xi_i , \eta_ j ) + E  
+    \quad \text{with} \quad
+    \int_{-1}^1 \int_{-1}^1 \mathrm{d} \xi \, \mathrm{d} \eta = 
+    \sum_{i=1}^n \sum_{j=1} w_i w_j = 4
+\end{multline*}
+which is the integration scheme presented in many textbooks on finite elements.  However, these formul\ae\ are not optimal, because they require many more function evaluations than are often necessary to secure a quadrature rule with some specified order of accuracy.  It is more efficient to adopt non-tensor product quadrature rules where, e.g., when integrating over a square, one has
+\begin{multline*}
     I = \int_{-1}^1 \int_{-1}^1 f ( \xi , \eta ) \, \mathrm{d} \xi \, \mathrm{d} \eta =
-    \sum_{i=1}^n w_i f ( \xi_i , \eta_i ) + E
-    \quad \text{where} \quad
+    \sum_{i=1}^n w_i f ( \xi_i , \eta_i ) + E  \\ 
+    \quad \text{with} \quad
     \int_{-1}^1 \int_{-1}^1 \mathrm{d} \xi \, \mathrm{d} \eta = 
     \sum_{i=1}^n w_i = 4
-\end{displaymath}
-with co-ordinates $\xi_i$ and $\eta_i$ placing the $i^{\text{th}}$ node of integration inside a square of area 4 whose corresponding weight of integration is $w_i$, with their being $n$ pairs of nodes and weights.  
+\end{multline*}
+where co-ordinates $\xi_i$ and $\eta_i$ place the $i^{\text{th}}$ node of integration inside a square of area 4 whose corresponding weight of integration is $w_i$, with their being $n$ pairs of nodes and weights.  
 
-It is this latter formula that we employ for our multi-dimensional integrations.
+It is this latter approach that we employ in all of our multi-dimensional integrations.
 
 \subsection{Gauss Integration of a Triangle}
 
-The triangle considered has natural co-ordinates $( \xi , \eta )$ that span $0 \leq \xi \leq 1-\eta$ and $0 \leq \eta \leq 1$ so that the integral of interest becomes
-\begin{equation}
+A triangle has natural co-ordinates $( \xi , \eta )$ that span regions of $0 \leq \xi \leq 1-\eta$ and $0 \leq \eta \leq 1$ so that an integral of $f(\xi, \eta)$ becomes
+\begin{multline}
 I = \int_0^1 \int_{\xi =0}^{1-\eta} f ( \xi , \eta ) \, \mathrm{d} \xi \, \mathrm{d} \eta =
-\sum_{i=1}^n w_i f ( \xi_i , \eta_i ) + E
-\quad \text{where} \quad
+\sum_{i=1}^n w_i f ( \xi_i , \eta_i ) + E \\
+\quad \text{with} \quad
 \int_0^1 \int_{\xi =0}^{1-\eta} \mathrm{d} \xi \, \mathrm{d} \eta = 
 \sum_{i=1}^n w_i = \frac{1}{2}
 \label{GaussTriangle}
-\end{equation}
-with co-ordinates $\xi_i$ and $\eta_i$ placing the $i^{\text{th}}$ node of integration inside the triangle whose corresponding weight of integration is $w_i$, with their being $n$ pairs of nodes and weights.  The area of this triangle is \textfrac{1}{2}, the sum of its weights. Table~\ref{tabQuadrature2D} provides a selection of quadratures for such triangles.  This table can be found in some finite element textbooks.
+\end{multline}
+where co-ordinates $\xi_i$ and $\eta_i$ place the $i^{\text{th}}$ node of integration inside the triangle whose corresponding weight of integration is $w_i$, with their being $n$ pairs of nodes and weights.  The area of this triangle is \textfrac{1}{2}, the sum of its weights. Table~\ref{tabQuadrature2D} provides a selection of quadrature rules for such triangles.  This table can be found in some finite element textbooks.
 
 \begin{table}
     \centering
@@ -396,14 +402,14 @@ with co-ordinates $\xi_i$ and $\eta_i$ placing the $i^{\text{th}}$ node of integ
         7 & 0.059715871789770 & 0.470142064105115 & 0.066197076394253 \\
         \hline
     \end{tabular}
-    \caption{Gauss quadrature weights and nodes for integrating over a triangle in its natural co-ordinate system $( \xi , \eta )$, where $0 \leq \xi \leq 1 - \eta$ and $0 \leq \eta \leq 1$.  These weights sum to \textfrac{1}{2}, which is the area of a triangle when evaluated in its natural co-ordinate system.}
+    \caption{Symmetric weights and nodes for Gauss quadratures that integrate over a triangle in its natural co-ordinate system $( \xi , \eta )$, where $0 \leq \xi \leq 1 - \eta$ and $0 \leq \eta \leq 1$.  These weights sum to \textfrac{1}{2}, which is the area of a triangle when evaluated in its natural co-ordinate system.}
     \label{tabQuadrature2D}
 \end{table}
 
 
 \subsection{Gauss Integration of a Pentagon}
 
-Gauss quadrature rules for a regular pentagon described in its natural coordinate system, i.e., oriented according to Fig.~\ref{figRegPentagon}, are presented in Table~\ref{tabQuadrature}, which describe integrations of the type
+Gauss quadrature rules for a regular pentagon described in its natural co-ordinate system, i.e., oriented according to Fig.~\ref{figRegPentagon}, are presented in Table~\ref{tabQuadrature}, which describe integrations of the type
 \begin{multline}
     \iint_{\pentagon} f ( \xi , \eta) \, \mathrm{d} \xi \, \mathrm{d} \eta = 
     \sum_{i=1}^n w_i f ( \xi_i , \eta_i ) + E \\
@@ -441,11 +447,11 @@ where co-ordinates $\xi_i$ and $\eta_i$ place the $i^{\text{th}}$ node inside th
         7 &  0.5337947578638855 &  0.4872045224587945 & 0.2642573384350463 \\
         \hline
     \end{tabular}
-    \caption{Gauss quadrature weights and nodes (a.k.a., cubature rules) for integrating over a regular pentagon in its natural coordinate system $( \xi , \eta )$.  These weights sum to the area of a pentagon inscribing an unit circle, the formula of which is given in Eqn.~(\ref{regPentagonArea}).}
+    \caption{Gauss quadrature weights and nodes (a.k.a., cubature rules) for integrating over a regular pentagon in its natural co-ordinate system $( \xi , \eta )$.  These weights sum to the area of a pentagon inscribing an unit circle, the formula of which is given in Eqn.~(\ref{regPentagonArea}).}
     \label{tabQuadrature}
 \end{table}
 
-The quadratures presented in Table~\ref{tabQuadrature} were supplied to the authors by Prof.\ N.\ Sukumar from the University of California at Davis, which he derived for us at our request using a methodology that he published in Ref.~\cite{Mousavietal10}.  In that document, the authors derived formul\ae\ for determining the nodes and weights for a class of generalized, Gaussian, quadrature rules, which they then applied to pentagons, hexagons, heptagons and octagons, of which they only published their nodes and weights of quadrature for the hexagon, as it tiles two space.  The node for the $1^{\mathrm{st}}$ order method is located at the centroid.  Nodes for the $3^{\mathrm{rd}}$ and $5^{\mathrm{th}}$ order methods of Table~\ref{tabQuadrature} are displayed in Fig.~\ref{figQuadrature}.
+The quadrature rules presented in Table~\ref{tabQuadrature} were supplied to the authors by Prof.\ N.\ Sukumar from the University of California at Davis, which he derived for us at our request using a methodology that he had published. \cite{Mousavietal10}  In that document, the authors derived formul\ae\ for determining the nodes and weights for a class of generalized, Gaussian, quadrature rules, which they then applied to pentagons, hexagons, heptagons and octagons, of which they only published their nodes and weights of quadrature for the hexagon, as it tiles two space.  The node for the $1^{\mathrm{st}}$ order method is located at the centroid.  Nodes for the $3^{\mathrm{rd}}$ and $5^{\mathrm{th}}$ order methods of Table~\ref{tabQuadrature} are displayed in Fig.~\ref{figQuadrature}.
 
 \begin{figure}
     \centering
@@ -460,20 +466,21 @@ The Gaussian quadrature rules of Mousavi, Xiao \& Sukumar \cite{Mousavietal10} p
 
 \subsection{Gauss Integration of a Tetrahedron}
 
-Integrating over the volume of a tetrahedron, when expressed in its natural co-ordinates $( \xi , \eta , \zeta )$ that span $0 \leq \xi \leq 1 - \eta - \zeta$, $0 \leq \eta \leq 1 - \zeta$ and $0 \leq \zeta \leq 1$ so that the integral of interest becomes
+Integrating over the volume of a tetrahedron, when expressed in its natural co-ordinates $( \xi , \eta , \zeta )$, which span ranges of $0 \leq \xi \leq 1 - \eta - \zeta$, $0 \leq \eta \leq 1 - \zeta$ and $0 \leq \zeta \leq 1$, so that an integral of some function $f ( \xi , \eta , \zeta )$ becomes
 \begin{multline}
      I = \int_0^1 \int_{\eta=0}^{1-\zeta} \int_{\xi = 0}^{1 - \eta - \zeta} 
      f ( \xi , \eta , \zeta ) \, \mathrm{d} \xi \, \mathrm{d} \eta \, 
      \mathrm{d} \zeta = \sum_{i=1}^n w_i f( \xi_i , \eta_i , \zeta_i ) + E \\
-     \text{where} \quad 
+     \text{with} \quad 
      \int_0^1 \int_{\eta=0}^{1-\zeta} \int_{\xi = 0}^{1 - \eta - \zeta} 
      \mathrm{d} \xi \, \mathrm{d} \eta \, \mathrm{d} \zeta = \sum_{i=1}^n w_i = 
      \frac{1}{6}
 \end{multline}
-with co-ordinates $\xi_i$, $\eta_i$ and $\zeta_i$ placing the $i^{\text{th}}$ node of integration inside the tetrahedron whose corresponding weight of integration is $w_i$, with there being $n$ pairs of nodes and weights.  The volume of this tetradedron is \textfrac{1}{6}.  Table~\ref{tabQuadraturetetra} provides a selection of quadratures for tetrahedra when mapped into their natural co-ordinate system.  This table can be found in some finite element textbooks.
+where co-ordinates $\xi_i$, $\eta_i$ and $\zeta_i$ place the $i^{\text{th}}$ node of integration inside a tetrahedron whose corresponding weight of integration is $w_i$, with there being $n$ pairs of nodes and weights.  The volume of this tetradedron is \textfrac{1}{6}.  Table~\ref{tabQuadraturetetra} provides a selection of quadrature rules for tetrahedra when expressed in their natural co-ordinate system.  This table can be found in some finite element textbooks.
 
+\footnotesize
 \begin{table}
-    \centering
+    \hspace{-1.75cm}
     \begin{tabular}{|c|rrrr|}
         \hline
         node & \centering $\xi$ co-ordinate \phantom{12} & $\eta$ co-ordinate \phantom{12} & 
@@ -528,6 +535,7 @@ with co-ordinates $\xi_i$, $\eta_i$ and $\zeta_i$ placing the $i^{\text{th}}$ no
              0.010949141561386 \\ 
         \hline
     \end{tabular}
-    \caption{Gauss quadrature weights and nodes for integrating over a tetrahedron in its natural co-ordinate system $(\xi , \eta , \zeta)$, where $0 \leq \xi \leq 1 - \eta - \zeta$, $0 \leq \eta \leq 1 - \zeta$ and $0 \leq \zeta \leq 1$.  These weights sum to \textfrac{1}{6}, which is the volume of a tetrahedron measured in its natural co-ordinate system.}
+    \caption{Symmetric weights and nodes for Gauss quadratures that integrate over a tetrahedron in its natural co-ordinate system $(\xi , \eta , \zeta)$, where $0 \leq \xi \leq 1 - \eta - \zeta$, $0 \leq \eta \leq 1 - \zeta$ and $0 \leq \zeta \leq 1$.  These weights sum to \textfrac{1}{6}, which is the volume of a tetrahedron measured in its natural co-ordinate system.}
     \label{tabQuadraturetetra}
 \end{table}
+\normalsize

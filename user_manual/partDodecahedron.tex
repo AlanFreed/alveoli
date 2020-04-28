@@ -5,27 +5,31 @@ Typical alveoli are fourteen sided polyhedra with one face normally being open a
 
 The tetrakaidecahedron and rhombic dodecahedron are both volume filling.  This property is preferred whenever one sets out to construct assemblages of alveoli to build a micro\-structural model that is to be solved numerically via a finite element method.  The purpose of such an exercise is to homogenize the response of an alveolar assembly up to the macroscopic level, i.e., the level of a continuum mass point, a.k.a., the parenchyma \cite{Daleetal80,DennySchroter95,DennySchroter97,DennySchroter00,Koweetal86,Ryketal07,Chenetal14}.  Such a finite element model can serve as a representative volume element (RVE) for parenchyma.
 
-The dodecahedron is an isotropic structure, or very nearly so as we shall show, and is nearly volume filling \cite{Kimmeletal87}.  It becomes a preferred geometry whenever a single alveolus is to be used as the RVE of homo\-genization, and from which closed form solutions have been derived \cite{BudianskyKimmel87,KimmelBudiansky90,Kimmeletal87,Freedetal12}.  Here isotropy of the microstructure ensures an isotropic macro response.  Parenchyma, as a tissue, is isotropic \cite{Weedetal15,Fung88,Hughesetal72}; whereas, lung, as an organ, is a complex, heterogeneous structure \cite{Mead73,West07}.  This distinction has, from time-to-time, gotten lost \cite{DennySchroter06}.  
+The dodecahedron is an isotropic structure, or very nearly so as we shall show, and is nearly volume filling \cite{Kimmeletal87}.  It becomes a preferred geometry whenever a single alveolus is to be used as the RVE of homo\-genization, and from which closed form solutions have been derived \cite{BudianskyKimmel87,KimmelBudiansky90,Kimmeletal87,Freedetal12}.  Here isotropy of the microstructure ensures an isotropic macro response.  Parenchyma, as a tissue, is isotropic \cite{Weedetal15,Fung88,Hughesetal72}; whereas, lung, as an organ, is a complex, heterogeneous structure \cite{Mead73,West07}.  This distinction has, from time-to-time, been forgotten \cite{DennySchroter06}.  
 
-For the reasons stated above, a dodecahedron, with vertices labeled according to Fig.~\ref{figDodecahedron}, is the geometric structure selected for use in this study. The question of how one assigns a co-ordinate system to a dodecahedron is discussed first.  Given this co-ordinate system, vertices of a dodecahedron are then assigned from which its septal chords and septal membranes are established.
+For the reasons stated above, a dodecahedron, with vertices labeled according to Fig.~\ref{figDodecahedronB}, is the geometric structure selected for use in this study. The question of how one assigns a co-ordinate system to a dodecahedron is discussed first.  Given this co-ordinate system, vertices of a dodecahedron are then assigned from which its septal chords and septal membranes are readily established.
 
 \begin{figure}
-	{\par\centering
-		\resizebox*{0.45\textwidth}{0.3\textheight}
-		{\includegraphics{figures/dodecahedron.jpg}} 
-		\resizebox*{0.45\textwidth}{0.3\textheight}
-		{\includegraphics{figures/dodecahedronVertices.jpg}}
-		\par}
-	\caption{Geometric representations for a dodecahedron.  Left image:  A cube is contained within a dodecahedron, with one of its five possible orientations being displayed.  Atop each face of the cube resides four pentagonal sub-areas that form the shape of a hipped roof line.  Right image:  Vertices 1 through 8 are located at the corners of such a cube.  The centroid for the cube is also the centroid for the dodecahedron.  Vertices 9 through 20 are corners of the hipped roof lines residing above each face of the cube.}
+    \centering
+    \subfigure[A cube is contained within a dodecahedron, with one of its five possible orientations being displayed.  Atop each face of the cube resides four pentagonal sub-areas that form the shape of a hipped roof line.]{
+        \includegraphics[width=0.45\textwidth]{figures/dodecahedron.png}
+        \label{figDodecahedronA}
+    }
+    \hfill
+    \subfigure[ Vertices 1 through 8 are located at the corners of such a cube.  The centroid for the cube is also the centroid for the dodecahedron.  Vertices 9 through 20 are corners of the hipped roof lines residing above each face of the cube.]{
+        \includegraphics[width=0.45\textwidth]{figures/dodecahedronVertices.jpg}
+        \label{figDodecahedronB}
+    }
+	\caption{Geometric representations for a dodecahedron.}
 	\label{figDodecahedron}
 \end{figure}
 
 \section{Co-ordinate Indexing}
 \label{reindexing3D}
 
-An orthonormal set of base vectors $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} )$ is assigned to a dodecahedron whose origin resides at its centroid and whose directions align with a set of far-field base vectors used for reference in one's finite element model of a lung.  The question is: How does one orient the indexing scheme of Fig.~\ref{figDodecahedron} against this basis?  Alternatively:  How can one describe a mapping $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} ) \overset{\text{?}}{\mapsto} ( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ wherein the ortho\-normal set of base vectors $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ is to serve as a reference basis for our alveolar dodecahedron to which the indexing scheme presented in Fig.~\ref{figDodecahedron} applies?
+An orthonormal set of base vectors $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} )$ is assigned to a dodecahedron whose origin resides at its centroid and whose directions align with a set of far-field base vectors used for reference in one's finite element model of a lung.  The question is: How does one orient the indexing scheme of Fig.~\ref{figDodecahedron} against this basis?  Alternatively:  How can one describe a mapping $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} ) \overset{\text{?}}{\mapsto} ( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ wherein an ortho\-normal set of base vectors $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ is to serve as a reference basis for our alveolar dodecahedron to which the indexing scheme presented in Fig.~\ref{figDodecahedron} applies?
 
-Given that a finite element model for lung exists, then a deformation gradient $\mathbfsf{F}$ can be made available at any mass point therein whereat an alveolus of interest resides.  The components of this deformation gradient are $F_{ij}$, $i, j = 1,2,3$, when evaluated in the co-ordinate frame $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} )$, which is the co-ordinate frame of the finite element analysis.  A Gram-Schmidt (or \textbf{QR}) decomposition of a non-singular $3 \! \times \! 3$ matrix results in a tangent vector $\vec{\mathbfsf{g}}_1$ and normal vector $\vec{\mathbfsf{g}}_1 \times \vec{\mathbfsf{g}}_2$ that remain invariant under transformations of the triangular matrix \textbf{R} \cite{McLellan80}.  These convected base vectors $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 , \vec{\mathbfsf{g}}_3 )$ rotate out of basis $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ via a Gram rotation \cite{FreedZamani18}.  Given this geometric information, Paul, Rajagopal \& Freed \cite{Pauletal20} were able to provide an answer to the above question of co-ordinate selection.
+Given that a finite element model for lung exists, then a deformation gradient $\mathbfsf{F}$ can be made available at any mass point therein whereat an alveolus of interest resides.  The components of this deformation gradient are $F_{ij}$, $i, j = 1,2,3$, when evaluated in the co-ordinate frame $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} )$, which is the co-ordinate frame of the finite element analysis.  A Gram-Schmidt (or \textbf{QR}) decomposition of a non-singular $3 \! \times \! 3$ matrix results in a tangent vector $\vec{\mathbfsf{g}}_1$ and normal vector $\vec{\mathbfsf{g}}_1 \times \vec{\mathbfsf{g}}_2$ that remain invariant under transformations of the triangular matrix \textbf{R} \cite{McLellan80}.  These convected base vectors $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 , \vec{\mathbfsf{g}}_3 )$ rotate out of basis $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ via a Gram rotation \cite{FreedZamani18}.  Given this geometric information, Paul, Rajagopal \& Freed \cite{Pauletal20} were able to provide an answer to the above question of co-ordinate frame selection.
 
 Their approach begins by establishing the extent of transverse shear crossing each of the co-ordinate directions $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} )$, as quantified by
 \begin{equation}
@@ -33,19 +37,19 @@ Their approach begins by establishing the extent of transverse shear crossing ea
 \mathcal{G}_2 =\dfrac{\sqrt{F^{\,2}_{12}+F^{\,2}_{32}}}{F_{22}} , \quad
 \mathcal{G}_3 =\dfrac{\sqrt{F^{\,2}_{13}+F^{\,2}_{23}}}{F_{33}}
 \end{equation} 
-where $\mathcal{G}_i$ is a measure of the shear deformation cutting across the $i^{\text{th}}$ direction.  Unit vector $\vec{\mathbfsf{E}}_1$ is selected as that direction from the set $\{ \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} \}$ which possesses minimal transverse shear.  Once selected, there are two possible planes that contain base vector $\vec{\mathbfsf{E}}_1$, and the one selected whose normal is to be $\vec{\mathbfsf{E}}_1 \times \vec{\mathbfsf{E}}_2$ is that plane with the least amount of in-plane shear, as determined by taking appropriate dot products between column vectors $\boldsymbol{f}_i = \{ F_{1i} \; F_{2i} \; F_{3i} \}^{\mathsf{T}}$, $i=1,2,3$.  Vector $\boldsymbol{f}_i$ has elements taken from the $i^{\text{th}}$ column of matrix $F_{ij}$, which represents the deformation gradient $\mathbfsf{F}$ evaluated in $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} )$.  Their strategy is summarized in Alg.~\ref{alg:pivoting}.
+where $\mathcal{G}_i$ is a measure of the shear deformation cutting across the $i^{\text{th}}$ direction.  Unit vector $\vec{\mathbfsf{E}}_1$ is selected as that direction from the set $\{ \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} \}$ which possesses minimal transverse shear.  Once selected, there are two possible planes that contain base vector $\vec{\mathbfsf{E}}_1$, and the one selected whose normal is to be $\vec{\mathbfsf{E}}_1 \times \vec{\mathbfsf{E}}_2$ is that plane with the least amount of in-plane shear, which can be determined by taking appropriate dot products between column vectors $\boldsymbol{f}_i = \{ F_{1i} \; F_{2i} \; F_{3i} \}^{\mathsf{T}}$, $i=1,2,3$.  Vector $\boldsymbol{f}_i$ has elements taken from the $i^{\text{th}}$ column of matrix $F_{ij}$, which represents the deformation gradient $\mathbfsf{F}$ evaluated in $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} )$.  Their strategy is summarized in Alg.~\ref{alg:pivoting}.
 
-Algorithm \ref{alg:pivoting} inputs a deformation gradient $\mathbfsf{F}$ whose components $F_{ij}$ are evaluated in the co-ordinate system $(  \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} )$ associated with a finite element model for lung.  The algorithm outputs an orthogonal matrix $\mathbfsf{P}$ that re-indexes the components of the deformation gradient $F_{ij}$ into an equivalent form where $\mathbfsf{F} = \mathcal{F}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$.  It is this re-indexed matrix $\mathcal{F}_{ij}$ that is to be subjected to Gram-Schmidt factorization later in Part~\ref{partKinematics}.  
+Algorithm \ref{alg:pivoting} inputs a deformation gradient $\mathbfsf{F}$ whose components $F_{ij}$ are evaluated in the co-ordinate system $(  \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} )$ associated with, in our case, a finite element model for lung.  The algorithm outputs an orthogonal matrix $\mathbfsf{P}$ that re-indexes the components of deformation gradient $F_{ij}$ into an equivalent form where $\mathbfsf{F} = \mathcal{F}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$.  It is this re-indexed matrix $\mathcal{F}_{ij}$ that is to be subjected to Gram-Schmidt factorization, which is discussed later in Part~\ref{partKinematics}.  
 
 \begin{algorithm}
     \KwIn{Deformation gradient $\mathbfsf{F}$ with components $F_{ij}$ expressed in $( \vec{\boldsymbol{\imath}} , \vec{\boldsymbol{\jmath}} , \vec{\boldsymbol{k}} )$.}
     \uIf{$\mathcal{G}_1 \le \mathcal{G}_2 \: \mathbf{and} \; \mathcal{G}_1 \le \mathcal{G}_3$}
-    {\eIf{$\boldsymbol{f}_1 \cdot \boldsymbol{f}_2 \le \boldsymbol{f}_1 \cdot \boldsymbol{f}_3$}{$[ \boldsymbol{\mathcal{F}}_1 ] = [ \mathbfsf{P}_1 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_1 ] , \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_1 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_1 ], \; \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_1, \vec{\mathbfsf{E}}_2, \vec{\mathbfsf{E}}_3 )$}{$[ \boldsymbol{\mathcal{F}}_2 ] = [ \mathbfsf{P}_2 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_2 ] , \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_2 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_2 ], \; \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_1, \vec{\mathbfsf{E}}_3, \vec{\mathbfsf{E}}_2 )$}}
+    {\eIf{$\boldsymbol{f}_1 \cdot \boldsymbol{f}_2 \le \boldsymbol{f}_1 \cdot \boldsymbol{f}_3$}{$[ \boldsymbol{\mathcal{F}}_1 ] = [ \mathbfsf{P}_1 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_1 ] : \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_1 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_1 ],$ \\ $\phantom{[ \boldsymbol{\mathcal{F}}_1 ]} \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_1, \vec{\mathbfsf{E}}_2, \vec{\mathbfsf{E}}_3 )$}{$[ \boldsymbol{\mathcal{F}}_2 ] = [ \mathbfsf{P}_2 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_2 ] : \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_2 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_2 ],$ \\ $\phantom{[ \boldsymbol{\mathcal{F}}_1 ]} \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_1, \vec{\mathbfsf{E}}_3, \vec{\mathbfsf{E}}_2 )$}}
     \uElseIf{$\mathcal{G}_2 \le \mathcal{G}_1 \: \mathbf{and} \; \mathcal{G}_2 \le \mathcal{G}_3$}
-    {\eIf{$\boldsymbol{f}_1 \cdot \boldsymbol{f}_2 \le \boldsymbol{f}_2 \cdot \boldsymbol{f}_3$}{$[ \boldsymbol{\mathcal{F}}_3 ] = [ \mathbfsf{P}_3 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_3 ] , \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_3 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_3 ] , \; \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_2, \vec{\mathbfsf{E}}_1, \vec{\mathbfsf{E}}_3 )$}{$[ \boldsymbol{\mathcal{F}}_4 ] = [ \mathbfsf{P}_4 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_4 ] , \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_4 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_4 ] , \; \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_2, \vec{\mathbfsf{E}}_3, \vec{\mathbfsf{E}}_1 )$}}
+    {\eIf{$\boldsymbol{f}_1 \cdot \boldsymbol{f}_2 \le \boldsymbol{f}_2 \cdot \boldsymbol{f}_3$}{$[ \boldsymbol{\mathcal{F}}_3 ] = [ \mathbfsf{P}_3 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_3 ] : \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_3 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_3 ] ,$ \\ $\phantom{[ \boldsymbol{\mathcal{F}}_1 ]} \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_2, \vec{\mathbfsf{E}}_1, \vec{\mathbfsf{E}}_3 )$}{$[ \boldsymbol{\mathcal{F}}_4 ] = [ \mathbfsf{P}_4 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_4 ] : \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_4 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_4 ] ,$ \\ $\phantom{[ \boldsymbol{\mathcal{F}}_1 ]} \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_2, \vec{\mathbfsf{E}}_3, \vec{\mathbfsf{E}}_1 )$}}
     \Else{
-        {\eIf{$\boldsymbol{f}_1 \cdot \boldsymbol{f}_3 \le \boldsymbol{f}_2 \cdot \boldsymbol{f}_3$}{$[ \boldsymbol{\mathcal{F}}_5 ] = [ \mathbfsf{P}_5 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_5 ] , \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_5 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_5 ] , \; \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_3, \vec{\mathbfsf{E}}_1, \vec{\mathbfsf{E}}_2 )$}{$[ \boldsymbol{\mathcal{F}}_6 ] = [ \mathbfsf{P}_6 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_6 ] , \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_6 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_6 ] , \; \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_3, \vec{\mathbfsf{E}}_2, \vec{\mathbfsf{E}}_1 )$}}}
-    \KwOut{Deformation gradient $\mathbfsf{F}$ with components $\mathcal{F}_{ij}$ expressed in $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ \\ as re-indexed by an orthogonal matrix $[ \mathbfsf{P} ]$.}
+        {\eIf{$\boldsymbol{f}_1 \cdot \boldsymbol{f}_3 \le \boldsymbol{f}_2 \cdot \boldsymbol{f}_3$}{$[ \boldsymbol{\mathcal{F}}_5 ] = [ \mathbfsf{P}_5 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_5 ] : \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_5 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_5 ] ,$ \\ $\phantom{[ \boldsymbol{\mathcal{F}}_1 ]} \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_3, \vec{\mathbfsf{E}}_1, \vec{\mathbfsf{E}}_2 )$}{$[ \boldsymbol{\mathcal{F}}_6 ] = [ \mathbfsf{P}_6 ]^{\mathsf{T}} [ \mathbfsf{F} ] [ \mathbfsf{P}_6 ] : \; [ \boldsymbol{\mathcal{F}} ] = [ \boldsymbol{\mathcal{F}}_6 ] , \; [ \mathbfsf{P} ] = [ \mathbfsf{P}_6 ] ,$ \\ $\phantom{[ \boldsymbol{\mathcal{F}}_1 ]} \therefore \; ( \vec{\boldsymbol{\imath}}, \vec{\boldsymbol{\jmath}}, \vec{\boldsymbol{k}} ) \mapsto ( \vec{\mathbfsf{E}}_3, \vec{\mathbfsf{E}}_2, \vec{\mathbfsf{E}}_1 )$}}}
+    \KwOut{Deformation gradient $\mathbfsf{F}$ with components $\mathcal{F}_{ij}$ expressed in $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$, as re-indexed by the orthogonal matrix $[ \mathbfsf{P} ]$.}
     \caption{Pivoting of the co-ordinate system.}
     \label{alg:pivoting}
 \end{algorithm}
@@ -135,7 +139,7 @@ From this point onward, it is assumed that base vectors $( \vec{\mathbfsf{E}}_1 
 
 \section{Geometric Properties of a Regular Pentagon}
 
-Figure~\ref{figRegPentagon} presents a regular pentagon drawn in its natural co-ordinate system with co\-ordinates designated as $(\xi, \eta)$.  Vertices of such a pentagon are placed at
+Figure~\ref{figRegPentagon} presents a regular pentagon drawn in its natural co-ordinate system with co-ordinates designated as $(\xi, \eta)$.  Vertices of such a pentagon are placed at
 \begin{equation}
 	\xi = \cos \left( \frac{2(k-1)\pi}{5} + \frac{\pi}{2} \right) \quad
 	\eta = \sin \left( \frac{2(k-1)\pi}{5} + \frac{\pi}{2} \right) \quad
@@ -146,8 +150,8 @@ wherein $k$ denotes the vertex number, as assigned in Fig.~\ref{figRegPentagon}.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=6cm]{figures/regPentagon.pdf}
-	\caption{A regular pentagon inscribed within the unit circle establishes its natural co\-ordinate system with co-ordinates $(\xi, \eta)$ described in Eqn.~(\ref{regPentagon}), and whose origin is located at its centroid.  Vertices are numbered counterclockwise with the uppermost vertex being labeled~1.}
+	\includegraphics[width=6cm]{figures/regPentagon.png}
+	\caption{A regular pentagon inscribed within the unit circle establishes its natural co-ordinate system with co-ordinates $(\xi, \eta)$ described in Eqn.~(\ref{regPentagon}), and whose origin is located at its centroid.  Vertices are numbered counter\-clockwise with the uppermost vertex being labeled~1.}
 	\label{figRegPentagon}
 \end{figure}
 
@@ -162,8 +166,7 @@ while the area of this pentagon is
 	5 \sin (\omega) \cos (\omega) \approx 2.378
 	\label{regPentagonArea}
 \end{equation}
-where the area of an unit circle is $\pi r^2 \approx 3.142$ because $r=1$.  The
-inside angles of a regular pentagon all measure $2\omega = 108^{\circ}$.  All approximations are truncated at four significant figures.
+where the area of an unit circle that inscribes the pentagon is $\pi r^2 \approx 3.142$, $r=1$.  The inside angles of a regular pentagon all measure $2\omega = 108^{\circ}$.  All approximations are truncated at four significant figures.
 
 \section{Geometric Properties of a Regular Dodecahedron}
 
@@ -178,7 +181,7 @@ Like the pentagon considered above, which inscribes the unit circle, here we con
 \end{tabular}
 \label{regDodecahedron}
 \end{equation}
-where $\phi = (1 + \sqrt{5})/2 \approx 1.618$ is also known as the golden ratio.
+where $\phi = (1 + \sqrt{5})/2 \approx 1.618$ and is also known as the golden ratio.
 
 Lengths of the thirty chords in a regular dodecahedron, when measured in its natural co-ordinate system, are all
 \begin{equation}
@@ -190,7 +193,7 @@ while the volume of such a dodecahedron is
 	V^d = \frac{40}{3 \sqrt{3} \phi^3} \tan^2 ( \omega ) \sin ( \omega ) \approx 2.785
 \label{regDodecahedronVolume}
 \end{equation}
-where volume of the unit sphere is $\tfrac{4}{3} \pi r^3 \approx 4.189$ because $r=1$.
+where volume of the unit sphere that inscribes the dodecahedron is $\tfrac{4}{3} \pi r^3 \approx 4.189$, $r=1$.
 
 The scale factor to map between the natural co-ordinates of a pentagon, defined in Eq.~(\ref{regPentagon}), with those of a dodecahedron, defined in Eq.~(\ref{regDodecahedron}), is
 \begin{equation}
@@ -211,18 +214,26 @@ Septal chord length $L(D)$, expressed as a function of alveolar diameter $D$, ca
 	\approx  \frac{D}{2.685} ,
 \label{dodecahedralHeight}
 \end{equation} 
-where $\alpha = \textfrac{\pi}{10} = 18^{\circ}$.  (There are twenty, equal, pie-shaped wedges that comprise this projected area.)  This is an average of the shortest and longest distances across this plane of projection.  Alveolar diameter $D$ is a property that can be measured during an histological study of parenchyma.  
+where $\alpha = \textfrac{\pi}{10} = 18^{\circ}$.  (There are twenty, equal, pie-shaped wedges that comprise this projected area.)  This is an average of the shortest and longest distances across this plane of projection.  Alveolar diameter $D$ is a property that can be measured in histological studies of parenchyma.  
 
 To dimension the alveoli of human lung, Sobin, Fung \& Tremer \cite{Sobinetal88} measured the mean diameter across an individual alveolus, viz., $D$ of Eq.~(\ref{dodecahedralHeight}),  sectioned from human lungs that were fixed at three different pressures.  Samples were taken from nine lungs extracted postmortem from individuals between 16 to 89 years of age.\footnote{%
-	Sobin \textit{et~al}.\ \cite{Sobinetal88} documented an age effect in these data that has been averaged over here, i.e., ignored.
+	Sobin \textit{et~al}.\ \cite{Sobinetal88} also documented an age effect in these data that has been averaged over here, i.e., ignored.
 }
 At a transpulmonary pressure of 4~cm~$\text{H}_2$O, the mean alveolar diameter was $D = 191$ $\pm$ 86~$\mu$m determined from a sampling size of 1423; at a pressure of 10~cm~$\text{H}_2$O, $D = 202$ $\pm$ 88~$\mu$m determined from a sampling size of 1296; and at a pressure of 14~cm~$\text{H}_2$O, $D = 235$ $\pm$ 99~$\mu$m determined from a sampling size of 1083.  These data are plotted in Fig.~\ref{septalLengthFig}.  All reported and drawn error bounds pertain to plus\slash minus one standard deviation in error.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.4\textwidth]{figures/septalLength.jpg}
-    \includegraphics[width=0.44\textwidth]{figures/alveolarDiaHistogram.jpg}
-	\caption{Mean and standard deviations for alveolar diameter in human lung illustrated in the left graphic, as reported by Sobin \textit{et~al}.\ \cite{Sobinetal88}, with a typical histogram for these statistics illustrated in the right graphic.  Note that this distribution has been truncated at an alveolar diameter of 24~$\mu$m.}
+    \subfigure[Mean and standard deviations for alveolar diameters in human lung.   
+        \cite{Sobinetal88}]{
+        \includegraphics[width=0.45\textwidth]{figures/septalLength.jpg}
+        \label{figSeptalLengthA}
+    }
+    \hfill
+    \subfigure[A typical histogram for these statistics, truncated at alveolar diameters below 24~$\mu$m.]{
+        \includegraphics[width=0.5\textwidth]{figures/alveolarDiaHistogram.jpg}
+        \label{figSeptalLengthB}
+    }
+	\caption{Alveolar diameters in human lung.}
 	\label{septalLengthFig}
 \end{figure}
 
@@ -266,9 +277,9 @@ to calculate each of the 60 individual tetrahedral volumes that collectively fil
 \section{Indexing Scheme for Dodecahedra}
 \label{sec:indexingDodecahedra}
 
-In order to implement the dodecahedron as a geometric model for an alveolar sac, as suggested by the images in Fig.~\ref{figRatLung}, it first becomes necessary to introduce a labeling strategy. Such a scheme is arbitrary, but once chosen it enables an analysis to be put forward.  The labeling scheme adopted in this work is illustrated in the right image of Fig.~\ref{figDodecahedron}. 
+In order to implement the dodecahedron as a geometric model for an alveolar sac, as suggested by the images in Fig.~\ref{figRatLung}, it first becomes necessary to introduce a labeling strategy. Such a scheme is arbitrary, but once chosen it enables an analysis to be put forward.  The labeling scheme adopted in this work is illustrated in the Fig.~\ref{figDodecahedronB}. 
   
-The co-ordinates positioning the twenty vertices of a regular dodecahedron in its natural frame of reference are presented in Table~\ref{TableDodecahedron}.  According to the labeling scheme of Fig.~\ref{figDodecahedron}, the thirty chords of a dodecahedron are given vertex assignments according to Table~\ref{Tablechordae}, while its twelve pentagons are given vertex assignments according to Table~\ref{TablePentagons}.
+The co-ordinates positioning the twenty vertices of a regular dodecahedron in its natural frame of reference are presented in Table~\ref{TableDodecahedron}.  According to the labeling scheme of Fig.~\ref{figDodecahedronB}, the thirty chords of a dodecahedron are given vertex assignments according to Table~\ref{Tablechordae}, while its twelve pentagons are given vertex assignments according to Table~\ref{TablePentagons}.
 
 \begin{table}
 	\begin{center}
@@ -298,7 +309,7 @@ The co-ordinates positioning the twenty vertices of a regular dodecahedron in it
 		\hline
 	\end{tabular}
 	\end{center}
-	\caption{Natural co-ordinates for the vertices of a regular dodecahedron, as labeled in Fig.~\ref{figDodecahedron} according to Eq.~(\ref{regDodecahedron}).}
+	\caption{Natural co-ordinates for the vertices of a regular dodecahedron, as labeled in Fig.~\ref{figDodecahedronB} according to Eqn.~(\ref{regDodecahedron}).}
 	\label{TableDodecahedron}
 \end{table}
 
@@ -322,7 +333,7 @@ The sixty tetrahedra that fill the volume of the dodecahedron contain vertices a
 		\hline
 	\end{tabular}
 	\end{center}
-	\caption{Vertices that locate the endpoints of septal chords in a dodecahedron, as labeled in Fig.~\ref{figDodecahedron}.}
+	\caption{Vertices that locate the endpoints of septal chords in a dodecahedron, as labeled in Fig.~\ref{figDodecahedronB}.}
 	\label{Tablechordae}
 \end{table}
 
@@ -346,26 +357,26 @@ The sixty tetrahedra that fill the volume of the dodecahedron contain vertices a
 		\hline
 	\end{tabular}
 	\end{center}
-	\caption{Vertices that locate the corners of regular pentagonal surfaces in a regular dodecahedron, and the chords that connect them.  They are indexed counterclockwise when viewed looking from the outside in, and labeled according to Fig.~\ref{figDodecahedron}.  The apex for each pentagon resides at the peak of the hipped roof-line for that pentagon.  This turns out to be important.} 
+	\caption{Vertices that locate the corners of regular pentagonal surfaces in a regular dodecahedron, and the chords that connect them.  They are indexed counterclockwise when viewed looking from the outside in, and labeled according to Fig.~\ref{figDodecahedronB}.  The apex for each pentagon resides at the peak of the hipped roof-line for that pentagon.  This turns out to be important.} 
 	\label{TablePentagons}
 \end{table}
 
 \section{Co-ordinate Systems for Chordal Fibers and Pentagonal Membranes}
 
-The dodecahedron used to model an alveolus is considered to be regular in its `natural' configuration, with the capability of being irregular in its reference configuration, and certainly becoming irregular after deformation.  The co-ordinate frame of its natural state is taken to have its origin positioned at the centroid of this regular dodecahedron, i.e., at the centroid of its enclosed cube (cf.\ Fig.~\ref{figDodecahedron}) or, equivalently, at the origin of that unit sphere for which the dodecahedron inscribes, as presented in Table~\ref{TableDodecahedron}.  We denote the base vectors associated with this frame of reference as $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$, assigned according to \S\ref{reindexing3D}.  There are two other co-ordinate systems with relevance to our analysis: those for the chordal fibers, and those for the pentagonal membranes.
+The dodecahedron used to model an alveolus is considered to be regular in its `natural' configuration, with a capability of being irregular in its reference configuration, and certainly becoming irregular after deformation.  The co-ordinate frame of its natural state is taken to have its origin positioned at the centroid of this regular dodecahedron, i.e., at the centroid of its enclosed cube (cf.\ Fig.~\ref{figDodecahedron}) or, equivalently, at the origin of that unit sphere for which the dodecahedron inscribes, as presented in Table~\ref{TableDodecahedron}.  We denote the base vectors associated with this frame of reference as $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$, assigned according to \S\ref{reindexing3D}.  There are two other co-ordinate systems with relevance to our analysis: those for the chordal fibers, and those for the pentagonal membranes.
 
-The local co-ordinate system of a chordal fiber is presented in Fig.~\ref{figchord}, while the local co-ordinate system of a pentagonal membrane is presented in Fig.~\ref{figPentagonCoord}.  The software described in \ref{appchords} and \ref{appPentagons} utilize these co-ordinate systems, whose origins are located at their centroids, along with their rotation and spin matrices, which are measured relative to the co-ordinate frame of the dodecahedron, i.e., relative to $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$.
+The local co-ordinate system of a chordal fiber is presented in Fig.~\ref{figchord}, while the local co-ordinate system of a pentagonal membrane is presented in Fig.~\ref{figPentagonCoord}.  Both co-ordinate systems are denoted as $( \vec{\mathbfsf{e}}_1 , \vec{\mathbfsf{e}}_2 , \vec{\mathbfsf{e}}_3 )$ and each rotates out of the reference co-ordinate system $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ via its own orthogonal tensor $\mathbfsf{Q}$.
 
 \begin{figure}
     \centering
-    \includegraphics[width=5.5cm]{figures/chord.pdf}
+    \includegraphics[width=5.5cm]{figures/chord.png}
     \caption{The co-ordinate system of a chord $( \vec{\mathbf{e}}_1 , \vec{\mathbf{e}}_2 , \vec{\mathbf{e}}_3 )$ relative to the co-ordinate system of its dodecahedron $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ with origins located at their respective centroids that are offset by a translation $\boldsymbol{\chi}$.  These describe a mapping $[ \{ \vec{\mathbf{e}}_1 \} \{ \vec{\mathbf{e}}_2 \} \{ \vec{\mathbf{e}}_3 \} ] = [ \{ \vec{\mathbf{E}}_1 \} \{ \vec{\mathbf{E}}_2 \} \{ \vec{\mathbf{E}}_3 \} ] [ \mathbfsf{Q} ]$ where $\mathbfsf{Q}$ is an orthogonal rotation.  The tangent base vector $\vec{\mathbf{e}}_1$ aligns with the axis of this chord. The normal base vector $\vec{\mathbf{e}}_2$ is coaxial with a line segment drawn from the origin out to the chordal axis such that $\vec{\mathbf{e}}_1 \cdot \vec{\mathbf{e}}_2 = 0$. While the binormal base vector is given by the cross product $\vec{\mathbf{e}}_3 = \vec{\mathbf{e}}_1 \times \vec{\mathbf{e}}_2$.}
     \label{figchord}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=5.5cm]{figures/pentagonCoord.pdf}
+    \includegraphics[width=5.5cm]{figures/pentagonCoord.png}
     \caption{The co-ordinate system of a pentagon $( \vec{\mathbf{e}}_1 , \vec{\mathbf{e}}_2 , \vec{\mathbf{e}}_3 )$ relative to the co-ordinate system of its dodecahedron $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ with origins located at their respective centroids that are offset by a translation $\boldsymbol{\chi}$.  These describe a mapping $[ \{ \vec{\mathbf{e}}_1 \} \{ \vec{\mathbf{e}}_2 \} \{ \vec{\mathbf{e}}_3 \} ] = [ \{ \vec{\mathbf{E}}_1 \} \{ \vec{\mathbf{E}}_2 \} \{ \vec{\mathbf{E}}_3 \} ] [ \mathbfsf{Q} ]$ where $\mathbfsf{Q}$ is an orthogonal rotation.  Base vector $\vec{\mathbf{e}}_1$ is coaxial to a line segment that connects two vertices which locate a pair of shoulders in a pentagon, viz., vertices 2 and 5 in Fig.~\ref{figRegPentagon}.  Base vector $\vec{\mathbf{e}}_2$ is coaxial with a line segment drawn from the head of this pentagon, i.e., vertex 1 in Fig.~\ref{figRegPentagon}, down to its base such that $\vec{\mathbf{e}}_1 \cdot \vec{\mathbf{e}}_2 = 0$.  Base vector $\vec{\mathbf{e}}_3 = \vec{\mathbf{e}}_1 \times \vec{\mathbf{e}}_2$ is the outward normal to this surface.}
     \label{figPentagonCoord}
 \end{figure}

@@ -1,4 +1,4 @@
-\section{Solvers}
+\appendix{Solvers}
 \label{appSolvers}
 
 Two ODE solvers are included in this software.  The first, \texttt{peceVtoX.py}, uses a two-step PECE (Predict, Evaluate, Correct, re-Evaluate) method to solve a first-order, ordinary differential equation $\dot{\mathbf{x}}(t) = \mathbf{v}(t) = \mathbf{f} (t, \mathbf{x})$ given an initial condition $\mathbf{x}_0 = \mathbf{x}(t_0)$ where, as an analogy, $\mathbf{x}$ denotes displacement and $\mathbf{v}$ denotes velocity.  The second, \texttt{peceAtoVandX.py}, uses another two-step PECE method to solve a second-order, ordinary, differential equation $\ddot{\mathbf{x}}(t) = \mathbf{a}(t) = \mathbf{f}(t, \mathbf{x}, \mathbf{v})$ given initial conditions $\mathbf{x}_0 = \mathbf{x}(t_0)$ and $\mathbf{v}_0 = \mathbf{v}(t_0) = \dot{\mathbf{x}}(t_0)$ where, as an analogy, $\mathbf{x}$ denotes displacement, $\mathbf{v}$ denotes velocity, and $\mathbf{a}$ denotes acceleration.

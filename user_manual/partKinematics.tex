@@ -1,7 +1,7 @@
 \part{Kinematics}
 \label{partKinematics}
 
-The irregular dodecahedron used here as a model for alveoli describes a 3D structure composed of thirty 1D rods (the septal chords) joined at twenty nodes (the vertices) that collectively circumscribe twelve 2D pentagonal membranes (the alveolar septa) that in turn envelop an alveolar sac whose volume is represented using sixty tetrahedra.  To be able to describe the overall mechanical response of this 3D dodecahedral structure, it is conjectured to be sufficient to know the individual mechanical responses of its 1D septal chords, its 2D septal membranes, and the 3D void within.  Their relevant kinematics are presented here, along with the shape functions used for interpolation and our description of deformation.
+The irregular dodecahedron used here as a model for alveoli describes a 3D structure composed of thirty 1D rods (the septal chords) joined at twenty nodes (the vertices) that collectively circumscribe twelve 2D pentagonal membranes (the alveolar septa) that in turn envelop an alveolar sac whose volume is represented using sixty tetrahedra.  To be able to describe the overall mechanical response of this 3D dodecahedral structure, it is conjectured to be sufficient to know the individual mechanical responses of its 1D septal chords, its 2D septal membranes, and the 3D void within.  Their relevant kinematics are presented here, along with the shape functions used for interpolation and their descriptions of deformation via stretch, using Laplace stretch \cite{Freedetal20} as our chosen kinematic field.
 
 \section{1D Chords}
 
@@ -9,7 +9,7 @@ The stretch of a rod under extension is a ratio of its lengths.  Specifically, $
 
 \subsection{Shape Functions for Interpolating a Rod}
 
-A two-noded alveolar chord has shape functions $N_i$, $i=1,2$, that, when evaluated in its natural coordinate system where $-1 \leq \xi \leq 1$, describe a matrix with elements
+A two-noded alveolar chord has shape functions $N_i$, $i=1,2$, that, when evaluated in its natural co-ordinate system where $-1 \leq \xi \leq 1$, describe a matrix with elements
 \begin{subequations}
     \begin{align}
 \mathbf{N} & = \begin{bmatrix} N_1 & N_2 \end{bmatrix} =
@@ -30,17 +30,17 @@ wherein $\xi$ is the natural co-ordinate.  Components $x_i$ and $u_i \defeq x_i 
 \subsection{Deformation Gradient for a Rod}
 
 The deformation gradient in this case is simply
-\begin{equation}
+\begin{multline}
     \mathbfsf{F} ( \xi ) = 1 + \frac{\partial \mathbfit{u}}{\partial \xi} 
-    \left( \frac{\partial \mathbfit{x}_0 }{\partial \xi} \right)^{-1} = 
-    1 + \sum_{i=1}^2 N_{i,\xi} u_i \left( \sum_{i=1}^2 N_{i,\xi} x_{0i} \right)^{-1} = 
-    1 + \frac{u_2 - u_1}{x_{02} - x_{01}} = \frac{x_2 - x_1}{x_{02} - x_{01}}
-\end{equation}
+    \left( \frac{\partial \mathbfit{x}_0 }{\partial \xi} \right)^{-1} \\ = 
+    1 + \sum_{i=1}^2 N_{i,\xi} u_i \left( \sum_{i=1}^2 N_{i,\xi} x_{0i} \right)^{-1}
+    = 1 + \frac{u_2 - u_1}{x_{02} - x_{01}} = \frac{x_2 - x_1}{x_{02} - x_{01}}
+\end{multline}
 which is uniform over the length of a chord, i.e., it is independent of $\xi$.
 
 \section{2D Triangles}
 
-Triangular elements are needed in a support capacity in order to construct our alevolar model; specifically, the four surfaces of a tetrahedron are triangles.  What is required of them is a capability to compute the traction acting across such a surface through integration.  This requires knowledge of their shape functions and quadrature rules, the latter of which is discussed in \S\ref{partNumericalMethods}. 
+Triangular elements are needed in a support capacity in order to construct our alevolar model; specifically, the four surfaces of a tetrahedron are triangles.  What is required of them is a capability to compute the traction acting across such a surface through integration.  This requires knowledge of their shape functions and quadrature rules, the latter topic being discussed in Part~\ref{partNumericalMethods}. 
 
 The shape functions for a triangle expressed in terms of its natural co-ordinates $( \xi , \eta )$, where $0 \leq \xi \leq 1$ and $0 \leq \eta \leq \xi$, are given by
 \begin{subequations}
@@ -137,7 +137,7 @@ We apply the construction technique of Dasgupta \cite{Dasgupta03} to compute the
 \end{subequations}
 with recursion starting at $\kappa_1 \defeq 1$.  Coefficients $\kappa_i$ enforce property 4 listed above.
 
-With this information in hand, we derived the rational polynomials describing Wachspress' shape functions for a pentagon specified in Eq.~(\ref{shapeFunctions}) in terms of parameters $a_i$, $b_i$ and $\kappa_i$.  The polynomial coefficients for the $A_i$ in Eq.~(\ref{shapeFnNum}) have values of
+With this information in hand, we derived rational polynomials describing Wachspress' shape functions for a pentagon specified in Eqn.~(\ref{shapeFunctions}) in terms of parameters $a_i$, $b_i$ and $\kappa_i$.  The polynomial coefficients for the $A_i$ in Eqn.~(\ref{shapeFnNum}) have values of
 \begin{subequations}
 	\label{shapeFnCoefs}
 	\begin{align}
@@ -156,11 +156,11 @@ With this information in hand, we derived the rational polynomials describing Wa
 	\alpha_{9i} & = -b_{i+1} b_{i+2} b_{i+3}
 	\end{align}
 \end{subequations}
-which differ for each shape function via index $i = 1,2,\dots,5$, while the polynomial coefficients for $B$ in Eq.~(\ref{shapeFnDenom}) have values of
+which differ for each shape function via index $i = 1,2,\dots,5$, while the polynomial coefficients for $B$ in Eqn.~(\ref{shapeFnDenom}) have values of
 \begin{equation}
 \beta_i = \sum_{j=1}^5 \alpha_{ij} \kappa_j, \qquad i = 0, 1, \dots, 5
 \end{equation}
-which are the same for all five shape functions.  Sums over the four cubic terms in Eq.~(\ref{shapeFnCoefs}) all vanish---a byproduct of Wachpress' formulation.  In the above formul\ae, an index count of $i \equiv 0 \implies i = 5$, while index counts of $i \equiv 6 \implies i = 1$, $i \equiv 7 \implies i = 2$ and $i \equiv 8 \implies i = 3$.  Shape function $N_1$ is illustrated in Fig.~\ref{figShapeFuntion}, with like images applying for the other four shape functions.
+which are the same for all five shape functions.  Sums over the four cubic terms in Eqn.~(\ref{shapeFnCoefs}) all vanish---a byproduct of Wachpress' formulation.  In the above formul\ae, an index count of $i \equiv 0 \implies i = 5$, while index counts of $i \equiv 6 \implies i = 1$, $i \equiv 7 \implies i = 2$ and $i \equiv 8 \implies i = 3$.  Shape function $N_1$ is illustrated in Fig.~\ref{figShapeFuntion}, with like images applying for the other four shape functions.
 
 \begin{figure}
 	\centering
@@ -169,7 +169,7 @@ which are the same for all five shape functions.  Sums over the four cubic terms
 	\label{figShapeFuntion}
 \end{figure}
 
-\subsection{Spatial Derivatives of Shape Functions}
+\subsection{First Derivatives of the Shape Functions}
 
 The first derivatives of Wachspress' shape functions for a pentagon are
 \begin{subequations}
@@ -199,7 +199,9 @@ The first derivatives of Wachspress' shape functions for a pentagon are
 \end{subequations}
 from which the deformation and displacement gradients are constructed.
 
-The second derivatives of these shape functions, which we used to test the compatibility conditions of this element, are described by
+\subsection{Second Derivatives of the Shape Functions}
+
+The second derivatives of these shape functions, which we use to test the compatibility conditions of this element, are described by
 \begin{subequations}
 	\begin{align}
 	N_{i+1,\xi\xi} & = \kappa_i \, \mathfrak{N}_{i,\xi\xi}(\xi,\eta) /
@@ -249,7 +251,7 @@ with $A_{i,\xi\eta} (\xi,\eta) = A_{i,\eta\xi} (\xi,\eta)$ and $B_{,\xi\eta} (\x
 
 \subsection{Deformation Gradient for an Irregular Pentagon}
 
-Derivatives of displacement $(u, v)$ taken with respect to the local co-ordinates $(\xi, \eta)$ used to describe the shape functions $N_i (\xi, \eta)$ of a pentagon result in a local displacement gradient with components
+Derivatives of displacement $(u, v)$ taken with respect to the local co-ordinates $(\xi, \eta)$ described in terms of gradients of the shape functions $N_{i,\xi} (\xi, \eta)$ and $N_{i,\eta}(\xi, \eta)$ of a pentagon have components
 \begin{subequations}
 	\label{gradient}
 	\begin{align}
@@ -262,7 +264,7 @@ Derivatives of displacement $(u, v)$ taken with respect to the local co-ordinate
 	\sum\nolimits_{i=1}^5 N_{i,\xi} (\xi,\eta) \, v_i & \sum\nolimits_{i=1}^5 N_{i,\eta} (\xi,\eta) \, v_i
 	\end{bmatrix} 
 	\label{displacementGradients} \\
-	\intertext{where $u \defeq x - x_0$ and $v \defeq y - y_0$.  Gradients of the global co-ordinates $(x_0,y_0)$ evaluated in a reference state taken with respect to local co-ordinates $(\xi, \eta)$ are described by the matrix equation} 
+	\intertext{where $u \defeq x - x_0$ and $v \defeq y - y_0$.  Gradients of the global co-ordinates $(x_0,y_0)$ evaluated in a reference state taken with respect to the local co-ordinates $(\xi, \eta)$ have components} 
 	\begin{bmatrix}
 	\partial x_0 / \partial\xi & \partial x_0 / \partial\eta \\
 	\partial y_0 / \partial\xi & \partial y_0 / \partial\eta
@@ -272,8 +274,8 @@ Derivatives of displacement $(u, v)$ taken with respect to the local co-ordinate
 	\sum\nolimits_{i=1}^5 N_{i,\xi} (\xi,\eta) \, y_{0i} & \sum\nolimits_{i=1}^5 N_{i,\eta} (\xi,\eta) \, y_{0i}
 	\end{bmatrix}
 	\label{co-ordinateGradients} \\
-	\intertext{wherein $(x_{0i}, y_{0i})$ are the reference global co-ordinates at the $i^{\mathrm{th}}$ vertex, while gradients of the global co-ordinates $(x,y)$ evaluated in the current state taken with respect to local co-ordinates $(\xi, \eta)$ are described by the matrix equation}
-	\mathbf{J} \defeq \begin{bmatrix}
+	\intertext{wherein $(x_{0i}, y_{0i})$ are the reference global co-ordinates at the $i^{\mathrm{th}}$ vertex, while gradients of the global co-ordinates $(x,y)$ evaluated in the current state taken with respect to the local co-ordinates $(\xi, \eta)$ have components}
+	\begin{bmatrix}
 	\partial x / \partial\xi & \partial x / \partial\eta \\
 	\partial y / \partial\xi & \partial y / \partial\eta
 	\end{bmatrix} & = 
@@ -281,10 +283,20 @@ Derivatives of displacement $(u, v)$ taken with respect to the local co-ordinate
 	\sum\nolimits_{i=1}^5 N_{i,\xi} (\xi,\eta) \, x_i & \sum\nolimits_{i=1}^5 N_{i,\eta} (\xi,\eta) \, x_i \\
 	\sum\nolimits_{i=1}^5 N_{i,\xi} (\xi,\eta) \, y_i & \sum\nolimits_{i=1}^5 N_{i,\eta} (\xi,\eta) \, y_i
 	\end{bmatrix}
-	\label{currentGradients}
+	\label{currentGradients} \\
+    \intertext{whose transpose establishes the Jacobian matrix}
+    \mathbf{J} \defeq \begin{bmatrix}
+    \partial x / \partial\xi & \partial y / \partial\xi \\
+    \partial x / \partial\eta & \partial y / \partial\eta
+    \end{bmatrix} & = 
+    \begin{bmatrix}
+    \sum\nolimits_{i=1}^5 N_{i,\xi} (\xi,\eta) \, x_i & \sum\nolimits_{i=1}^5 N_{i,\xi} (\xi,\eta) \, y_i \\
+    \sum\nolimits_{i=1}^5 N_{i,\eta} (\xi,\eta) \, x_i & \sum\nolimits_{i=1}^5 N_{i,\eta} (\xi,\eta) \, y_i
+    \end{bmatrix}
+    \label{JacobianMtx2D}
 	\end{align}
 \end{subequations}
-wherein $(x_i, y_i)$ are the current global co-ordinates at the $i^{\mathrm{th}}$ vertex, with $\mathbf{J}$ being the Jacobian matrix.
+wherein $(x_i, y_i)$ are the current global co-ordinates at the $i^{\mathrm{th}}$ vertex.
 
 From the above matrices, one can construct the deformation gradient $\mathbfsf{F} = \partial \mathbfit{x} / \partial \mathbf{x}_0 = \mathbfsf{I} + \partial \mathbfit{u} / \partial \mathbfit{x}_0$ for an irregular pentagon via
 \begin{subequations}
@@ -294,7 +306,7 @@ From the above matrices, one can construct the deformation gradient $\mathbfsf{F
 \begin{bmatrix}
 F_{11}(\xi, \eta) & F_{12}(\xi, \eta) \\
 F_{21}(\xi, \eta) & F_{22}(\xi, \eta)
-\end{bmatrix}  = 
+\end{bmatrix} \notag \\ & = 
 \begin{bmatrix}
 1 & 0 \\
 0 & 1
@@ -317,7 +329,7 @@ F_{22} (\xi, \eta) & -F_{12} (\xi, \eta) \\
 \end{bmatrix}
 \end{align}
 \end{subequations}
-while its associated displacement gradient $\mathbfsf{G} = \partial \mathbfit{u} / \partial \mathbfit{x}$ follows from
+while its associated displacement gradient $\mathbfsf{G} = \partial \mathbfit{u} / \partial \mathbfit{x}$ is given by
 \begin{equation}
 \mathbfsf{G} (\xi, \eta) = 
 \begin{bmatrix}
@@ -335,7 +347,7 @@ G_{21}(\xi, \eta) & G_{22}(\xi, \eta)
 \end{bmatrix}^{-1} 
 \label{displacementGradient}
 \end{equation}
-which is not invertible, in general.  All are evaluated in the 12 plane belonging to a co-ordinate system $( \vec{\mathbfsf{e}}_2 , \vec{\mathbfsf{e}}_2 , \vec{\mathbfsf{e}}_3 )$ that orients this pentagon, with $\vec{\mathbfsf{e}}_3$ being normal to its surface, as illustrated in Fig.~\ref{figPentagonCoord}.  The deformation and displacement gradients are two, fundamental, kinematic fields commonly used in the construction of constitutive equations.  They are exported as methods from module \texttt{shapeFunctions} described in \ref{appShapeFunctions} along with the velocity gradient $\mathbfsf{L} (\xi, \eta) = \dot{\mathbfsf{F}} (\xi, \eta) \, \mathbfsf{F}^{-1} (\xi, \eta)$.
+which is not invertible, in general.  All are evaluated in the 12 plane belonging to a co-ordinate system $( \vec{\mathbfsf{e}}_2 , \vec{\mathbfsf{e}}_2 , \vec{\mathbfsf{e}}_3 )$ that orients this pentagon, with $\vec{\mathbfsf{e}}_3$ being normal to its surface, as illustrated in Fig.~\ref{figPentagonCoord}.  The deformation and displacement gradients are two, fundamental, kinematic fields commonly used in the construction of constitutive equations.
 
 \subsection{Compatibility Conditions}
 
@@ -471,12 +483,12 @@ with $\partial \xi / \partial x_0$ and $\partial \eta / \partial y_0$ effectivel
 \end{equation}
 where $L(\xi,\eta)$ is the septal length of a pentagonal edge in its natural configuration, as drawn in Fig.~\ref{figRegPentagon}, while $L_0(x,y)$ is the actual, alveolar, septal length with $A_0(x,y)$ being the area of an alveolar septum in its reference state.  This formula follows from Eqns.~(\ref{regPentagonLength} \& \ref{regPentagonArea}).
 
-We study compatibility only for the purpose of assessing applicability in our choice of selecting Wachspress shape functions.  Otherwise, it is not required from our modeling of an alveolus via a dodecahedron. 
+We study compatibility only for the purpose of assessing applicability in our choice of selecting Wachspress shape functions.  Otherwise, it is not required in our modeling of an alveolus via a dodecahedron. 
 
 \subsection{Gram-Schmidt Decomposition of the Deformation Gradient}
 \label{secQR}
 
-To describe the kinematics of a planar membrane, an upper-triangular Gram-Schmidt decomposition of the deformation gradient $\mathbfsf{F}$ is used in lieu of the symmetric polar decomposition that is commonly adopted \cite{Srinivasa12,FreedSrinivasa15,Freedetal17,FreedZamani19,Freedetal19}.  McLellan \cite{McLellan76,McLellan80} was the first to propose a triangular decomposition of $\mathbfsf{F}$, to prove its uniqueness and existence, and to establish many of its physical properties.  This idea has been rediscovered several times since then, e.g., \cite{Rosakis90,Souchet93,Srinivasa12}.  A thorough history of the \textbf{QR} (Gram-Schmidt) decomposition has been written by Leon, Bj\"orck and Gander \cite{Leonetal13}, with a brief history regarding its application to kinematics being given in Ref.~\cite{Freedetal19}.
+To describe kinematics of a planar membrane, an upper-triangular Gram-Schmidt decomposition of the deformation gradient $\mathbfsf{F}$ is used in lieu of the symmetric polar decomposition that is commonly adopted \cite{Srinivasa12,FreedSrinivasa15,Freedetal17,FreedZamani19,Freedetal19}.  McLellan \cite{McLellan76,McLellan80} was the first to propose a triangular decomposition of $\mathbfsf{F}$, to prove its uniqueness and existence, and to establish many of its physical properties.  This idea has been rediscovered several times since then, e.g., \cite{Rosakis90,Souchet93,Srinivasa12}.  A thorough history of the \textbf{QR} (Gram-Schmidt) decomposition has been written by Leon, Bj\"orck and Gander \cite{Leonetal13}, with a brief history regarding its application to kinematics being given in Freed \textit{et~al}. \cite{Freedetal19}
 
 A Gram-Schmidt factorization of the deformation gradient $\mathbfsf{F}$ is written here as $\mathbfsf{F} = \boldsymbol{\mathcal{RU}}$, where the rotation $\boldsymbol{\mathcal{R}}$ is orthogonal, and where the Laplace stretch $\boldsymbol{\mathcal{U}}$ is upper-triangular \cite{Freedetal19}.\footnote{
 	The \textbf{QR} rotation $\boldsymbol{\mathcal{R}}$ and stretch $\boldsymbol{\mathcal{U}}$ tensors are distinct from those that arise from a polar decomposition of a deformation gradient, typically denoted as $\mathbfsf{R}$ and $\mathbfsf{U}$, as found in any, modern, continuum mechanics text.  McLellan \cite{McLellan76,McLellan80} introduced the Laplace stretch in 1976, which he denoted as $\mathbfsf{H}$, while Srinivasa \cite{Srinivasa12} denoted it as $\tilde{\mathbfsf{F}}$ in his 2012 paper.
@@ -505,16 +517,16 @@ a & a g \\ 0 & b
 \end{bmatrix}
 \label{LaplaceStretch2D}
 \end{equation}
-where $a$ and $b$ are the principal elongations (ratios of current lengths to reference lengths) and $g$ is the extent of in-plane shear, as measured in a co-ordinate frame $(  \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$ illustrated in Fig.~\ref{figKinematics}.  It is worth pointing out that the components of Laplace stretch, viz., $\mathcal{U}_{ij}$, are evaluated in the reference co-ordinate system $( \vec{\mathbfsf{e}}_1 , \vec{\mathbfsf{e}}_2 )$ of the pentagon, as $\mathbfsf{F} = F_{ij} \, \vec{\mathbfsf{e}}_i \otimes \vec{\mathbfsf{e}}_j$, but their physical interpretations arise in co-ordinate system $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$.
+where $a$ and $b$ are the principal elongations (ratios of current lengths to reference lengths) and $g$ is the extent of in-plane shear, as measured in a co-ordinate frame $(  \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$ illustrated in Fig.~\ref{figKinematics}.  It is worth pointing out that the components of Laplace stretch, viz., $\mathcal{U}_{ij}$, are evaluated in the reference co-ordinate system $( \vec{\mathbfsf{e}}_1 , \vec{\mathbfsf{e}}_2 )$ of the pentagon, as $\mathbfsf{F} = F_{ij} \, \vec{\mathbfsf{e}}_i \otimes \vec{\mathbfsf{e}}_j$, but their physical interpretations arise in the Gram rotated co-ordinate system $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=8cm]{figures/deformation.pdf}
-	\caption{Physical attributes of a planar deformation: $a$ and $b$ represent elongations, while $g = \tan \phi$ denotes the extent of shear.  They are measured in a physical frame of reference with unit base vectors $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$ where $\vec{\mathbfsf{g}}_1$ embeds in the material.}
+	\includegraphics[width=8cm]{figures/deformation.png}
+	\caption{Physical attributes of a planar deformation: $a$ and $b$ represent elongations, while $g = \tan \phi$ denotes the magnitude of shear.  They are measured in a physical frame of reference with unit base vectors $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$ where $\vec{\mathbfsf{g}}_1$ embeds in the material.}
 	\label{figKinematics}
 \end{figure}
 
-An orthogonal tensor $\boldsymbol{\mathcal{R}} = \bigl[ \vec{\mathbfsf{g}}_1 \bigm| \vec{\mathbfsf{g}}_2 \bigr] = \delta_{ij} \, \vec{\mathbfsf{g}}_i \otimes \vec{\mathbfsf{e}}_j = \mathcal{R}_{ij} \, \vec{\mathbfsf{e}}_i \otimes \vec{\mathbfsf{e}}_j$ rotates the reference co-ordinate axes $( \vec{\mathbfsf{e}}_1 , \vec{\mathbfsf{e}}_2 )$ into a physical co-ordinate system $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$ through an angle $\theta$, which is the fourth physical attribute arising from a \textbf{QR} factorization of $\mathbfsf{F}$.  This angle of rotation describes an orthogonal matrix whereby
+Orthogonal tensor $\boldsymbol{\mathcal{R}} = \bigl[ \vec{\mathbfsf{g}}_1 \bigm| \vec{\mathbfsf{g}}_2 \bigr] = \delta_{ij} \, \vec{\mathbfsf{g}}_i \otimes \vec{\mathbfsf{e}}_j = \mathcal{R}_{ij} \, \vec{\mathbfsf{e}}_i \otimes \vec{\mathbfsf{e}}_j$ rotates the reference co-ordinate axes $( \vec{\mathbfsf{e}}_1 , \vec{\mathbfsf{e}}_2 )$ into a physical co-ordinate system $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$ through an angle $\theta$, which is the fourth physical attribute arising from a \textbf{QR} factorization of $\mathbfsf{F}$.  This angle of rotation describes a proper orthogonal matrix, specifically
 \begin{equation}
 \boldsymbol{\mathcal{R}} = \begin{bmatrix}
 \cos \theta & -\sin \theta \\
@@ -538,9 +550,9 @@ where a positive angle $\theta$ corresponds with a counter\-clockwise rotation o
 \subsubsection{Dilemma}
 \label{secDilemma} 
 
-Until recently, there has been a tacit assumption in prior applications of Gram-Schmidt factorizations of $\mathbfsf{F}$ that the physical base vectors $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$ always satisfy a geometric condition whereby the physical 1-direction $\vec{\mathbfsf{g}}_1$ rotates out of the reference 1-direction $\vec{\mathbfsf{e}}_1$, but this need not always be the case.  Physical vector $\vec{\mathbfsf{g}}_1$ could equally likely rotate out of the 2-direction $\vec{\mathbfsf{e}}_2$ of the reference frame.  At issue is not: How the physical base vectors orient in space?  That is managed by Gram's procedure.  Rather, at issue is: How do the physical base vectors index with respect to the reference base vectors?  
+Until recently, there has been a tacit assumption in prior applications of Gram-Schmidt factorizations of $\mathbfsf{F}$ that the physical base vectors $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$ always satisfy a geometric condition whereby the physical 1-direction $\vec{\mathbfsf{g}}_1$ rotates out of the reference 1-direction $\vec{\mathbfsf{e}}_1$, but this need not always be the case.  Physical vector $\vec{\mathbfsf{g}}_1$ could equally likely rotate out of the 2-direction $\vec{\mathbfsf{e}}_2$ of the reference frame.  At issue is not: How the physical base vectors orient in space?  That is managed by Gram's procedure.  Rather, at issue is: How do the physical base vectors index with respect to the reference base vectors?  This topic is addressed in \S\ref{reindexing3D} for the 3D case; below we address it for the 2D case.
 
-To illustrate this concern, consider two deformation histories, as drawn in Fig.~\ref{figDilemma}, each of which describe a simple shear taking place in the plane of a membrane.  In one case shear occurs in the 1-direction, while in the other case shear occurs in the 2-direction.  There are no elongations in this deformation.  These motions lead to Gram-Schmidt factorizations of the deformation gradient, when following the protocol of Eqns.~(\ref{physicalVariables}--\ref{trigFns}), that are described by
+To illustrate the concern, consider two deformation histories, as drawn in Fig.~\ref{figDilemma}, each of which describes a simple shear taking place in the plane of a membrane.  In one case shear occurs in the 1-direction, while in the other case shear occurs in the 2-direction.  There are no elongations in either deformation.  These motions lead to Gram-Schmidt factorizations of the deformation gradient, when following the protocol of Eqns.~(\ref{physicalVariables}--\ref{trigFns}), that are described by
 \begin{subequations}
 	\label{shears}
 	\begin{align}
@@ -564,16 +576,16 @@ To illustrate this concern, consider two deformation histories, as drawn in Fig.
 	\label{shear2}
 	\end{align}
 \end{subequations}
-where we see that shear $\mathcal{U}_{12}$ has the same physical interpretation in both cases, viz., $\gamma$, but the elongations $\mathcal{U}_{11}$ and $\mathcal{U}_{22}$ do not, viz., $\mathcal{U}_{11}=1$ and $\mathcal{U}_{22}=1$ in Eq.~(\ref{shear1}), whereas $\mathcal{U}_{11} = \sqrt{1 + \gamma^2}$ and $\mathcal{U}_{22} = 1 / \sqrt{1 + \gamma^2}$ for the motion described in Eq.~(\ref{shear2}).  Consequently, two geometric interpretations are produced for just one physical mode of deformation.  This cannot be!
+respectively, where we see that shear $\mathcal{U}_{12}$ has the same physical interpretation in both cases, viz., $\gamma$, but the elongations $\mathcal{U}_{11}$ and $\mathcal{U}_{22}$ do not, viz., $\mathcal{U}_{11}=1$ and $\mathcal{U}_{22}=1$ in Eqn.~(\ref{shear1}), whereas $\mathcal{U}_{11} = \sqrt{1 + \gamma^2}$ and $\mathcal{U}_{22} = 1 / \sqrt{1 + \gamma^2}$ for the motion described in Eqn.~(\ref{shear2}).  Consequently, two geometric interpretations are produced for just one physical mode of deformation.  This cannot be!
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.5\textwidth]{figures/figDilemma.pdf}
+	\includegraphics[width=0.5\textwidth]{figures/figDilemma.png}
 	\caption{The left graphic designates a reference configuration while the right two graphics designate deformed configurations, both in basis $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$.  The top graphic associates with the motion of Eqn.~(\ref{shear1}), while the bottom graphic associates with the motion of Eqn.~(\ref{shear2}).}
 	\label{figDilemma}
 \end{figure}
 
-The only difference between the motions that lead to the two deformation gradients presented in Eq.~(\ref{shears}) is one's choice for labeling the co-ordinate directions.  Matrix operations of row and column pivoting, taken from linear algebra, allow one to transform the lower-triangular form of Eq.~(\ref{shear2}) into an upper-triangular form like Eq.~(\ref{shear1}); hence, producing an unified physical interpretation for both shearing motions, and thereby providing a means for establishing a remedy to this dilemma. 
+The only difference between the motions that lead to the two deformation gradients presented in Eqn.~(\ref{shears}) is one's choice for labeling the co-ordinate directions.  Matrix operations of row and column pivoting, taken from linear algebra, allow one to transform the lower-triangular form of Eqn.~(\ref{shear2}) into an upper-triangular form like Eqn.~(\ref{shear1}); hence, producing an unified physical interpretation for both shearing motions, and thereby providing a means for establishing a remedy to this dilemma. 
 
 
 \subsubsection{Remedy}
@@ -605,7 +617,7 @@ For 2D membranes, there are only two co-ordinate re-indexings that are possible 
 	\label{Q1}
 	\end{align}
 \end{subequations}
-where components $\mathcal{F}_{ij} = P_{ki} F_{k\ell} P_{\ell j}$ are the components to be used in the Gram-Schmidt factorization presented in \S\ref{secQR2D}, and where $\mathbfsf{P} \in \{ \mathbfsf{P}_0 , \mathbfsf{P}_1 \}$ is orthogonal, i.e., $\mathbfsf{P} \mathbfsf{P}^{\mathsf{T}} = \mathbfsf{P}^{\hspace{-1pt}\mathsf{T}} \mathbfsf{P} = \mathbfsf{I}$ with $\det \mathbfsf{P} = \pm 1$; specifically, $\det \mathbfsf{P}_0 = +1$ while $\det \mathbfsf{P}_1 = -1$.
+where components $\mathcal{F}_{ij} = P_{ki} F_{k\ell} P_{\ell j}$ are the components to be used in the Gram-Schmidt factorization presented in \S\ref{secQR2D}, see also \S\ref{reindexing3D}, and where $\mathbfsf{P} \in \{ \mathbfsf{P}_0 , \mathbfsf{P}_1 \}$ is orthogonal, i.e., $\mathbfsf{P} \mathbfsf{P}^{\mathsf{T}} = \mathbfsf{P}^{\hspace{-1pt}\mathsf{T}} \mathbfsf{P} = \mathbfsf{I}$ with $\det \mathbfsf{P} = \pm 1$; specifically, $\det \mathbfsf{P}_0 = +1$ while $\det \mathbfsf{P}_1 = -1$.
 
 The challenge in implementing such a strategy is to determine when to switch from $\mathbfsf{P}_0$ (case 1) to $\mathbfsf{P}_1$ (case 2), or back again, viz., from $\mathbfsf{P}_1$ to $\mathbfsf{P}_0$.  Continuity in the physical fields of deformation $(a , b , g )$ must be satisfied in order for such a change in co-ordinate frame to be physically meaningful.  To this end, it is useful to represent the components of a planar deformation gradient as
 \begin{equation}
@@ -633,8 +645,8 @@ where $x = F_{11}$ and $y = F_{22}$ are elongations, while ratios $\alpha = F_{2
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.3\textwidth]{figures/figF.pdf}
-	\caption{A general description for uniform planar deformation, where $x , y \in \mathbb{R}_+$ and $\alpha , \beta \in \mathbb{R}$.  Shears $\alpha$ and $\beta$ are drawn in their positive sense.}
+	\includegraphics[width=0.3\textwidth]{figures/figF.png}
+	\caption{A general description for homogeneous planar deformation, where $x , y \in \mathbb{R}_+$ and $\alpha , \beta \in \mathbb{R}$.  Shears $\alpha$ and $\beta$ are drawn in their positive sense.}
 	\label{figF}
 \end{figure}
 
@@ -670,13 +682,14 @@ where attributes in the left column apply to case~1 (i.e., Eqn.~\ref{Q0}) while 
 \end{subequations}
 where it is easily verified that $\tilde{a} = \hat{a}$ and $\tilde{b} = \hat{b}$ whenever $\tilde{g} = \hat{g}$; consequently, the physical attributes of deformation $a , b , g$ remain continuous across a co-ordinate switch, however, the angle of co-ordinate rotation $\theta$ will not be continuous across such a switch between co-ordinate frames, as they represent rotations out of different co-ordinate directions.
 
-The above strategy returns matrices for the rotation and Laplace stretch described in Eqn.~(\ref{shear1}) for both deformation gradients presented in Eqn.~(\ref{shears}). The dilemma is remedied.  Laplace stretch, as remedied, therefore has an unique physical interpretation.  
+The above strategy returns matrices for the rotation and Laplace stretch described in Eqn.~(\ref{shear1}) for both deformation gradients presented in Eqn.~(\ref{shears}). The dilemma is remedied.  Laplace stretch, as remedied, therefore has an unique physical interpretation.    Co-ordinate re-indexing ensures that the invariant properties of Laplace stretch \cite{McLellan80} are adhered to.
 
-This above process is the 2D version of the 3D version presented earlier in \S\ref{reindexing3D}.  It is easier to understand what is happening in the 2D case, which is why more detail is presented here.  It may certainly happen that even when the 3D co-ordinates are re-indexed there may be one or more of the pentagons whose 2D co-ordinates need to be re-indexed, too.
+The above protocol is the 2D version of the 3D version presented in \S\ref{reindexing3D}.  It is easier to understand what is happening in the 2D case, which is why more detail is presented here.  It may certainly happen that even when the 3D co-ordinates are re-indexed, there may be one or more of the twelve pentagons whose 2D co-ordinates need to be re-indexed, too.
 
-There are three kinematic variables that describe deformation in a planar membrane: elongation ratios $a$ and $b$ and simple shear $g$.  These variables will vary both temporally and spatially whenever Wachspress' shape functions are used, as described above.  The fields introduced above are exported from module \texttt{membranes} outlined in \ref{appMembranes}.
+There are three kinematic variables that describe deformation in a planar membrane: elongation ratios $a$ and $b$ and simple shear $g$.  These variables will vary both temporally and spatially throughout a pentagon whenever Wachspress' shape functions are used.
 
 \subsection{Thermodynamic Strains and Strain Rates}
+\label{strainsAndStrainRates2D}
 
 In terms of the above physical attributes for stretch, i.e., $a$, $b$ and $g$, and their reference values, viz., $a_0$, $b_0$ and $g_0$, one can define a set of strain attributes derived from thermo\-dynamics, specifically \cite{Freed17}
 \begin{subequations}
@@ -692,13 +705,13 @@ In terms of the above physical attributes for stretch, i.e., $a$, $b$ and $g$, a
     \mathrm{d} \gamma & = \mathrm{d} g
     \end{align}
 \end{subequations}
-whose rates are exact differentials, i.e., they are independent of path---a tacit requirement from thermo\-dynamics \cite{Caratheodory09}.  Here $\xi$ denotes dilation, $\varepsilon$ denotes squeeze, and $\gamma$ denotes shear. 
+whose rates are exact differentials, i.e., they are independent of path---a tacit requirement from thermo\-dynamics \cite{Caratheodory09}.  Here $\xi$ denotes dilation (uniform areal stretch), $\varepsilon$ denotes squeeze (pure shear), and $\gamma$ denotes (simple) shear. 
 
 \subsubsection{Stretch Rates}
 
 The following approximations for stretch rates were derived by Freed \&\ Zamani \cite{FreedZamani18}.  From these, the various strain rates listed in Eqn.~(\ref{thermodynamicStrains2D}) can be established.  
 
-A forward difference formula is used to approximate rates in the reference configuration for the various stretch attributes, as obtained from $\dot{\boldsymbol{\mathcal{U}}}_0 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / h + \mathcal{O}(h)$.  This produces
+A forward difference formula is used to approximate rates in the reference configuration for the various stretch attributes, as obtained from $\dot{\boldsymbol{\mathcal{U}}}_0 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / h + \mathcal{O}(h)$, which produces
 \begin{equation}
 \mathrm{d} a_0 = \frac {a_1 - a_0}{h} , \quad 
 \mathrm{d} b_0 = \frac {b_1 - b_0}{h} , \quad 
@@ -706,7 +719,7 @@ A forward difference formula is used to approximate rates in the reference confi
 \left( \frac{g_1 - g_0}{h} \right) .
 \label{forwardDifference1stOrder2D}
 \end{equation}
-A backward difference formula $\dot{\boldsymbol{\mathcal{U}}}_1 = ( \boldsymbol{\mathcal{U}}_1 - \boldsymbol{\mathcal{U}}_0 ) / h + \mathcal{O}(h)$ is used to estimate rates for the various stretch attributes at the end of its first integration step, from which it follows that
+A backward difference formula $\dot{\boldsymbol{\mathcal{U}}}_1 = ( \boldsymbol{\mathcal{U}}_1 - \boldsymbol{\mathcal{U}}_0 ) / h + \mathcal{O}(h)$ is used to estimate rates for the various stretch attributes at the end of its first integration step, which give
 \begin{equation}
 \mathrm{d} a_1 = \frac {a_1 - a_0}{h} , \quad
 \mathrm{d} b_1 = \frac {b_1 - b_0}{h} , \quad
@@ -728,7 +741,7 @@ Equations (\ref{forwardDifference1stOrder2D} \& \ref{backwardDifference1stOrder2
 \end{aligned}
 \label{backwardDifference2ndOrder2D}
 \end{equation}
-which will require $a_{n-1}$, $b_{n-1}$ and $g_{n-1}$ to be stored in a finite element setting.
+which require stretch attributes $a_{n-1}$, $b_{n-1}$ and $g_{n-1}$ to be stored in a finite element setting.
 
 \section{3D Irregular Dodecahedra}
 
@@ -738,25 +751,26 @@ However, whenever an alveolar sac is filled with fluid (blood, interstitial flui
 
 \subsection{Shape Functions for Interpolating an Irregular Tetrahedron}
 
-The shape functions associated with the four vertices of a tetrahedron $N_i$, $i = 1, 2, 3, 4,$ that are used in this work are defined as follows
+The shape functions associated with the four vertices of a tetrahedron $N_i$, $i = 1, 2, 3, 4,$ are defined as follows
 \begin{subequations}
     \begin{align}
     N_1 & = 1 - \xi - \eta - \zeta , \quad
     N_2 = \xi , \quad
     N_3 = \eta , \quad
     N_4 = \zeta \\
-    \intertext{where $\xi$, $\eta$ and $\zeta$ represent its natural co-ordinates whereby $0 \leq \xi \leq 1$, $0 \leq \eta \leq 1-\xi$ and $0 \leq \zeta \leq 1-\xi-\eta$.  Gradients of these shape functions are} 
+    \intertext{where $\xi$, $\eta$ and $\zeta$ represent natural co-ordinates with $0 \leq \xi \leq 1$, $0 \leq \eta \leq 1-\xi$ and $0 \leq \zeta \leq 1-\xi-\eta$.  Gradients of these shape functions are} 
     N_{1,\xi} & = -1 , \quad N_{1,\eta} = -1 , \quad N_{1,\zeta} = -1 \notag \\
     N_{2,\xi} & = 1 , \quad \phantom{-} N_{2,\eta} = 0 , \quad \phantom{-} N_{2,\zeta} = 0 \notag \\
     N_{3,\xi} & = 0 , \quad \phantom{-} N_{3,\eta} = 1 , \quad \phantom{-} N_{3,\zeta} = 0 \notag \\
     N_{4,\xi} & = 0 , \quad \phantom{-} N_{4,\eta} = 0 , \quad \phantom{-} N_{4,\zeta} = 1 
     \end{align}
 \end{subequations}
-and consequently the deformation gradient will be constant throughout its volume.
+and consequently the deformation gradient will be constant throughout its volume, like the deformation gradients used for chords and triangles.
 
 \subsubsection{Deformation Gradient for an Irregular Tetrahedron}
 
 The deformation gradient for a volume element is constructed from
+\small
 \begin{equation}
     \mathbfsf{F} ( \xi , \eta , \zeta ) = \begin{bmatrix} 1 & 0 & 0 \\
     0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} + \begin{bmatrix}
@@ -769,6 +783,7 @@ The deformation gradient for a volume element is constructed from
     \partial z_0 / \partial \xi & \partial z_0 / \partial \eta & \partial z_0 / \partial \zeta
     \end{bmatrix}^{-1}
 \end{equation}
+\normalsize
 such that, for the four-node tetrahedron considered here, one has
 \begin{subequations}
     \begin{align}
@@ -786,7 +801,7 @@ such that, for the four-node tetrahedron considered here, one has
     v_2 - v_1 & v_3 - v_1 & v_4 - v_1 \\
     w_2 - w_1 & w_3 - w_1 & w_4 - w_1
     \end{bmatrix} \\
-    \intertext{whose nodal displacements $\mathbfit{u}_i \defeq \mathbfit{x}_i - \mathbfit{x}_{0i}$, $i=1,2,3,4$, have components $\mathbfit{u}_i = u_i \, \vec{\mathbfsf{E}}_1 + v_i \, \vec{\mathbfsf{E}}_2 + w_i \, \vec{\mathbfsf{E}}_3$ when evaluated in the co-ordinate frame of a dodecahedron $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ with $u_i \defeq x_i - x_{0i}$, $v_i \defeq y_i - y_{0i}$ and $w_i \defeq z_i - z_{0i}$, and where}
+    \intertext{whose nodal displacements $\mathbfit{u}_i \defeq \mathbfit{x}_i - \mathbfit{x}_{0i}$, $i=1,2,3,4$, have components of $\mathbfit{u}_i = u_i \, \vec{\mathbfsf{E}}_1 + v_i \, \vec{\mathbfsf{E}}_2 + w_i \, \vec{\mathbfsf{E}}_3$, when evaluated in the reference co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ of our dodecahedron, with $u_i \defeq x_i - x_{0i}$, $v_i \defeq y_i - y_{0i}$ and $w_i \defeq z_i - z_{0i}$, and where}
     \begin{bmatrix}
     \partial x_0 / \partial \xi & \partial x_0 / \partial \eta & \partial x_0 / \partial \zeta \\
     \partial y_0 / \partial \xi & \partial y_0 / \partial \eta & \partial y_0 / \partial \zeta \\
@@ -801,31 +816,31 @@ such that, for the four-node tetrahedron considered here, one has
     y_{02} - y_{01} & y_{03} - y_{01} & y_{04} - y_{01} \\
     z_{02} - z_{01} & z_{03} - z_{01} & z_{04} - z_{01}
     \end{bmatrix} \\
-    \intertext{whose initial nodal positions are $\mathbfit{x}_{0i} = x_{0i} \, \vec{\mathbfsf{E}}_1 + y_{0i} \, \vec{\mathbfsf{E}}_2 + z_{0i} \, \vec{\mathbfsf{E}}_3$.  This matrix is invertible, becuase the four vertices of the tetrahedron are distinct.  The Jacobian matrix is given by}
+    \intertext{whose initial nodal positions are $\mathbfit{x}_{0i} = x_{0i} \, \vec{\mathbfsf{E}}_1 + y_{0i} \, \vec{\mathbfsf{E}}_2 + z_{0i} \, \vec{\mathbfsf{E}}_3$ at vertex $i$.  This matrix is invertible, becuase the four vertices of a tetrahedron are distinct.  The Jacobian matrix is given by}
     \mathbf{J} \defeq \begin{bmatrix}
-    \partial x / \partial \xi & \partial x / \partial \eta & \partial x / \partial \zeta \\
-    \partial y / \partial \xi & \partial y / \partial \eta & \partial y / \partial \zeta \\
-    \partial z / \partial \xi & \partial z / \partial \eta & \partial z / \partial \zeta
+    \partial x / \partial \xi & \partial y / \partial \xi & \partial z / \partial \xi \\
+    \partial x / \partial \eta & \partial y / \partial \eta & \partial z / \partial \eta \\
+    \partial x / \partial \zeta & \partial y / \partial \zeta & \partial z / \partial \zeta
     \end{bmatrix} & = \begin{bmatrix}
-    \sum_{i=1}^4 N_{i,\xi} x_{i} & \sum_{i=1}^4 N_{i,\eta} x_{i} & \sum_{i=1}^4 N_{i,\zeta} x_{i} \\
-    \sum_{i=1}^4 N_{i,\xi} y_{i} & \sum_{i=1}^4 N_{i,\eta} y_{i} & \sum_{i=1}^4 N_{i,\zeta} y_{i} \\
-    \sum_{i=1}^4 N_{i,\xi} z_{i} & \sum_{i=1}^4 N_{i,\eta} z_{i} & \sum_{i=1}^4 N_{i,\zeta} z_{i}
+    \sum_{i=1}^4 N_{i,\xi} x_{i} & \sum_{i=1}^4 N_{i,\xi} y_{i} & \sum_{i=1}^4 N_{i,\xi} z_{i} \\
+    \sum_{i=1}^4 N_{i,\eta} x_{i} & \sum_{i=1}^4 N_{i,\eta} y_{i} & \sum_{i=1}^4 N_{i,\eta} z_{i} \\
+    \sum_{i=1}^4 N_{i,\zeta} x_{i} & \sum_{i=1}^4 N_{i,\zeta} y_{i} & \sum_{i=1}^4 N_{i,\zeta} z_{i}
     \end{bmatrix} \notag \\
     & = \begin{bmatrix}
-    x_{2} - x_{1} & x_{3} - x_{1} & x_{4} - x_{1} \\
-    y_{2} - y_{1} & y_{3} - y_{1} & y_{4} - y_{1} \\
-    z_{2} - z_{1} & z_{3} - z_{1} & z_{4} - z_{1}
+    x_{2} - x_{1} & y_{2} - y_{1} & z_{2} - z_{1} \\
+    x_{3} - x_{1} & y_{3} - y_{1} & z_{3} - z_{1} \\
+    x_{4} - x_{1} & y_{4} - y_{1} & z_{4} - z_{1}
     \end{bmatrix}
     \end{align}
 \end{subequations}
-which is used in integrations.  Its current nodal positions are $\mathbfit{x}_{i} = x_i \, \vec{\mathbfsf{E}}_1 + y_i \, \vec{\mathbfsf{E}}_2 + z_i \, \vec{\mathbfsf{E}}_3$, $i=1,2,3,4$.  The Jacobian matrix is also invertible, because the four vertices of a tetrahedron are distinct.
+whose determinant is used in integrations.  The current nodal positions have components $\mathbfit{x}_{i} = x_i \, \vec{\mathbfsf{E}}_1 + y_i \, \vec{\mathbfsf{E}}_2 + z_i \, \vec{\mathbfsf{E}}_3$, $i=1,2,3,4$, in the dodecahedral frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$.  The Jacobian matrix is invertible, because the four vertices of a tetrahedron are distinct.
 
 \subsection{\textbf{QR} Factorization of $\mathbfsf{F}$}
 \label{secQR3D}
 
-The re-indexed deformation gradient presented in \S\ref{reindexing3D} has a Gram-Schmidt decomposition that we denote as $\mathbfsf{F} = \boldsymbol{\mathcal{RU}}$ wherein $\boldsymbol{\mathcal{R}} = \bigl[ \vec{\mathbfsf{g}}_1 \bigm| \vec{\mathbfsf{g}}_2 \bigm| \vec{\mathbfsf{g}}_3 \bigr] = \delta_{ij} \, \vec{\mathbfsf{g}}_i \otimes \vec{\mathbfsf{E}}_j = \mathcal{R}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ is a Gram rotation with orthogonal components, and $\boldsymbol{\mathcal{U}} = \mathcal{U}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ is a Laplace stretch \cite{Freedetal19} with upper-triangular components, so that $\mathbfsf{F} = \mathcal{F}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j = \mathcal{R}_{ik\,} \mathcal{U}_{kj} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$.
+The re-indexed deformation gradient presented in \S\ref{reindexing3D} has a Gram-Schmidt decomposition that we denote as $\mathbfsf{F} = \boldsymbol{\mathcal{RU}}$ whose components are an orthogonal rotation matrix $\boldsymbol{\mathcal{R}} = \bigl[ \vec{\mathbfsf{g}}_1 \bigm| \vec{\mathbfsf{g}}_2 \bigm| \vec{\mathbfsf{g}}_3 \bigr] = \delta_{ij} \, \vec{\mathbfsf{g}}_i \otimes \vec{\mathbfsf{E}}_j = \mathcal{R}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ and an upper-triangular matrix $\boldsymbol{\mathcal{U}} = \mathcal{U}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ called Laplace stretch, \cite{Freedetal19} both evaluated in the reference co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$, so that $\mathbfsf{F} = \mathcal{F}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j = \mathcal{R}_{ik\,} \mathcal{U}_{kj} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$, and therefore $\mathcal{F}_{ij} = \mathcal{R}_{ik\,} \mathcal{U}_{kj}$.
 
-The components of Laplace stretch $\mathcal{U}_{ij}$ are readily gotten through a Cholesky factorization of the right Cauchy-Green deformation tensor, here taken to be $\mathbfsf{C} = \mathcal{C}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ with components $\mathcal{C}_{ij} = \mathcal{F}_{ki\,} \mathcal{F}_{kj}$ (no eigen analysis is required).  Laplace stretch has elements \cite{Freed17}
+The components of Laplace stretch $\mathcal{U}_{ij}$ are readily gotten through a Cholesky factorization of the right Cauchy-Green deformation tensor $\mathbfsf{C} = \mathcal{C}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ with tensor components $\mathcal{C}_{ij} = \mathcal{F}_{ki\,} \mathcal{F}_{kj}$ relate to their physical attributes via \cite{Freed17}
 \begin{equation} 
 \boldsymbol{\mathcal{U}} = 
 \begin{bmatrix}
@@ -839,7 +854,7 @@ a & a \gamma & a \beta \\ 0 & b & b \alpha \\ 0 & 0 & c
 \end{bmatrix}
 \label{LaplaceStretch3D}
 \end{equation}
-with components $\mathcal{U}_{ij}$ being evaluated according to the formul\ae\ \cite{Srinivasa12}
+with tensor components $\mathcal{U}_{ij}$ being evaluated according to formul\ae\ \cite{Srinivasa12}
 \begin{equation}
 \begin{aligned}
 \mathcal{U}_{11} & = \sqrt{\mathcal{C}_{11}} & 
@@ -856,7 +871,7 @@ with components $\mathcal{U}_{ij}$ being evaluated according to the formul\ae\ \
 \end{aligned}
 \label{LagrangianLaplaceStretch3D}
 \end{equation}
-so that
+implying that the physical attributes for Laplace stretch can be evaluated via
 \begin{equation}
 a \defeq \mathcal{U}_{11} , \quad
 b \defeq \mathcal{U}_{22} , \quad
@@ -866,11 +881,14 @@ c \defeq \mathcal{U}_{33} , \quad
 \gamma \defeq \frac{\mathcal{U}_{12}}{\mathcal{U}_{11}}
 \label{LagrangianPhysicalAttributes3D}
 \end{equation}
-where $a$, $b$ and $c$ are three, orthogonal, elongation ratios, and where $\alpha$, $\beta$ and $\gamma$ are three, orthogonal, simple shears, with $a_0$, $b_0$, $c_0$, $\alpha_0$, $\beta_0$ and $\gamma_0$ denoting their values in some reference state. The elongations must be positive whereas the shears may be of either sign. Collectively, they constitute a complete set of physical attributes for describing stretch from which constitutive equations can then be constructed.
+where $a$, $b$ and $c$ are three, orthogonal, elongation ratios, and where $\alpha$, $\beta$ and $\gamma$ are three, orthogonal, simple shears, with $a_0$, $b_0$, $c_0$, $\alpha_0$, $\beta_0$ and $\gamma_0$ denoting their values in some reference state. The elongations must be positive, whereas the shears may be of either sign. Collectively, they constitute a complete set of physical attributes for describing stretch from which constitutive equations can then be constructed. 
+
+No eigen\-value\slash eigen\-vector analysis is required to acquire either the stretch components or their attributes when using this technique. \cite{Srinivasa12} The eigen\-values and eigen\-vectors of the triangular Laplace stretch equate with the eigen\-values and eigen\-vectors of the symmetric polar stretch \textit{only\/} in an absence of shear. \cite{Rosakis90}  Laplace stretch associates with the geometric description of a cube deforming into a parallelepiped; whereas, polar stretch associates with the geometric description of a sphere deforming into an ellipsoid.  They are distinct measures of stretch.
 
 \subsection{Thermodynamic Strains and Strain Rates}
+\label{strainsAndStrainRates3D}
 
-In terms of the above physical attributes for stretch, one can define a set of strain attributes derived from thermo\-dynamics, specifically \cite{Freed17}
+In terms of the above physical attributes for stretch, one can define an useful set of strain attributes derived from thermo\-dynamics, specifically \cite{Freed17}
 \begin{subequations}
     \label{thermodynamicStrains3D}
     \begin{align}
@@ -961,31 +979,31 @@ The thermodynamic conjugate pairs of Freed \textit{et~al}.\ \cite{Freed17,Freede
 
 \subsection{Isotropic Motions}
 
-Imposing the uniform far-field motion of a volumetric expansion onto our dodecahedral model results in a dodecahedral dilatation ($\Xi \defeq \ln \sqrt[3]{ V \! / V_0 }$) that equals its pentagonal dilation ($\xi \defeq \ln \sqrt{ A / A_0 }$) that equals its chordal strain ($e \defeq \ln ( L / L_0 )$).  These three strain measures follow from the 3-mode thermo\-dynamic theory of Freed \textit{et~al}.\ \cite{Freedetal17,FreedZamani19}.  Other choices for strain measures do not result in one-to-one relationships when exposed to an isotropic motion like those observed here.  This is a particularly useful result in that it establishes a meaningful scaling in terms of strains between the three dimensions, cf.\ Fig.~\ref{figDilatation}.  It also provides for a verification of the numerical implementation of our dodecahedral model.  
+Imposing the uniform far-field motion of a volumetric expansion onto our dodecahedral model results in a dodecahedral dilatation ($\Xi \defeq \ln \sqrt[3]{ V \! / V_0 }$) that equals its pentagonal dilation ($\xi \defeq \ln \sqrt{ A / A_0 }$) that equals its chordal strain ($e \defeq \ln ( L / L_0 )$).  These three strain measures follow from the 3-mode thermo\-dynamic theory of Freed \textit{et~al}., \cite{Freedetal17,FreedZamani19} as presented above.  Other choices for strain measures do not result in one-to-one relationships when exposed to an isotropic motion like those observed here.  This is a particularly useful result in that it establishes a meaningful scaling in terms of strains between the three dimensions, cf.\ Fig.~\ref{figDilatation}.  It also provides for a verification of the numerical implementation of our dodecahedral model.  
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.9\textwidth]{figures/dilatation.jpg}
+	\includegraphics[width=\textwidth]{figures/dilatation.jpg}
 	\caption{Response of a dodecahedron exposed to an isotropic motion of dilatation.  The abscissa is the control variable and the ordinates are response variables. The right graphic plots the areal response of the pentagons $\xi = \ln \sqrt{A / A_0}$, while the left graphic plots the axial response of the chords $e = \ln ( L / L_0)$. Both are plotted against the volumetric response of the dodecahedron $\Xi = \ln \sqrt[3]{V \! / V_0}$.  Here $V$ denotes dodecahedral volume, $A$ denotes pentagonal area, and $L$ denotes chordal length, all being evaluated in the current state, whose reference values are $V_0$, $A_0$ and $L_0$.}
 	\label{figDilatation}
 \end{figure}
 
 \subsubsection{Geometric vs.\ Thermodynamic Strains}
 
-There are two types of strain measures that one can use to quantify deformation within a pentagon of a dodecahedron: geometric and thermo\-dynamic.  For the uniform far-field motion of volumetric expansion, only the thermo\-dynamic strain known as dilation, i.e., $\xi = \ln \sqrt{ab/a_0b_0}$, varies with the motion, and its response equals that of the geometric strain $\ln \sqrt{A / A_0}$, see Fig.~\ref{figDilatation2}.  Also present in this graph is an observation that the thermo\-dynamic strains for squeeze $\varepsilon$ and shear $\gamma$ do not contribute under motions of pure dilatation, as expected.  This further verifies the numerical implementation of our dodecahedral model.
+There are two types of strain measures that one can use to quantify deformation within a pentagon of a dodecahedron: geometric and thermo\-dynamic.  For the uniform far-field motion of volumetric expansion, only a thermo\-dynamic strain known as dilation, i.e., $\xi = \ln \sqrt{ab/a_0b_0}$, varies with the motion, and its response equals that of the geometric strain $\ln \sqrt{A / A_0}$, see Fig.~\ref{figDilatation2}.  Also present in this graph is an observation that the thermo\-dynamic strains for squeeze $\varepsilon$ and shear $\gamma$ do not contribute under motions of pure dilatation, as expected.  This further verifies the numerical implementation of our dodecahedral model.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.9\textwidth]{figures/dilatationGeoVsThermo.jpg}
+	\includegraphics[width=\textwidth]{figures/dilatationGeoVsThermo.jpg}
 	\caption{Response of a dodecahedron exposed to a far-field isotropic motion of dilatation.  The abscissa is the control variable and the ordinates are response variables. The right graphic plots the three thermo\-dynamic strains, as they apply to a pentagon, while the left graphic plots the geometric strain of a pentagon.}
 	\label{figDilatation2}
 \end{figure}
 
-To put this into perspective, we compare with studies done by multiple investigators where ratios of alveolar surface area, viz., $A/A_0$, have been measured in rat, rabbit, guinea pig, and cat, cf.\ Roan \& Waters \cite[Table~1]{RoanWaters11}.  These experiments considered ranges that went as low as 25\% and as high as 100\% of total lung capacity.  Taking statistics of their tabulation produced results of: $A/A_0 = 1.47 \pm 0.44$ during inflation and $A/A_0 = 1.18 \pm 0.14$ during deflation, which correspond to a $\xi = \ln\sqrt{A/A_0} = 0.19 \pm 0.18$ for inflation and a $\xi = \ln\sqrt{A/A_0} = 0.08 \pm 0.07$ for deflation.  These areal strains values coincide with the chordal strains of $e=\ln(L/L_0) = 0.13$ measured in~vivo around the periphery of an alveolus in rat lung, as reported by Perlman \& Bhattachary \cite{PerlmanBhattacharya07}.  Our kinematics have been verified well past these physiologic ranges, viz., for dilatations up to 100\% logarithmic strain. 
+To put this into perspective, we compare with studies done by multiple investigators where ratios of alveolar surface area, viz., $A/A_0$, have been measured in rat, rabbit, guinea pig, and cat, cf.\ Roan \& Waters \cite[Table~1]{RoanWaters11}.  These experiments considered ranges that went as low as 25\% and as high as 100\% of total lung capacity.  Taking statistics of their tabulation produced results of: $A/A_0 = 1.47 \pm 0.44$ during inflation and $A/A_0 = 1.18 \pm 0.14$ during deflation, which correspond to a $\xi = \ln\sqrt{A/A_0} = 0.19 \pm 0.18$ for inflation and a $\xi = \ln\sqrt{A/A_0} = 0.08 \pm 0.07$ for deflation.  These areal strain values coincide with chordal strains of $e=\ln(L/L_0) = 0.13$ measured in~vivo around the periphery of an alveolus in rat lung, as reported by Perlman \& Bhattachary \cite{PerlmanBhattacharya07}.  Our kinematics have been verified well past these physiologic ranges, viz., for dilatations up to 100\% logarithmic strain. 
 
 \subsection{Isochoric Motions}
 
-The motions of pure and simple shears are volume preserving.  Imposing these shears as far-field motions onto our dodecahedral model produced the results displayed in Fig.~\ref{figIsochoric}.  For a simple shear, the numerical model is in error by about machine precision, i.e., $\epsilon_m \approx 2.2 \times 10^{-16}$, for strains up to 100\%, while for pure shear (a special case of squeeze in 3D) the model is in error by about machine precision for strains up to of about 60\%, after which the error further increases, up to about $10\epsilon_m$ at strains around~100\%.  This further verifies the numerical implementation of our dodecahedral model.
+The motions of pure and simple shears are volume preserving.  Imposing these shears as far-field motions onto our dodecahedral model produced the results displayed in Fig.~\ref{figIsochoric}.  For a simple shear, the numerical model is in error by about machine precision, i.e., $\epsilon_m \approx 2.2 \times 10^{-16}$, for strains up to 100\%, while for pure shear (a special case of squeeze in 3D) the model is in error by about machine precision for strains up to of about 60\%, after which the error increases up to about $10\epsilon_m$ at strains around~100\%.  This further verifies the numerical implementation of our dodecahedral model.
 
 \begin{figure}
 	\centering
@@ -996,31 +1014,31 @@ The motions of pure and simple shears are volume preserving.  Imposing these she
 
 \subsubsection{Geometric Strains}
 
-How the thirty chords and the twelve irregular pentagons deform under far-field motions of pure shear is displayed in Fig.~\ref{figPureShears}.  Figure~\ref{figIsochoric} demonstrates that the overall response of a dodecahedron is isochoric during pure shear.  Regardless, Fig.~\ref{figPureShears} demonstrates that the individual chordal and pentagonal constituents deform in a non-homogeneous manner, where the strains have been calculated as geometric changes in dodecahedral shape.  This result agrees with in~vivo observations made by Perlman \& Bhattacharya \cite{PerlmanBhattacharya07} where confocal microscopy was used to image a breathing rat lung.
+How the thirty chords and the twelve irregular pentagons deform under far-field motions of pure shear is displayed in Fig.~\ref{figPureShears}.  Figure~\ref{figIsochoric} demonstrates that the overall response of a dodecahedron is isochoric during pure shear.  Regardless, Fig.~\ref{figPureShears} demonstrates that the individual chordal and pentagonal constituents deform in a non-homogeneous manner, where the strains have been calculated as geometric changes in dodecahedral shape.  This result agrees with \textit{in~vivo\/} observations made by Perlman \& Bhattacharya \cite{PerlmanBhattacharya07} where confocal microscopy was used to image a breathing rat lung.
 
 \begin{figure}
 	\centering
-	\includegraphics[width=14cm]{figures/squeeze12.jpg} \\
-	\includegraphics[width=14cm]{figures/squeeze23.jpg} \\
-	\includegraphics[width=14cm]{figures/squeeze13.jpg} 
+	\includegraphics[width=\textwidth]{figures/squeeze12.jpg} \\
+	\includegraphics[width=\textwidth]{figures/squeeze23.jpg} \\
+	\includegraphics[width=\textwidth]{figures/squeeze13.jpg} 
 	\caption{Response of a dodecahedron exposed to far-field pure-shear motions in the sense of Treloar \cite{Treloar75}: $a = \ell$, $b = 1/\ell$ and $c = 1$ in the top images; $a = 1$, $b = \ell$ and $c = 1/\ell$ in the middle images; and $a = 1/\ell$, $b = 1$ and $c = \ell$ in the bottom images, with $\ell$ denoting an elongation of extrusion.  In all six graphic images, the relevant (controlled) motion of the far-field pure shear is plotted along the abscissa.  In each image pair, the right graphic presents pentagonal dilations, while the left graphic presents chordal elongations. Only unique responses are plotted; repetitions are not.}
 	\label{figPureShears}
 \end{figure}
 
-For the dodecahedral chords, there are six independent responses for motions of pure shear: two chords each for three of these lines, and eight chords each for the remaining three curves present in the left images of Fig.~\ref{figPureShears}.  For pentagons, there are three independent responses with four pentagons responding according to each curve shown in the right images.  Although different chords and pentagons deform differently when sheared in different directions, their collective responses are the same regardless of the far-field direction being sheared.  Consequently, the local geometric response of a dodecahedron is isotropic under the far-field motions of pure shear.  
+For the chords, there are six independent responses for dodecahedral motions of pure shear: two chords each for three of these lines, and eight chords each for the remaining three curves present in the left images of Fig.~\ref{figPureShears}.  For pentagons, there are three independent responses with four pentagons responding according to each curve shown in the right images.  Although different chords and pentagons deform differently when sheared in different directions, their collective responses are the same regardless of the far-field direction being sheared.  Consequently, the local geometric response of a dodecahedron is isotropic under the far-field motions of pure shear.  
 
-How the thirty chords and the twelve irregular pentagons deform under far-field motions of simple shear is displayed in Fig.~\ref{figSimpleShears}.  Figure~\ref{figIsochoric} demonstrates that the overall response of a dodecahedron is isochoric during a far-field simple shear. Figure~\ref{figSimpleShears} demonstrates that the individual chordal and pentagonal constituents deform in a non-homogeneous manner during simple shears, like they do for pure shears.  However, unlike pure shears whose collective chordal and pentagonal responses remain isotropic, here they diverge from isotropy under motions of simple shear.  Simple shears in the 12 and 23 planes have the same collective response; whereas, simple shear in the 13 plane has a slightly different response.  
+How the thirty chords and the twelve irregular pentagons deform under far-field motions of simple shear is displayed in Fig.~\ref{figSimpleShears}.  Figure~\ref{figIsochoric} demonstrates that the overall response of a dodecahedron is isochoric during a far-field simple shear. Figure~\ref{figSimpleShears} demonstrates that the individual chordal and pentagonal constituents deform in a non-homogeneous manner during simple shears, like they do for pure shears.  However, unlike pure shears whose collective chordal and pentagonal responses remain isotropic, here they diverge slightly from isotropy under motions of simple shear.  Simple shears in the 12 and 23 planes have the same collective response; whereas, simple shear in the 13 plane has a slightly different response.  
 
 \begin{figure}
 	\centering
-	\includegraphics[width=14cm]{figures/shear12.jpg} \\
-	\includegraphics[width=14cm]{figures/shear23.jpg} \\
-	\includegraphics[width=14cm]{figures/shear13.jpg} 
-	\caption{Response of a dodecahedron exposed to far-field simple-shear motions.  In all six graphic images, the relevant (controlled) motion of simple shear is plotted along the abscissa.  In each image pair, the right graphic presents pentagonal dilations, while the left graphic presents chordal elongations. Only unique responses are plotted; repetitions are not.}
+	\includegraphics[width=\textwidth]{figures/shear12.jpg} \\
+	\includegraphics[width=\textwidth]{figures/shear23.jpg} \\
+	\includegraphics[width=\textwidth]{figures/shear13.jpg} 
+	\caption{Response of a dodecahedron exposed to far-field simple-shear motions.  In all six graphic images, the relevant (controlled) motion of simple shear is plotted along the abscissa.  In each image pair, the right graphic presents pentagonal dilations, while the left graphic presents chordal elongations. Only unique responses are plotted; repetitions are not. Responses in the 13 plane differ from those of the 12 and 23 planes.}
 	\label{figSimpleShears}
 \end{figure}
 
-Figures \ref{figDilatation}--\ref{figSimpleShears} establish that a dodecahedron is (nearly, but not completely) isotropic in its kinematic response, as measured by the geometric strains $e = \ln (L / L_0)$, $\xi = \ln \sqrt{A / A_0}$ and $\Xi = \ln \sqrt[3]{V / V_0}$.  Furthermore, even though a far-field deformation is homogeneous, in accordance with Conjecture~\ref{conjecture}, the local deformations within the individual constituents of an alveolus will typically be heterogeneous, which agrees with imaging data \cite{PerlmanBhattacharya07}.
+Figures \ref{figDilatation}--\ref{figSimpleShears} show that a dodecahedron is (nearly, but not completely) isotropic in its kinematic response, as measured by the geometric strains $e = \ln (L / L_0)$, $\xi = \ln \sqrt{A / A_0}$ and $\Xi = \ln \sqrt[3]{V / V_0}$.  Furthermore, even though a far-field deformation is homogeneous, in accordance with our Conjecture on pg.~\pageref{conjecture}, the local deformations within the individual constituents of an alveolus will typically be heterogeneous, which agrees with imaging data \cite{PerlmanBhattacharya07}.
 
 \subsubsection{Thermodynamic Strains}
 
@@ -1028,8 +1046,8 @@ Addressing the septal response, modeled here as a set of twelve irregular pentag
 
 The thermo\-dynamic strains arising from a Gram-Schmidt factorization of the deformation gradient put forward in \S\ref{secQR} specify three strain measures pertinent to a membrane: dilation $\xi = \ln \sqrt{ab/a_0 b_0}$, squeeze $\varepsilon = \ln \sqrt{ab_0 / a_0 b}$ and shear $\gamma = g - g_0$, where elongations $a$ and $b$ and magnitude of shear $g$ are illustrated in Fig.~\ref{figKinematics}.  Of these, dilation is an uniform response, while squeeze and shear describe non-uniform responses.  To acquire them requires knowing the deformation gradient.
 
-The curves in Figs.~\ref{figPureShears} \& \ref{figSimpleShears} were obtained from geometric measures for chordal strain $\ln (L/L_0)$ and areal dilation $\ln \sqrt{A/A_0}$.  They were computed under separate conditions of pure and simple far-field shears.  The curves in Figs.~\ref{figPureShearsPentagons} \& \ref{figSimpleShearsPentagons} were obtained from thermo\-dynamic measures for membrane strain under the same far-field deformations.  The strains of dilation $\xi$, squeeze $\varepsilon$, and shear $\gamma$ were computed in accordance with \S\ref{secQR} using deformation gradients gotten from the pentagonal shape functions of Wachspress \cite{Wachspress75} discussed in \S\ref{secShapeFns}.\footnote{
-	Five constant-strain triangles were also used to quantify the deformation gradient for each pentagonal surface at its centroid---the common vertex to all five triangles.  This approach provided accurate descriptions for uniform strain, i.e., dilation $\xi$, but not for the two non-uniform strains, viz., squeeze $\varepsilon$ and shear $\gamma$.
+The curves in Figs.~\ref{figPureShears} \& \ref{figSimpleShears} were obtained from geometric measures for chordal strain $\ln (L/L_0)$ and areal dilation $\ln \sqrt{A/A_0}$.  They were computed under separate far-field conditions of pure and simple shears.  The curves in Figs.~\ref{figPureShearsPentagons} \& \ref{figSimpleShearsPentagons} were obtained from thermo\-dynamic measures for membrane strain under the same far-field deformations.  The strains of dilation $\xi$, squeeze $\varepsilon$, and shear $\gamma$ were computed in accordance with \S\ref{secQR} using deformation gradients gotten from the pentagonal shape functions of Wachspress \cite{Wachspress75} discussed in \S\ref{secShapeFns}.\footnote{
+	Five constant-strain triangles were also used to quantify the deformation gradient for each pentagonal surface at its centroid---the common vertex to all five triangles.  This approach provided accurate descriptions for uniform strain, i.e., dilation $\xi$, but not for the two non-uniform strains, viz., squeeze $\varepsilon$ and shear $\gamma$; hence, our preference to use Wachspress shape functions for alveolar planes.
 } 
 
 \begin{figure}
@@ -1037,7 +1055,7 @@ The curves in Figs.~\ref{figPureShears} \& \ref{figSimpleShears} were obtained f
 	\includegraphics[width=\textwidth]{figures/pentagonalPureShear12.jpg} \\
 	\includegraphics[width=\textwidth]{figures/pentagonalPureShear23.jpg} \\
 	\includegraphics[width=\textwidth]{figures/pentagonalPureShear13.jpg} \\
-	\caption{Same boundary conditions as in Fig.~\ref{figPureShears}.  Pentagonal areas were used to compute dilation in Fig.~\ref{figPureShears}.  The shape functions of Wachspress were used to compute dilation here.  The uniform response in the right column of Fig.~\ref{figPureShears} and in the left column above are the same, providing additional assurance that the code has been correctly implemented.  The squeeze response shown in the center column is the same for all three orientations of far-field pure shear, i.e., this response is isotropic.  The right column has ordinates scaled by $10^{-14}$ implicating that there is no simple shear response occurring within any pentagonal surface of the dodecahedron whenever it is subjected to a far-field motion of pure shear.}
+	\caption{Same boundary conditions as in Fig.~\ref{figPureShears}.  Pentagonal areas were used to compute dilation in Fig.~\ref{figPureShears}.  The shape functions of Wachspress were used to compute dilation here.  The uniform response in the right column of Fig.~\ref{figPureShears} and in the left column above are the same, providing additional assurance that the code has been correctly implemented.  The squeeze response shown in the center column is the same for all three orientations of far-field pure shear, i.e., this response is isotropic.  The right column has ordinates scaled by $10^{-14}$ implicating that there is no effective simple shear response occurring within any pentagonal surface of the dodecahedron whenever it is subjected to a far-field motion of pure shear.}
 	\label{figPureShearsPentagons}
 \end{figure}
 
@@ -1046,7 +1064,7 @@ The curves in Figs.~\ref{figPureShears} \& \ref{figSimpleShears} were obtained f
 	\includegraphics[width=\textwidth]{figures/pentagonalSimpleShear12.jpg} \\
 	\includegraphics[width=\textwidth]{figures/pentagonalSimpleShear23.jpg} \\
 	\includegraphics[width=\textwidth]{figures/pentagonalSimpleShear13.jpg} \\
-	\caption{Same boundary conditions as in Fig.~\ref{figSimpleShears}.  Pentagonal areas were used to compute dilation in Fig.~\ref{figSimpleShears}.  The shape functions of Wachspress were used to compute dilation here. The uniform response in the right column of Fig.~\ref{figSimpleShears} and in the left column above are the same, providing additional assurance that the code has been correctly implemented.  Like the dilational responses of the left column, the squeeze responses of the center column are the same in the 1-2 and 2-3 planes, but differ in the 1-3 plane.  In all cases, the simple shear response of any pentagonal plane is proportional to that of the far-field shear imposed, further substantiating the code's implementation.  The shear response of the septal membranes is isotropic.}
+	\caption{Same boundary conditions as in Fig.~\ref{figSimpleShears}.  Pentagonal areas were used to compute dilation in Fig.~\ref{figSimpleShears}.  The shape functions of Wachspress were used to compute dilation here. The uniform response in the right column of Fig.~\ref{figSimpleShears} and in the left column above are the same, providing additional assurance that the code has been correctly implemented.  Like the dilational responses of the left column, the squeeze responses of the center column are the same in the 12 and 23 planes, but differ in the 13 plane.  In all cases, the simple shear response of any pentagonal plane is proportional to that of the far-field shear imposed, further substantiating the code's implementation.  The shear response of the septal membranes is isotropic.}
 	\label{figSimpleShearsPentagons}
 \end{figure}
 
@@ -1081,7 +1099,7 @@ Figure \ref{figCompatDilatation} presents the compatibility response at the cent
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figures/compatibilityDilatation.jpg}
-	\caption{Planar compatibility requires $F_{11,2} = F_{12,1}$ and $F_{22,1} = F_{21,2}$ where the left-hand sides are plotted as the absciss\ae\ and the right-hand sides are plotted as the ordinates.  For compatibility, the response ought to lie along the $45^{\circ}$ diagonal, which is drawn in red over the range of $\pm 10^{-15}$ where machine precision is about $2.2 \times 10^{-16}$.  Here the motion is one of uniform dilatation out to 100\% strain.}
+	\caption{Planar compatibility requires $F_{11,2} = F_{12,1}$ and $F_{22,1} = F_{21,2}$ where the left-hand sides of these formul\ae\ are plotted as the absciss\ae\ and the right-hand sides are plotted as the ordinates.  For compatibility, the response ought to lie along the $45^{\circ}$ diagonal, which is drawn in red over the range of $\pm 10^{-15}$ where machine precision is about $2.2 \times 10^{-16}$.  Here the motion is one of uniform dilatation out to 100\% strain.}
 	\label{figCompatDilatation}
 \end{figure}
 
@@ -1091,7 +1109,7 @@ Similarly, Figs.~\ref{figCompatPureShearP5} \& \ref{figCompatSimpleShearP5} pres
 	\centering
 	\includegraphics[width=\textwidth]{figures/compatibilityPureShearP5G7.jpg}
 	\includegraphics[width=\textwidth]{figures/compatibilityPureShearP5G5.jpg}
-	\caption{Planar compatibility requires $F_{11,2} = F_{12,1}$ and $F_{22,1} = F_{21,2}$ where the left-hand sides are plotted as the absciss\ae\ and the right-hand sides are plotted as the ordinates.  For compatibility, the response ought to lie along the $45^{\circ}$ diagonal, which is drawn in red over the range of $\pm 10^{-15}$ where machine precision is about $2.2 \times 10^{-16}$.  Here the motion is one of pure shear out to 100\% strain with elongation occurring in the 1-direction, contraction occurring in the 2~direction, while the 3-direction is held fixed.  These results pertain to pentagon~5: nodes 15, 5, 12, 11, 1, cf.\ Fig.~\ref{figDodecahedron} and Table~\ref{TablePentagons}.  The top row of figures is the best response (at Gauss point 7, cf.\ Fig.~\ref{figQuadrature}) while the bottom row of figures is the worst response (at Gauss point 5).}
+	\caption{Planar compatibility requires $F_{11,2} = F_{12,1}$ and $F_{22,1} = F_{21,2}$ where the left-hand sides of these formul\ae\ are plotted as the absciss\ae\ and the right-hand sides are plotted as the ordinates.  For compatibility, the response ought to lie along the $45^{\circ}$ diagonal, which is drawn in red over the range of $\pm 10^{-15}$ where machine precision is about $2.2 \times 10^{-16}$.  Here the motion is one of pure shear out to 100\% strain with elongation occurring in the 1-direction, contraction occurring in the 2~direction, while the 3-direction is held fixed.  These results pertain to pentagon~5: nodes 15, 5, 12, 11, 1, cf.\ Fig.~\ref{figDodecahedron} and Table~\ref{TablePentagons}.  The top row of figures is the best response (at Gauss point 7, cf.\ Fig.~\ref{figQuadrature}) while the bottom row of figures is the worst response (at Gauss point 5).}
 	\label{figCompatPureShearP5}
 \end{figure}
 
@@ -1099,11 +1117,11 @@ Similarly, Figs.~\ref{figCompatPureShearP5} \& \ref{figCompatSimpleShearP5} pres
 	\centering
 	\includegraphics[width=\textwidth]{figures/compatibilitySimpleShearP5G7.jpg}
 	\includegraphics[width=\textwidth]{figures/compatibilitySimpleShearP5G5.jpg}
-	\caption{Planar compatibility requires $F_{11,2} = F_{12,1}$ and $F_{22,1} = F_{21,2}$ where the left-hand sides are plotted as the absciss\ae\ and the right-hand sides are plotted as the ordinates.  For compatibility, the response ought to lie along the $45^{\circ}$ diagonal, which is drawn in red over the range of $\pm 10^{-15}$ where machine precision is about $2.2 \times 10^{-16}$.  Here the motion is one of simple shear out to 100\% strain, shearing along 1-2~planes in the 1-direction.  These results pertain to pentagon~5: nodes 15, 5, 12, 11, 1, cf.\ Fig.~\ref{figDodecahedron} and Table~\ref{TablePentagons}.  The top row of figures is the best response (at Gauss point 7, cf.\ Fig.~\ref{figQuadrature}) while the bottom row of figures is the worst response (at Gauss point 5).}
+	\caption{Planar compatibility requires $F_{11,2} = F_{12,1}$ and $F_{22,1} = F_{21,2}$ where the left-hand sides of these formul\ae\ are plotted as the absciss\ae\ and the right-hand sides are plotted as the ordinates.  For compatibility, the response ought to lie along the $45^{\circ}$ diagonal, which is drawn in red over the range of $\pm 10^{-15}$ where machine precision is about $2.2 \times 10^{-16}$.  Here the motion is one of simple shear out to 100\% strain, shearing along 1-2~planes in the 1-direction.  These results pertain to pentagon~5: nodes 15, 5, 12, 11, 1, cf.\ Fig.~\ref{figDodecahedron} and Table~\ref{TablePentagons}.  The top row of figures is the best response (at Gauss point 7, cf.\ Fig.~\ref{figQuadrature}) while the bottom row of figures is the worst response (at Gauss point 5).}
 	\label{figCompatSimpleShearP5}
 \end{figure}
 
 This collective set of graphs, Figs.~\ref{figCompatDilatation}--\ref{figCompatSimpleShearP5}, investigate the constraint of compatibility in terms of the three fundamental modes of deformation: dilatation, squeeze and shear.  These figures verify that the constraint of compatibility is satisfied when using the pentagonal shape functions of Wachspress \cite{Wachspress75,Wachspress16} in our dodecahedral model, as errors are typically less than ten times machine precision.  This has been verified out to deformations that are at least three times those of their normal physiologic range.
 
-Our kinematic analysis of a dodecaheron has been verified theoretically and numerically.
+Our kinematic analysis of a dodecaheron has been verified both theoretically and numerically.
 

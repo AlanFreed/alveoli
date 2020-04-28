@@ -1,49 +1,36 @@
-%% This is file `elsarticle-template-1-num.tex',
-%%
-%% Copyright 2009 Elsevier Ltd
-%%
-%% This file is part of the 'Elsarticle Bundle'.
-%% ---------------------------------------------
-%%
-%% It may be distributed under the conditions of the LaTeX Project Public
-%% License, either version 1.2 of this license or (at your option) any
-%% later version.  The latest version of this license is in
-%%    http://www.latex-project.org/lppl.txt
-%% and version 1.2 or later is part of all distributions of LaTeX
-%% version 1999/12/01 or later.
-%%
-%% The list of all files belonging to the 'Elsarticle Bundle' is
-%% given in the file `manifest.txt'.
-%%
-%% Template article for Elsevier's document class `elsarticle'
-%% with numbered style bibliographic references
-%%
-%% $Id: elsarticle-template-1-num.tex 149 2009-10-08 05:01:15Z rishi $
-%% $URL: http://lenova.river-valley.com/svn/elsbst/trunk/elsarticle-template-1-num.tex $
-%%
-%% \documentclass[preprint,12pt]{elsarticle}
-\documentclass[final,3p,12pt]{elsarticle}
+\documentclass{arlticle}
+% \usepackage{ARLboxhandler}
+\usepackage{notoccite}
+\usepackage{totpages}
+\def\MandatoryDL{ARL-02-28-19(Unlimited).dls}
+\def\LocalMandatoryDL{blank.dls}
+\def\UserDL{ARLstencil.dls}
+\addtolength{\cftfignumwidth}{0.0ex}
+\addtolength{\cfttabnumwidth}{0.0ex}
+\sectspace
+\usepackage{fgcite}\FgTypeJ % PACKAGE FOR REFERENCING FIGURES
+%\usepackage{tbcite}\TbTypeB % PACKAGE FOR REFERENCING TABLES
+\usepackage{eqcite}\EqTypeH % PACKAGE FOR REFERENCING EQUATIONS
+\usepackage{enumitem, stackengine, verbatim}
+\usepackage{amssymb, amsmath}
 
+% IF CITATIONS ARE NEEDED IN APPENDICES, SET THE FOLLOWING TWO LINES
+\usepackage{bibentry}
+\nobibliography*
 
-%% Use the option review to obtain double line spacing
-%% \documentclass[preprint,review,12pt]{elsarticle}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em\TeX}}
 
-%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
-%% for a journal layout:
-%% \documentclass[final,1p,times]{elsarticle}
-%% \documentclass[final,1p,times,twocolumn]{elsarticle}
-%% \documentclass[final,3p,times]{elsarticle}
-%% \documentclass[final,3p,times,twocolumn]{elsarticle}
-%% \documentclass[final,5p,times]{elsarticle}
-%% \documentclass[final,5p,times,twocolumn]{elsarticle}
-
-%% if you use PostScript figures in your article
-%% use the graphics package for simple commands
-%% \usepackage{graphics}
-%% or use the graphicx package for more complicated commands
-%% \usepackage{graphicx}
-%% or use the epsfig package if you prefer to use the old commands
-%% \usepackage{epsfig}
+\newcommand{\url}[1]{%
+    \begingroup
+    \begingroup\lccode`~=`/\lowercase{\endgroup\def~}{/\penalty0 }%
+    \begingroup\lccode`~=`.\lowercase{\endgroup\def~}{.\penalty0 }%
+    \catcode`/=\active\catcode`.=\active
+    \scantokens{#1\noexpand}%
+    \endgroup
+}
+\renewcommand\url[1]{\urlhelp#1\relax\relax\relax}
+\def\urlhelp#1#2\relax{%
+    {#1}\penalty0\ifx\relax#2\else\urlhelp#2\relax\fi}
 
 %% The amssymb package provides various useful mathematical symbols
 \usepackage{amssymb}
@@ -51,7 +38,10 @@
 \usepackage{amsthm}
 \newtheorem*{cor}{Corollary}
 \newtheorem*{defn}{Definition}
+\newtheorem*{conj}{Conjecture}
 % \newtheorem*{algorithm}[theorem]{Algorithm}
+
+\renewcommand{\S}{Section~}
 
 \renewcommand{\thepart}{\arabic{part}}
 \renewcommand{\thesection}{\thepart.\arabic{section}}
@@ -61,7 +51,7 @@
 \renewcommand{\theequation}{\thepart.\arabic{equation}}
 \renewcommand{\thefigure}{\thepart.\arabic{figure}}
 \renewcommand{\thetable}{\thepart.\arabic{table}}
-%
+
 %% The lineno packages adds line numbers. Start line numbering with
 %% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
 %% for the whole article with \linenumbers after \end{frontmatter}.
@@ -86,22 +76,21 @@
 %%
 %% \biboptions{comma,round}
 
-\biboptions{sort&compress}
-
-\journal{Draft}
+% \biboptions{sort&compress}
 
 
-%%
-%%  The following packages, definitions and macros were added by the authors.
-%%
+%%%%% BEGIN USER DEFINED MACROS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%
+\usepackage{subfigure}
+
 \usepackage{amsmath}
 \usepackage{stmaryrd}    % source of \mapsfrom
 %\usepackage{mathtools}
 %
-\DeclareMathAlphabet{\mathbfit}{\encodingdefault}{\rmdefault}{bx}{sl}
-\DeclareMathAlphabet{\mathbfsf}{\encodingdefault}{\sfdefault}{bx}{n}
+% \DeclareMathAlphabet{\mathbfit}{\encodingdefault}{\rmdefault}{bx}{sl}
+% \DeclareMathAlphabet{\mathbfsf}{\encodingdefault}{\sfdefault}{bx}{n}
+\newcommand{\mathbfit}[1]{\boldsymbol{\mathit{#1}}}
+\newcommand{\mathbfsf}[1]{\boldsymbol{\mathsf{#1}}}
 %
 \usepackage[ruled,vlined]{algorithm2e}
 % \usepackage{algorithm}
@@ -109,7 +98,7 @@
 %
 % \newdefinition{defn}{Definition}
 % \newdefinition{rmk}{Remark}
-\newdefinition{conjecture}{Conjecture}
+% \newdefinition{conjecture}{Conjecture}
 % \newtheorem{thm}{Theorem}
 % \newtheorem{cor}{Corollary}
 % \newproof{pf}{Proof}
@@ -197,182 +186,216 @@
 
 %%
 % \usepackage{wasysym}
+
 % Extracted out the font for a pentagon directly to avoid 'too many math alphabets'
 \def\wasyfamily{\fontencoding{U}\fontfamily{wasy}\selectfont}
-\def\pentagon   {\mbox{\wasyfamily\char68}}
+\def\pentagon{\mbox{\wasyfamily\char68}}
 
 \usepackage{geometry,mathtools}
 \setcounter{MaxMatrixCols}{12}
 
-% font for matrix
+% font for writing large matrices
 \usepackage{amsmath,scalefnt}
 
+%%%%% END OF USER DEFINED MACROS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{roman}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% If desired, can use the following command to put a
+% "DRAFT" stamp on each page; Can also use optional argument for
+% page classification markings, as in 
+\PageStamp[DRAFT: UNCLASSIFIED]
+% You can turn off with \StopPageStamp.  See arlticle documentation for 
+% further details.
+%
+% Default PageStamp is "DRAFT".  Can be used for class. markings
+\def\PageStampColor{red}% THIS LINE IS ONLY NEEDED TO CHANGE THE PAGE STAMP COLOR
+%\PageStamp[NOT SECRET]%  <---COMMENT THIS LINE IF NO PAGE STAMP DESIRED
+%\UseClassMarkings
+%\downgrading
+%  {Steven B Segletes}
+% {Mechanical Engineer}
+%  {Multiple Sources}
+% {20YYMMDD}
+% {20YYMMDD}
+% \newcommand\ClassLabelStyle{\normalsize\bfseries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% COVER & TITLE PAGE INPUTS SPECIFIED IN THE FOLLOWING COMMANDS:
+%\arlzipcode{}%	               	For use, if other than 21005-5066, i.e., 5069
+%\arlrptno  {ARL-TR-8859}%		Uncomment and use, when needed
+%\pubdate   {November 2019}%	Uncomment and use, when needed
+\arltitle  {A Dodecahedral Model for Alveoli: \\ Interim Report}
+\allauthors{Alan D.\ Freed, Shahla Zamani, Sandipan Paul and John D. Clayton}
+\authorsA  {A.D.\ Freed, S.\ Zamani, S.\ Pual and J.D. Clayton}
+\organizationA	{Weapons and Materials Research Directorate, 
+    \myCCDCorg}% <-----THIS MACRO CAN BE REPLACED WITH APPROPRIATE WORDS, IF NEEDED
+%% NOTE THAT FOR CONTRACT REPORTS, THE ADDRESS IS INCLUDED IN \organizationA, etc.,
+%% AS IN THE FOLLOWING LINE
+% \organizationA{SURVICE Engineering Company\\4695 Millenium Dr.\\Belcamp, MD 21017-7722}
+\distcodes[FCDD-RLW-PC]{A}{}{}    % DISTRIBUTION STATEMENT A
+%\distcodes[FCDD-RLW-PC]{C}{3}{X} %	FOR DISTRIBUTION C3, WITH EXPORT CONTROL
+%\distcodes[FCDD-RLW-PC]{F}{}{}   %	FOR DISTRIBUTION F, WITHOUT EXPORT CONTROL
+%\UnderContract{W91CRB-09-D-0027} % FOR CONTRACT REPORTS, ARL-CR SERIES
+%\FOUOPageStamp                   % FOR FOUO DOCUMENTS
+%\FOIAexemptions{3}               % FOR ADDING FOIA EXEMPTIONS
+%\AddDistributionReason{4}        % FOR ADDING REASON TO DISTRIBUTION STATEMENT 
+%\AddDistributionReason{X}        % FOR ADDING EXPORT CONTROLLED TO DISTRIBUTION STATEMENT
+
+%%%%%% HERE IS AN ALTERNATE WAY TO DO FIGS, IF YOU USE boxhandler TO DEFINE FIGS.
+%% ISSUE \holdFigures AND THEN DEFINE ALL THE FIGURES IN THE PREAMBLE
+%% TO USE THE FIGURES IN THE DOCUMENT, ISSUE \nextFigure[ht]
+%\holdFigures
+%\WrapperOn[UNCLASSIFIED]% DEFAULT MARKING LABEL FOR PORTION-MARKED FIGURES/TABLES
+
+% \bxfigure{ Configurations, deformations, and coordinate frames 
+% \cite{clayton2019,clayton2019acta} \label{fig1}}
+% $ { \includegraphics[scale=0.5]{fig1} } 
 
 
-\begin{document}
 
-\begin{frontmatter}
 
-%% Title, authors and addresses
+\begin {document}
 
-%% use the tnoteref command within \title for footnotes;
-%% use the tnotetext command for the associated footnote;
-%% use the fnref command within \author or \address for footnotes;
-%% use the fntext command for the associated footnote;
-%% use the corref command within \author for corresponding author footnotes;
-%% use the cortext command for the associated footnote;
-%% use the ead command for the email address,
-%% and the form \ead[url] for the home page:
-%%
-%% \title{Title\tnoteref{label1}}
-%% \tnotetext[label1]{}
-%% \author{Name\corref{cor1}\fnref{label2}}
-%% \ead{email address}
-%% \ead[url]{home page}
-%% \fntext[label2]{}
-%% \cortext[cor1]{}
-%% \address{Address\fnref{label3}}
-%% \fntext[label3]{}
 
-\title{A Dodecahedral Model for Alveoli}
+\ARLcover{A}%   AN A (OR A BLANK) MANDATORY ARGUMENT GIVES AN ARL DOC PROFILE
+%               AN S AS THE MANDATORY ARGUMENT GIVES SLAD DOCUMENT PROFILE
+%               A ZERO AS THE OPTIONAL ARGUMENT WILL USE A LO-INK COVER: \ARLcover[0]{}
+%               OTHERWISE OPTIONAL TEXT PRINTED ON COVER
 
-%% use optional labels to link authors explicitly to addresses:
-%% \author[label1,label2]{<author name>}
-%% \address[label1]{<address>}
-%% \address[label2]{<address>}
+\arltitlepage%			[p. i]
 
-\author[add1,add2]{Alan D.~Freed\corref{corr}}
+%% OPTION I: CREATE YOUR OWN SF298 in LaTeX:
+\begin{createSFtwoNINEeight}
+    % SFitemONE AUTOMATICALLY FILLED IN (\pubdate)
+    % SFitemTWO AUTOMATICALLY FILLED IN (Final)
+    \SFitemTHREE{June 2019--June 2020}
+    % SFitemFOUR AUTO-FILLED WITH \arltitle DATA
+    % SFitemFIVEa AUTO-FILLED WITH \UnderContract DATA
+    % \SFitemFIVEb{[Grant Number here]}
+    % \SFitemFIVEc{[PE Number here]}
+    \SFitemFIVEd{}
+    % \SFitemFIVEe{[Task No. here]}
+    % \SFitemFIVEf{[WU Number here]}
+    % SFitemSIX{} AUTO-FILLED WITH \allauthors DATA
+    \SFitemSEVEN{\myCCDCorgLONG\\ATTN: % <- USES DEFAULT, OR TYPE IT DIRECTLY
+        \OfficeSymbol\\% <-USES \distcodes OPTIONAL ARG, OR TYPE IT DIRECTLY
+        Aberdeen Proving Ground, MD 21005-5066}
+    % SFitemEIGHT AUTOMATICALLY FILLED IN (\arlrptno)
+    % \SFitemNINE{[Sponsor here]}
+    % \SFitemTEN{[Sponsor Acronym]}
+    % \SFitemELEVEN{[Sponsor Rpt. No.]}
+    % SFitemTWELVE AUTOMATICALLY FILLED IN WITH \distcodes DATA
+    \SFitemTHIRTEEN{primary authors' emails: 
+        $<$afreed$@$tamu.edu$>$ and
+        $<$john.d.clayton1.civ$@$mail.mil$>$.}
+    \SFitemFOURTEEN{% PLACE ABSTRACT HERE
+        Write abstract here.
+    }
+    \SFitemFIFTEEN{% PLACE KEYWORDS HERE, COMMA SEPARATED
+    }
+    % \SFitemSIXTEENa{}% defaults to UNCLASSIFIED
+    % \SFitemSIXTEENb    defaults to UNCLASSIFIED
+    % \SFitemSIXTEENc    defaults to UNCLASSIFIED
+    % SFitemSEVENTEEN AUTOMATICALLY FILLED IN WITH "SAR" or "UU"
+    % ITEM 18 CAN BE AUTOMATICALLY OBTAINED WITH \ref{TotPages}, USING THE totpages PACKAGE
+    \SFitemEIGHTEEN{\ref{TotPages}}% = FRONT MATTER PP.+REPORT PP.+2 (OR +4 IF CLASSIFIED)
+    \SFitemNINETEENa{% COMMUNICATIN AUTHOR
+    }
+    \SFitemNINETEENb{% PHONE NUMBER OF COMMUNICATING AUTHOR
+    }
+\end{createSFtwoNINEeight}
+%
 
-\ead{afreed@tamu.edu, alan.d.freed.civ@mail.mil}
+\tableofcontents%		p. iii
+\listoffigures%			Comment out, if not needed
+\pagebreak
+\listoftables*%			Comment out, if not needed
+\acknowledgments
+Prof.\ Alan D. Fredd acknowledges support of a Joint Faculty Appointment with the U.S.\ Army Combat Capabilities Development Command (CCDC) Army Research Laboratory.  Shahla Zamani and Sandipan Pual acknowledge support from a grant funded by the CCDC Army Research Laboratory.  John D.\ Clayton acknowledges support of the CCDC Army Research Laboratory.  Prof.\ J.N.\ Reddy was the PI for that part of this project performed at Texas A\&M University by Shahla Zamani and Sandipan Paul.  Dr.\ M.\ Kleinberger was the Cooperative Agreement Manager (CAM) and Dr.\ John D.\ Clayton was the Technical Manager (TM) for this contract at the CCDC Army Research Laboratory.
 
-\cortext[corr]{Corresponding author}
+\clearpage
 
-\author[add1]{Shahla Zamani}
-
-\author[add2]{John D.~Clayton}
-
-% \author[add1]{J.~N.\ Reddy}
-
-\date{Draft version: \today}
-
-\address[add1]{Department of Mechanical Engineering, 
-              Texas A\&M University,
-              College Station, \\ TX 77843, 
-              United States}
-          
-\address[add2]{Impact Physics Branch, 
-               U.S.\ Army Research Laboratory,
-               Aberdeen Proving Ground, 
-               Aberdeen, MD 21005, 
-               United States}
-              
-              
-\begin{abstract}
-
-write
-
-\end{abstract}
-
-\begin{keyword}
-%% keywords here, in the form: keyword \sep keyword
-
-write
-
-%% MSC codes here, in the form: \MSC code \sep code
-%% or \MSC[2008] code \sep code (2000 is the default)
-
-% \MSC 15A06 \sep 65F05 \sep 74A05 \sep 74A10 \sep 74A15 \sep 74A20
-
-\end{keyword}
-
-\end{frontmatter}
-
-% \linenumbers
+\pagenumbering{arabic}%		p. 1
 
 %% main text
 
-\newpage
 \setcounter{part}{0}
 \include{partIntroduction}
 
-\newpage
 \setcounter{equation}{0}
 \setcounter{figure}{0}
 \setcounter{section}{0}
 \setcounter{table}{0}
 \include{partDodecahedron}
 
-\newpage
 \setcounter{equation}{0}
 \setcounter{figure}{0}
 \setcounter{section}{0}
 \setcounter{table}{0}
 \include{partKinematics}
 
-\newpage
 \setcounter{equation}{0}
 \setcounter{figure}{0}
 \setcounter{section}{0}
 \setcounter{table}{0}
 \include{partConstitutiveTheory}
 
-\newpage
 \setcounter{equation}{0}
 \setcounter{figure}{0}
 \setcounter{section}{0}
 \setcounter{table}{0}
 \include{partNumericalIntegration}
 
-\newpage
 \setcounter{equation}{0}
 \setcounter{figure}{0}
 \setcounter{section}{0}
 \setcounter{table}{0}
 \include{partVariationalFormulation}
 
-\newpage
-\noindent\textbf{Acknowledgments}
-
-\medskip
-\noindent
-A.D.F.\ acknowledges support of a Joint Faculty Appointment with the CCDC Army Research Laboratory.
-S.Z.\ acknowledges support from a grant funded by the CCDC Army Research Laboratory. 
-J.D.C.\ acknowledges support of the CCDC Army Research Laboratory.  
-Prof.\ J.N.\ Reddy was the PI for that part of this project performed at Texas A\&M University by S.Z. 
-Dr.\ M.\ Kleinberger was the Cooperative Agreement Manager (CAM) and J.D.C.\ was the Technical Manager (TM) for this contract at the CCDC Army Research Laboratory.
+\clearpage
 
 \small
-\bibliographystyle{elsarticle-num}
+\setcounter{part}{7}
+\setcounter{section}{0}
+\bibliographystyle{ARL}
 \bibliography{dodec}
+% \arlbibliography[f]{dodec}% Provide name of .bib file as argument
 \normalsize
+
+% Appendices
 
 \setcounter{equation}{0}
 \setcounter{figure}{0}
+\setcounter{section}{0}
 \setcounter{table}{0}
-
-\appendix
-
 \include{appImplicitElasticity}
 
-\newpage
-\include{appOverview}
+% \include{appOverview}
 
-\newpage
-\include{appDodecahedron}
+% \include{appDodecahedron}
 
-\newpage
-\include{appVertices}
+% \include{appVertices}
 
-\newpage
-\include{appChords}
+% \include{appChords}
 
-\newpage
-\include{appPentagons}
+% \include{appPentagons}
 
-\newpage
-\include{appModels}
+% \include{appModels}
 
-\newpage
-\include{appSolvers}
+% \include{appSolvers}
 
-\end{document}
+% Include (uncomment) the following distribution lists when they become available.
+
+%\distlistsetup%         Set up page parameters for DL printing.
+%\begin{distributionlist}
+%    \input{\MandatoryDL}%     Mandatory DL, Ensure you have current version
+%    \input{\UserDL}%          Your DL for this report.
+%\end{distributionlist}
+%\distlistcleanup%	Cleans up and restores pre-DL settings
+
+%%%%%%% USE BACK COVER IF DOCUMENT HAS OVERALL MARKING
+%\backcover%   Report's back cover, showing overall marking, as appropriate
+
+\end {document}

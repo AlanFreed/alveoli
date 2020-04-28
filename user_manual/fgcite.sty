@@ -1,0 +1,211 @@
+\ProvidesPackage {fgcite} [2014/07/01 v1.10]
+%
+% by Steven B. Segletes, for the public domain.
+%
+% 'fgcite prints out the preferred reference format for figure
+% citations, e.g., figure 1 as opposed to Fig. (1), fig.(1), etc. 
+%
+% Advantages of using 'fgcite:
+% 1) Ability to quickly change from `figure x' to `Fig(x)' through
+%    whole document, with a single line change (\FgTypeC).  This is 
+%    useful when converting from tech report to manuscript formats;
+% 2) Saves typing:
+%    With the 'fgcite package, type        `\fgcite{fig:myfig}'
+%    vs. the traditional LaTeX approach of `figure~\ref{fig:myfig}'  .
+%
+%
+% A number of format types are predefined:
+%
+% FgTypeA : figure x  , figures x and y		(old ARL report standard)
+% FgTypeB : Figure x  , Figures x and y
+% FgTypeC : fig. (x)  , figs. (x) and (y)
+% FgTypeD : Fig. (x)  , Figs. (x) and (y)
+% FgTypeE : fig.(x)   , figs.(x) and (y)
+% FgTypeF : Fig.(x)   , Figs.(x) and (y)
+% FgTypeG : figure (x), figures (x) and (y)
+% FgTypeH : Figure (x), Figures (x) and (y)
+% FgTypeI : Fig. x    , Figs. x and y
+% FgTypeJ : Figure x and Fig. y, Figs. x and y	(ARL report standard)
+%
+% Other format types are easily added.
+%
+% Usage:
+%
+% % In Preamble:
+% \usepackage{fgcite}
+% \FgTypex	% where `x' is A, B, etc.  defaults to FgTypeA
+%
+% % In Document:
+% \Fgcite{ref} ...
+% ... \figcite{ref} ...
+% \Fgcites{ref1}, \andfgcite{ref2}, and \andfgcite{ref3} ...
+% ... \fgcites{ref1}, \andfgcite{ref2}, and \andfgcite{ref3}...
+%
+% where ref is the LaTeX reference, for example, fig:myfig  .
+%
+% A literal option [l] is available to use the the argument as the
+% actual figure number, rather than as an figure reference:
+%
+% \fgcite[l]{13}
+%
+% This literal option can be used with the following calls:
+% \Fgcite, \fgcite, \Fgcites, \fgcites and \andfgcite.
+%
+%
+% FgTypeA : figure x  , figures x and y
+\newcommand\FgTypeA{%
+  \def\Fgname{Figure}%
+  \def\fgname{figure}%
+  \def\Fgsname{Figures}%
+  \def\fgsname{figures}%
+  \def\fgsep{~}%
+  \def\fgssep{~}%
+  \def\fgldelimit{}%
+  \def\fgrdelimit{}%
+}
+% FgTypeB : Figure x  , Figures x and y
+\newcommand\FgTypeB{%
+  \def\Fgname{Figure}%
+  \def\fgname{Figure}%
+  \def\Fgsname{Figures}%
+  \def\fgsname{Figures}%
+  \def\fgsep{~}%
+  \def\fgssep{~}%
+  \def\fgldelimit{}%
+  \def\fgrdelimit{}%
+}
+% FgTypeC : fig. (x)  , figs. (x) and (y)
+\newcommand\FgTypeC{%
+  \def\Fgname{Fig.}%
+  \def\fgname{fig.}%
+  \def\Fgsname{Figs.}%
+  \def\fgsname{figs.}%
+  \def\fgsep{~}%
+  \def\fgssep{~}%
+  \def\fgldelimit{(}%
+  \def\fgrdelimit{)}%
+}
+% FgTypeD : Fig. (x)  , Figs. (x) and (y)
+\newcommand\FgTypeD{%
+  \def\Fgname{Fig.}%
+  \def\fgname{Fig.}%
+  \def\Fgsname{Figs.}%
+  \def\fgsname{Figs.}%
+  \def\fgsep{~}%
+  \def\fgssep{~}%
+  \def\fgldelimit{(}%
+  \def\fgrdelimit{)}%
+}
+% FgTypeE : fig.(x)  , figs.(x) and (y)
+\newcommand\FgTypeE{%
+  \def\Fgname{Fig.}%
+  \def\fgname{fig.}%
+  \def\Fgsname{Figs.}%
+  \def\fgsname{figs.}%
+  \def\fgsep{}%
+  \def\fgssep{}%
+  \def\fgldelimit{(}%
+  \def\fgrdelimit{)}%
+}
+% FgTypeF : Fig.(x)  , Figs.(x) and (y)
+\newcommand\FgTypeF{%
+  \def\Fgname{Fig.}%
+  \def\fgname{Fig.}%
+  \def\Fgsname{Figs.}%
+  \def\fgsname{Figs.}%
+  \def\fgsep{}%
+  \def\fgssep{}%
+  \def\fgldelimit{(}%
+  \def\fgrdelimit{)}%
+}
+% FgTypeG : figure (x)  , figures (x) and (y)
+\newcommand\FgTypeG{%
+  \def\Fgname{Figure}%
+  \def\fgname{figure}%
+  \def\Fgsname{Figure}%
+  \def\fgsname{figure}%
+  \def\fgsep{~}%
+  \def\fgssep{~}%
+  \def\fgldelimit{(}%
+  \def\fgrdelimit{)}%
+}
+% FgTypeH : Figure (x)  , Figures (x) and (y)
+\newcommand\FgTypeH{%
+  \def\Fgname{Figure}%
+  \def\fgname{Figure}%
+  \def\Fgsname{Figures}%
+  \def\fgsname{Figures}%
+  \def\fgsep{~}%
+  \def\fgssep{~}%
+  \def\fgldelimit{(}%
+  \def\fgrdelimit{)}%
+}
+% FgTypeI : Fig. x  , Figs. x and y
+\newcommand\FgTypeI{%
+  \def\Fgname{Fig.}%
+  \def\fgname{Fig.}%
+  \def\Fgsname{Figs.}%
+  \def\fgsname{Figs.}%
+  \def\fgsep{~}%
+  \def\fgssep{~}%
+  \def\fgldelimit{}%
+  \def\fgrdelimit{}%
+}
+% FgTypeJ : Figure x and Fig. y  , Figs. x and y
+\newcommand\FgTypeJ{%
+  \def\Fgname{Figure}%
+  \def\fgname{Fig.}%
+  \def\Fgsname{Figures}%
+  \def\fgsname{Figs.}%
+  \def\fgsep{~}%
+  \def\fgssep{~}%
+  \def\fgldelimit{}%
+  \def\fgrdelimit{}%
+}
+
+% Default to Figure Type J format
+\FgTypeJ
+%
+% For citing a figure at the beginning of a sentence
+\newcommand\Fgcite[2][]{%
+  \if l#1%
+    \Fgname\fgsep\fgldelimit#2\fgrdelimit
+  \else%
+    \Fgname\fgsep\fgldelimit\ref{#2}\fgrdelimit
+  \fi
+}
+% For citing a figure in the middle of a sentence
+\newcommand\fgcite[2][]{%
+  \if l#1%
+    \fgname\fgsep\fgldelimit#2\fgrdelimit
+  \else%
+    \fgname\fgsep\fgldelimit\ref{#2}\fgrdelimit
+  \fi
+}
+% For citing the first of multiple figures at the beginning of a sentence
+\newcommand\Fgcites[2][]{%
+  \if l#1%
+    \Fgsname\fgssep\fgldelimit#2\fgrdelimit
+  \else%
+    \Fgsname\fgssep\fgldelimit\ref{#2}\fgrdelimit
+  \fi
+}
+% For citing the first of multiple figures in the middle of a sentence
+\newcommand\fgcites[2][]{%
+  \if l#1%
+    \fgsname\fgssep\fgldelimit#2\fgrdelimit
+  \else%
+    \fgsname\fgssep\fgldelimit\ref{#2}\fgrdelimit
+  \fi
+}
+% For citing a figure number without the leading word figure, fig, etc.
+% Used in conjuction with \Fgcites and \fgcites
+\newcommand\andfgcite[2][]{%
+  \if l#1%
+    \fgldelimit#2\fgrdelimit
+  \else%
+    \fgldelimit\ref{#2}\fgrdelimit
+  \fi
+}
+%
+\endinput

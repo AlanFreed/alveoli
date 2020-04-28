@@ -1,0 +1,14 @@
+\pdlitem{1}
+DEFENSE TECHNICAL\\
+INFORMATION CTR\\
+DTIC OCA
+
+\pdlitem{1}
+DIR \expandafter\uppercase\expandafter{\myCCDCorgSHORT}\\
+FCDD RLD CL\\
+\dlt TECH LIB
+
+
+\def\ifundefined#1{\expandafter\ifx\csname#1\endcsname\relax}
+\ifundefined{LocalMandatoryDL}\relax\else\input{\LocalMandatoryDL}\fi
+
