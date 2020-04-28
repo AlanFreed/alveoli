@@ -9,7 +9,7 @@ from vertices import vertex
 
 """
 Created on Mon Jan 28 2019
-Last Updated:  Oct 06 2019
+Updated on Tue Apr 21 2020
 
 A test file for class chord in file chords.py.
 
@@ -25,31 +25,24 @@ def run():
     phi = (1.0 + m.sqrt(5.0)) / 2.0
 
     # time step size
-    h = 0.1
-    gaussPts = 3
+    h = 1.0e-3
+    degree = 3
     sqrt3 = m.sqrt(3.0)
     v1 = vertex(1, 1.0 / sqrt3, 1.0 / sqrt3, 1.0 / sqrt3, h)
     v9 = vertex(9, 0.0, phi / sqrt3, 1.0 / (sqrt3 * phi), h)
-    c = chord(2, v1, v9, h, gaussPts)
+    c = chord(2, v1, v9, h, degree)
+
+    print("The chord, when printed via print(chord), is:")
+    print(c)
 
     # print out the material properties of this chord
-    print("This chord has the following material properties:")
+    print("\nThis chord has the following material properties:")
     print(" chord mass density   = {:8.5e} (gr/cm^3)".format(c.massDensity()))
     print(" chord cross-section  = {:8.5e} (cm^2)".format(c.area('r')))
     print(" collagen has an area = {:8.5e} (cm^2)".format(c.areaCollagen('r')))
-    print(" elastin  has an area = {:8.5e} (CM^2)".format(c.areaElastin('r')))
-    E1, E2, et = c.matPropCollagen()
-    print("collagen material properties are:")
-    print("    E1  = {:8.5e} barye".format(E1))
-    print("    E2  = {:8.5e} barye".format(E2))
-    print("    e_t = {:8.5e}".format(et))
-    E1, E2, et = c.matPropElastin()
-    print("elastin material properties are:")
-    print("    E1  = {:8.5e} barye".format(E1))
-    print("    E2  = {:8.5e} barye".format(E2))
-    print("    e_t = {:8.5e}".format(et))
+    print(" elastin  has an area = {:8.5e} (cm^2)".format(c.areaElastin('r')))
 
-    print('reference state:')
+    print('\nIn the reference state:')
     print(c.toString('ref'))
     print('length:   {:8.5e}'.format(c.length('ref')))
     centroid = c.centroid('ref')
@@ -162,7 +155,8 @@ def run():
     print("whose determinant is {:8.5e}".format(np.linalg.det(mass)))
     print("and whose inverse is ")
     print(np.linalg.inv(mass))
-    
+
+    """
     M = 1
     se = 1
     sc = 1
@@ -170,9 +164,11 @@ def run():
     print("\nThe stiffness matrix for this chord is:")
     stiff = c.stiffnessMatrix(M, se, sc)
     print(stiff)
-    
+
     print("\nThe force vector for this chord is:")
     force = c.forcingFunction(se, sc)
     print(force)
-    
+    """
+
+
 run()

@@ -29,9 +29,10 @@ def nominalDiameter():
     # normalized dodecahedral diameter
     dia0 = tan(omega) * (1.0 + cos(alpha)) * len0
     dia = (1.0 + cos(alpha)) / (sqrt3 * cos(omega))
-    print('\nThe diameter of a normalized dodecahedron is:')
-    print('D  = {}'.format(dia))
-    print('D0 = {}'.format(dia0))
+    print('\nThe diameter of a dodecahedron in its natural co-ordinates is:')
+    print('D = {}'.format(dia))
+    print('Theoretically, it should be')
+    print('D = {}'.format(dia0))
 
 
 def run():
@@ -55,8 +56,10 @@ def run():
     v.update(x2, y2, z2)
     v.advance()
     v.update(x3, y3, z3)
-    print('\nThe coordinates are:')
-    x, y, z = v.coordinates('reference')
+    print('\nThe reference co-ordinates are:')
+    x = v.coordinates('reference')
+    print('          ' + coordinatesToString(x[0], x[1], x[2]))
+    print('while the history of co-ordinate values is')
     print('Referece: ' + v.toString('r'))
     print('Previous: ' + v.toString('p'))
     print('Current:  ' + v.toString('c'))
@@ -82,6 +85,9 @@ def run():
     print('Current:  ' + coordinatesToString(d2u[0], d2u[1], d2u[2]))
     d2u = v.acceleration('n')
     print('Next:     ' + coordinatesToString(d2u[0], d2u[1], d2u[2]))
+
+    print('\nTest printing a vertex object with the print(object) command.')
+    print(v)
 
 
 nominalDiameter()

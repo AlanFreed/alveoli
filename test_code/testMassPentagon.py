@@ -3,6 +3,7 @@
 
 # import sympy as sy
 from chords import chord
+from fractions import Fraction
 import math as m
 import numpy as np
 from pentagons import pentagon
@@ -10,7 +11,7 @@ from vertices import vertex
 
 """
 Created on Aug 27 2019
-Updated on Oct 06 2019
+Updated on Apr 07 2020
 
 A test file for class pentagon in file pentagon.py to find the mass matrix
 
@@ -42,6 +43,8 @@ def run(pentagonGaussPts):
     p.update()
     p.advance()
 
+    area = p.area("curr")
+
     mass = p.massMatrix()
     # normalize this matrix
     maxEle = np.amax(mass)
@@ -50,7 +53,9 @@ def run(pentagonGaussPts):
     print('A pentagon with {} Gauss points has a normalized mass matrix of:\n'
           .format(pentagonGaussPts))
     print(mass)
-    print('\nwith a determinant of {:6.4e}.\n'.format(np.linalg.det(mass)))
+    det = np.linalg.det(mass)
+    print('\nwith a determinant of {:6.4e} with inverse {:6.4e} and area {:6.4e}.\n'
+          .format(det, 1/det, area))
 
 
 print("")
