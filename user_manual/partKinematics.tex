@@ -32,9 +32,9 @@ wherein $\xi$ is the natural co-ordinate.  Components $x_i$ and $u_i \defeq x_i 
 The deformation gradient in this case is simply
 \begin{multline}
     \mathbfsf{F} ( \xi ) = 1 + \frac{\partial \mathbfit{u}}{\partial \xi} 
-    \left( \frac{\partial \mathbfit{x}_0 }{\partial \xi} \right)^{-1} \\ = 
-    1 + \sum_{i=1}^2 N_{i,\xi} u_i \left( \sum_{i=1}^2 N_{i,\xi} x_{0i} \right)^{-1}
-    = 1 + \frac{u_2 - u_1}{x_{02} - x_{01}} = \frac{x_2 - x_1}{x_{02} - x_{01}}
+    \left( \frac{\partial \mathbfit{x}_0 }{\partial \xi} \right)^{-1} = 
+    1 + \sum_{i=1}^2 N_{i,\xi} u_i \left( \sum_{i=1}^2 N_{i,\xi} x_{0i} \right)^{-1} \\
+    = 1 + \frac{u_2 - u_1}{x_{02} - x_{01}} \, \vec{\mathbfsf{e}}_1 \otimes \vec{\mathbfsf{e}}_1 = \frac{x_2 - x_1}{x_{02} - x_{01}} \, \vec{\mathbfsf{e}}_1 \otimes \vec{\mathbfsf{e}}_1
 \end{multline}
 which is uniform over the length of a chord, i.e., it is independent of $\xi$.
 
@@ -65,6 +65,8 @@ The kinematics of an irregular pentagon, on the other hand, are not trivial.  Sh
 \subsection{Wachspress' Shape Functions for Interpolating an Irregular Pentagon}
 \label{secShapeFns}
 
+The idea here is to model each pentagonal face of the dodecahedron with exactly one pentagonal finite element.  Five constant-strain triangles were originally considered, but their accuracy was found to be wanting when compared with that of a single pentagonal element whenever deformation becomes non-uniform.  There was no difference between them whenever the deformation was an uniform dilation.
+
 In 1975, Wachspress \cite{Wachspress75,Wachspress16} derived a set of shape functions $N_i$ that are capable of interpolating convex polyhedra.  His shape functions take on the form of rational polynomials, viz., $N_i = A_i / B$ where $A_i$ and $B$ are polynomials.  In contrast, classic isoparametric elements are constructed from polynomial shape functions \cite{Hughes87}.  For the Wachspress shape functions of a pentagon, the $A_i$ are cubic polynomials, while $B$ is a quadratic polynomial.
 
 Let us consider a convex pentagonal domain $\Omega$ defined over $\mathbb{R}^2$ whose vertices have global co-ordinates of
@@ -85,7 +87,7 @@ y(\xi, \eta) & = \sum\nolimits_{i=1}^5 N_i (\xi, \eta) \, y_i
 \mathbfit{x}(\boldsymbol{\xi}) = \sum_{i=1}^5 N_i (\boldsymbol{\xi}) \, 
 \mathbfit{x}_{\,i}
 \end{equation}
-which relate natural co-ordinates $\boldsymbol{\xi} \equiv (\xi, \eta)$ to global co-ordinates $\mathbfit{x} \equiv (x, y)$, where $\mathbfit{x}_{\,i} \equiv (x_i, y_i)$ are nodal co-ordinates at the $i^{\mathrm{th}}$ vertex, with $i$ indexing counterclockwise around a pentagon according to Fig.~\ref{figRegPentagon}.  Displacement $\mathbfit{u} (\mathbfit{x}) \defeq \mathbfit{x} - \mathbfit{x}_0$, with reference co-ordinates $\mathbfit{x}_0 \equiv (x_0, y_0)$, also obeys this mapping
+which relate natural co-ordinates $\boldsymbol{\xi} \equiv (\xi, \eta)$ to global co-ordinates $\mathbfit{x} \equiv (x, y)$, where $\mathbfit{x}_{\,i} \equiv (x_i, y_i)$ are nodal co-ordinates at the $i^{\mathrm{th}}$ vertex, with $i$ indexing counter\-clockwise around a pentagon according to Fig.~\ref{figRegPentagon}.  Displacement $\mathbfit{u} (\mathbfit{x}) \defeq \mathbfit{x} - \mathbfit{x}_0$, with reference co-ordinates $\mathbfit{x}_0 \equiv (x_0, y_0)$, also obeys this mapping
 \begin{equation}
 \begin{aligned}
 u(\xi, \eta) & = \sum\nolimits_{i=1}^5 N_i (\xi, \eta) \, u_i \\
@@ -201,7 +203,7 @@ from which the deformation and displacement gradients are constructed.
 
 \subsection{Second Derivatives of the Shape Functions}
 
-The second derivatives of these shape functions, which we use to test the compatibility conditions of this element, are described by
+The second derivatives of these shape functions, which we used to test the compatibility conditions of this element, are described by
 \begin{subequations}
 	\begin{align}
 	N_{i+1,\xi\xi} & = \kappa_i \, \mathfrak{N}_{i,\xi\xi}(\xi,\eta) /
@@ -488,7 +490,7 @@ We study compatibility only for the purpose of assessing applicability in our ch
 \subsection{Gram-Schmidt Decomposition of the Deformation Gradient}
 \label{secQR}
 
-To describe kinematics of a planar membrane, an upper-triangular Gram-Schmidt decomposition of the deformation gradient $\mathbfsf{F}$ is used in lieu of the symmetric polar decomposition that is commonly adopted \cite{Srinivasa12,FreedSrinivasa15,Freedetal17,FreedZamani19,Freedetal19}.  McLellan \cite{McLellan76,McLellan80} was the first to propose a triangular decomposition of $\mathbfsf{F}$, to prove its uniqueness and existence, and to establish many of its physical properties.  This idea has been rediscovered several times since then, e.g., \cite{Rosakis90,Souchet93,Srinivasa12}.  A thorough history of the \textbf{QR} (Gram-Schmidt) decomposition has been written by Leon, Bj\"orck and Gander \cite{Leonetal13}, with a brief history regarding its application to kinematics being given in Freed \textit{et~al}. \cite{Freedetal19}
+To describe kinematics of a planar membrane, an upper-triangular Gram-Schmidt decomposition of the deformation gradient $\mathbfsf{F}$ is used in lieu of the symmetric polar decomposition that is commonly adopted \cite{Srinivasa12,FreedSrinivasa15,Freedetal17,FreedZamani19,Freedetal19}.  McLellan \cite{McLellan76,McLellan80} was the first to propose a triangular decomposition of $\mathbfsf{F}$, to prove its uniqueness and existence, and to establish many of its physical properties.  This idea has been rediscovered several times since then, e.g., \cite{Rosakis90,Souchet93,Srinivasa12}.  A thorough history of the \textbf{QR} (Gram-Schmidt) decomposition has been written by Leon, Bj\"orck \& Gander \cite{Leonetal13}, with a brief history regarding its application to kinematics being given in Freed \textit{et~al}. \cite{Freedetal19}
 
 A Gram-Schmidt factorization of the deformation gradient $\mathbfsf{F}$ is written here as $\mathbfsf{F} = \boldsymbol{\mathcal{RU}}$, where the rotation $\boldsymbol{\mathcal{R}}$ is orthogonal, and where the Laplace stretch $\boldsymbol{\mathcal{U}}$ is upper-triangular \cite{Freedetal19}.\footnote{
 	The \textbf{QR} rotation $\boldsymbol{\mathcal{R}}$ and stretch $\boldsymbol{\mathcal{U}}$ tensors are distinct from those that arise from a polar decomposition of a deformation gradient, typically denoted as $\mathbfsf{R}$ and $\mathbfsf{U}$, as found in any, modern, continuum mechanics text.  McLellan \cite{McLellan76,McLellan80} introduced the Laplace stretch in 1976, which he denoted as $\mathbfsf{H}$, while Srinivasa \cite{Srinivasa12} denoted it as $\tilde{\mathbfsf{F}}$ in his 2012 paper.
@@ -544,7 +546,9 @@ with
 \theta = \tan^{-1} \left( \frac{F_{21}}{F_{11}} \right)
 \label{trigFns}
 \end{equation}  
-where a positive angle $\theta$ corresponds with a counter\-clockwise rotation of physical axes $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$ about reference axes $( \vec{\mathbfsf{e}}_1 , \vec{\mathbfsf{e}}_2 )$.
+where a positive angle $\theta$ corresponds with a counter\-clockwise rotation of physical axes $( \vec{\mathbfsf{g}}_1 , \vec{\mathbfsf{g}}_2 )$ about reference axes $( \vec{\mathbfsf{e}}_1 , \vec{\mathbfsf{e}}_2 )$.  
+
+From the four independent components of a planar deformation gradient $F_{ij}$ come three deformation attributes, i.e., $a$, $b$ and $g$, and one rotational attribute, i.e., $\theta$.
 
 
 \subsubsection{Dilemma}
@@ -576,7 +580,7 @@ To illustrate the concern, consider two deformation histories, as drawn in Fig.~
 	\label{shear2}
 	\end{align}
 \end{subequations}
-respectively, where we see that shear $\mathcal{U}_{12}$ has the same physical interpretation in both cases, viz., $\gamma$, but the elongations $\mathcal{U}_{11}$ and $\mathcal{U}_{22}$ do not, viz., $\mathcal{U}_{11}=1$ and $\mathcal{U}_{22}=1$ in Eqn.~(\ref{shear1}), whereas $\mathcal{U}_{11} = \sqrt{1 + \gamma^2}$ and $\mathcal{U}_{22} = 1 / \sqrt{1 + \gamma^2}$ for the motion described in Eqn.~(\ref{shear2}).  Consequently, two geometric interpretations are produced for just one physical mode of deformation.  This cannot be!
+respectively, where we see that shear $\mathcal{U}_{12}$ has the same physical interpretation in both cases, viz., $\gamma$, but elongations $\mathcal{U}_{11}$ and $\mathcal{U}_{22}$ do not, viz., $\mathcal{U}_{11}=1$ and $\mathcal{U}_{22}=1$ in Eqn.~(\ref{shear1}), whereas $\mathcal{U}_{11} = \sqrt{1 + \gamma^2}$ and $\mathcal{U}_{22} = 1 / \sqrt{1 + \gamma^2}$ for the motion described in Eqn.~(\ref{shear2}).  Consequently, two geometric interpretations are produced for just one physical mode of deformation.  This cannot be!
 
 \begin{figure}
 	\centering
@@ -668,7 +672,7 @@ The physical attributes for Laplace stretch, as they pertain to the two cases in
 	\label{thetaAttribute}
 	\end{align}
 \end{subequations}
-where attributes in the left column apply to case~1 (i.e., Eqn.~\ref{Q0}) while those in the right column apply to case~2 (viz., Eqn.~\ref{Q1}).  The actual set of physical attributes $\{ a, b, g, \theta \}$ that are to be used when quantifying Laplace stretch and its inverse, according to Eqn.~(\ref{LaplaceStretch}), are then selected via the strategy  
+where attributes in the left column apply to case~1 (i.e., Eqn.~\ref{Q0}) while those in the right column apply to case~2 (viz., Eqn.~\ref{Q1}).  The actual set of physical attributes $\{ a, b, g, \theta \}$ that are to be used when quantifying Laplace stretch and its inverse, according to Eqn.~(\ref{LaplaceStretch2D}), are then selected via the strategy  
 \begin{subequations}
 	\label{attributeMaps}
 	\begin{align}
@@ -680,7 +684,7 @@ where attributes in the left column apply to case~1 (i.e., Eqn.~\ref{Q0}) while 
 	\mapsto \{ a , b , g , \theta \}
 	\end{align}
 \end{subequations}
-where it is easily verified that $\tilde{a} = \hat{a}$ and $\tilde{b} = \hat{b}$ whenever $\tilde{g} = \hat{g}$; consequently, the physical attributes of deformation $a , b , g$ remain continuous across a co-ordinate switch, however, the angle of co-ordinate rotation $\theta$ will not be continuous across such a switch between co-ordinate frames, as they represent rotations out of different co-ordinate directions.
+where it is easily verified that $\tilde{a} = \hat{a}$ and $\tilde{b} = \hat{b}$ whenever $\tilde{g} = \hat{g}$; consequently, the physical attributes of deformation $a , b , g$ remain continuous across a co-ordinate switch, however, the angle of co-ordinate rotation $\theta$ will not be continuous across such a switch between co-ordinate frames, as they represent rotations out of different co-ordinate directions.  A like statement applies in the 3D case whenever one uses the re-indexing scheme presented in \S\ref{reindexing3D}, i.e., the physical attributes of Laplace stretch remain continuous across a re-indexing of one's co-ordinate frame.
 
 The above strategy returns matrices for the rotation and Laplace stretch described in Eqn.~(\ref{shear1}) for both deformation gradients presented in Eqn.~(\ref{shears}). The dilemma is remedied.  Laplace stretch, as remedied, therefore has an unique physical interpretation.    Co-ordinate re-indexing ensures that the invariant properties of Laplace stretch \cite{McLellan80} are adhered to.
 
@@ -711,33 +715,33 @@ whose rates are exact differentials, i.e., they are independent of path---a taci
 
 The following approximations for stretch rates were derived by Freed \&\ Zamani \cite{FreedZamani18}.  From these, the various strain rates listed in Eqn.~(\ref{thermodynamicStrains2D}) can be established.  
 
-A forward difference formula is used to approximate rates in the reference configuration for the various stretch attributes, as obtained from $\dot{\boldsymbol{\mathcal{U}}}_0 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / h + \mathcal{O}(h)$, which produces
+A forward difference formula is used to approximate rates in the reference configuration for the various stretch attributes, as obtained from $\mathrm{d}\boldsymbol{\mathcal{U}}_0 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / \mathrm{d}t + \mathcal{O}(\mathrm{d}t)$ that, neglecting higher-order terms, produces
 \begin{equation}
-\mathrm{d} a_0 = \frac {a_1 - a_0}{h} , \quad 
-\mathrm{d} b_0 = \frac {b_1 - b_0}{h} , \quad 
+\mathrm{d} a_0 = \frac {a_1 - a_0}{\mathrm{d}t} , \quad 
+\mathrm{d} b_0 = \frac {b_1 - b_0}{\mathrm{d}t} , \quad 
 \mathrm{d} g_0 = \frac{a_1}{a_0} 
-\left( \frac{g_1 - g_0}{h} \right) .
+\left( \frac{g_1 - g_0}{\mathrm{d}t} \right) 
 \label{forwardDifference1stOrder2D}
 \end{equation}
-A backward difference formula $\dot{\boldsymbol{\mathcal{U}}}_1 = ( \boldsymbol{\mathcal{U}}_1 - \boldsymbol{\mathcal{U}}_0 ) / h + \mathcal{O}(h)$ is used to estimate rates for the various stretch attributes at the end of its first integration step, which give
+where $\mathrm{d} t = t_1 - t_0$ is the applied time step.  A backward difference formula $\mathrm{d} \boldsymbol{\mathcal{U}}_1 = ( \boldsymbol{\mathcal{U}}_1 - \boldsymbol{\mathcal{U}}_0 ) / \mathrm{d}t + \mathcal{O}(\mathrm{d}t)$ is used to estimate rates for the various stretch attributes at the end of its first integration step that, neglecting higher-order terms, give
 \begin{equation}
-\mathrm{d} a_1 = \frac {a_1 - a_0}{h} , \quad
-\mathrm{d} b_1 = \frac {b_1 - b_0}{h} , \quad
+\mathrm{d} a_1 = \frac {a_1 - a_0}{\mathrm{d}t} , \quad
+\mathrm{d} b_1 = \frac {b_1 - b_0}{\mathrm{d}t} , \quad
 \mathrm{d} g_1 = \frac{a_0}{a_1} 
-\left(\frac{g_1 - g_0}{h} \right) .
+\left(\frac{g_1 - g_0}{\mathrm{d}t} \right) .
 \label{backwardDifference1stOrder2D}
 \end{equation}
 Curiously, there is a distinction in how the shear rates are approximated at the two nodes for this first interval of integration.
 
-Equations (\ref{forwardDifference1stOrder2D} \& \ref{backwardDifference1stOrder2D}) are first-order approximations for these derivatives.  Second-order approximations can be established whenever $n > 0$ provided the stepsize for step $[n, n+1]$ equals the stepsize for step $[n-1, n]$, where state $n=0$ associates with an initial condition.  The backward difference formula  $\dot{\boldsymbol{\mathcal{U}}}_{n+1} = ( 3 \, \boldsymbol{\mathcal{U}}_{n+1} -  4 \, \boldsymbol{\mathcal{U}}_{n} + \boldsymbol{\mathcal{U}}_{n-1} ) / 2h + \mathcal{O}(h^2)$ then produces stretch rates of
+Equations (\ref{forwardDifference1stOrder2D} \& \ref{backwardDifference1stOrder2D}) are first-order approximations for these derivatives.  Second-order approximations can be established whenever $n > 0$ provided the stepsize for step $[n, n+1]$ equals the stepsize for step $[n-1, n]$, where state $n=0$ associates with an initial condition.  The backward difference formula  $\mathrm{d} \boldsymbol{\mathcal{U}}_{n+1} = ( 3 \, \boldsymbol{\mathcal{U}}_{n+1} -  4 \, \boldsymbol{\mathcal{U}}_{n} + \boldsymbol{\mathcal{U}}_{n-1} ) / 2\mathrm{d}t + \mathcal{O} \bigl( (\mathrm{d}t)^2 \bigr)$ then produces rates for the stretch attributes of
 \begin{equation}
 \begin{aligned}
 \mathrm{d} a_{n+1} & 
-= \frac {3a_{n+1} - 4a_{n} +  a_{n-1}}{2h} \\ 
+= \frac {3a_{n+1} - 4a_{n} +  a_{n-1}}{2\mathrm{d}t} \\ 
 \mathrm{d} b_{n+1} & 
-= \frac {3b_{n+1} - 4b_{n} +  b_{n-1}}{2h} \\
+= \frac {3b_{n+1} - 4b_{n} +  b_{n-1}}{2\mathrm{d}t} \\
 \mathrm{d} g_{n+1} & 
-= \frac{2a_{n}} {a_{n+1}} \left(\frac{g_{n+1} - g_{n}}{h} \right) - \frac{a_{n-1}}{a_{n+1}} \left( \frac{g_{n+1} - g_{n-1}}{2h} \right) 
+= \frac{2a_{n}} {a_{n+1}} \left(\frac{g_{n+1} - g_{n}}{\mathrm{d}t} \right) - \frac{a_{n-1}}{a_{n+1}} \left( \frac{g_{n+1} - g_{n-1}}{2\mathrm{d}t} \right) 
 \end{aligned}
 \label{backwardDifference2ndOrder2D}
 \end{equation}
@@ -840,7 +844,7 @@ whose determinant is used in integrations.  The current nodal positions have com
 
 The re-indexed deformation gradient presented in \S\ref{reindexing3D} has a Gram-Schmidt decomposition that we denote as $\mathbfsf{F} = \boldsymbol{\mathcal{RU}}$ whose components are an orthogonal rotation matrix $\boldsymbol{\mathcal{R}} = \bigl[ \vec{\mathbfsf{g}}_1 \bigm| \vec{\mathbfsf{g}}_2 \bigm| \vec{\mathbfsf{g}}_3 \bigr] = \delta_{ij} \, \vec{\mathbfsf{g}}_i \otimes \vec{\mathbfsf{E}}_j = \mathcal{R}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ and an upper-triangular matrix $\boldsymbol{\mathcal{U}} = \mathcal{U}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ called Laplace stretch, \cite{Freedetal19} both evaluated in the reference co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$, so that $\mathbfsf{F} = \mathcal{F}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j = \mathcal{R}_{ik\,} \mathcal{U}_{kj} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$, and therefore $\mathcal{F}_{ij} = \mathcal{R}_{ik\,} \mathcal{U}_{kj}$.
 
-The components of Laplace stretch $\mathcal{U}_{ij}$ are readily gotten through a Cholesky factorization of the right Cauchy-Green deformation tensor $\mathbfsf{C} = \mathcal{C}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ with tensor components $\mathcal{C}_{ij} = \mathcal{F}_{ki\,} \mathcal{F}_{kj}$ relate to their physical attributes via \cite{Freed17}
+The components of Laplace stretch $\mathcal{U}_{ij}$ are readily gotten through a Cholesky factorization of the right Cauchy-Green deformation tensor $\mathbfsf{C} = \mathcal{C}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ with tensor components $\mathcal{C}_{ij} = \mathcal{F}_{ki\,} \mathcal{F}_{kj}$ that relate to their physical attributes via \cite{Freed17}
 \begin{equation} 
 \boldsymbol{\mathcal{U}} = 
 \begin{bmatrix}
@@ -915,58 +919,58 @@ whose rates are exact differentials, i.e., they are independent of path---a taci
 
 The following approximations for stretch rates were derived by Freed \&\ Zamani \cite{FreedZamani18}.  From these, the various strain rates listed in Eqn.~(\ref{thermodynamicStrains3D}) can be established.  
 
-A forward difference formula is used to approximate rates in the reference configuration for the various stretch attributes, as obtained from $\dot{\boldsymbol{\mathcal{U}}}_0 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / h + \mathcal{O}(h)$.  This produces
+A forward difference formula is used to approximate rates in the reference configuration for the various stretch attributes, as obtained from $\mathrm{d} \boldsymbol{\mathcal{U}}_0 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / \mathrm{d}t + \mathcal{O}(\mathrm{d}t)$.  Neglecting higher-order terms, this produces
 \begin{equation}
 \begin{aligned}
 \mathrm{d} a_0 &
-= \frac {a_1 - a_0}{h} \quad &
+= \frac {a_1 - a_0}{\mathrm{d}t} \quad &
 \mathrm{d} \alpha_0 & 
-= \frac{b_1}{b_0} \left(\frac{\alpha_1 - \alpha_0}{h} \right) \\
+= \frac{b_1}{b_0} \left(\frac{\alpha_1 - \alpha_0}{\mathrm{d}t} \right) \\
 \mathrm{d} b_0 & 
-= \frac {b_1 - b_0}{h} \quad & 
+= \frac {b_1 - b_0}{\mathrm{d}t} \quad & 
 \mathrm{d} \beta_0 & 
-= \frac{a_1}{a_0} \left( \frac{\beta_1 - \beta_0}{h} \right) \\
+= \frac{a_1}{a_0} \left( \frac{\beta_1 - \beta_0}{\mathrm{d}t} \right) \\
 \mathrm{d} c_0 & 
-= \frac {c_1 - c_0}{h} \quad & 
-\mathrm{d} \gamma_0 & \approx \frac{a_1}{a_0} \left( \frac{\gamma_1 - \gamma_0}{h}\right) .
+= \frac {c_1 - c_0}{\mathrm{d}t} \quad & 
+\mathrm{d} \gamma_0 & = \frac{a_1}{a_0} \left( \frac{\gamma_1 - \gamma_0}{\mathrm{d}t}\right) .
 \end{aligned}
 \label{forwardDifference1stOrder3D}
 \end{equation}
-A backward difference formula $\dot{\boldsymbol{\mathcal{U}}}_1 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / h + \mathcal{O}(h)$ is used to estimate rates for the various stretch attributes at the end of its first integration step, from which it follows that
+A backward difference formula $\mathrm{d} \boldsymbol{\mathcal{U}}_1 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / \mathrm{d}t + \mathcal{O}(\mathrm{d}t)$ is used to estimate rates for the various stretch attributes at the end of its first integration step, from which it follows that
 \begin{equation}
 \begin{aligned}
 \mathrm{d} a_1 & 
-= \frac {a_1 - a_0}{h} \;\; & 
+= \frac {a_1 - a_0}{\mathrm{d}t} \;\; & 
 \mathrm{d} \alpha_1 & 
-= \frac {b_0}{b_1} \left( \frac{\alpha_1 - \alpha_0}{h} \right) \\
+= \frac {b_0}{b_1} \left( \frac{\alpha_1 - \alpha_0}{\mathrm{d}t} \right) \\
 \mathrm{d} b_1 & 
-= \frac {b_1 - b_0}{h} \;\; & 
+= \frac {b_1 - b_0}{\mathrm{d}t} \;\; & 
 \mathrm{d} \beta_1 & 
-= \frac {a_0} {a_1} \left( \frac{\beta_1 - \beta_0}{h} \right) \\
+= \frac {a_0} {a_1} \left( \frac{\beta_1 - \beta_0}{\mathrm{d}t} \right) \\
 \mathrm{d} c_1 & 
-= \frac {c_1 - c_0}{h} \;\; & 
+= \frac {c_1 - c_0}{\mathrm{d}t} \;\; & 
 \mathrm{d} \gamma_1 & 
-= \frac{a_0}{a_1} \left(\frac{\gamma_1 - \gamma_0}{h} \right) .
+= \frac{a_0}{a_1} \left(\frac{\gamma_1 - \gamma_0}{\mathrm{d}t} \right) .
 \end{aligned}
 \label{backwardDifference1stOrder3D}
 \end{equation}
-Curiously, there is a distinction in how the shear rates are approximated at the two nodes for this first interval of integration.
+Curiously, there is a distinction in how the shear rates are approximated at the two nodes belonging to this first interval of integration.
 
-Equations (\ref{forwardDifference1stOrder3D} \& \ref{backwardDifference1stOrder3D}) are first-order approximations for these derivatives.  Second-order approximations can be established whenever $n > 0$ provided the stepsize for step $[n, n+1]$ equals the stepsize for step $[n-1, n]$, where state $n=0$ associates with an initial condition.  The backward difference formula  $\dot{\boldsymbol{\mathcal{U}}}_{n+1} = ( 3 \, \boldsymbol{\mathcal{U}}_{n+1} -  4 \, \boldsymbol{\mathcal{U}}_{n} + \boldsymbol{\mathcal{U}}_{n-1} ) / 2h + \mathcal{O}(h^2)$ produces differential stretch rates of
+Equations (\ref{forwardDifference1stOrder3D} \& \ref{backwardDifference1stOrder3D}) are first-order approximations for these derivatives.  Second-order approximations can be established whenever $n > 0$ provided the stepsize for step $[n, n+1]$ equals the stepsize for step $[n-1, n]$, where state $n=0$ associates with an initial condition.  The backward difference formula  $\mathrm{d} \boldsymbol{\mathcal{U}}_{n+1} = ( 3 \, \boldsymbol{\mathcal{U}}_{n+1} -  4 \, \boldsymbol{\mathcal{U}}_{n} + \boldsymbol{\mathcal{U}}_{n-1} ) / 2\mathrm{d}t + \mathcal{O} \bigl( ( \mathrm{d}t )^2 \bigr)$ produces differential stretch rates of
 \begin{equation}
 \begin{aligned}
 \mathrm{d} a_{n+1} & 
-= \frac {3a_{n+1} - 4a_{n} +  a_{n-1}}{2h} \\ 
+= \frac {3a_{n+1} - 4a_{n} +  a_{n-1}}{2\mathrm{d}t} \\ 
 \mathrm{d} b_{n+1} & 
-= \frac {3b_{n+1} - 4b_{n} +  b_{n-1}}{2h} \\
+= \frac {3b_{n+1} - 4b_{n} +  b_{n-1}}{2\mathrm{d}t} \\
 \mathrm{d} c_{n+1} & 
-= \frac {3c_{n+1} - 4c_{n} +  c_{n-1}}{2h} \\
+= \frac {3c_{n+1} - 4c_{n} +  c_{n-1}}{2\mathrm{d}t} \\
 \mathrm{d} \alpha_{n+1} & 
-= \frac{2b_{n}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n}}{h} \right) - \frac{b_{n-1}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n-1}}{2h} \right) \\
+= 2 \frac{b_{n}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n}}{\mathrm{d}t} \right) - \frac{b_{n-1}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n-1}}{2\mathrm{d}t} \right) \\
 \mathrm{d} \beta_{n+1} & 
-= \frac{2a_{n}}{a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n} }{h} \right) - \frac{a_{n-1}} {a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n-1}}{2h} \right) \\ 
+= 2 \frac{a_{n}}{a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n} }{\mathrm{d}t} \right) - \frac{a_{n-1}} {a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n-1}}{2\mathrm{d}t} \right) \\ 
 \mathrm{d} \gamma_{n+1} & 
-= \frac{2a_{n}} {a_{n+1}} \left(\frac{\gamma_{n+1} - \gamma_{n}}{h} \right) - \frac{a_{n-1}}{a_{n+1}} \left( \frac{\gamma_{n+1} - \gamma_{n-1}}{2h} \right) 
+= 2 \frac{a_{n}} {a_{n+1}} \left(\frac{\gamma_{n+1} - \gamma_{n}}{\mathrm{d}t} \right) - \frac{a_{n-1}}{a_{n+1}} \left( \frac{\gamma_{n+1} - \gamma_{n-1}}{2\mathrm{d}t} \right) 
 \end{aligned}
 \label{backwardDifference2ndOrder3D}
 \end{equation}

@@ -18,7 +18,7 @@ that contains co-ordinate differences at a dodecahedral vertex evaluated in the 
 
 When assembled, vectors $\mathbf{f}$, $\mathbf{u}$ and $\ddot{\mathbf{u}}$ have lengths of 60 for the alveolar chord and septa models, and a length of 63 for the alveolar sac model, while matrices $\mathbf{M}$ and $\mathbf{K}$ have dimensions of $60 \! \times \! 60$ for the alveolar chord and septa models, and dimensions of $63 \! \times \! 63$ for the alveolar sac model.  The model for alveolar volume has an extra node located at the centroid of the dodecahedron, which is a node in common betwixt the 60 tetrahedra needed to fill the volume of a dodecahedron in our modeling of an alveolus. 
 
-As a modeling simplification, the alveolar chords, the alveolar septa, and the alveolar sac are each modeled separately.  It is the nodal forces resulting from these three, separate, finite-element models that then are summed.  These are obtained by interpolating the stresses integrated at their Guass points out to their nodes, which belong to the set dodecahedral vertices.  These three sources for vertex force can be added, from which an uniform (homogenized) state of stress can then be calculated for return.  
+As a modeling simplification, the alveolar chords, the alveolar septa, and the alveolar sac are each modeled separately.  It is the nodal forces, i.e., forces at the vertices, resulting from these three, separate, finite-element models that are then summed.  These are obtained by interpolating the stresses integrated at each model's Guass points out to these common nodes, which belong to the set of dodecahedral vertices.  These three sources for vertex force can be added, from which an uniform (homo\-genized) state of stress can then be calculated for return.  
 
 Consequently, we are constructing three, individual, finite-element models governed by the following systems of hyperbolic differential equations
 \begin{subequations}
@@ -41,9 +41,9 @@ A consistent mass matrix \cite{Archer65} for an element, established in its natu
 	\mathrm{d} V
 	\label{consistentMassMatrix}
 \end{equation}
-wherein $\mathbf{N}$ is the shape function matrix for an element whose mass density is $\rho$.  This mass matrix is said to be consistent in that it is calculated with the same shape functions that are used to create the stiffness matrix.  Consistent mass matrices are symmetric.  Unfortunately, they may be singular, too, which is not a desirable feature for our chosen numerical approach.
+wherein $\mathbf{N}$ is the shape function matrix for an element of interest whose mass density is $\rho$.  This mass matrix is said to be consistent in that it is calculated with the same shape functions that are used to create the stiffness matrix.  Consistent mass matrices are symmetric.  Unfortunately, they may be singular, too, which is not a desirable feature for our chosen numerical approach.
 
-To construct a non-singular mass matrix, we introduce a lumped mass matrix.  Specifically, a sum of all row elements from each row of the consistent mass matrix establishes diagonal elements in a lumped mass matrix \cite{Reddy93} in that
+To construct a non-singular mass matrix, we introduce a lumped mass matrix.  Specifically, a sum of all column elements for each row of a consistent mass matrix establishes the diagonal elements of a lumped mass matrix \cite{Reddy93} in that
 \begin{equation}
 \mathbf{M}_L = \sum_{i=1}^n M_{Li} 
 \quad \text{where} \quad
@@ -52,13 +52,13 @@ M_{Li} = \sum_{j=1}^n \int_{V} \rho \, N_i \, N_j \, \mathrm{d} V
 \end{equation}
 wherein $\sum_{j=1}^n N_j = 1$, with $i$ being a Gauss point from the $n$ Gauss points in an element.
 
-A lumped-consistent (or weighted) mass matrix $\mathbf{M}_W $ can then be defined as follows
+A lumped-consistent (or weighted) mass matrix $\mathbf{M}_W $ can be created as follows
 \begin{equation}
 \mathbf{M}_W  = (1 - \mu) \, \mathbf{M}_{C} + \mu \, \mathbf{M}_{L}
 \end{equation}
-wherein $\mu$ is a free scalar parameter for weighting the consistent and lumped mass matrices.  The reason for mixing $\mathbf{M}_C$ and $\mathbf{M}_L$ is that the weighted matrix $\mathbf{M}_W$ will not be singular.  Herein $\mu$ is taken to be a half, i.e., an averaged mass matrix is adopted, which has a nice property of minimizing low frequency dispersion.  Specifically, the weighting
+wherein $\mu$ is a free scalar parameter for weighting the consistent and lumped mass matrices.  The reason for mixing $\mathbf{M}_C$ and $\mathbf{M}_L$ is to ensure a nonsingular mass matrix.  In this work, $\mu$ is taken to be a half, i.e., an averaged mass matrix is adopted, which has a nice property of minimizing low frequency dispersion; specifically, 
 \begin{equation}
-\mathbf{M}_A  = \tfrac{1}{2} \, (\mathbf{M}_{C} + \mathbf{M}_{L})
+\mathbf{M}_A  \defeq \tfrac{1}{2} \, (\mathbf{M}_{C} + \mathbf{M}_{L})
 \label{LumconsMass}
 \end{equation}
 is how we shall construct all of our mass matrices.  The averaged mass matrix $\mathbf{M}_A$ is invertible---a requirement of the selected numerical solution strategy presented in \S\ref{sec:solve2ndOrderODE}.
@@ -66,17 +66,17 @@ is how we shall construct all of our mass matrices.  The averaged mass matrix $\
 \subsection{Mass Matrices for a Chord}
 
 A two-noded alveolar chord has shape functions $N_i$ that, when evaluated in its natural co-ordinate system wherein $-1 \leq \xi \leq 1$, aggregate into a matrix of shape functions
-\begin{equation}
+\begin{multline}
 \mathbf{N} = \begin{bmatrix} N_1 & N_2 \end{bmatrix} =
 \begin{bmatrix}
 \frac{1}{2} \, (1 - \xi) &  \frac{1}{2} \, (1 + \xi)
-\end{bmatrix} 
-\quad \text{so that} \quad
+\end{bmatrix} \\
+\text{with} \quad
 N_{1,\xi} = -\tfrac{1}{2} 
 \quad \text{and} \quad
 N_{2,\xi} = \tfrac{1}{2}
-\end{equation}
-where $\xi$ is the abscissa associated with a specific Gauss integration rule, cf.\ Table~\ref{tabQuadrature1D}.
+\end{multline}
+where $\xi$ is an abscissa associated with a specific Gauss quadrature rule, cf.\ Table~\ref{tabQuadrature1D}.
 
 The Jacobian matrix $\mathbf{J}$ for a one-dimensional chord, which is also its Jacobian determinant $| \mathbf{J} |$, is used to transform the integrals in Eqns.~(\ref{consistentMassMatrix} \& \ref{lumpedMassMatrix}) from their global co-ordinate system into their natural co-ordinate system.  It has a value of
 \begin{equation}
@@ -88,30 +88,30 @@ The Jacobian matrix $\mathbf{J}$ for a one-dimensional chord, which is also its 
 given nodal co-ordinates of $x_1 = -\tfrac{1}{2} L$ and $x_2 = \tfrac{1}{2} L$, where $L$ is the length of our alveolar chord.  The Jacobian matrix and its Jacobian determinant are equal in the case of a rod, because the space is one dimensional. 
 
 The consistent mass matrix for a 1D alveolar chord modeled as a two-noded rod, when evaluated in its natural co-ordinate system, becomes
-\begin{equation}
+\begin{equation} 
     \begin{aligned}
-    \mathbf{M}_{1C} & = \int_0^L \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \, A \, \mathrm{d} x  = \int_{-1}^{1} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N}\, A \, | \mathbf{J} | \,  \mathrm{d} \xi \\
-    & = \sum_{i=1}^n  \rho  \, \mathbf{N} ^{\mathsf{T}} (\xi_i) \, \mathbf{N}(\xi_i) \, A \, | \mathbf{J} | \, w_i = \sum_{i=1}^n \frac{\rho A L w_i}{8} \begin{bmatrix}
+    \mathbf{M}_{1C} & = \int_0^L \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \, A \, \mathrm{d} x  = \int_{-1}^{1} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N}\, A \, | \mathbf{J} | \,  \mathrm{d} \xi \\ & 
+    = \sum_{i=1}^n  \rho  \, \mathbf{N} ^{\mathsf{T}} (\xi_i) \, \mathbf{N}(\xi_i) \, A \, | \mathbf{J} | \, w_i \\ &
+    = \sum_{i=1}^n \frac{\rho A L w_i}{8} \begin{bmatrix}
     1 - 2\xi_i + \xi_i^2 & 1 - \xi_i^2 \\
     1 - \xi_i^2 & 1 + 2 \xi_i + \xi_i^2
     \end{bmatrix}
     \end{aligned}
     \label{ConsMassMatrix1DA}
 \end{equation}
-with $\textbf{N} (\xi_i)$ and $w_i$ being the shape functions and weights of quadrature for the selected Gauss integration rule evaluated at Gauss point $i$, while $A$ is the cross-sectional area of our alveolar chord. Table~\ref{tabQuadrature1D} presents values for the absciss\ae\ $\xi_i$ and weights $w_i$ of integration for schemes where there are $n = 1, 2$ or $3$ nodes of integration along an alveolar chord.  
+with $\textbf{N} (\xi_i)$ and $w_i$ being the shape functions and weights of quadrature for a selected Gauss integration rule evaluated at its Gauss point $i$, while $A$ is the cross-sectional area of our alveolar chord. Table~\ref{tabQuadrature1D} presents values for the absciss\ae\ $\xi_i$ and weights $w_i$ of integration for schemes where there are $n = 1, 2$ or $3$ nodes of integration along an alveolar chord.  
 
 The lumped mass matrix for a 1D alveolar chord in its natural co-ordinate system is 
-\begin{equation}
+\begin{multline}
 \mathbf{M}_{1L} = \sum_{\text{rows}} \sum_{i=1}^n \frac{\rho A L w_i}{8} \begin{bmatrix}
 1 - 2\xi_i + \xi_i^2 & 1 - \xi_i^2 \\
 1 - \xi_i^2 & 1 + 2 \xi_i + \xi_i^2
-\end{bmatrix} 
+\end{bmatrix} \\
 = \sum_{i=1}^n \frac{\rho A L w_i}{4} \begin{bmatrix} 
 1 - \xi_i & 0 \\ 0 & 1 + \xi_i \end{bmatrix}
 \label{LumconsMassMatrix1DA}
-\end{equation}
-where it is readily apparent that the mass matrix in Eqn.~(\ref{ConsMassMatrix1DA}) is singular at a Gauss point, whereas the mass matrix in Eqn.~(\ref{LumconsMassMatrix1DA}) has a reciprocal, except when $\xi = \pm 1$. 
-
+\end{multline}
+where it is seen that the mass matrix in Eqn.~(\ref{ConsMassMatrix1DA}) is singular at any given Gauss point, whereas the mass matrix in Eqn.~(\ref{LumconsMassMatrix1DA}) has a reciprocal, except when $\xi = \pm 1$. 
 
 Chordal mass matrices associated with the Gauss quadratures listed in Table~\ref{tabQuadrature1D} become: the consistent mass matrices for a chord are
 \begin{subequations}
@@ -142,10 +142,11 @@ Chordal mass matrices associated with the Gauss quadratures listed in Table~\ref
     \label{avgMassMatrix1D}
 \end{align}
 \end{subequations}
-which are the mass matrices that we employ.  This collection of mass matrices pertain to one Gauss point (left set of mass matrices), two Gauss points (center set of mass matrices), and three Gauss points (right set of mass matrices).  For this element, there is no difference between the mass matrices for two and three Gauss points of integration.  In the derivation of these matrices, it is assumed that the cross-sectional area and mass density  are both uniform along the length of a septal chord.  Furthermore, because septal chord volume $V$ is considered to be preserved, i.e., $V = V_0$ where $V_0 = A_0 L_0$ and $V = A L$, it follows that these mass matrices are constant; hence, their inverses need only be determined once.
+which are the mass matrices that we employ.  This collection of mass matrices pertain to one Gauss point (left column of mass matrices), two Gauss points (center column of mass matrices), and three Gauss points (right column of mass matrices).  For this element, there is no difference between the mass matrices for two and three Gauss points of integration.  In the derivation of these matrices, it is assumed that the cross-sectional area and mass density  are both uniform along the length of a septal chord.  Furthermore, because septal chord volume $V$ is considered to be preserved, i.e., $V = V_0$ where $V_0 = A_0 L_0$ and $V = A L$, it follows that these mass matrices are constant; hence, they only need to be inverted once.
 
 \subsubsection{Assemble Mass Matrices for the Septal Chords}
 
+\newpage
 \subsection{Mass Matrices for a Pentagon}
 
 For an alveolar septa represented as an irregular pentagon, its matrix of shape functions $\mathbf{N}$ takes on the form of
@@ -163,7 +164,7 @@ A consistent mass matrix $\mathbf{M}_{2C}$ is constructed by substituting the ab
     \mathbf{M}_{2C} = \iint_{\pentagon} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,|\mathbf{J}| \, h \, \mathrm{d} \xi \, \mathrm{d} \eta
     \label{massintegral2d}
 \end{equation}
-with $h$ denoting membrane thickness, and where $|\mathbf{J}|$ specifies the determinant of this $2 \! \times \! 2$ Jacobian matrix for a pentagon.  In areal derivations, the Jacobian of a two-dimensional transformation connects the physical ${x, y}$ to the natural ${\xi, \eta}$ co-ordinate systems involved.  Components of this Jacobian matrix are calculated using derivatives of shape functions taken with respect to the local co-ordinates at the $i^{\mathrm{th}}$ vertex via
+with $h$ denoting membrane thickness, and where $|\mathbf{J}|$ specifies the determinant of its $2 \! \times \! 2$ Jacobian matrix $\mathbf{J}$.  In areal derivations, the Jacobian of a two-dimensional transformation connects the physical ${x, y}$ to the natural ${\xi, \eta}$ co-ordinate systems involved.  Components of this Jacobian matrix are calculated using derivatives of shape functions taken with respect to the local co-ordinates at the $i^{\mathrm{th}}$ vertex via
 \begin{equation}
 \mathbf{J} = 
 \begin{bmatrix}
@@ -1219,7 +1220,7 @@ where $\mathbf{D}$ have the expression
 %Since the alveolus is squeezing, the air inside it develops pressure on the alveolus.
 %This pressure and the recoiling forces and the expansile forces have to become equal for the alveolus to stay stable. 
 
-The principle of stationary potential energy with the Rayleigh-Ritz approach, Eq.~(\ref{principle}) determines the basis of finite element stress analysis. The internal strain energy is balanced with the potential energy of applied internal and external loads on the body.
+The principle of stationary potential energy with the Rayleigh-Ritz approach, i.e., Eqn.~(\ref{principle}), determines the basis of finite element stress analysis. The internal strain energy is balanced with the potential energy of applied internal and external loads on the body.
 
 The virtual work done by external forces $\delta{W}$ in Eq.~(\ref{principle}) can be expressed as follow
 \begin{equation}

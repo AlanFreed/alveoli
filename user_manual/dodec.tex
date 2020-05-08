@@ -48,9 +48,9 @@
 \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
 \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
 
-\renewcommand{\theequation}{\thepart.\arabic{equation}}
-\renewcommand{\thefigure}{\thepart.\arabic{figure}}
-\renewcommand{\thetable}{\thepart.\arabic{table}}
+\renewcommand{\theequation}{\arabic{equation}}
+\renewcommand{\thefigure}{\arabic{figure}}
+\renewcommand{\thetable}{\arabic{table}}
 
 %% The lineno packages adds line numbers. Start line numbering with
 %% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
@@ -313,7 +313,7 @@
 \pagebreak
 \listoftables*%			Comment out, if not needed
 \acknowledgments
-Prof.\ Alan D. Fredd acknowledges support of a Joint Faculty Appointment with the U.S.\ Army Combat Capabilities Development Command (CCDC) Army Research Laboratory.  Shahla Zamani and Sandipan Pual acknowledge support from a grant funded by the CCDC Army Research Laboratory.  John D.\ Clayton acknowledges support of the CCDC Army Research Laboratory.  Prof.\ J.N.\ Reddy was the PI for that part of this project performed at Texas A\&M University by Shahla Zamani and Sandipan Paul.  Dr.\ M.\ Kleinberger was the Cooperative Agreement Manager (CAM) and Dr.\ John D.\ Clayton was the Technical Manager (TM) for this contract at the CCDC Army Research Laboratory.
+Prof.\ Alan D. Freed acknowledges support of a Joint Faculty Appointment with the U.S.\ Army Combat Capabilities Development Command (CCDC) Army Research Laboratory.  Shahla Zamani and Sandipan Pual acknowledge support from a grant funded by the CCDC Army Research Laboratory.  John D.\ Clayton acknowledges support of the CCDC Army Research Laboratory.  Prof.\ J.N.\ Reddy was the PI for that part of this project performed at Texas A\&M University by Shahla Zamani and Sandipan Paul.  Dr.\ M.\ Kleinberger was the Cooperative Agreement Manager (CAM) and Dr.\ John D.\ Clayton was the Technical Manager (TM) for this contract at the CCDC Army Research Laboratory.
 
 \clearpage
 
@@ -321,37 +321,37 @@ Prof.\ Alan D. Fredd acknowledges support of a Joint Faculty Appointment with th
 
 %% main text
 
-\setcounter{part}{0}
+%\setcounter{part}{0}
 \include{partIntroduction}
 
-\setcounter{equation}{0}
-\setcounter{figure}{0}
+%\setcounter{equation}{0}
+%\setcounter{figure}{0}
 \setcounter{section}{0}
-\setcounter{table}{0}
+%\setcounter{table}{0}
 \include{partDodecahedron}
 
-\setcounter{equation}{0}
-\setcounter{figure}{0}
+%\setcounter{equation}{0}
+%\setcounter{figure}{0}
 \setcounter{section}{0}
-\setcounter{table}{0}
+%\setcounter{table}{0}
 \include{partKinematics}
 
-\setcounter{equation}{0}
-\setcounter{figure}{0}
+%\setcounter{equation}{0}
+%\setcounter{figure}{0}
 \setcounter{section}{0}
-\setcounter{table}{0}
+%\setcounter{table}{0}
 \include{partConstitutiveTheory}
 
-\setcounter{equation}{0}
-\setcounter{figure}{0}
+%\setcounter{equation}{0}
+%\setcounter{figure}{0}
 \setcounter{section}{0}
-\setcounter{table}{0}
+%\setcounter{table}{0}
 \include{partNumericalIntegration}
 
-\setcounter{equation}{0}
-\setcounter{figure}{0}
+%\setcounter{equation}{0}
+%\setcounter{figure}{0}
 \setcounter{section}{0}
-\setcounter{table}{0}
+%\setcounter{table}{0}
 \include{partVariationalFormulation}
 
 \clearpage

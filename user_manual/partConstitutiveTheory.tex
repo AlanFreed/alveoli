@@ -3,9 +3,9 @@
 
 Roan \& Waters \cite{RoanWaters11} and Suki \textit{et~al}.\ \cite{Sukietal05,Sukietal11} have both written extensive review articles on the mechanics of parenchyma.  They have provided detailed information about the structural constituents of alveoli.  And they have discussed their influence on the overall mechanical response of parenchyma.  Of particular relevance, from a mechanics perspective, are the constituent building blocks of alveolar tissue: collagen (types I and III, predominantly), elastin, proteoglycans and other proteins, surfactant and cells (epithelial and endothelial, predominantly).  These constituents are assembled in such a manner so as to produce a variety of alveolar sub-structures that are essentially 1D (alveolar chords), 2D (alveolar septa) and 3D (alveolar sacs) in their geometric construction.  
 
-Birzle \textit{et~al}.\ \cite{Birzleetal19} performed a set of uniaxial experiments on rat parenchyma in an effort to delineate the separate effects of elastin, collagen and the ground substance (everything else) on the collective mechanical response of these tissues.  This information should be useful, especially in the construction of a mixture theory for alveolar septa, which is a topic of research of another member in our group.  Results from their research will be a useful aid in our modeling efforts of septal planes.
+Birzle \textit{et~al}.\ \cite{Birzleetal19} performed a set of uniaxial experiments on rat parenchyma in an effort to delineate the separate effects of elastin, collagen and the ground substance (everything else) on the collective mechanical response of these tissues.  This information should be useful, especially in the construction of a mixture theory for alveolar septa, which is a topic of research of another member in our group.  Results from their research will also be a useful aid in our modeling efforts of septal planes.
 
-A dodecahedron is used here as a geometric model for an alveolus \cite{FrankusLee74}, cf.\ Figs.~\ref{figRatLung} \& \ref{figDodecahedron}.  It is comprised of: thirty 1D rods that represent alvolar chords, twelve 2D membranes that represent alveolar septa, considered here to be pentagonal in shape, and one 3D cavity filled with air (or fluid in the case of a contusion caused by injury, or an edema caused by disease) whose geometry is considered to be dodecahedral in shape.  The thermo\-elastic constitutive equations presented in this chapter for spatial chords and membranes are derived in Appendix~\ref{appImplicitElasticity}.  Elastic behavior is sufficient for our intended application of studying alveoli subjected to traveling waves.
+A dodecahedron is used here as a geometric model for an alveolus \cite{FrankusLee74}, cf.\ Figs.~\ref{figRatLung} \& \ref{figDodecahedron}.  It is comprised of: thirty 1D rods that represent alveolar chords, twelve 2D membranes that represent alveolar septa, considered here to be pentagonal in shape, and one 3D cavity filled with air (or fluid in the case of a contusion caused by injury, or an edema caused by disease) whose geometry is considered to be dodecahedral in shape.  The thermo\-elastic constitutive equations presented in this chapter for spatial chords and membranes are derived in Appendix~\ref{appImplicitElasticity}.  Elastic behavior is sufficient for our intended application of studying alveoli subjected to traveling waves.
 
 We recall from our kinematic study of a dodecahedron that the geometric strains (i.e., $e \defeq \ln ( L / L_0 )$ for the elongation of septal chords, $\xi \defeq \ln \sqrt{A / A_0}$ for the dilation of septal membranes, and $\Xi \defeq \ln \sqrt[3]{V / V_0}$ for the dilatation of alveolar volume) are equivalent to one another under motions of uniform compression\slash expansion.  These three, geometric, strain measures also exist as thermo\-dynamic strains, each associating with a distinct and unique conjugate stress. \cite{Freed17,FreedZamani19}
 
@@ -32,7 +32,7 @@ Combining the First and Second Laws of Thermo\-dynamics governing uniform, rever
     \label{thermoelastic3Dlaw}
     \end{align}
 \end{subequations}
-wherein $U$ is an internal energy density (erg/gr = dyne.cm/gr), which is a function of state, $\theta$ is a temperature in Kelvin ($273 + \mbox{}^{\circ}$C), $\eta$ is an entropy density (erg/gr.K), $L$ is a length of line (cm), $A$ is an area of surface ($\text{cm}^2$), $V$ is a volume of space ($\text{cm}^3$), $F$ is a force (dyne), $T$ is a surface tension (dyne/cm), and $P$ is a pressure (dyne/$\text{cm}^2$ = barye), whereas the mass densities $\rho_{1D}$ ($\text{gr/cm}$), $\rho_{2D}$ ($\text{gr/cm}^2$) and $\rho_{3D}$ ($\text{gr/cm}^3$) associate with a reference state of per unit length, or per unit area, or per unit volume, as appropriate.  Pressure $P$ is assigned to be positive whenever a body undergoes hydro\-static compression, per accepted practice.
+wherein $U$ is an internal energy density (erg/g = dyne.cm/g), which is a function of state, $\theta$ is a temperature in Kelvin ($273 + \mbox{}^{\circ}$C), $\eta$ is an entropy density (erg/g.K), $L$ is a length of line (cm), $A$ is an area of surface ($\text{cm}^2$), $V$ is a volume of space ($\text{cm}^3$), $F$ is a force (dyne), $T$ is a surface tension (dyne/cm), and $P$ is a pressure (dyne/$\text{cm}^2$ = barye), whereas the mass densities $\rho_{1D}$ ($\text{g/cm}$), $\rho_{2D}$ ($\text{g/cm}^2$) and $\rho_{3D}$ ($\text{g/cm}^3$) associate with a reference state of per unit length, or per unit area, or per unit volume, as appropriate.  Pressure $P$ is assigned to be positive whenever a body undergoes hydro\-static compression.  Per accepted continuum mechanics practice, the sign of pressure gets flipped back and forth depending on what pressure we are talking about in lung mechanics.
 
 \subsection{Constitutive Equations}
 
@@ -66,7 +66,7 @@ where strains are logarithms of dimension-appropriate stretches.  As a matter of
     \Pi & = \rho_{3D} \, \partial_{\Xi} U ( \eta , \Xi )
     \end{align}
 \end{subequations}
-wherein $\pi \defeq 2T$ and $\Pi \defeq -3P$ are the measures for surface tension and pressure that are used in this work.  We find it useful to use this negative measure for pressure because the transpulmonary pressure in lung, under normal physiologic conditions, is typically negative; hence, $\Pi$ would be positive in its specification of transpulmonary pressure.  The above constitutive equations describe Green thermo\-elastic solids of specified dimension undergoing uniform motions in adiabatic enclosures.
+wherein $\pi \defeq 2T$ and $\Pi \defeq -3P$ are the measures for surface tension and pressure that we use in this work.  We find it useful to use this negative measure for pressure because the transpulmonary pressure in lung, under normal physiologic conditions, is typically negative; hence, $\Pi$ would be positive in its specification of transpulmonary pressure.  The above constitutive equations describe Green thermo\-elastic solids of specified dimension undergoing uniform motions in adiabatic enclosures.
 
 We consider response variables for temperature and force\slash surface-tension\slash pressure to be $C^1$ functions of state; therefore, the internal energy $U$ is taken to be a $C^2$ function of state in a Green thermo\-elastic solid undergoing uniform adiabatic motions (cf.\ Weinhold \cite{Weinhold75c} and Gilmore \cite{Gilmore84}).  Under these conditions of smoothness, one can differentiate Eqn.~(\ref{uniformCEs}), thereby producing the following collection of coupled, partial, differential equations
 \begin{subequations}
@@ -154,7 +154,7 @@ K_{\theta} & \defeq -V \, \partial_V P |_{\theta} =
 \tfrac{1}{9} \, \partial_{\Xi} \Pi |_{\theta}
 \end{align}
 \end{subequations}
-where we employ the commonly used notation $\partial_{\theta} \eta |_F \defeq ( \partial \eta / \partial \theta ) |_F$, etc.  The various specific heats $C_f$, $C_t$, $C_p$ (erg/gr.K) introduced here are, essentially, all equivalent as they are all defined per unit mass, insensitive to dimension.  They are evaluated at a fixed thermo\-dynamic force, which does depend on dimension, but this does not impact the value for specific heat.  Hereafter they will be denoted simply as $C$.  The various thermal expansions $\alpha_f$, $\alpha_t$, $\alpha_p$ (1/K) are, however, all distinct as they are each defined with respect to their physical dimension, viz., $\alpha_f \defeq L^{-1} \, \partial L / \partial \theta |_F$, $\alpha_t \defeq A^{-1} \, \partial A / \partial \theta |_T$ and $\alpha_p \defeq V^{-1} \, \partial V / \partial \theta |_P$.  Nevertheless, they relate to one another because $\ln \sqrt{A / \! A_0} = \ln (L / L_0) \implies \alpha_t = 2 \alpha_f$ and $\ln \sqrt[3]{V \! / V_0} = \ln (L / L_0) \implies \alpha_p = 3 \alpha_f$ for uniform motions.  Hereafter, only the linear coefficient for thermal expansion, denoted as $\alpha \defeq \alpha_f$, will be used.  Parameter $E_{\theta}$ is a modulus of extension (dyne), parameter $M_{\theta}$ is a modulus of dilation (dyne/cm), and parameter $K_{\theta}$ is a modulus of dilatation ($\mathrm{dyne/cm}^2$), a.k.a.\ the bulk modulus, with each modulus being measured at fixed temperature.  Shear moduli are discussed later in Sections~\ref{secNonuniform2D} \& \ref{secNonuniform3D}.  The above material constants are gradients.  They constitute tangents to their associated physical response curves.  Consequently, they need not be of constant value throughout state space, like a Hookean material would suppose them to be.  This is an important characteristic of the hypo-elastic constructions of Eqns.~(\ref{GreenElasticODEs} \& \ref{HelmholtzElasticODEs}), as they pertain to our application. 
+where we employ the commonly used notation $\partial_{\theta} \eta |_F \defeq ( \partial \eta / \partial \theta ) |_F$, etc.  The various specific heats $C_f$, $C_t$, $C_p$ (erg/g.K) introduced here are, essentially, all equivalent as they are all defined per unit mass, insensitive to dimension.  They are evaluated at a fixed thermo\-dynamic force, which does depend on dimension, but this does not impact the value for specific heat.  Hereafter they will be denoted simply as $C$.  The various thermal expansions $\alpha_f$, $\alpha_t$, $\alpha_p$ (1/K) are, however, all distinct as they are each defined with respect to their physical dimension, viz., $\alpha_f \defeq L^{-1} \, \partial L / \partial \theta |_F$, $\alpha_t \defeq A^{-1} \, \partial A / \partial \theta |_T$ and $\alpha_p \defeq V^{-1} \, \partial V / \partial \theta |_P$.  Nevertheless, they relate to one another because $\ln \sqrt{A / \! A_0} = \ln (L / L_0) \implies \alpha_t = 2 \alpha_f$ and $\ln \sqrt[3]{V \! / V_0} = \ln (L / L_0) \implies \alpha_p = 3 \alpha_f$ for uniform motions.  Hereafter, only the linear coefficient for thermal expansion, denoted as $\alpha \defeq \alpha_f$, will be used.  Parameter $E_{\theta}$ is a modulus of extension (dyne), parameter $M_{\theta}$ is a modulus of dilation (dyne/cm), and parameter $K_{\theta}$ is a modulus of dilatation ($\mathrm{dyne/cm}^2$), a.k.a.\ the bulk modulus, with each modulus being measured at fixed temperature.  Shear moduli are discussed later in Sections~\ref{secNonuniform2D} \& \ref{secNonuniform3D}.  The above material constants are gradients.  They constitute tangents to their associated physical response curves.  Consequently, they need not be of constant value throughout state space, like a Hookean material would suppose them to be.  This is an important characteristic of the hypo-elastic constructions of Eqns.~(\ref{GreenElasticODEs} \& \ref{HelmholtzElasticODEs}), as they pertain to our application. 
 
 In terms of the material properties given in Eqn.~(\ref{materialConstants}), of which there are three per dimension, the internal energy density has three curvatures that associate with it.  For 1D materials:
 \begin{subequations}
@@ -264,7 +264,7 @@ a^{-1} \, \mathrm{d}a & (a/b) \, \mathrm{d} g \\
 \pi \, \mathrm{d} \xi + \sigma \, \mathrm{d} \varepsilon + 
 \tau \, \mathrm{d} \gamma
 \label{convectedWorkRate} \\
-\intertext{wherein $\mathcal{S}_{ij}$ are the components of a surface tension evaluated in the co-ordinate frame of a membrane.  (In \S\ref{secFE_CE} they will be converted into components of the Eulerian Kirchhoff stress or the Lagrangian, second, Piola-Kirchhoff stress.)  
+\intertext{wherein $\mathcal{S}_{ij}$ are the components of a surface tension evaluated in the co-ordinate frame of a membrane.  (In \S\ref{secFE_CE} they will be converted into components of the Eulerian Kirchhoff stress and the Lagrangian, second, Piola-Kirchhoff stress.)  
 \medskip\newline
 Equation (\ref{convectedWorkRate}) conjectures that the First and Second Laws of Thermo\-dynamics can be expressed as a differential equation known as a Pfaffian form that, in this case, is considered to look like}
 \mathrm{d} \hspace{1pt} U & = \theta \, \mathrm{d} \eta + \tfrac{1}{\rho} 
@@ -275,7 +275,7 @@ Equation (\ref{convectedWorkRate}) conjectures that the First and Second Laws of
 \end{subequations} 
 where $\{ \pi , \sigma , \tau  \}$ describes a set of intensive scalar-valued stresses whose thermo\-dynamic conjugates $\{ \xi , \varepsilon , \gamma \}$ describe a set of extensive scalar-valued strains.  This contrasts with the classic approach, where the work done is decomposed into a scalar-valued isotropic part and a tensor-valued deviatoric part.  The above thermo\-dynamic strains are defined in \S\ref{secQR2D}, while their conjugate stresses, and how they relate to the tensor components of stress, are discussed in \S\ref{secFE_CE}. 
 
-Conjugate pair $( \xi , \pi )$ describes a dilation $2 \, \mathrm{d} \xi \Leftarrow A^{-1} \, \mathrm{d} A$ caused by a surface tension $\pi \Leftarrow 2T$ where $\xi = \ln \sqrt{A / \! A_0}$ and $\pi = \mathcal{S}_{11} + \mathcal{S}_{22}$.  This pair describes the uniform contribution to stress power discussed in \S\ref{secUniformCE}.  Pair $( \varepsilon , \sigma )$ describes a squeeze $\varepsilon$ (or pure shear) caused by a normal-stress difference $\sigma = \mathcal{S}_{11} - \mathcal{S}_{22}$.  And pair $( \gamma , \tau )$ describes an in-plane shear $\gamma$ caused by a shear stress $\tau$. Collectively, pairs $( \varepsilon , \sigma )$ and $( \gamma , \tau )$ account for any non-uniform contributions to stress power, i.e., contributions from other than uniform dilation.  These pairs are quantified in \S\ref{secConjugatePairs}.
+Conjugate pair $( \xi , \pi )$ describes a dilation $2 \, \mathrm{d} \xi \Leftarrow A^{-1} \, \mathrm{d} A$ caused by a surface tension $\pi \Leftarrow 2T$ where $\xi \defeq \ln \sqrt{A / \! A_0}$ and $\pi \defeq \mathcal{S}_{11} + \mathcal{S}_{22}$.  This pair describes the uniform contribution to stress power discussed in \S\ref{secUniformCE}.  Pair $( \varepsilon , \sigma )$ describes a squeeze $\varepsilon$ (or pure shear) caused by a normal-stress difference $\sigma \defeq \mathcal{S}_{11} - \mathcal{S}_{22}$.  And pair $( \gamma , \tau )$ describes an in-plane shear $\gamma$ caused by a shear stress $\tau$. Collectively, pairs $( \varepsilon , \sigma )$ and $( \gamma , \tau )$ account for any non-uniform contributions to stress power, i.e., contributions from other than uniform dilation.  These pairs are quantified in \S\ref{secConjugatePairs}.
 
 \subsection{General Constitutive Equations}
 
@@ -380,7 +380,7 @@ Converting the above internal energy formulation into its Helmholtz equivalent p
 that, collectively, provide a general theoretical structure for a Green thermo\-elastic membrane appropriate for our application.
 
 \medskip\noindent
-\textbf{Note}:  The uniform response (Eqn.~\ref{Helmholtz2Duniform}) and the non-uniform response (Eqn.~\ref{Helmholtz2Dnonuniform}) are, by supposition, decoupled in this constitutive construction.  There is experimental evidence that the bulk and shear moduli of parenchyma both depend upon transpulmonary pressure \cite{LaiFook79,Jahedetal90}.  It is conjectured that this is a structural effect of alveolar geometry; it is not a characteristic of the constituents that comprise an alveolus.  As such, we do not couple the uniform and non-uniform responses in the constitutive framework of Eqn.~(\ref{Helmholtz2Duncoupled}).
+\textbf{Note}:  The uniform response (Eqn.~\ref{Helmholtz2Duniform}) and the non-uniform response (Eqn.~\ref{Helmholtz2Dnonuniform}) are, by supposition, decoupled in this constitutive construction.  There is experimental evidence that the bulk and shear moduli of parenchyma both depend upon transpulmonary pressure \cite{LaiFook79,Jahedetal90}.  It is conjectured that this is a structural effect of alveolar geometry; it is not a characteristic of the constituents that comprise an alveolus.  As such, we do not couple the uniform and non-uniform responses in the constitutive framework of Eqn.~(\ref{Helmholtz2Duncoupled}) at this time in order that we may test this conjecture.
 
 \subsection{Material Response Functions}
 \label{secMaterialConstants}
@@ -473,7 +473,7 @@ where gradients $\partial \eta / \partial \theta$, $\partial \xi / \partial \the
     \label{HelmholtzMembraneODEsNonUniform}
     \end{align}
 \end{subequations}
-that, collectively, are used herein to describe a thermo\-elastic membrane.  These moduli can depend upon both stress and strain, in accordance with the implicit theory presented in Appendix~\ref{appImplicitElasticity}.
+that, collectively, are used to describe a thermo\-elastic membrane.  These moduli can depend upon both stress and strain, in accordance with the implicit theory of elasticity presented in Appendix~\ref{appImplicitElasticity}.
 
 \subsubsection{The Poisson Effect}
 \label{PoissonRatio}
@@ -490,7 +490,7 @@ N = 2M \, \frac{1 - \nu}{1 + \nu}
 \quad \text{and} \quad
 \mathcal{S}_{21} = \mathcal{S}_{22} = 0 
 \end{displaymath}
-provided that the temperature $\theta$ is held constant.  Consequently, $\tfrac{2}{3} M \leq N \leq 2M$ given that $0 \leq \nu \leq \textfrac{1}{2}$, so the squeeze modulus $N$ plays an analogous role to the shear modulus $\mu$ found in the classical theory of elasticity.  
+provided that the temperature $\theta$ is held constant.  Consequently, $\tfrac{2}{3} M \leq N \leq 2M$ follows provided that $0 \leq \nu \leq \textfrac{1}{2}$, so the squeeze modulus $N$ plays an analogous role to the shear modulus $\mu$ found in the classical theory of elasticity.  
 
 If one were to consider such a membrane as having uniform thickness $h$ that varies with deformation so as to preserve its volume, then $\nu = \textfrac{1}{2}$ and Eqn.~(\ref{HelmholtzMembraneODEsNonUniform}) would become
 \begin{equation}
@@ -509,7 +509,7 @@ which is a useful result.
 
 \medskip\noindent
 \textbf{Note}: 
-The conjugate pair approach presented here allows for a distinct shear modulus $G$ that can take on any positive value.  This is important because shear experiments done on soft tissues, which unfortunately are few in number, tend to produce shear moduli that are many orders in magnitude smaller than their bulk moduli, e.g., in parenchyma their ratio is $K/G \approx 10^{4}$ (150~MPa vs.\ 10--54~kPa \cite{Sarafetal07}).  Classically, such a result has been used to argue that the material can be modeled, to a reasonable approximation, as being ideally incompressible---a 3D notion.  Such an assumption is no longer necessary in our formulation.
+The conjugate pair approach presented here allows for a distinct shear modulus $G$ that can take on any positive value.  This is important because shear experiments done on soft tissues, which unfortunately are few in number, tend to produce shear moduli that are many orders in magnitude smaller than their bulk moduli, e.g., in parenchyma their ratio is $K/G \approx 10^{4}$ (150~MPa vs.\ 10--54~kPa).  \cite{Sarafetal07}  Classically, such a result has been used to argue that a material can be modeled, to a reasonable approximation, as being ideally incompressible---a 3D notion.  Such an assumption is no longer necessary in our formulation.
 
 \section{Green Thermoelastic Solids: Non-Uniform Motions}
 \label{secNonuniform3D}
@@ -865,13 +865,13 @@ About 75\%\ of the acting transpulmonary pressure (the difference between pleura
 
 Because the primary purpose for the alveolar model being constructed here is to better understand alveolar behavior as a shock wave passes over it, there are certain assumptions that we impose upon our model that under normal or different physiologic conditions might otherwise not apply.  
 
-\textit{First\/}: An alveolus is considered to be an adiabatic pressure vessel in which air and heat cannot move into or out of as a shock wave passes over it, simply because the wave speed is too fast.  There is insufficient time for these transport phenomena to occur.
+\textit{First\/}: An alveolus is considered to be an adiabatic pressure vessel in which air and heat cannot move into or out of as a shock wave passes over it, simply because the wave speed is too fast.  There is insufficient time for these transport phenomena to occur.  This is the `closed-cell' approximation used by Clayton \& Freed \cite{ClaytonFreed20} in the dynamic loading of their continuum model for parenchyma.
 
-\textit{Second\/}: The tissues that comprise lung are visco\-elastic \cite{Hildebrandt69,HoppinHildebrandt77} mixtures of collagen, elastin, cells, and ground substance. \cite{RoanWaters11,Sukietal11}  Whenever a lung is subjected to a shock wave there is insufficient time for the viscous characteristics in a visco\-elastic response to manifest themselves; therefore, the overall response remains glassy elastic.  Furthermore, even though we could construct a mixture theory for modeling an alveolar membrane, we are not able to construct the necessary experiments to paramterize it; consequently, an isotropic, elastic, homogeneous continuum is assumed for modeling the planar septa.
+\textit{Second\/}: The tissues that comprise lung are visco\-elastic \cite{Hildebrandt69,HoppinHildebrandt77} mixtures of collagen, elastin, cells, and ground substance. \cite{RoanWaters11,Sukietal11}  Whenever a lung is subjected to a shock wave there is insufficient time for the viscous characteristics in a visco\-elastic response to manifest themselves; therefore, the overall response remains glassy elastic.  Furthermore, even though we could construct a mixture theory for modeling an alveolar membrane, it would be challenging to establish the boundary conditions, nor would we be able to construct the necessary experiments to paramterize it; consequently, an isotropic, elastic, homogeneous continuum is assumed for modeling the planar septa.
 
-\textit{Third\/}: Temperature remains constant across a shock wave-front traveling through a compressible gas \cite{AmesStaff53}.  It is therefore assumed that alveolar temperature remains at body temperature whenever a lung is subjected to a shock wave.  All changes in alveolar entropy are therefore caused by changes in alveolar strain.
+\textit{Third\/}: Temperature remains continuous in a jump across the kinematic discontinuity caused by a shock wave traveling through a compressible gas. \cite{AmesStaff53} As such, temperature is taken to be continuous across the spatial discontinuity of a shock wave traveling through parenchyma, too.  However, temperature can change both in front of and behind a traveling wave, where the material first compresses and then exapnds.  Throughout this excursion, the overall process is taken to be adiabatic, in accordance with the first assumption.
 
-\textit{Fourth\/}: The air\slash membrane interface of an alveolus is lined with a surfactant, which is a thin bi-lipid film that plays a substantial role during normal lung function.  This film reduces alveolar surface tension to help advert total lung collapse at maximum exhale \cite{Stamenovic90}.  Even so, some alveoli still collapse, getting re-recruited during a later breath.  Models have been proposed for both surfactant \cite{Hills99} and alveolar recruitment \cite{Bates07}, but these effects are not included here as they are not thought to play a significant role in lung mechanics when subjected to a shock wave. 
+\textit{Fourth\/}: The air\slash membrane interface of an alveolus is lined with a surfactant, which is a thin bi-lipid film that plays a substantial role during normal lung function.  This film reduces alveolar surface tension to help advert total lung collapse at maximum exhale \cite{Stamenovic90}.  Even so, some alveoli still collapse, getting re-recruited during a later breath.  Models have been proposed for both surfactant \cite{Hills99} and alveolar recruitment \cite{Bates07}, but these effects are not included here as they are not thought to play a significant role in lung mechanics when a lung becomes subjected to a shock wave. 
 
 \textit{Fifth\/}: Matsuda \textit{et~al}.\ \cite{Matsudaetal87} found the diameters of collagen and elastin fibers that circumscribe an alveolar mouth to be about 5-7 times larger than those of their septal chords.  The alveolar mouth, with its thicker fibers and open face that attach an alveolus to an alveolar duct, is modeled here as a phantom face, viz., with fibers sized like any of the other eleven pentagonal elements comprising a dodecahedron, and a twelfth phantom face placed where the alveolar mouth resides \cite{Freedetal12}.  Kimmel \& Budiansky supported this conjecture via a private communication they had with Prof.\ T.\ A.\ Wilson.  Kimmel \& Budiansky wrote: \cite{KimmelBudiansky90}
 \small
@@ -881,7 +881,7 @@ Because the primary purpose for the alveolar model being constructed here is to 
 \normalsize
 This conjecture of Kimmel \& Budiansky, along with the experimental findings of Matsuda \textit{et~al}., provides a pathway by which we can scale the surface traction carried by a single alveolar membrane with that of the chords the envelope it.  In other words, this provides an avenue for parameterizing the membrane model in an other\-wise void of relevant experimental data needed to estimate its parameters.
 
-\textit{Sixth\/}: Membranes have elastic moduli plus a bending stiffness excited by curvature.  This bending energy is proportional to $(w/r)^2$, with $w$ being membrane thickness (width) and $r$ being its radius of curvature.  Consequently, bending stresses can be neglected when compared with their in-plane stresses whenever $w \ll r$, which is the supposition here.  This is in concert with our assumption that the septal chords are modeled as rods, not beams, because of their slenderness ratio.  Furthermore, these septa tend to be flat because there are roughly equal pressures acting on both sides of these membranes, eliminating the driving force behind bending \cite{HoppinHildebrandt77} and, we surmise, helping to suppress wrinkling, too.
+\textit{Sixth\/}: Alveolar surfaces are modeled as membranes, not plates, and therefore are assumed to have no out-of-plane bending stiffness.  This is in concert with our assumption that the septal chords are modeled as rods, not beams, because of their slenderness ratio.  Furthermore, these septa tend to be flat because there are roughly equal pressures acting on both sides of these membranes, thereby eliminating curvature which is the driving force behind out-of-plane bending \cite{HoppinHildebrandt77} and, we surmise, also helps to suppress wrinkling.
 
 \subsection{Modeling Septal Chords Subjected to Shock Waves}
 
@@ -957,7 +957,7 @@ The collagen and elastin fibers that make up a septal chord have the same length
     E^e = E^e ( \theta , e , s^e )
     \end{align}
 \end{subequations}
-where $\eta^c$ and $\eta^e$ are the entropy densities (erg/gr.K) for collagen and elastin; $s^c \defeq \lambda F^c / A^c_0$ and $s^e \defeq \lambda F^e / A_0^e$ are the chordal stresses (barye = $\text{dyne/cm}^2$) carried by the collagen and elastin fibers, wherein $\lambda = L/L_0$ is the fiber stretch, $A^c_0$ and $A^e_0$ are their traction-free cross-sectional areas ($\text{cm}^2$), and $F^c$ and $F^e$ are the forces (dyne) they transmit.  Parameters $C^c$ and $C^e$ are their specific heats at constant pressure (erg/gr.K), $\alpha^c$ and $\alpha^e$ are their linear coefficients of thermal expansion (1/K), $E^e$ and $E^e$ are their elastic moduli ($\text{dyne/cm}^2$ = $\text{erg/cm}^3$), and $\rho^c$ and $\rho^e$ are their mass densities ($\text{gr/cm}^3$).  These differential equations are subject to initial conditions considered to be $s^c_0 = s^c |_{L = L_0} = 0$, $s^e_0 = s^e |_{L = L_0} = 0$, $\eta^c = \eta^c_0$ and $\eta^e = \eta^e_0$, where  $\eta_0^c$ and $\eta_0^e$ are their respective entropy densities at rest.
+where $\eta^c$ and $\eta^e$ are the entropy densities (erg/g.K) for collagen and elastin; $s^c \defeq \lambda F^c / A^c_0$ and $s^e \defeq \lambda F^e / A_0^e$ are the chordal stresses (barye = $\text{dyne/cm}^2$) carried by the collagen and elastin fibers, wherein $\lambda = L/L_0$ is the fiber stretch, $A^c_0$ and $A^e_0$ are their traction-free cross-sectional areas ($\text{cm}^2$), and $F^c$ and $F^e$ are the forces (dyne) they transmit.  Parameters $C^c$ and $C^e$ are their specific heats at constant pressure (erg/g.K), $\alpha^c$ and $\alpha^e$ are their linear coefficients of thermal expansion (1/K), $E^e$ and $E^e$ are their elastic moduli ($\text{dyne/cm}^2$ = $\text{erg/cm}^3$), and $\rho^c$ and $\rho^e$ are their mass densities ($\text{g/cm}^3$).  These differential equations are subject to initial conditions considered to be $s^c_0 = s^c |_{L = L_0} = 0$, $s^e_0 = s^e |_{L = L_0} = 0$, $\eta^c = \eta^c_0$ and $\eta^e = \eta^e_0$, where  $\eta_0^c$ and $\eta_0^e$ are their respective entropy densities at rest.
 
 The actual force and entropy of an individual septal chord in our alveolar model is taken to be one third of a fiber's calculated values, as determined by Eqn.~(\ref{alveolarChord}), because each alveolar chord is typically shared between three adjoining alveoli; consequently, 
 \begin{equation}
@@ -968,7 +968,7 @@ The actual force and entropy of an individual septal chord in our alveolar model
 \end{equation}  
 where $F^f$ (dyne) is a third of the fiber's force carried by a septal chord, and $S^f$ (erg/K) is a third of the fiber's entropy.
 
-Collagen is a fiber comprised of numerous, long, slender, wavy filaments whose waviness, known as crimp, straightens under sufficient deformation \cite{Kastelicetal'78,FreedDoehring05}.  Elastin is a linked fiber network, much like an elastomer, whose filaments between crosslinks rotate to align with an axis of loading under sufficient deformation \cite{AaronGosline81,Urry89}.  Consequently, collagen and elastin both recruit constituent filaments with increasing deformation into an overall, load-bearing, fiber response.  The internal energies of collagen and elastin may therefore be thought of as being comprised of a configurational energy and a strain energy.  As such, both collagen and elastin are modeled as Freed-Rajagopal biologic fibers, which are described in terms of two such internal energies.  Their model is derived from the theory of implicit elasticity in \ref{appImplicitElasticity}.  According to their model, tangent compliances for collagen and elastin, pertinent to the hypo-elastic constitutive formulation of Eqn.~(\ref{alveolarChord}), are described by
+Collagen is a fiber comprised of numerous, long, slender, wavy filaments whose waviness, known as crimp, straightens under sufficient deformation \cite{Kastelicetal'78,FreedDoehring05}.  Elastin is a linked fiber network, much like an elastomer, whose filaments between crosslinks rotate to align with an axis of loading under sufficient deformation \cite{AaronGosline81,Urry89}.  Consequently, collagen and elastin both recruit constituent filaments with increasing deformation into an overall, load-bearing, fiber response.  The internal energies of collagen and elastin may therefore be thought of as being comprised of a configurational energy and a strain energy.  As such, both collagen and elastin are modeled as Freed-Rajagopal biologic fibers, which are described in terms of two such internal energies.  Their model is derived from the theory of implicit elasticity, cf.\ App.~\ref{appImplicitElasticity}.  According to their model, tangent compliances for collagen and elastin, pertinent to the hypo-elastic constitutive formulation of Eqn.~(\ref{alveolarChord}), are described by
 \begin{subequations}
     \label{septalChordModuli}
     \begin{align}
@@ -978,21 +978,21 @@ Collagen is a fiber comprised of numerous, long, slender, wavy filaments whose w
     e_1^e & = e - \alpha^e (\theta - \theta_0) - \frac{s^e}{E_2^e} 
     \end{align}
 \end{subequations}
-where $\theta_0$ is body temperature, i.e., 310~K.  Material constants $E_1^c$ and $E_2^c$ are the two asymptotic moduli for collagen that bound its response, i.e., $E_1^c \leq E^c \leq E^c_2$, while $E_1^e$ and $E_2^e$ are the two asymptotic moduli for elastin that bound its response, viz., $E^e_1 \leq E^e \leq E^e_2$, both having units of stress (barye = dyne/$\text{cm}^2$), with $e_t^c$ and $e_t^e$ being their respective transition strains, cf.\ App.~\ref{appImplicitElasticity}.  
+where $\theta_0$ is body temperature, i.e., 310~K.  Material constants $E_1^c$ and $E_2^c$ are the two asymptotic moduli for collagen that bound its response, i.e., $E_1^c \leq E^c \leq E^c_2$, while $E_1^e$ and $E_2^e$ are the two asymptotic moduli for elastin that bound its response, viz., $E^e_1 \leq E^e \leq E^e_2$, both having units of stress (barye = dyne/$\text{cm}^2$), with $e_t^c$ and $e_t^e$ being their respective transition strains (see their derivation in App.~\ref{appImplicitElasticity}).  
 
-In compression, it is assumed $E^c = E^c_1 E^c_2 / ( E^c_1 + E^c_2 )$ and $E^e = E^e_1 E^e_2 / ( E^e_1 + E^e_2 )$, which are the elastic moduli for collagen and elastin at zero fiber stress.  This is done to help ensure a stable numerical implementation.
+In compression, it is assumed $E^c = E^c_1 E^c_2 / ( E^c_1 + E^c_2 )$ and $E^e = E^e_1 E^e_2 / ( E^e_1 + E^e_2 )$, which are the elastic moduli for collagen and elastin at zero fiber stress.  This is done to help ensure a stable numerical implementation, as long slender rods readily buckle under compressive loads---a phenomenon not modeled here.
 
-The material properties needed to model septal chords are listed in Tables~\ref{tab:alveolarProp} \& \ref{tableCollagenElastin}.  From Eqn.~(\ref{thermodynamicConstraints}), these moduli are bound from above by $E^c_{\max} = 4.9 \times 10^9$~barye ($\text{dyne/cm}^2$) and $E^e_{\max} = 1.7 \times 10^9$~barye.  We therefore observe that $E^c_2$ and $E^e_2$ are about 100 times smaller than $E^c_{\max}$ and $E^e_{\max}$.  We recall that temperature $\theta = \theta_0$ in our application, where $\theta_0$ is body temperature, so strains $e^c_1$ and $e^e_1$ defined in the second column above simplify somewhat.  
+The material properties needed to model septal chords are listed in Tables~\ref{tab:alveolarProp} \& \ref{tableCollagenElastin}.  From Eqn.~(\ref{thermodynamicConstraints}), these moduli are bound from above by $E^c_{\max} = 4.9 \times 10^9$~barye ($\text{dyne/cm}^2$) and $E^e_{\max} = 1.7 \times 10^9$~barye.  We therefore observe that $E^c_2$ and $E^e_2$ are about 100 times smaller than $E^c_{\max}$ and $E^e_{\max}$.
 
 \begin{table}
     \centering
     \begin{tabular}{|l|l|l|}
         \hline
         \multicolumn{3}{|c|}{Collagen$\vphantom{|^{|^|}}$} \\ \hline
-        $\rho^c$ \hfill [$\textrm{gr/cm}^{3^{\phantom{|}}}$] & $1.34$ & 
+        $\rho^c$ \hfill [$\textrm{g/cm}^{3^{\phantom{|}}}$] & $1.34$ & 
         Fels \cite{Fels64} \\
-        $\eta_0^c$ \hfill [erg/gr.K] & $3.7 \times 10^7$ &  \\
-        $C^c$ \hfill [erg/gr.K] & $1.7 \times 10^7$ & 
+        $\eta_0^c$ \hfill [erg/g.K] & $3.7 \times 10^7$ &  \\
+        $C^c$ \hfill [erg/g.K] & $1.7 \times 10^7$ & 
         Kanagy \cite{Kanagy55} \\
         $\alpha^c$ \hfill [1/C] & $1.8 \times 10^{-4}$ & 
         Weir \cite{Weir48}  \\
@@ -1001,11 +1001,11 @@ The material properties needed to model septal chords are listed in Tables~\ref{
         $E_2^c$ \hfill [barye] & $3.0 \times 10^7$ & authors experience \\ \hline
         \multicolumn{3}{|c|}{Elastin$\vphantom{|^{|^|}}$} \\ \hline 
         Parameter & Value & Reference \\ \hline
-        $\rho^e$ \hfill [$\textrm{gr/cm}^{3^{\phantom{|}}}$] & $1.31$ & 
+        $\rho^e$ \hfill [$\textrm{g/cm}^{3^{\phantom{|}}}$] & $1.31$ & 
         Lillie \& Gosline \cite{LillieGosline02a} \\
-        $\eta_0^e$ \hfill [erg/gr.K] & $3.4 \times 10^7$ & 
+        $\eta_0^e$ \hfill [erg/g.K] & $3.4 \times 10^7$ & 
         Shadwick \& Gosline \cite{ShadwickGosline85} \\
-        $C^e$ \hfill [$\textrm{erg/gr.K}$] & $4.2 \times 10^7$  & 
+        $C^e$ \hfill [$\textrm{erg/g.K}$] & $4.2 \times 10^7$  & 
         Kakivaya \& Hoeve \cite{KakivayaHoeve75} \\
         $\alpha^e$ \hfill [1/C] & $3.2\times 10^{-4}$ & 
         Lillie \& Gosline \cite{LillieGosline02a} \\ 
@@ -1034,7 +1034,7 @@ The thermo\-elastic response of a planar membrane used to model alveolar septa, 
     \end{matrix} \right\} , \quad
     M = M ( \theta , s^{\pi} , \xi )
 \end{displaymath}
-where $s^{\pi} \defeq \pi / h$ has units of stress (dyne/$\text{cm}^2$) with $h$ denoting height or thickness of the spetal membrane.  Assuming the volume of a septal membrane remains constant, thickness would obey $h = h_0 \exp ( -2 \xi )$ where $h_0$ is its traction-free thickness.  Tangent modulus $M$ is an areal equivalent of the bulk modulus.  The second set of ODEs establishes the non-uniform response of a membrane, as described in Eqn.~(\ref{HelmholtzMembraneODEsNonUniform}), viz.,
+where $s^{\pi} \defeq \pi / h$ has units of stress (dyne/$\text{cm}^2$) with $h$ denoting height or thickness of the spetal membrane.  Assuming the volume of a septal membrane remains constant, thickness would obey $h = h_0 \exp ( -2 \xi )$ with $h_0$ being its traction-free thickness.  Tangent modulus $M$ is an areal equivalent of the bulk modulus.  The second set of ODEs establishes the non-uniform response of a membrane, as described in Eqn.~(\ref{HelmholtzMembraneODEsNonUniform}), viz.,
 \begin{displaymath}
     \left\{ \begin{matrix}
     \mathrm{d} s^{\sigma} \\ \mathrm{d} s^{\tau}
@@ -1053,7 +1053,7 @@ where $s^{\sigma} \defeq \sigma / h$ and $s^{\tau} \defeq \tau / h$ also have un
 
 From a mechanics perspective, we know a great deal more about alveolar chords than we know about alveolar septa.  More judgment will therefore be required in our construction and parameterization of a material model for alveolar membranes.  
 
-A typical alveolar septum is 4-5 $\mu$m in width \cite{Sukietal11}.  They are comprised of an outside layer of epithelial cells that encase capillaries made of endothelial cells along with a basement membrane that is composed of unorganized collagen and elastin filaments, plus proteoglycans and other extracellular proteins.  This basement membrane, roughly at mid-plane in an alveolar septum, has a width of about $0.5 \, \mu$m \cite{RoanWaters11}.  Inertial forces generated by these membranes are to be based upon a membrane thickness of $\sim\!\!5$~$\mu$m with an approximate density of water, while the structural forces that they carry are to be based upon a basement membrane thickness of $\sim\!\! 0.5$~$\mu$m.  
+A typical alveolar septum is 4-5 $\mu$m thick \cite{Sukietal11}.  They are comprised of an outside layer of epithelial cells that encase capillaries made of endothelial cells along with a basement membrane that is composed of unorganized collagen and elastin filaments, plus proteoglycans and other extracellular proteins.  This basement membrane, roughly at mid-plane in an alveolar septum, has a width of about $0.5 \, \mu$m \cite{RoanWaters11}.  Inertial forces generated by these membranes are to be based upon a membrane thickness of $\sim\!\!5$~$\mu$m with an approximate density of water, while the structural forces that they carry are to be based upon a basement membrane thickness of $\sim\!\! 0.5$~$\mu$m.  
 
 It is not known how much of the mechanical load is actually carried by the cells in an alveolar septum vs.\ the extracellular basement membrane they encase, but it is generally thought that this basement membrane carries the majority of the load \cite{Sukietal11}.  Therefore, by diminishing the moduli that are appropriate for describing a basement membrane with thickness $\sim\!\! 0.5$~$\mu$m by a factor of 10, we get estimates for effective septal moduli that are applicable when modeling a whole septal membrane with thickness $\sim\!\! 5$~$\mu$m.  We employ the model parameters specified in Table~\ref{tableVisceralPleura}, which are based upon this assumption.
 
@@ -1062,9 +1062,9 @@ It is not known how much of the mechanical load is actually carried by the cells
     \begin{tabular}{|l|l|}
         \hline
         Property & Value \\ \hline
-        $\rho$ \hfill [$\textrm{gr/cm}^{3^{\phantom{|}}}$] & $1.1$ \\
-        $\eta_0$ \hfill [erg/gr.K] & $5.0 \times 10^6$ \\
-        $C$ \hfill [erg/gr.K] & $2.1 \times 10^7$ \\
+        $\rho$ \hfill [$\textrm{g/cm}^{3^{\phantom{|}}}$] & $1.1$ \\
+        $\eta_0$ \hfill [erg/g.K] & $5.0 \times 10^6$ \\
+        $C$ \hfill [erg/g.K] & $2.1 \times 10^7$ \\
         $\alpha$ \hfill [1/C] & $1.2 \times 10^{-4}$ \\ \hline
         $\xi_t$ & $0.24$ \\
         $M_1$ \hfill [barye] & $8.0 \times 10^2$ \\
@@ -1080,7 +1080,7 @@ It is not known how much of the mechanical load is actually carried by the cells
     \label{tableVisceralPleura}
 \end{table}
 
-Collagen and elastin appear as thin filaments randomly oriented and somewhat uniformly dispersed throughout a basement membrane, unlike the strongly aligned fibers that appear in septal chords.  Consequently, for our purposes, we model this collective ensemble of tissue and structure types as a homo\-geneous isotropic membrane modeled after the Freed-Rajagopal biologic fiber \cite{FreedRajagopal16} that we have extended to membranes in Appendix~\ref{appImplicitElasticity}, specifically
+Collagen and elastin appear as thin filaments randomly oriented and somewhat uniformly dispersed throughout a basement membrane, unlike the strongly aligned fibers that appear in septal chords.  Consequently, for our purposes, we model this collective ensemble of tissue and structure types as a homo\-geneous isotropic membrane modeled after the Freed-Rajagopal biologic fiber \cite{FreedRajagopal16} that we have extended to membranes in App.~\ref{appImplicitElasticity}, specifically
 \begin{subequations}
     \label{septalCompliances}
     \begin{align}
@@ -1098,16 +1098,16 @@ Collagen and elastin appear as thin filaments randomly oriented and somewhat uni
 \end{subequations}
 where compliant, initial, tangent moduli $M_1$, $N_1$ and $G_1$ and stiff, terminal, tangent moduli $M_2$, $N_2$ and $G_2$ bound their respective responses so that $M_1 \leq M \leq M_2$, $N_1 \leq N \leq N_2$ and $G_1 \leq G \leq G_2$, with a gradual transition between their asymp\-totic bounds occurring around strains $\xi_t$, $\varepsilon_t$ and $\gamma_t$.
 
-In compression, areal modulus $M$ is assigned a value of $M = M_1 M_2 / ( M_1 + M_2 )$ which is the tangent modulus at zero surface tension.  This extends into compression in an effort to maintain numeric stability.  Normally, a negative surface tension would cause wrinkling of the membrane surface, which is not addressed here.  In contrast, the squeeze $N$ and $G$ shear moduli maintain applicability whenever their arguments are negative valued.  This is handled via the sign function present in Eqns.~(\ref{septalSqueezeCompliance} \& \ref{septalShearCompliance}).
+In compression, areal modulus $M$ is assigned a value of $M = M_1 M_2 / ( M_1 + M_2 )$ which is the tangent modulus at zero surface tension.  This extends into compression in an effort to maintain numeric stability.  Normally, a negative surface tension would cause wrinkling of the membrane surface, which is not addressed here.  In contrast, the squeeze $N$ and shear $G$ moduli maintain applicability whenever their arguments are negative valued.  This is handled via the sign function present in Eqns.~(\ref{septalSqueezeCompliance} \& \ref{septalShearCompliance}).
 
-In \S\ref{PoissonRatio} it was determined that $N = \tfrac{2}{3} M$ whenever Poisson's ratio $\nu$ is a half.  Imposing this constriant of incompressibility is straightforward for Hookean materials, but not so obvious for biologic materials.  Examining the data of Freed \textit{et~al}.\ \cite{Freedetal17} for the pleural membrane, it seems reasonable to apply this factor to the limiting moduli, viz., it was found that $N_1 \approx \tfrac{2}{3} M_1$ and $N_2 \approx \tfrac{2}{3} M_2$; however, the transition strains were not found to obey this scaling, rather $\varepsilon_t \approx \tfrac{1}{4} \xi_t$.  Regarding the shear response of parenchyma, we use the bounds reported by Saraf \text{et~al}.\ \cite{Sarafetal07} for setting $G_1$ and $G_2$, while using the transition strain $\gamma_t$ reported in Freed \textit{et~al}.\ \cite{Freedetal17} for muscle tissue.  Clearly, there is a need for experiments to provide better estimates for these material properties.
+In \S\ref{PoissonRatio} it was determined that $N = \tfrac{2}{3} M$ whenever Poisson's ratio $\nu$ is a half.  Imposing this constriant of incompressibility is straightforward for Hookean materials, but it is not as obvious for biologic materials.  Examining the data of Freed \textit{et~al}.\ \cite{Freedetal17} for the pleural membrane, it seems reasonable to apply this proportionality factor to the limiting moduli, viz., it was found that $N_1 \approx \tfrac{2}{3} M_1$ and $N_2 \approx \tfrac{2}{3} M_2$.  However, the transition strains were not found to obey this scaling; rather, $\varepsilon_t \approx \tfrac{1}{4} \xi_t$.  Regarding the shear response of parenchyma, we use the bounds reported by Saraf \text{et~al}.\ \cite{Sarafetal07} for setting $G_1$ and $G_2$, while using the transition strain $\gamma_t$ reported in Freed \textit{et~al}.\ \cite{Freedetal17} for muscle tissue.  Clearly, there is a need for experiments to provide better estimates for these material properties.
 
 Finite element technology is used to interpolate the entropy and these stresses, integrated at the Gauss points, to entropies and forces at the vertices of a pentagon, cf.\ Part~\ref{partVariational}.  The actual entropies and forces interpolated to these nodes are halved, because each septal plane belongs to two adjoining alveoli. 
 
 \subsection{Modeling an Alveolar Volume Subjected to Shock Waves}
 \label{sec:IdealGasLaw}
 
-Alveoli are connected to bronchial trees via alveolar ducts.  Under normal conditions, air moves in and out of the alveoli via these ducts.  However, when subjected to a stress wave passing over an alveolus, there is no time for the transport of air to take place.  Hence, we can consider the air (and heat) within an alveolus to become `trapped', and the pressure to be uniform therein.  The governing process is therefore adiabatic.  It is under this condition that we model the volumetric response of an alveolar sac.
+Alveoli are connected to bronchial trees via alveolar ducts.  Under normal conditions, air moves in and out of the alveoli via these ducts.  However, when subjected to a stress wave passing over an alveolus, there is no time for the transport of air to take place.  Hence, we can consider the air (and heat) within an alveolus to become `trapped', and the pressure to be uniform therein.  The governing thermo\-dynamic process is therefore adiabatic.  It is under this condition that we model the volumetric response of an alveolar sac.
 
 \subsubsection{Alveoli Filled with Air}
 
@@ -1135,7 +1135,7 @@ P_0 \, \frac{V_0 \hspace{0.5pt} \theta}{\theta_0 V}
 with the other two material properties pertaining to moist air at body temperature\footnote{
     Physical properties for air were taken from the website \texttt{www.peacesoftware.de} hosted by Berndt Wischnewski.
 }
-being its mass density $\rho$ of $1.125 \times 10^{-3} \; \text{gr/cm}^3$ and its specific heat $C$ of $1.007 \times 10^7$~erg/gr.K at constant pressure, constrained by $K < K_{\max} = \rho C / \alpha^2 \theta \approx \rho C \theta$.  An alveolar sac, when modeled as an adiabatic pressure vessel filled with an ideal gas, is described by
+being its mass density $\rho$ of $1.125 \times 10^{-3} \; \text{g/cm}^3$ and its specific heat $C$ of $1.007 \times 10^7$~erg/g.K at constant pressure, constrained by $K < K_{\max} = \rho C / \alpha^2 \theta \approx \rho C \theta$.  An alveolar sac, when modeled as an adiabatic pressure vessel filled with an ideal gas, is described by
 \begin{equation}
 \left\{ \begin{matrix}
     \mathrm{d} \eta \\ -3 \, \mathrm{d} P
@@ -1160,7 +1160,7 @@ Pressure $P$ is mapped to nodal forces at the vertices of a dodecahedron in our 
 
 \subsubsection{Alveoli Filled with Fluid}
 
-In lung tissues that are not healthy, fluids may fill alveolar volumes at various regions throughout a lung, e.g., as could have been caused by injury, pneumonia, etc.  In such localities the mechanical response of the local parenchyma will be vastly stiffer than that of healthy tissue, and as such, it will respond very differently to a traveling shock wave.
+In lung tissues that are not healthy, fluids may fill alveolar volumes at various regions throughout a lung, e.g., as could have been caused by injury, pneumonia, etc.  In such localities the mechanical response of the local parenchyma will be vastly stiffer than that of healthy tissue, and as such, it will respond very differently to a traveling shock wave.  For example, the speed of a wave moving over alveoli filled with fluid will be substantially faster than the speed of the same wave moving over healthy alveoli filled with air.
 
 In the presence of a passing shock wave, we suppose that an unhealthy alveolar sac, like a healthy one, can be modeled as an adiabatic enclosure, but now the fluid within such an alveolus is considered to behave, momentarily, like an elastic solid.
 
@@ -1213,9 +1213,11 @@ How these are to be parameterized will be addressed in next year's work.
 \section{Finite Element Implementation of Constitutive Equations}
 \label{secFE_CE}
 
-These constitutive models are implemented into our finite element model as hypo-elastic material models \cite{Truesdell55} described by\footnote{
+The above constitutive models are implemented into our finite element model as hypo-elastic material models \cite{Truesdell55} described by\footnote{
     Constitutive equation $\mathrm{d} \boldsymbol{\sigma} = \mathbf{M} ( \boldsymbol{\sigma}, \boldsymbol{\epsilon} ) \, \mathrm{d} \boldsymbol{\epsilon}$ is that of a hypo-elastic solid \cite{Truesdell55}.  A reasonable visco\-elastic constitutive equation that one could consider would be a Zener \cite{Zener48} solid, which would look something like
-    $$ \boldsymbol{\sigma} + \boldsymbol{\tau} \, \mathrm{d} \boldsymbol{\sigma} = \boldsymbol{E}_{\infty} \boldsymbol{\epsilon} + \boldsymbol{\tau} \mathbfsf{E}_0 \, \mathrm{d} \boldsymbol{\epsilon} $$ 
+    $$ \boldsymbol{\sigma} + \boldsymbol{\tau} \, \mathrm{d} \boldsymbol{\sigma} = \boldsymbol{E}_{\infty} \boldsymbol{\epsilon} + \boldsymbol{\tau} \mathbfsf{E}_0 \, \mathrm{d} \boldsymbol{\epsilon} 
+    \quad \text{or} \quad 
+    \mathrm{d} \boldsymbol{\sigma} + \boldsymbol{\tau} \, \mathrm{d}^2 \boldsymbol{\sigma} = \boldsymbol{E}_{\infty} \mathrm{d} \boldsymbol{\epsilon} + \boldsymbol{\tau} \mathbfsf{E}_0 \, \mathrm{d}^2 \boldsymbol{\epsilon}$$ 
     where $\mathbfsf{E}_{\infty}$ is a matrix of rubbery moduli, $\mathbfsf{E}_0$ is a matrix of glassy moduli, and $\boldsymbol{\tau}$ is a matrix of characteristic relaxation times.  This is a topic for future work.
 }
 \begin{equation}
@@ -1228,7 +1230,7 @@ These constitutive models are implemented into our finite element model as hypo-
 \end{equation}
 where $\boldsymbol{\sigma}$, $\boldsymbol{\epsilon}$ and $\boldsymbol{\lambda}$ are arrays of stress, strain and stretch attributes, respectively, with matrix $\mathbf{M} ( \boldsymbol{\sigma}, \boldsymbol{\epsilon} )$ containing the constitutive tangent moduli, i.e., $\mathrm{d} \boldsymbol{\sigma} / \mathrm{d} \boldsymbol{\epsilon}$, that, in general, may depend upon both stress $\boldsymbol{\sigma}$ and strain $\boldsymbol{\epsilon}$, while strain depends solely upon stretch $\boldsymbol{\lambda}$.
 
-The two-step PECE algorithm presented in \S\ref{sec:1stOrderPECE} presumes the following information.  There is an initial condition for the thermo\-dynamic stresses $\boldsymbol{\sigma}_0$.  An initial far-field deformation gradient $\mathbfsf{F}_0$ is also known, from which initial conditions for the thermo\-dynamic stretches $\boldsymbol{\lambda}_0$ and strains $\boldsymbol{\epsilon}_0$ can be readily obtained.  All nodes of integration are to be spaced uniformly in time with $h>0$ designating their separation in time.  
+The two-step PECE algorithm presented in \S\ref{sec:1stOrderPECE} presumes the following information.  There is an initial condition for the thermo\-dynamic stresses $\boldsymbol{\sigma}_0$.  An initial far-field deformation gradient $\mathbfsf{F}_0$ is also known, from which initial conditions for the thermo\-dynamic stretches $\boldsymbol{\lambda}_0$ and strains $\boldsymbol{\epsilon}_0$ can be readily obtained.  All nodes of integration are to be spaced uniformly in time with $\mathrm{d}t > 0$ designating their separation in time.  
 
 A far-field deformation gradient is considered to be known at the end of the first integration step, i.e., $\mathbfsf{F}_1$, from which the thermo\-dynamic stretches $\boldsymbol{\lambda}_1$ and strains $\boldsymbol{\epsilon}_1$ can be calculated, with differential rates $\mathrm{d} \boldsymbol{\lambda}_0$ and $\mathrm{d} \boldsymbol{\lambda}_1$ coming from finite difference formul\ae, so that $\mathrm{d} \boldsymbol{\epsilon}_0 = [ \mathrm{d} \boldsymbol{\varepsilon} ( \boldsymbol{\lambda}_0 ) / \mathrm{d} \boldsymbol{\lambda}_0 ] \, \mathrm{d} \boldsymbol{\lambda}_0$ and $\mathrm{d} \boldsymbol{\epsilon}_1 = [ \mathrm{d} \boldsymbol{\varepsilon} ( \boldsymbol{\lambda}_1 ) / \mathrm{d} \boldsymbol{\lambda}_1 ] \, \mathrm{d} \boldsymbol{\lambda}_1$ follow.  Consequently, an initial stress rate can be established, i.e., $\mathrm{d} \boldsymbol{\sigma}_0 = \mathbf{M} ( \boldsymbol{\sigma}_0 , \boldsymbol{\epsilon}_0 ) \, \mathrm{d} \boldsymbol{\epsilon}_0$.  With this information, Heun's method (Eqn.~\ref{startUp1stOrderODEs}) can be called upon to integrate Eqn.~(\ref{hypoelastic}) to determine the thermo\-dynamic stresses and their differential rates out to the end of the first integration step, viz., $\boldsymbol{\sigma}_1$ after which one can determine $\mathrm{d} \boldsymbol{\sigma}_1 = \mathbf{M} ( \boldsymbol{\sigma}_1 , \boldsymbol{\epsilon}_1 ) \, \mathrm{d} \boldsymbol{\epsilon}_1$.    
 
@@ -1331,7 +1333,7 @@ The differential rates of these physical attributes relate to the differential r
 \end{equation}
 where the above matrix establishes $\mathrm{d} \boldsymbol{\varepsilon} ( \boldsymbol{\lambda} ) / \mathrm{d} \boldsymbol{\lambda}$ in Eqn.~(\ref{hypoelastic}), with $\mathrm{d} \boldsymbol{\lambda}$ being the vector at the right of this matrix, and $\mathrm{d} \boldsymbol{\varepsilon}$ being the vector on the left-hand side. 
 
-The matrix of tangent moduli $\mathbf{M} ( \boldsymbol{\sigma} , \boldsymbol{\varepsilon} )$ given in Eqn.~(\ref{hypoelastic}) is Eqn.~(\ref{HelmholtzODEs}) for the general case, whose moduli are: an bulk modulus $K(\theta , \Pi , \Xi)$, two squeeze moduli $N_1 = N ( \sigma_1 , \varepsilon_1 )$ and $N_2 = N ( \sigma_2 , \varepsilon_2 )$, and three shear moduli $G_1 = G ( \tau_1 , \gamma_1 )$, $G_2 = G ( \tau_2 , \gamma_2 )$ and $G_3 = G ( \tau_3 , \gamma_3 )$.  The vector being operated on by this matrix of tangent moduli is $\mathrm{d} \boldsymbol{\varepsilon}$ above, with the constitutive equation returning a vector $\mathrm{d} \boldsymbol{\sigma} = \{ \mathrm{d} \eta , \mathrm{d} \Pi , \mathrm{d} \sigma_1 , \mathrm{d} \sigma_2 , \mathrm{d} \tau_1 , \mathrm{d} \tau_2 , \mathrm{d} \tau_3 \}^{\mathsf{T}}$.  The numerical method presented in \S\ref{sec:1stOrderPECE} can be called upon to integrate this hypo-elastic constitutive equation.  
+The matrix of tangent moduli $\mathbf{M} ( \boldsymbol{\sigma} , \boldsymbol{\varepsilon} )$ given in Eqn.~(\ref{hypoelastic}) is Eqn.~(\ref{HelmholtzODEs}) for the general case, whose moduli are: a bulk modulus $K(\theta , \Pi , \Xi)$, two squeeze moduli $N_1 = N ( \sigma_1 , \varepsilon_1 )$ and $N_2 = N ( \sigma_2 , \varepsilon_2 )$, and three shear moduli $G_1 = G ( \tau_1 , \gamma_1 )$, $G_2 = G ( \tau_2 , \gamma_2 )$ and $G_3 = G ( \tau_3 , \gamma_3 )$.  The vector being operated on by this matrix of tangent moduli is $\mathrm{d} \boldsymbol{\varepsilon}$ above, with the constitutive equation returning a vector $\mathrm{d} \boldsymbol{\sigma} = \{ \mathrm{d} \eta , \mathrm{d} \Pi , \mathrm{d} \sigma_1 , \mathrm{d} \sigma_2 , \mathrm{d} \tau_1 , \mathrm{d} \tau_2 , \mathrm{d} \tau_3 \}^{\mathsf{T}}$.  The numerical method presented in \S\ref{sec:1stOrderPECE} can be called upon to integrate this hypo-elastic constitutive equation.  
 
 After this constitutive equation has been integrated, the ensuing thermo\-dynamic stress attributes can be mapped into components $\mathcal{S}_{ij}$ belonging to a stress tensor $\boldsymbol{\mathcal{S}} = \mathcal{S}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$, $i, j = 1, 2, 3$, evaluated in the re-indexed basis $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ of our dodecahedron; specifically,
 \begin{equation}
@@ -1368,7 +1370,7 @@ P_{ik} S_{k\ell} P_{j\ell}
 \quad \text{and} \quad
 P_{ik} s_{k\ell} P_{j\ell} 
 \end{displaymath}
-where $\mathbfsf{P}$ is the orthogonal matrix defined in \S\ref{reindexing3D}.
+where $\mathbfsf{P}$ is an orthogonal matrix defined in \S\ref{reindexing3D}.
 
 \section{Code Verification and Constitutive Parameterization}
 \label{secCE_verifyCode}
