@@ -11,7 +11,7 @@ from vertices import vertex
 """
 Module dodecahedra.py provides geometric info about a deforming dodecahedron.
 
-Copyright (c) 2019 Alan D. Freed
+Copyright (c) 2020 Alan D. Freed
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,18 +28,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
-__version__ = "1.3.1"
+__version__ = "1.0.0"
 __date__ = "08-08-2019"
-__update__ = "10-06-2019"
+__update__ = "05-20-2020"
 __authors__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, zamani.shahla@tamu.edu"
 
 r"""
-
-Changes in version "1.3.0":
-
-    Tetrahedra are included in the construction.  They are used to represent
-    the volume of a dodecahedron and its properties.
+A listing of changes made wrt version release can be found at the end of file.
 
 
 Overview of module Dodecahedra.py:
@@ -810,3 +806,13 @@ class dodecahedron(object):
         else:
             raise RuntimeError("An unknown state {} in ".format(str(state)) +
                                "a call to dodecahedron.dVolumetricStrain.")
+
+
+"""
+Changes in version "1.0.0":
+
+    Tetrahedra are included in the construction.  They are used to represent
+    the volume of a dodecahedron and its properties.
+
+Changes were not kept track of in the beta versions.
+"""

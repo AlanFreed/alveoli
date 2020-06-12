@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from ceChords import septalChord
 from gaussQuadratures import gaussQuadChord1, gaussQuadChord3, gaussQuadChord5
 import materialProperties as mp
-import math as m
+import math
 import numpy as np
-from peceVtoX import pece
+from peceCE import control, pece
 from ridder import findRoot
 from shapeFnChords import shapeFunction
 import spin as spinMtx
@@ -15,7 +16,7 @@ from vertices import vertex
 """
 Module chords.py provides geometric information about a septal chord.
 
-Copyright (c) 2019 Alan D. Freed
+Copyright (c) 2020 Alan D. Freed
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,9 +33,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
-__version__ = "1.4.0"
+__version__ = "1.0.0"
 __date__ = "08-08-2019"
-__update__ = "04-17-2020"
+__update__ = "05-20-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -44,11 +45,11 @@ A listing of changes made wrt version release can be found at the end of file.
 
 Class chord in file chords.py allows for the creation of objects that are to
 be used to represent chords that connect vertices in a polyhedron.  A chord is
-assigned an unique number, two distinct vertices that serve as end points, the
-time step size used to approximate derivatives and integrals, and the number
-of Gauss points to be used for integration.
+assigned an unique number, two distinct vertices that serve as its end points,
+the time-step size used to approximate derivatives and integrals, plus the
+number of Gauss points that are to be used for integrating over its length.
 
-Initial coordinates that locate vertices in a dodecahedron used to model the
+Initial co-ordinates that locate vertices in a dodecahedron used to model the
 alveoli of lung are assigned according to a reference configuration where the
 pleural pressure (the pressure surrounding lung in the pleural cavity) and the
 transpulmonary pressure (the difference between aleolar and pleural pressures)
@@ -70,22 +71,26 @@ take on any of the following values:
     'p', 'prev', 'previous'      gets the value for a previous configuration
     'r', 'ref', 'reference'      gets the value for the reference configuration
 
+Co-ordinates are handled as tuples; vector fields are handled as arrays;
+tensor fields are handled as matrices.
+
 
 class chord
 
 A chord object, say c, can be printed out to the command window using the
-following command.  The objected printed associates with the current state.
+following command.  The object printed associates with the current state.
 
     print(c)
 
 constructor
 
-    c = chord(number, vertex1, vertex2, h, degree)
-        number    immutable value that is unique to this chord
-        vertex1   an end point of the chord, an instance of class vertex
-        vertex2   an end point of the chord, an instance of class vertex
-        h         timestep size between two successive calls to 'advance'
-        degree    order of polynomials integrated exactly: must be 1, 3 or 5
+    c = chord(number, vertex1, vertex2, dt, polyDegree, m=1)
+        number      is an immutable value that is unique to this chord
+        vertex1     is an end point of the chord, an instance of class vertex
+        vertex2     is an end point of the chord, an instance of class vertex
+        dt          is the time seperating any two neighboring configurations
+        polyDegree  order of polynomials integrated exactly: must be 1, 3 or 5
+        m           is the number of CE iterations, i.e., PE(CE)^m, m in [0, 5]
 
 methods
 
@@ -93,7 +98,7 @@ methods
         returns a string representation for this chord in configuration 'state'
 
     n = c.number()
-        returns the unique indexing number affiated with this chord
+        returns the unique indexing number affiliated with this chord
 
     v1, v2 = c.vertexNumbers()
         returns the unique numbers assigned to the two vertices of this chord
@@ -108,49 +113,30 @@ methods
         returns the number of Gauss points assigned to this chord
 
     c.update()
-        assigns new coordinate values to the chord for its next location and
-        updates all effected fields.  It is to be called after all vertices
-        have had their coordinates updated.  This may be called multiple times
-        before freezing its values with a call to 'advance'
+        assigns new co-ordinate values to the chord for its next location and
+        updates all effected fields.  It is to be called AFTER all vertices
+        have had their co-ordinates updated.  It may be called multiple times
+        before freezing the co-ordinate values with a call to chord.advance
 
     c.advance()
-        assigns the current fields to the previous fields, and then it assigns
+        assigns the current fields to the previous fields, and then assigns
         the next fields to the current fields, thereby freezing the present
-        next-fields in preparation for an advancment of the solution along its
-        path
+        next-fields in preparation for an advancment of a solution along its
+        path of motion
 
-    Material properties that associate with this chord.  The areas are drawn
-    from a random statistical distribution.
+    Material properties that associate with this chord.
 
     rho = c.massDensity()
         returns the mass density of the chord (collagen and elastin fibers)
 
-    a = c.areaCollagen(state)
-        returns the cross-sectional area of the collagen fiber in
-        configuration 'state'
-
-    a = c.areaElastin(state)
-        returns the cross-sectional area of the elastin fiber in
-        configuration 'state'
-
-    E = c.tangentModulusCollagen(fiberStress, fiberStrain)
-        returns the elastic tangent modulus for the collagen fiber
-
-    E = c.tangentModulusElastin(fiberStress, fiberStrain)
-        returns the elastic tangent modulus for the elastin fiber
-
-    stressRate = c.odeCollagen(time, stress)
-        called by the PECE integrator for stress in the collagen fiber
-
-    stressRate = c.odeElastin(time, stress)
-        called by the PECE integrator for stress in the elastin fiber
-
-    Geometric fields associated with a chord in 3 space are:
+    Geometric fields associated with a chord in 3 space.  For those fields that
+    are constructed from difference formulae, it is necessary that they be
+    rotated into the re-indexed co-ordinate frame for the 'state' of interest
 
     a = c.area(state)
         returns the cross-sectional area of the chord, i.e., both the collagen
-        and elastin fibers in configuration 'state' under the assumption that
-        volume is preserved
+        and elastin fibers in configuration 'state', deformed under an
+        assumption that chordal volume is preserved
 
     ell = c.length(state)
         returns the chordal length in configuration 'state'
@@ -158,36 +144,41 @@ methods
     lambda = c.stretch(state)
         returns the chordal stretch in configuration 'state'
 
-    Kinematic fields associated with the centroid of a chord in 3 space are:
+    Kinematic fields associated with the centroid of a chord in 3 space are
 
     [x, y, z] = c.centroid(state)
         returns coordinates for the chordal mid-point in configuration 'state'
 
-    [ux, uy, uz] = c.displacement(state)
+    [ux, uy, uz] = c.displacement(reindex, state)
         returns the displacement of the centroid in configuration 'state'
 
-    [vx, vy, vz] = c.velocity(state)
+    [vx, vy, vz] = c.velocity(reindex, state)
         returns the velocity of the centroid in configuration 'state'
 
-    [ax, ay, az] = c.acceleration(state)
+    [ax, ay, az] = c.acceleration(reindex, state)
         returns the acceleration of the centroid in configuration 'state'
 
-    Rotation and spin of a chord wrt the dodecahedral coordinate system are:
+    Rotation and spin of a chord wrt the dodecahedral coordinate system are
 
     pMtx = c.rotation(state)
         returns a 3x3 orthogonal matrix that rotates the reference base vectors
-        into the set of local base vectors pertaining to a chord whose axis
-        aligns with the 1 direction, while the 2 direction passes through the
-        origin of the dodecahedral reference coordinate system.  The returned
-        matrix associates with configuration 'state'
+        (E_1, E_2, E_3) into a set of local base vectors (e_1, e_2, e_3) that
+        pertain to a chord whose axis aligns with the e_1 direction, while the
+        e_2 direction passes through the origin of the dodecahedral reference
+        co-ordinate system.  The returned matrix associates with configuration
+        'state'
 
-    omegaMtx = c.spin(state)
+    omegaMtx = c.spin(reindex, state)
+        input
+            reindex is an instance of class pivot from pivotIncomingF.py
+        output
         returns a 3x3 skew symmetric matrix that describes the time rate of
-        change in rotation, i.e., the spin of the local chordal coordinate
-        system about the fixed coordinate system of the dodecahedron.  The
-        returned matrix associates with configuration 'state'
+        change in rotation, i.e., the spin of the local chordal co-ordinate
+        system (e_1, e_2, e_3) about a fixed co-ordinate frame (E_1, E_2, E_3)
+        belonging to the dodecahedron.  The returned matrix associates with
+        configuration 'state'
 
-    Thermodynamic fields associated with a chord are:
+    Thermodynamic fields evaluated in the chordal co-ordinate system:
 
     epsilon = c.strain(state)
         returns the logarithmic strain of the chord in configuration 'state'
@@ -201,50 +192,133 @@ methods
     f = c.force(state)
         returns the force carried by the chord in configuration 'state'
 
-    The fundamental kinematic fields are:
+    truth = c.collagenHasRuptured(state)
+        returns True if the collagen fiber in the chord has ruptured
+
+    truth = c.elastinHasRuptured(state)
+        returns True if the elastin fiber in the chord has ruptured
+
+    Kinematic fields evaluated in the chordal co-ordinate system:
 
     gMtx = c.G(gaussPt, state)
-        returns the displacement gradient at the specified Gauss point for the
-        specified configuration.  gMtx is scalar valued for a chord.
+        returns the displacement gradient G at a specified Gauss point for the
+        specified configuration.  gMtx is a 1x1 matrix for a chord.
 
     fMtx = c.F(gaussPt, state)
-        returns the deformation gradient at the specified Gauss point for the
-        specified configuration.  fMtx is scalar valued for a chord.
+        returns the deformation gradient F at a specified Gauss point for the
+        specified configuration.  fMtx is a 1x1 matrix for a chord.
 
     lMtx = c.L(gaussPt, state)
-        returns the velocity gradient at the specified Gauss point for the
-        specified configuration.  lMtx is scalar valued for a chord.
+        returns the velocity gradient L at a specified Gauss point for the
+        specified configuration.  lMtx is a 1x1 matrix for a chord.
 
     Fields needed to construct a finite element solution strategy are:
 
     sf = c.shapeFunction(gaussPt):
-        returns the shape function associated with the specified Gauss point.
+        returns the shape function associated with a specified Gauss point.
 
     gq = c.gaussQuadrature()
         returns the Gauss quadrature rule being used for integration.
 
     mMtx = c.massMatrix()
-        returns an average of the lumped and consistent mass matrices (ensures
-        the mass matrix is not singular) for the chosen number of Gauss points
-        for a chord whose mass density, rho, and whose cross-sectional area
-        are considered to be uniform over the length of the chord.
+        returns an average of the lumped and consistent mass matrices (thereby
+        ensuring that the mass matrix is not singular) for a chosen number of
+        Gauss points for a chord whose mass density, rho, and whose cross-
+        sectional area are considered to be uniform over the length of the
+        chord.  The mass matrix is constant and therefore independent of state.
 
     kMtx = c.stiffnessMatrix()
         returns a tangent stiffness matrix for the chosen number of Gauss
-        points belonging to the current state.
+        points belonging to the current state.  An updated Lagrangian
+        formulation is implemented.
 
     fVec = c.forcingFunction()
-        returns a vector for the forcing function on the right-hand side
-        belonging to the current state.
+        returns a vector describing the forcing function on the right-hand side
+        belonging to the current state.  An updated Lagrangian formulation is
+        implemented.
 """
+
+# create a control object for the PECE integrator
+
+
+class chordCtrl(control):
+
+    def __init__(self, ctrlVars, dt, temp0, len0):
+        # Call the constructor of the base type.
+        super().__init__(ctrlVars, dt)
+        # This creates the counter  self.step  which may be useful.
+        # Add any other information for your inhereted type, as required.
+        self.TR = temp0    # initial temperature
+        self.LR = len0     # initial length
+        # create their fields for the previous, current and next steps
+        self.TP = temp0
+        self.TC = temp0
+        self.TN = temp0
+        self.LP = len0
+        self.LC = len0
+        self.LN = len0
+        return  # a new instance of type chordCtrl
+
+    def x(self, tN, tempN, lenN):
+        # Call the base implementation of this method to create xVec.
+        xVec = super().x(tN)
+        # You will need to add your application's control functions here,
+        # i.e., you will need to populate xVec before returning.
+        # The temperature at time t in centigrade
+        xVec[0] = tempN
+        # The strain, i.e., log of stretch, at time t
+        xVec[1] = math.log(lenN / self.LR)
+        # update the data structure
+        self.TN = tempN
+        self.LN = lenN
+        return xVec
+
+    # call x before calling dxdt
+    def dxdt(self, tN, restart=False):
+        # Do not call the base implementation of this method to build dxdtVec.
+        dxdtVec = np.zeros((2,), dtype=float)
+        if restart is True:
+            self.step = 1
+        if self.step == 0:
+            # a first-order forward finite difference
+            dxdtVec[0] = (self.TN - self.TC) / self.dt
+            dxdtVec[1] = (self.LN - self.LC) / (self.LC * self.dt)
+        elif self.step == 1:
+            # a first-order backward finite difference
+            dxdtVec[0] = (self.TN - self.TC) / self.dt
+            dxdtVec[1] = (self.LN - self.LC) / (self.LN * self.dt)
+        else:
+            # a second-order backward finite difference
+            dxdtVec[0] = ((3.0 * self.TN - 4.0 * self.TC + self.TP) /
+                          (2.0 * self.dt))
+            dxdtVec[1] = ((3.0 * self.LN - 4.0 * self.LC + self.LP) /
+                          (2.0 * self.LN * self.dt))
+        return dxdtVec
+
+    def advance(self):
+        # Call the base implementation of this method
+        super().advance()
+        # Called internally by the pece integrator.  Do not call it yourself.
+        # Update your object's data structure, if required
+        self.TP = self.TC
+        self.TC = self.TN
+        self.LP = self.LC
+        self.LC = self.LN
+        return  # nothing
 
 
 class chord(object):
 
-    def __init__(self, number, vertex1, vertex2, h, degree):
-        self._number = int(number)
+    def __init__(self, number, vertex1, vertex2, dt, polyDegree, m=1):
+        stressR = 0.0
+        # verify the inputs
 
-        # verify the input
+        # provide an unique identifier for the chord
+        if isinstance(number, int):
+            self._number = number
+        else:
+            raise RuntimeError("The chord number must be an integer.")
+
         if not isinstance(vertex1, vertex):
             raise RuntimeError('vertex1 sent to the chord ' +
                                'constructor was not of type vertex.')
@@ -267,29 +341,41 @@ class chord(object):
             raise RuntimeError('A chord must have two distinct vertices.')
 
         # create the time variables
-        if h > np.finfo(float).eps:
-            self._h = float(h)
+        if isinstance(dt, float) and dt > np.finfo(float).eps:
+            self._h = dt
         else:
-            raise RuntimeError("The stepsize sent to the chord " +
+            raise RuntimeError("The timestep size dt sent to the chord " +
                                "constructor must exceed machine precision.")
-        self._tp = -self._h
-        self._tc = 0.0
-        self._tn = self._h
+        self._tP = -dt
+        self._tC = 0.0
+        self._tN = dt
 
         # assign the Gauss quadrature rule to be used
-        if degree == 1:
+        if polyDegree == 1:
             self._gq = gaussQuadChord1
-        elif degree == 3:
+        elif polyDegree == 3:
             self._gq = gaussQuadChord3
-        elif degree == 5:
+        elif polyDegree == 5:
             self._gq = gaussQuadChord5
         else:
-            raise RuntimeError('A Gauss quadrature capable of integrating ' +
-                               'polynomials up to degree {}'.format(degree) +
-                               '\nwas specified in a call to the chord ' +
-                               'constructor; degree must be 1, 3 or 5.')
+            raise RuntimeError('A Gauss quadrature rule capable of ' +
+                               'integrating polynomials up to degree ' +
+                               '{} \n'.format(polyDegree) +
+                               'was specified in a call to the chord ' +
+                               'constructor, but degree must be 1, 3 or 5.')
 
-        # create the four rotation matrices
+        # limit the range for m in our implementation of PE(CE)^m
+        if isinstance(m, int):
+            if m < 0:
+                self.m = 0
+            elif m > 5:
+                self.m = 5
+            else:
+                self.m = m
+        else:
+            raise RuntimeError("Argument m must be an integer within [0, 5].")
+
+        # create the four rotation matrices: rotate dodecahedral into chordal
         self._Pr3D = np.identity(3, dtype=float)
         self._Pp3D = np.identity(3, dtype=float)
         self._Pc3D = np.identity(3, dtype=float)
@@ -328,7 +414,7 @@ class chord(object):
         n1y = y / mag
         n1z = z / mag
 
-        # base vector 2: goes from the coordinate origin to the chord
+        # base vector 2: goes from the co-ordinate origin to the chord
         # initial guess: base vector 2 points to the midpoint of the chord
         x = (x1[0] + x2[0]) / 2.0
         y = (x1[1] + x2[1]) / 2.0
@@ -339,12 +425,12 @@ class chord(object):
         ez = z / mag
 
         # an internal function is used to locate that point along the chordal
-        # axis which results in a vector n2 that is normal to n1
+        # axis which results in a vector n2 that is normal to base vector n1
         def getDelta(delta):
             nx = ex + delta * n1x
             ny = ey + delta * n1y
             nz = ez + delta * n1z
-            # when the dot product is zero then the two vectors are orthogonal
+            # when the dot product is zero, the two vectors are orthogonal
             n1Dotn2 = n1x * nx + n1y * ny + n1z * nz
             return n1Dotn2
 
@@ -362,12 +448,12 @@ class chord(object):
         n2y = y / mag
         n2z = z / mag
 
-        # base vector 3 is obtained through the cross product
+        # base vector 3 (the binormal) is obtained through a cross product
         n3x = n1y * n2z - n1z * n2y
         n3y = n1z * n2x - n1x * n2z
         n3z = n1x * n2y - n1y * n2x
 
-        # create the rotation matrix from dodecahedral to chordal coordinates
+        # create the rotation matrix from dodecahedral to chordal co-ordinates
         self._Pr3D[0, 0] = n1x
         self._Pr3D[0, 1] = n2x
         self._Pr3D[0, 2] = n3x
@@ -382,7 +468,7 @@ class chord(object):
         self._Pn3D[:, :] = self._Pr3D[:, :]
 
         # establish the shape functions located at the various Gauss points
-        if degree == 1:
+        if polyDegree == 1:
             # this quadrature rule has a single Gauss point
             atGaussPt = 1
             sf1 = shapeFunction(self._gq.coordinates(atGaussPt))
@@ -390,7 +476,7 @@ class chord(object):
             self._shapeFns = {
                 1: sf1
             }
-        elif degree == 3:
+        elif polyDegree == 3:
             # this quadrature rule has two Gauss points
             atGaussPt = 1
             sf1 = shapeFunction(self._gq.coordinates(atGaussPt))
@@ -416,9 +502,10 @@ class chord(object):
                 3: sf3
             }
 
-        # create chord gradients at their Gauss points via dictionaries
-        # 'p' implies previous, 'c' implies current, 'n' implies next
-        if degree == 1:
+        # create the displacement and deformation gradients for a chord at
+        # their Gauss points via dictionaries.  '0' implies reference,
+        # 'p' implies previous, 'c' implies current, and 'n' implies next.
+        if polyDegree == 1:
             # displacement gradients located at the Gauss points of a chord
             self._G0 = {
                 1: np.zeros((1, 1), dtype=float)
@@ -445,7 +532,7 @@ class chord(object):
             self._Fn = {
                 1: np.ones((1, 1), dtype=float)
             }
-        elif degree == 3:
+        elif polyDegree == 3:
             # displacement gradients located at the Gauss points of a chord
             self._G0 = {
                 1: np.zeros((1, 1), dtype=float),
@@ -480,7 +567,7 @@ class chord(object):
                 1: np.ones((1, 1), dtype=float),
                 2: np.ones((1, 1), dtype=float)
             }
-        else:  # degree == 5
+        else:  # polyDegree == 5
             # displacement gradients located at the Gauss points of a chord
             self._G0 = {
                 1: np.zeros((1, 1), dtype=float),
@@ -524,28 +611,37 @@ class chord(object):
                 3: np.ones((1, 1), dtype=float)
             }
 
-        # establish the physical properties for this chord
-        dia = mp.fiberDiameterCollagen()
-        self._areaC = np.pi * dia**2 / 4.0
-        dia = mp.fiberDiameterElastin()
-        self._areaE = np.pi * dia**2 / 4.0
-        self._rho = ((self._areaC * mp.rhoCollagen() +
-                      self._areaE * mp.rhoElastin()) /
-                     (self._areaC + self._areaE))
+        # create the constitutive model for this chord
+        diaC = mp.fiberDiameterCollagen()
+        diaE = mp.fiberDiameterElastin()
+        self._sc = septalChord(L0, diaC, diaE)
 
-        # create the ODE solvers for the two fiber constitutive equations
-        time0 = 0.0
-        stress0 = np.array([0.0])
-        self._peceC = pece(self.odeCollagen, time0, stress0, h)
-        self._peceE = pece(self.odeElastin, time0, stress0, h)
+        # create the control object
+        nbrVars = 2  # temperature and strain (chordal lengths are passed)
+        T0 = 37.0     # body temperature
+        self._ctrl = chordCtrl(nbrVars, dt, T0, L0)
 
-        # create the fiber stresses
-        self._stressCp = stress0[0]
-        self._stressCc = stress0[0]
-        self._stressCn = stress0[0]
-        self._stressEp = stress0[0]
-        self._stressEc = stress0[0]
-        self._stressEn = stress0[0]
+        # create the response objects
+        self._respC = self._sc.bioFiberCollagen()
+        self._respE = self._sc.bioFiberElastin()
+        y0C = np.zeros((nbrVars,), dtype=float)
+        y0E = np.zeros((nbrVars,), dtype=float)
+        y0C[0] = mp.etaCollagen()
+        y0C[1] = stressR
+        y0E[0] = mp.etaElastin()
+        y0E[1] = stressR
+
+        # create their integrators
+        self._peceC = pece(self._tC, y0C, dt, self._ctrl, self._respC, m)
+        self._peceE = pece(self._tC, y0E, dt, self._ctrl, self._respE, m)
+
+        # establish physical properties of this chord
+        self._rho = self._sc.massDensityChord()
+
+        # create the fiber forces
+        self._forceP = y0C[1]
+        self._forceC = y0C[1]
+        self._forceN = y0C[1]
 
         return  # a new chord object
 
@@ -563,7 +659,7 @@ class chord(object):
             s = s + '   ' + self._vertex[1].toString(state) + '\n'
             s = s + '   ' + self._vertex[2].toString(state)
         else:
-            raise RuntimeError("Error: unknown state {} ".format(str(state)) +
+            raise RuntimeError("Unknown state {} ".format(str(state)) +
                                "in a call to chord.toString.")
         return s
 
@@ -614,7 +710,7 @@ class chord(object):
         n1y = y / mag
         n1z = z / mag
 
-        # base vector 2: goes from the coordinate origin to the chord
+        # base vector 2: goes from the co-ordinate origin to the chord
         # initial guess: base vector 2 points to the midpoint of the chord
         x = (x1[0] + x2[0]) / 2.0
         y = (x1[1] + x2[1]) / 2.0
@@ -625,12 +721,12 @@ class chord(object):
         ez = z / mag
 
         # an internal function is used to locate that point along the chordal
-        # axis which results in a vector n2 that is normal to n1
+        # axis which results in a vector n2 that is normal to base vector n1
         def getDelta(delta):
             nx = ex + delta * n1x
             ny = ey + delta * n1y
             nz = ez + delta * n1z
-            # when the dot product is zero then the two vectors are orthogonal
+            # when the dot product is zero, the two vectors are orthogonal
             n1Dotn2 = n1x * nx + n1y * ny + n1z * nz
             return n1Dotn2
 
@@ -648,12 +744,12 @@ class chord(object):
         n2y = y / mag
         n2z = z / mag
 
-        # base vector 3 is obtained through the cross product
+        # base vector 3 is obtained through a cross product
         n3x = n1y * n2z - n1z * n2y
         n3y = n1z * n2x - n1x * n2z
         n3z = n1x * n2y - n1y * n2x
 
-        # create the rotation matrix from dodecahedral to chordal coordinates
+        # create the rotation matrix from dodecahedral to chordal co-ordinates
         self._Pn3D[0, 0] = n1x
         self._Pn3D[0, 1] = n2x
         self._Pn3D[0, 2] = n3x
@@ -664,7 +760,7 @@ class chord(object):
         self._Pn3D[2, 1] = n2z
         self._Pn3D[2, 2] = n3z
 
-        # chordal coordinates for the chords
+        # chordal co-ordinates for the chords, must be tuples
         x10 = (-self._L0 / 2.0,)
         x20 = (self._L0 / 2.0,)
         x1n = (-self._Ln / 2.0,)
@@ -725,9 +821,9 @@ class chord(object):
             self._Gc[i] = self._Gn[i]
 
         # advance the independent variable of integration, i.e., time
-        self._tp = self._tc
-        self._tc = self._tn
-        self._tn += self._h
+        self._tP = self._tC
+        self._tC = self._tN
+        self._tN += self._h
 
         # advance the dependent variables of integration, i.e., the stresses
         self._stressCp = self._stressCc
@@ -739,15 +835,17 @@ class chord(object):
         self._peceC.advance()
         self._peceE.advance()
 
+        return  # nothing, the data structure has been advanced
+
     # Material properties that associate with this chord.  Except for the mass
-    # density, all are drawn randomly from a statistical distribution.
+    # density, all are drawn randomly from various statistical distributions.
 
     def massDensity(self):
         # returns the mass density of the chord (collagen and elastin fibers)
         return self._rho
 
     def areaCollagen(self, state):
-        # returns the cross-sectional area of the collagen fiber assuming
+        # returns the cross-sectional area of the collagen fiber, assuming
         # volume is preserved
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -766,7 +864,7 @@ class chord(object):
                                "was sent in call a to chord.areaCollagen.")
 
     def areaElastin(self, state):
-        # returns the cross-sectional area of the elastin fiber assuming
+        # returns the cross-sectional area of the elastin fiber, assuming
         # volume is preserved
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -784,39 +882,66 @@ class chord(object):
             raise RuntimeError("An unknown state of {} ".format(str(state)) +
                                "was sent in call a to chord.areaElastin.")
 
-    def tangentModulusCollagen(self, fiberStress, fiberStrain):
-        # returns the tangent modulus of Freed & Rajagopal for elastic fibers
-        E1, E2, e_t = mp.collagenFiber()
-        nonLinStrain = fiberStrain - fiberStress / E2
-        if nonLinStrain < e_t:
-            compliance = ((e_t - nonLinStrain) /
-                          (E1 * e_t + 2.0 * fiberStress) + 1.0 / E2)
-            return 1 / compliance
-        else:
-            return E2
 
-    def tangentModulusElastin(self, fiberStress, fiberStrain):
-        # returns the tangent modulus of Freed & Rajagopal for elastic fibers
-        E1, E2, e_t = mp.elastinFiber()
-        nonLinStrain = fiberStrain - fiberStress / E2
-        if nonLinStrain < e_t:
-            compliance = ((e_t - nonLinStrain) /
-                          (E1 * e_t + 2.0 * fiberStress) + 1.0 / E2)
-            return 1 / compliance
-        else:
-            return E2
 
-    def odeCollagen(self, time, stress):
-        if (time < 0.99999 * self._tp) or (time > 1.00001 * self._tn):
+
+
+
+
+
+
+
+
+
+
+
+    def tangentModulusCollagen(self, temperature, fiberStress, fiberStrain):
+        # tangent modulus of a Freed-Rajagopal elastic fiber
+        if fiberStress > 0.0:
+            nonLinStrain = (fiberStrain -
+                            mp.alphaCollagen() * (temperature + 273 - 310) -
+                            fiberStress / self._Ec2)
+            if nonLinStrain < self._ec_t:
+                compliance = ((self._ec_t - nonLinStrain) /
+                              (self._Ec1 * self._ec_t + 2.0 * fiberStress) +
+                              1.0 / self._Ec2)
+                return 1.0 / compliance
+            else:
+                return self._Ec2
+        else:
+            return self._Ec1 * self._Ec2 / (self._Ec1 + self._Ec2)
+
+    def tangentModulusElastin(self, temperature, fiberStress, fiberStrain):
+        # tangent modulus of a Freed-Rajagopal elastic fiber
+        if fiberStress > 0.0:
+            nonLinStrain = (fiberStrain -
+                            mp.alphaElastin() * (temperature + 273 - 310) -
+                            fiberStress / self._Ee2)
+            if nonLinStrain < self._ee_t:
+                compliance = ((self._ee_t - nonLinStrain) /
+                              (self._Ee1 * self._ee_t + 2.0 * fiberStress) +
+                              1.0 / self._Ee2)
+                return 1.0 / compliance
+            else:
+                return self._Ee2
+        else:
+            return self._Ee1 * self._Ee2 / (self._Ee1 + self._Ee2)
+
+    def odeCollagen(self, time, entropyStress):
+        # verify the input
+        if (time < 0.99999 * self._tP) or (time > 1.00001 * self._tN):
             raise RuntimeError("Time is being extrapolated instead of being " +
                                "interpolated in a call to chord.odeCollagen.")
+        if not isinstance(entropyStress, np.ndarray):
+            raise RuntimeError("Variable entropyStress must be a NumPy array.")
+
         # obtain the Lagrange interpolation weights
-        wp = ((time - self._tc)*(time - self._tn) /
-              ((self._tp - self._tc)*(self._tp - self._tn)))
-        wc = ((time - self._tp)*(time - self._tn) /
-              ((self._tc - self._tp)*(self._tc - self._tn)))
-        wn = ((time - self._tp)*(time - self._tc) /
-              ((self._tn - self._tp)*(self._tn - self._tc)))
+        wp = ((time - self._tC)*(time - self._tN) /
+              ((self._tP - self._tC)*(self._tP - self._tN)))
+        wc = ((time - self._tP)*(time - self._tN) /
+              ((self._tC - self._tP)*(self._tC - self._tN)))
+        wn = ((time - self._tP)*(time - self._tC) /
+              ((self._tN - self._tP)*(self._tN - self._tC)))
 
         # interpolate strain and its rate
         strain = (wp * self.strain("prev") + wc * self.strain("curr") +
@@ -826,21 +951,26 @@ class chord(object):
                       wn * self.dStrain("next"))
 
         # construct the governing ODE to be integrated by the PECE method
-        dStressdStrain = self.tangentModulusCollagen(stress, strain)
-        stressRate = dStressdStrain * strainRate
+        C = mp.CpCollagen()
+        alpha = mp.alphaCollagen()
+        rho = mp.rhoCollagen()
+        E = self.tangentModulusCollagen(stress, strain)
+        M = np.zeros((2, 2), dtype=float)
+        M[0, 0] = (mp.CpCollage() / 310.0 -
+                   mp.alphaCollagen()**2 * E / mp.rhoCollagen())
         return stressRate
 
     def odeElastin(self, time, stress):
-        if (time < 0.99999 * self._tp) or (time > 1.00001 * self._tn):
+        if (time < 0.99999 * self._tP) or (time > 1.00001 * self._tN):
             raise RuntimeError("Time is being extrapolated instead of being " +
                                "interpolated in a call to chord.odeElastin.")
         # obtain the Lagrange interpolation weights
-        wp = ((time - self._tc)*(time - self._tn) /
-              ((self._tp - self._tc)*(self._tp - self._tn)))
-        wc = ((time - self._tp)*(time - self._tn) /
-              ((self._tc - self._tp)*(self._tc - self._tn)))
-        wn = ((time - self._tp)*(time - self._tc) /
-              ((self._tn - self._tp)*(self._tn - self._tc)))
+        wp = ((time - self._tC)*(time - self._tN) /
+              ((self._tP - self._tC)*(self._tP - self._tN)))
+        wc = ((time - self._tP)*(time - self._tN) /
+              ((self._tC - self._tP)*(self._tC - self._tN)))
+        wn = ((time - self._tP)*(time - self._tC) /
+              ((self._tN - self._tP)*(self._tN - self._tC)))
 
         # interpolate strain and its rate
         strain = (wp * self.strain("prev") + wc * self.strain("curr") +
@@ -853,6 +983,23 @@ class chord(object):
         dStressdStrain = self.tangentModulusElastin(stress, strain)
         stressRate = dStressdStrain * strainRate
         return stressRate
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # geometric properties of the chord
 
@@ -933,53 +1080,22 @@ class chord(object):
                                "was sent in a call to chord.centroid.")
         return np.array([cx, cy, cz])
 
-    def displacement(self, state):
-        x0 = self.centroid('ref')
-        x = self.centroid(state)
-        u = x - x0
+    def displacement(self, reindex, state):
+        u1 = self._vertex[1].displacement(reindex, state)
+        u2 = self._vertex[2].displacement(reindex, state)
+        u = 0.5 * (u1 + u2)
         return u
 
-    def velocity(self, state):
-        twoH = 2.0 * self._h
-        xp = self.centroid('prev')
-        xc = self.centroid('curr')
-        xn = self.centroid('next')
-        if isinstance(state, str):
-            v = np.zeros(3, dtype=float)
-            if state == 'c' or state == 'curr' or state == 'current':
-                # use second-order central difference formula
-                v = (xn - xp) / twoH
-            elif state == 'n' or state == 'next':
-                # use second-order backward difference formula
-                v = (3.0 * xn - 4.0 * xc + xp) / twoH
-            elif state == 'p' or state == 'prev' or state == 'previous':
-                # use second-order forward difference formula
-                v = (-xn + 4.0 * xc - 3.0 * xp) / twoH
-            elif state == 'r' or state == 'ref' or state == 'reference':
-                pass
-            else:
-                raise RuntimeError("An unknown state of {} ".format(state) +
-                                   "was sent in a call to chord.velocity.")
-        else:
-            raise RuntimeError("An unknown state of {} ".format(str(state)) +
-                               "was sent in call a to chord.velocity.")
+    def velocity(self, reindex, state):
+        v1 = self._vertex[1].velocity(reindex, state)
+        v2 = self._vertex[2].velocity(reindex, state)
+        v = 0.5 * (v1 + v2)
         return v
 
-    def acceleration(self, state):
-        if isinstance(state, str):
-            a = np.zeros(3, dtype=float)
-            if state == 'r' or state == 'ref' or state == 'reference':
-                pass
-            else:
-                h2 = self._h**2
-                xp = self.centroid('prev')
-                xc = self.centroid('curr')
-                xn = self.centroid('next')
-                # use second-order central differenc formula
-                a = (xn - 2.0 * xc + xp) / h2
-        else:
-            raise RuntimeError("An unknown state of {} ".format(str(state)) +
-                               "was sent in a call to chord.acceleration.")
+    def acceleration(self, reindex, state):
+        a1 = self._vertex[1].acceleration(reindex, state)
+        a2 = self._vertex[2].acceleration(reindex, state)
+        a = 0.5 * (a1 + a2)
         return a
 
     def rotation(self, state):
@@ -999,17 +1115,17 @@ class chord(object):
             raise RuntimeError("An unknown state of {} ".format(str(state)) +
                                "was sent in a call to chord.rotation.")
 
-    def spin(self, state):
+    def spin(self, reindex, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
                 return spinMtx.currSpin(self._Pp3D, self._Pc3D,
-                                        self._Pn3D, self._h)
+                                        self._Pn3D, reindex, self._h)
             elif state == 'n' or state == 'next':
                 return spinMtx.nextSpin(self._Pp3D, self._Pc3D,
-                                        self._Pn3D, self._h)
+                                        self._Pn3D, reindex, self._h)
             elif state == 'p' or state == 'prev' or state == 'previous':
                 return spinMtx.prevSpin(self._Pp3D, self._Pc3D,
-                                        self._Pn3D, self._h)
+                                        self._Pn3D, reindex, self._h)
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return np.zeros((3, 3), dtype=float)
             else:
@@ -1095,6 +1211,8 @@ class chord(object):
             raise RuntimeError("An unknown state of {} ".format(str(state)) +
                                "was sent in a call to chord.force.")
 
+    # fundamental kinematic fields
+
     # displacement gradient at a Gauss point
     def G(self, gaussPt, state):
         if (gaussPt < 1) or (gaussPt > self.gaussPoints()):
@@ -1123,8 +1241,7 @@ class chord(object):
             raise RuntimeError("An unknown state {} ".format(str(state)) +
                                "sent in a call to chord.G.")
 
-    # fundamental kinematic fields
-
+    # deformation gradient at a Gauss point
     def F(self, gaussPt, state):
         if (gaussPt < 1) or (gaussPt > self.gaussPoints()):
             if self.gaussPoints() == 1:
@@ -1202,7 +1319,7 @@ class chord(object):
                                    "[1, {}] ".format(self.gaussPoints()) +
                                    "in a call to chord.shapeFunction " +
                                    "and you sent {}.".format(gaussPt))
-            sf = self._shapeFns[gaussPt]
+        sf = self._shapeFns[gaussPt]
         return sf
 
     def gaussQuadrature(self):
@@ -1212,29 +1329,36 @@ class chord(object):
         # use the following rule for Gauss quadrature
         gq = self.gaussQuadrature()
 
-        # initial natural coordinates for a chord
-        xn1 = -self.length("ref") / 2.0
-        xn2 = self.length("ref") / 2.0
-
-        # construct the consistent mass matrix assuming conservation of volume
+        # construct the consistent mass matrix in natural co-ordinates
+        massC = np.zeros((2, 2), dtype=float)
         NtN = np.zeros((2, 2), dtype=float)
         for i in range(self.gaussPoints()):
             sf = self.shapeFunction(i+1)
             NtN += gq.weight(i+1) * np.matmul(np.transpose(sf.Nmtx), sf.Nmtx)
-        Jdet = sf.jacobianDet(xn1, xn2)
-        massC = np.zeros((2, 2), dtype=float)
-        massC = (self.massDensity() * self.area("ref") * Jdet) * NtN
+        massC[:, :] = NtN[:, :]
 
-        # construct the lumped mass matrix
+        # construct the lumped mass matrix in natural co-ordinates
         massL = np.zeros((2, 2), dtype=float)
         row, col = np.diag_indices_from(massC)
         massL[row, col] = massC.sum(axis=1)
 
-        # construct the mass matrix
-        # an average of the consistent and lumped mass matrices
-        mass = np.zeros((2, 2), dtype=float)
-        mass = 0.5 * (massC + massL)
+        # construct the averaged mass matrix in natural co-ordinates
+        massA = np.zeros((2, 2), dtype=float)
+        massA = 0.5 * (massC + massL)
 
+        # the following print statements were used to verify the code
+        # print("\nThe averaged mass matrix in natural co-ordinates is")
+        # print(0.5 * massA)  # the half is the Jacobian for span [-1, 1]
+
+        # convert average mass matrix from natural to physical co-ordinates
+        length = self.length("ref")
+        area = self.area('ref')
+        xn1 = (-length / 2,)
+        xn2 = (length / 2,)
+        mass = np.zeros((2, 2), dtype=float)
+        Jdet = sf.jacobianDet(xn1, xn2)
+        rho = self.massDensity()
+        mass = (rho * area * Jdet) * massA
         return mass
 
     """
@@ -1466,7 +1590,7 @@ class chord(object):
 
 
 """
-Changes made in version "1.4.0":
+Changes made in version "1.0.0":
 
 
 A chord object can now be printed using the print(object) command.
@@ -1509,5 +1633,5 @@ Removed methods
 Methods c.G and c.F now return 1x1 matrices instead of floats
 
 
-Changes made were not kept track of prior to version "1.3.0":
+Changes made were not kept track of in the beta versions.
 """

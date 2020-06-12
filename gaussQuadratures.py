@@ -6,7 +6,7 @@ import numpy as np
 """
 Module gaussQuadratures.py provides Gaussian quadratures for integration.
 
-Copyright (c) 2019 Alan D. Freed
+Copyright (c) 2020 Alan D. Freed
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,9 +23,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
-__version__ = "1.4.0"
+__version__ = "1.0.0"
 __date__ = "04-14-2020"
-__update__ = "04-14-2020"
+__update__ = "05-20-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -587,7 +587,7 @@ gaussQuadTetrahedron3 = gaussQuadTetrahedra(3)
 gaussQuadTetrahedron5 = gaussQuadTetrahedra(5)
 
 """
-Changes made in version "1.4.0":
+Changes made in version "1.0.0":
 
 Original version
 """

@@ -23,13 +23,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
-__version__ = "1.3.0"
+__version__ = "1.0.0"
 __date__ = "10-05-2019"
-__update__ = "11-07-2019"
+__update__ = "05-18-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
 """
+A listing of changes made wrt version release can be found at the end of file.
+
+
 For those properties that have units, CGS units are used here:
     length          centimeters
     mass            grams
@@ -100,21 +103,21 @@ Coefficients of linear thermal expansion (1/K) for the aveolar constituents:
 The following procedures supply random values describing geometries in alveoli.
 
     l = alveolarDiameter()
-        Determines an alveolar diameter from its statistical distribution.
+        Determines an alveolar diameter from its probability distribution.
         Associates with humans, age 15-35, whose lungs were fixed at 4 cm H20.
         Data are from: Sobin, Fung & Tremer, 1988.  The returned values have
         been extrapolated back to zero gauge pressure.
 
     d = fiberDiameterCollagen()
         Returns the diameter (in centimeters) of a collagen fiber determined
-        from its statistical distribution.  Associates with humans, age 15-35,
+        from its probability distribution.  Associates with humans, age 15-35,
         whose lungs were fixed at 4 cm H20.  Data are from: Sobin, Fung and
         Tremer, 1988.  The returned values have been extrapolated back to zero
         gauge pressure.
 
     d = fiberDiameterElastin()
         Returns the diameter (in centimeters) of an elastin fiber determined
-        from its statistical distribution.  Associates with humans, age 15-35,
+        from its probability distribution.  Associates with humans, age 15-35,
         whose lungs were fixed at 4 cm H20.  Data are from: Sobin, Fung and
         Tremer, 1988.  The returned values have been extrapolated back to zero
         gauge pressure.
@@ -355,101 +358,120 @@ def collagenFiber():
     # no statistics available, based on judgment
     # the compliant modulus
     mu1 = 5.0E5     # the mean compliant modulus in barye
-    sigma1 = 2.0E5  # the standard deviation
+    sigma1 = 1.0E5  # the standard deviation
     E1 = random.gauss(mu1, sigma1)
     # bracket the permissible variability
-    while (E1 < mu1 - 2.25 * sigma1) or (E1 > mu1 + 4.0 * sigma1):
+    while (E1 < mu1 - 4.0 * sigma1) or (E1 > mu1 + 4.0 * sigma1):
         E1 = random.gauss(mu1, sigma1)
     # the stiffness modulus
     mu2 = 5.0E7     # the mean stiff modulus in barye
-    sigma2 = 1.0E7  # the standard deviation
+    sigma2 = 5.0E6  # the standard deviation
     E2 = random.gauss(mu2, sigma2)
     # bracket the permissible variability
-    while (E1 >= E2) or (E2 < mu2 - 4.0 * sigma2) or (E2 > mu2 + 4.0 * sigma2):
+    while (E1 >= E2) or (E2 < mu2 - 5.0 * sigma2) or (E2 > mu2 + 5.0 * sigma2):
         E2 = random.gauss(mu2, sigma2)
     # the transition strain
     muT = 0.09       # the mean transition strain at 30% total lung capacity
-    sigmaT = 0.015    # standard deviation
+    sigmaT = 0.018   # standard deviation
     e_t = random.gauss(muT, sigmaT)
     # bracket the permissible variability
-    while (e_t < muT - 3.0 * sigmaT) or (e_t > muT + 4.0 * sigmaT):
+    while (e_t < muT - 4.0 * sigmaT) or (e_t > muT + 4.0 * sigmaT):
         e_t = random.gauss(muT, sigmaT)
-    return E1, E2, e_t
+    # the strain at fracture, i.e., stress_fracture = E2 * strain_fracture
+    muT = 0.25       # the mean rupture strain
+    sigmaT = 0.025   # standard deviation
+    e_max = random.gauss(muT, sigmaT)
+    # bracket the permissible variability
+    while (e_max < muT - 5.0 * sigmaT) or (e_max > muT + 5.0 * sigmaT):
+        e_max = random.gauss(muT, sigmaT)
+    return E1, E2, e_t, e_max
 
 
 def elastinFiber():
     # no statistics available, based on judgment
     # the compliant modulus
     mu1 = 2.3E6     # the mean compliant modulus in barye
-    sigma1 = 1.0E6  # the standard deviation
+    sigma1 = 3.0E5  # the standard deviation
     E1 = random.gauss(mu1, sigma1)
     # bracket the permissible variability
-    while (E1 < mu1 - 2.0 * sigma1) or (E1 > mu1 + 4.0 * sigma1):
+    while (E1 < mu1 - 5.0 * sigma1) or (E1 > mu1 + 5.0 * sigma1):
         E1 = random.gauss(mu1, sigma1)
     # the stiffness modulus
     mu2 = 1.0E7     # the mean stiff modulus in barye
-    sigma2 = 2.0E6  # the standard deviation
+    sigma2 = 1.0E6  # the standard deviation
     E2 = random.gauss(mu2, sigma2)
     # bracket the permissible variability
-    while (E1 >= E2) or (E2 < mu2 - 4.0 * sigma2) or (E2 > mu2 + 4.0 * sigma2):
+    while (E1 >= E2) or (E2 < mu2 - 5.0 * sigma2) or (E2 > mu2 + 5.0 * sigma2):
         E2 = random.gauss(mu2, sigma2)
     # the transition strain
     muT = 0.4        # the mean transition strain
-    sigmaT = 0.1    # standard deviation
+    sigmaT = 0.08    # standard deviation
     e_t = random.gauss(muT, sigmaT)
     # bracket the permissible variability
-    while (e_t < muT - 3.0 * sigmaT) or (e_t > muT + 4.0 * sigmaT):
+    while (e_t < muT - 4.0 * sigmaT) or (e_t > muT + 4.0 * sigmaT):
         e_t = random.gauss(muT, sigmaT)
-    return E1, E2, e_t
+    # the strain at fracture, i.e., stress_fracture = E2 * strain_fracture
+    muT = 0.3        # the mean transition strain at 30% total lung capacity
+    sigmaT = 0.03    # standard deviation
+    e_max = random.gauss(muT, sigmaT)
+    # bracket the permissible variability
+    while (e_max < muT - 5.0 * sigmaT) or (e_max > muT + 5.0 * sigmaT):
+        e_max = random.gauss(muT, sigmaT)
+    return E1, E2, e_t, e_max
 
 
 def septalMembrane():
     # no statistics available, based on judgment
-    # We use the data fit of the model for viseral plueral from:
-    # Freed, Erel, and Moreno, JoMMS, Vol. 12, 2017.
-    # The visceral plueral is about 50 +/- 30 microns thick, which is about
-    # 100 times thicker than a typical basement membrane in a septal plane.
 
     # the dilation response
 
     # the compliant modulus
-    mu1 = 1.0E4     # the mean compliant modulus in barye
-    sigma1 = 3.0E3  # the standard deviation
+    mu1 = 5.0E4     # the mean compliant modulus in barye
+    sigma1 = 1.0E3  # the standard deviation
     M1 = random.gauss(mu1, sigma1)
     # bracket the permissible variability
-    while (M1 < mu1 - 3.0 * sigma1) or (M1 > mu1 + 4.0 * sigma1):
+    while (M1 < mu1 - 4.0 * sigma1) or (M1 > mu1 + 4.0 * sigma1):
         M1 = random.gauss(mu1, sigma1)
     # the stiffness modulus
-    mu2 = 4.0E7     # the mean stiff modulus in barye
-    sigma2 = 1.0E7  # the standard deviation
+    mu2 = 2.0E6     # the mean stiff modulus in barye
+    sigma2 = 1.0E5  # the standard deviation
     M2 = random.gauss(mu2, sigma2)
     # bracket the permissible variability
-    while (M1 >= M2) or (M2 < mu2 - 3.0 * sigma2) or (M2 > mu2 + 4.0 * sigma2):
+    while (M1 >= M2) or (M2 < mu2 - 4.0 * sigma2) or (M2 > mu2 + 4.0 * sigma2):
         M2 = random.gauss(mu2, sigma2)
     # the transition strain
     muT = 0.2       # the mean transition strain
-    sigmaT = 0.05   # standard deviation
+    sigmaT = 0.025  # standard deviation
     e_Mt = random.gauss(muT, sigmaT)
     # bracket the permissible variability
-    while (e_Mt < muT - 3.0 * sigmaT) or (e_Mt > muT + 4.0 * sigmaT):
+    while (e_Mt < muT - 4.0 * sigmaT) or (e_Mt > muT + 4.0 * sigmaT):
         e_Mt = random.gauss(muT, sigmaT)
 
     # the squeeze response
 
-    # for Poisons ratio to be a half it follows that
-    N1 = M1 / 3.0
-    N2 = M2 / 3.0
-    e_Nt = e_Mt / 3.0
+    N1 = 2.0 * M1 / 3.0
+    N2 = 2.0 * M2 / 3.0
+    e_Nt = 2.0 * e_Mt / 3.0
 
     # the shear response
 
     # assumed to be approximately 1/1000th that of the dilation response
-    G1 = M1 / 1000.0
+    G1 = M1 / 250.0
     G2 = M2 / 1000.0
     e_Gt = e_Mt
 
-    return M1, M2, e_Mt, N1, N2, e_Nt, G1, G2, e_Gt
+    # the maximum strain at rupture
+
+    e_max = 0.2
+
+    return M1, M2, e_Mt, e_max, N1, N2, e_Nt, G1, G2, e_Gt
 
 
 # set a truly random seed for the random number generator
 random.seed()
+
+"""
+Changes made in version "1.0.0":
+
+This is the initial version of materialProperties.py.
+"""

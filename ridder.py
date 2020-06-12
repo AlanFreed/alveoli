@@ -8,7 +8,7 @@ import sys
 """
 Module ridder.py provides a root finding algorithm.
 
-Copyright (c) 2019 Alan D. Freed
+Copyright (c) 2020 Alan D. Freed
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,11 +25,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
-__version__ = "1.3.0"
+__version__ = "1.0.0"
 __date__ = "07-06-2018"
-__update__ = "09-24-2019"
+__update__ = "05-20-2020"
 __author__ = "Alan D. Freed"
-__author_email__ = "adfreed@tamu.edu"
+__author_email__ = "afreed@tamu.edu"
 
 """
 Function 'findRoot' uses Ridder's method to determine a root of a function,
@@ -100,3 +100,10 @@ def findRoot(xL, xU, f, tol=1.0e-9):
             fr = fxi
     print('Warning: iterations exceeded maxIter in findRoot.')
     return xi
+
+
+"""
+Changes made in version "1.0.0":
+
+This is the initial version of this code, which I took from my lecture notes.
+"""

@@ -25,9 +25,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
-__version__ = "1.4.0"
+__version__ = "1.0.0"
 __date__ = "04-17-2020"
-__update__ = "04-20-2020"
+__update__ = "05-21-2020"
 __author__ = "Alan D. Freed and Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -100,29 +100,52 @@ methods
             co-ordinate frame and the analysis frame of configuration 'state'
 
     In the following set of four methods, local fields are quantified in the
-    co-ordinate frame of the dodecahedron, while global fields are quantified
-    in the co-ordinate frame of the user.  Typically, the local frame is at a
-    microscopic level, while the global frame is at a macroscopic level.
+    co-ordinate frame of the dodecahedron with basis (E1, E2, E3), while
+    global fields are quantified in the co-ordinate frame of the user with
+    basis (i, j, k).  Typically, the local frame is at a microscopic level,
+    while the global frame is at a macroscopic level.  In our application,
+    (i, j, k) is the co-ordinate basis of an FEA of a lung, e.g., while
+    (E1, E2, E3) is the co-ordinate basis of our dodecahedron.
 
     lVec = p.globalToLocalVector(gVec, state)
         gVec    a vector whose components are in the global (i, j, k) frame
-        lVec    a vector whose components are in a local (e1, e2, e3) frame
+        lVec    a vector whose components are in a local (E1, E2, E3) frame
         maps a global vector into a local vector at configuration 'state'
 
     gVec = p.localToGlobalVector(lVec, state)
         gVec    a vector whose components are in the global (i, j, k) frame
-        lVec    a vector whose components are in a local (e1, e2, e3) frame
+        lVec    a vector whose components are in a local (E1, E2, E3) frame
         maps a local vector into a global vector at configuration 'state'
 
     lTen = p.globalToLocalTensor(gTen, state)
         gTen    a tensor whose components are in the global (i, j, k) frame
-        lTen    a tensor whose components are in a local (e1, e2, e3) frame
+        lTen    a tensor whose components are in a local (E1, E2, E3) frame
         maps a global tensor into a local tensor at configuration 'state'
 
     gTen = p.localToGlobalTensor(lTen, state)
         gTen    a tensor whose components are in the global (i, j, k) frame
-        lTen    a tensor whose components are in a local (e1, e2, e3) frame
+        lTen    a tensor whose components are in a local (E1, E2, E3) frame
         maps a local tensor into a global tensor at configuration 'state'
+
+    These two methods map a pivoted field from one re-indexed co-ordinate
+    system to another re-indexed co-ordinate system, viz., they are maps
+    between re-indexed frames for basis (E1, E2, E3).
+
+    toVec = p.reindexVector(fromVec, fromCase, toCase)
+        fromVec     is the vector before it has been mapped
+        toVec       is the vector after  it has been mapped
+        fromCase    is the p.pivotedCase out of which it is to be rotated
+        toCase      is the p.pivotedCase in to  which it is to be rotated
+
+    toTen = p.reindexTensor(fromTen, fromCase, toCase)
+        fromTen     is the tensor before it has been mapped
+        toTen       is the tensor after  it has been mapped
+        fromCase    is the p.pivotedCase out of which it is to be rotated
+        toCase      is the p.pivotedCase in to  which it is to be rotated
+
+Reference:
+    Paul, S., Rajagopal, K. R., and Freed, A. D., "On coordinate indexing when
+    using Laplace stretch", in review.
 """
 
 
@@ -261,7 +284,6 @@ class pivot(object):
                 self._Pn[:, :] = self.P6[:, :]
 
         # pivot the deformation gradient as required
-        self._Fn = self.globalToLocalTensor(F, "next")
         self._Fn = np.matmul(np.transpose(self._Pn), np.matmul(F, self._Pn))
 
         return  # nothing
@@ -355,7 +377,85 @@ class pivot(object):
         gTen = np.matmul(P, np.matmul(lTen, np.transpose(P)))
         return gTen
 
+    def reindexVector(self, fromVec, fromCase, toCase):
+        toVec = np.zeros(3, dtype=float)
+        if fromCase == toCase:
+            toVec[:] = fromVec[:]
+        else:
+            if fromCase == 1:
+                fromP = self.P1
+            elif fromCase == 2:
+                fromP = self.P2
+            elif fromCase == 3:
+                fromP = self.P3
+            elif fromCase == 4:
+                fromP = self.P4
+            elif fromCase == 5:
+                fromP = self.P5
+            elif fromCase == 6:
+                fromP = self.P6
+            else:
+                raise RuntimeError('fromCase in reindexTensor must belong ' +
+                                   'to [1, 6], you sent {}.'.format(fromCase))
+            if toCase == 1:
+                toP = self.P1
+            elif toCase == 2:
+                toP = self.P2
+            elif toCase == 3:
+                toP = self.P3
+            elif toCase == 4:
+                toP = self.P4
+            elif toCase == 5:
+                toP = self.P5
+            elif toCase == 6:
+                toP = self.P6
+            else:
+                raise RuntimeError('toCase in reindexTensor must belong ' +
+                                   'to [1, 6], you sent {}.'.format(toCase))
+            pMtx = np.matmul(np.transpose(toP), fromP)
+            toVec = np.matmul(pMtx, fromVec)
+        return toVec
+
+    def reindexTensor(self, fromTen, fromCase, toCase):
+        toTen = np.zeros((3, 3), dtype=float)
+        if fromCase == toCase:
+            toTen[:, :] = fromTen[:, :]
+        else:
+            if fromCase == 1:
+                fromP = self.P1
+            elif fromCase == 2:
+                fromP = self.P2
+            elif fromCase == 3:
+                fromP = self.P3
+            elif fromCase == 4:
+                fromP = self.P4
+            elif fromCase == 5:
+                fromP = self.P5
+            elif fromCase == 6:
+                fromP = self.P6
+            else:
+                raise RuntimeError('fromCase in reindexTensor must belong ' +
+                                   'to [1, 6], you sent {}.'.format(fromCase))
+            if toCase == 1:
+                toP = self.P1
+            elif toCase == 2:
+                toP = self.P2
+            elif toCase == 3:
+                toP = self.P3
+            elif toCase == 4:
+                toP = self.P4
+            elif toCase == 5:
+                toP = self.P5
+            elif toCase == 6:
+                toP = self.P6
+            else:
+                raise RuntimeError('toCase in reindexTensor must belong ' +
+                                   'to [1, 6], you sent {}.'.format(toCase))
+            pMtx = np.matmul(np.transpose(toP), fromP)
+            toTen = np.matmul(pMtx, np.matmul(fromTen, np.transpose(pMtx)))
+        return toTen
+
 
 """
-Version 1.4.0 is the original version.
+Version 1.0.0 is the original version.
 """

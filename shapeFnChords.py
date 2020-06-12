@@ -6,7 +6,7 @@ import numpy as np
 """
 Module shapeFnChords.py provides shape functions for interpolating a chord.
 
-Copyright (c) 2019 Alan D. Freed
+Copyright (c) 2020 Alan D. Freed
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,9 +23,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
-__version__ = "1.4.0"
+__version__ = "1.0.0"
 __date__ = "09-23-2019"
-__update__ = "04-16-2019"
+__update__ = "04-30-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -150,7 +150,7 @@ class shapeFunction(object):
 
     def jacobianMtx(self, x1, x2):
         Jmtx = np.zeros((1, 1), dtype=float)
-        if isinstance(x1, tuple):
+        if isinstance(x1, tuple) and isinstance(x2, tuple):
             Jmtx[0, 0] = self.dN1dXi * x1[0] + self.dN2dXi * x2[0]
         else:
             raise RuntimeError("Each argument of shapeFunction.jacobianMtx " +
@@ -158,7 +158,7 @@ class shapeFunction(object):
         return Jmtx
 
     def jacobianDet(self, x1, x2):
-        if isinstance(x1, tuple):
+        if isinstance(x1, tuple) and isinstance(x2, tuple):
             Jdet = self.dN1dXi * x1[0] + self.dN2dXi * x2[0]
         else:
             raise RuntimeError("Each argument of shapeFunction.jacobianDet " +
@@ -167,7 +167,8 @@ class shapeFunction(object):
 
     def G(self, x1, x2, x01, x02):
         Gmtx = np.zeros((1, 1), dtype=float)
-        if isinstance(x1, tuple):
+        if (isinstance(x1, tuple) and isinstance(x2, tuple) and
+           isinstance(x01, tuple) and isinstance(x02, tuple)):
             # determine the displacement gradient
             disGrad = (self.dN1dXi * (x1[0] - x01[0]) +
                        self.dN2dXi * (x2[0] - x02[0]))
@@ -181,7 +182,8 @@ class shapeFunction(object):
 
     def F(self, x1, x2, x01, x02):
         Fmtx = np.zeros((1, 1), dtype=float)
-        if isinstance(x1, tuple):
+        if (isinstance(x1, tuple) and isinstance(x2, tuple) and
+           isinstance(x01, tuple) and isinstance(x02, tuple)):
             # determine the displacement gradient
             disGrad = (self.dN1dXi * (x1[0] - x01[0]) +
                        self.dN2dXi * (x2[0] - x02[0]))
@@ -195,7 +197,7 @@ class shapeFunction(object):
 
 
 """
-Changes made in version "1.4.0":
+Changes made in version "1.0.0":
 
 
 Tuples are now passed as arguments instead of floats to make its interface
@@ -227,7 +229,5 @@ Removed method
     dNmat = sf.dNdximat()
 
 
-Changes made in version "1.3.0":
-
-Original version
+Changes made in versions of this code were not documented.
 """
