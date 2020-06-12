@@ -3,12 +3,12 @@
 
 from math import cos, sqrt, tan
 import numpy as np
-from vertices import coordinatesToString
-from vertices import vertex
+from pivotIncomingF import pivot
+from vertices import vectorToString, matrixToString, vertex
 
 """
 Created on Mon Jan 21 2019
-Updated on Fri Jul 05 2019
+Updated on Mon May 04 2020
 
 A test file for class vertex in file vertices.py.
 
@@ -36,58 +36,121 @@ def nominalDiameter():
 
 
 def run():
-    number = 11
-    h = 0.1
-    x0 = 1.23456789
-    y0 = -2.3456789
-    z0 = 3.456789
-    x1 = 1.34567789
-    y1 = -2.23456789
-    z1 = 3.3456789
-    x2 = 1.456789
-    y2 = -2.123456789
-    z2 = 3.23456789
-    x3 = 1.5678901234
-    y3 = -2.012345678
-    z3 = 3.123456789
-    v = vertex(number, x0, y0, z0, h)
-    v.update(x1, y1, z1)
+    # impose a far-field deformation history
+    F0 = np.eye(3, dtype=float)
+    F1 = np.copy(F0)
+    F1[0, 0] += 0.01
+    F1[1, 1] -= 0.01
+    F1[1, 0] -= 0.01
+    F1[2, 0] += 0.01
+    F2 = np.copy(F1)
+    F2[0, 0] += 0.01
+    F2[1, 1] -= 0.01
+    F2[0, 1] += 0.02
+    F2[2, 0] += 0.01
+    F3 = np.copy(F2)
+    F3[0, 0] += 0.02
+    F3[1, 1] -= 0.02
+    F3[0, 2] -= 0.01
+    F3[2, 1] += 0.02
+    p = pivot(F0)
+    p.update(F1)
+    p.advance()
+    p.update(F2)
+    p.advance()
+    p.update(F3)
+
+    # get this histories re-indexed deformation gradients
+    pF0 = p.pivotedF('ref')
+    pF1 = p.pivotedF('prev')
+    pF2 = p.pivotedF('curr')
+    pF3 = p.pivotedF('next')
+    print('\nPivot cases for the imposed deformation were:')
+    print('   reference: {}'.format(p.pivotCase('ref')))
+    print('   previous:  {}'.format(p.pivotCase('prev')))
+    print('   current:   {}'.format(p.pivotCase('curr')))
+    print('   next:      {}'.format(p.pivotCase('next')))
+    print('\nFor example, given an F_next of\n')
+    print(matrixToString(F3))
+    print('\nit re-indexes into a pivoted F_next with components of\n')
+    print(matrixToString(pF3))
+
+    # vertex 1 located in its natural co-ordinates for this deformation field
+    xNC = np.array([1.0 / sqrt(3.0), 1.0 / sqrt(3.0), 1.0 / sqrt(3.0)])
+    x0 = np.matmul(pF0, xNC)
+    x1 = np.matmul(pF1, xNC)
+    x2 = np.matmul(pF2, xNC)
+    x3 = np.matmul(pF3, xNC)
+
+    # create vertex 1
+    number = 1
+    coordinates = (x0[0], x0[1], x0[2])
+    h = 0.001
+    v = vertex(number, coordinates, h)
+    coordinates = (x1[0], x1[1], x1[2])
+    v.update(coordinates)
     v.advance()
-    v.update(x2, y2, z2)
+    coordinates = (x2[0], x2[1], x2[2])
+    v.update(coordinates)
     v.advance()
-    v.update(x3, y3, z3)
-    print('\nThe reference co-ordinates are:')
-    x = v.coordinates('reference')
-    print('          ' + coordinatesToString(x[0], x[1], x[2]))
-    print('while the history of co-ordinate values is')
-    print('Referece: ' + v.toString('r'))
-    print('Previous: ' + v.toString('p'))
-    print('Current:  ' + v.toString('c'))
-    print('Next:     ' + v.toString('n'))
-    print('\nThe displacements are:')
-    u = v.displacement('prev')
-    print('Previous: ' + coordinatesToString(u[0], u[1], u[2]))
-    u = v.displacement('curr')
-    print('Current:  ' + coordinatesToString(u[0], u[1], u[2]))
-    u = v.displacement('next')
-    print('Next:     ' + coordinatesToString(u[0], u[1], u[2]))
-    print('\nThe velocities are:')
-    du = v.velocity('previous')
-    print('Previous: ' + coordinatesToString(du[0], du[1], du[2]))
-    du = v.velocity('current')
-    print('Current:  ' + coordinatesToString(du[0], du[1], du[2]))
-    du = v.velocity('next')
-    print('Next:     ' + coordinatesToString(du[0], du[1], du[2]))
-    print('\nThe acclerations are:')
-    d2u = v.acceleration('p')
-    print('Previous: ' + coordinatesToString(d2u[0], d2u[1], d2u[2]))
-    d2u = v.acceleration('c')
-    print('Current:  ' + coordinatesToString(d2u[0], d2u[1], d2u[2]))
-    d2u = v.acceleration('n')
-    print('Next:     ' + coordinatesToString(d2u[0], d2u[1], d2u[2]))
+    coordinates = (x3[0], x3[1], x3[2])
+    v.update(coordinates)
+
+    print('\nThe co-ordinate values for this vertex are:')
+    print('   reference: ' + v.toString('ref'))
+    print('   previous:  ' + v.toString('prev'))
+    print('   current:   ' + v.toString('curr'))
+    print('   next:      ' + v.toString('next'))
+
+    print('\nwhose displacement vectors in their respective frames are:')
+    up = v.displacement(p, 'prev')
+    print('   previous:  ' + vectorToString(up))
+    uc = v.displacement(p, 'curr')
+    print('   current:   ' + vectorToString(uc))
+    un = v.displacement(p, 'next')
+    print('   next:      ' + vectorToString(un))
+    print("that when pushed back into the user's frame of reference become")
+    u0 = p.localToGlobalVector(up, 'prev')
+    print('   previous:  ' + vectorToString(u0))
+    u0 = p.localToGlobalVector(uc, 'curr')
+    print('   current:   ' + vectorToString(u0))
+    u0 = p.localToGlobalVector(un, 'next')
+    print('   next:      ' + vectorToString(u0))
+
+    print('\nwhose velocity vectors in their respective frames are:')
+    dup = v.velocity(p, 'prev')
+    print('   previous:  ' + vectorToString(dup))
+    duc = v.velocity(p, 'curr')
+    print('   current:   ' + vectorToString(duc))
+    dun = v.velocity(p, 'next')
+    print('   next:      ' + vectorToString(dun))
+    print("that when pushed back tino the user's frame of reference become")
+    du0 = p.localToGlobalVector(dup, 'prev')
+    print('   previous:  ' + vectorToString(du0))
+    du0 = p.localToGlobalVector(duc, 'curr')
+    print('   current:   ' + vectorToString(du0))
+    du0 = p.localToGlobalVector(dun, 'next')
+    print('   next:      ' + vectorToString(du0))
+
+    print('\nand whose accleration vectors in their respective frames are:')
+    d2up = v.acceleration(p, 'prev')
+    print('   previous:  ' + vectorToString(d2up))
+    d2uc = v.acceleration(p, 'curr')
+    print('   current:   ' + vectorToString(d2uc))
+    d2un = v.acceleration(p, 'next')
+    print('   next:      ' + vectorToString(d2un))
+    print("that when pushed back into the user's frame of reference become")
+    d2u0 = p.localToGlobalVector(d2up, 'prev')
+    print('   previous:  ' + vectorToString(d2u0))
+    d2u0 = p.localToGlobalVector(d2uc, 'curr')
+    print('   current:   ' + vectorToString(d2u0))
+    d2u0 = p.localToGlobalVector(d2un, 'next')
+    print('   next:      ' + vectorToString(d2u0))
+    print('which are the same, as they ought to be.')
 
     print('\nTest printing a vertex object with the print(object) command.')
     print(v)
+    print("Notice: the current state is printed when using the print command.")
 
 
 nominalDiameter()

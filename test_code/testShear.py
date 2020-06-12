@@ -10,7 +10,7 @@ from pylab import rcParams
 
 """
 Created on Mon Feb 04 2019
-Updated on Fri Oct 11 2019
+Updated on Thr Apr 07 2020
 
 Creates figures that examines the cordal and pentagonal responses of a regular
 dodecahedron deformed into an irregular dodecahedron subjected to simple shear.
@@ -95,11 +95,11 @@ def run():
 
     plt.title("Dodecahedral", fontsize=20)
     plt.legend([line1, line2, line3, line4, line5, line6, line7, line8],
-               ["cord 1", "cord 2", "cord 4", "cord 6", "cord 8",
-                "cord 10", "cord 12", "cord 18"],
+               ["chord 1", "chord 2", "chord 4", "chord 6", "chord 8",
+                "chord 10", "chord 12", "chord 18"],
                bbox_to_anchor=(0.025, 0.975), loc=2, fontsize=14)
     plt.xlabel(r'Far Field $\gamma_{12}$', fontsize=16)
-    plt.ylabel(r'Cordal Strain: $e=\ln (L/L_0)$', fontsize=16)
+    plt.ylabel(r'Chordal Strain: $e=\ln (L/L_0)$', fontsize=16)
 
     ax2 = plt.subplot(1, 2, 2)
     # add the curves
@@ -184,11 +184,11 @@ def run():
 
     plt.title("Dodecahedral", fontsize=20)
     plt.legend([line1, line2, line3, line4, line5, line6, line7, line8],
-               ["cord 1", "cord 2", "cord 3", "cord 6", "cord 7",
-                "cord 10", "cord 11", "cord 12"],
+               ["chord 1", "chord 2", "chord 3", "chord 6", "chord 7",
+                "chord 10", "chord 11", "chord 12"],
                bbox_to_anchor=(0.025, 0.975), loc=2, fontsize=14)
     plt.xlabel(r'Far Field $\gamma_{13}$', fontsize=16)
-    plt.ylabel(r'Cordal Strain: $e=\ln (L/L_0)$', fontsize=16)
+    plt.ylabel(r'Chordal Strain: $e=\ln (L/L_0)$', fontsize=16)
 
     ax4 = plt.subplot(1, 2, 2)
     # add the curves
@@ -273,11 +273,11 @@ def run():
 
     plt.title("Dodecahedral", fontsize=20)
     plt.legend([line1, line2, line3, line4, line5, line6, line7, line8],
-               ["cord 1", "cord 2", "cord 3", "cord 6", "cord 7",
-                "cord 10", "cord 11", "cord 13"],
+               ["chord 1", "chord 2", "chord 3", "chord 6", "chord 7",
+                "chord 10", "chord 11", "chord 13"],
                bbox_to_anchor=(0.025, 0.975), loc=2, fontsize=14)
     plt.xlabel(r'Far Field $\gamma_{23}$', fontsize=16)
-    plt.ylabel(r'Cordal Strain: $e=\ln (L/L_0)$', fontsize=16)
+    plt.ylabel(r'Chordal Strain: $e=\ln (L/L_0)$', fontsize=16)
 
     ax6 = plt.subplot(1, 2, 2)
     # add the curves

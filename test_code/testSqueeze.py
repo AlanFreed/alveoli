@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Feb 04 2019
-Updated on Fri Oct 11 2019
+Updated on Thr Apr 07 2020
 
 Creates figures that examines the chordal and pentagonal responses of a regular
 dodecahedron deformed into an irregular dodecahedron subjected to a pure shear.
@@ -88,11 +88,11 @@ def run():
 
     plt.title("Dodecahedral", fontsize=20)
     plt.legend([line1, line2, line3, line4, line5, line6],
-               ["cord 1", "cord 2", "cord 6", "cord 10", "cord 11",
-                "cord 18"],
+               ["chord 1", "chord 2", "chord 6", "chord 10", "chord 11",
+                "chord 18"],
                bbox_to_anchor=(0.025, 0.975), loc=2, fontsize=14)
     plt.xlabel(r'Far Field $\ln \sqrt[3]{a/b}$', fontsize=16)
-    plt.ylabel(r'Cordal Strain: $e=\ln (L/L_0)$', fontsize=16)
+    plt.ylabel(r'Chordal Strain: $e=\ln (L/L_0)$', fontsize=16)
 
     ax22 = plt.subplot(1, 2, 2)
     # add the curves
@@ -169,11 +169,11 @@ def run():
 
     plt.title("Dodecahedral", fontsize=20)
     plt.legend([line1, line2, line3, line4, line5, line6],
-               ["cord 1", "cord 2", "cord 6", "cord 10", "cord 11",
-                "cord 18"],
+               ["chord 1", "chord 2", "chord 6", "chord 10", "chord 11",
+                "chord 18"],
                bbox_to_anchor=(0.025, 0.975), loc=2, fontsize=14)
     plt.xlabel(r'Far Field $\ln \sqrt[3]{c/a}$', fontsize=16)
-    plt.ylabel(r'Cordal Strain: $e=\ln (L/L_0)$', fontsize=16)
+    plt.ylabel(r'Chordal Strain: $e=\ln (L/L_0)$', fontsize=16)
 
     ax22 = plt.subplot(1, 2, 2)
     # add the curves
@@ -250,11 +250,11 @@ def run():
 
     plt.title("Dodecahedral", fontsize=20)
     plt.legend([line1, line2, line3, line4, line5, line6],
-               ["cord 1", "cord 2", "cord 6", "cord 10", "cord 11",
-                "cord 18"],
+               ["chord 1", "chord 2", "chord 6", "chord 10", "chord 11",
+                "chord 18"],
                bbox_to_anchor=(0.025, 0.975), loc=2, fontsize=14)
     plt.xlabel(r'Far Field $\ln \sqrt[3]{b/c}$', fontsize=16)
-    plt.ylabel(r'Cordal Strain: $e=\ln (L/L_0)$', fontsize=16)
+    plt.ylabel(r'Chordal Strain: $e=\ln (L/L_0)$', fontsize=16)
 
     ax32 = plt.subplot(1, 2, 2)
     # add the curves

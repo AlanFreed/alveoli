@@ -10,7 +10,7 @@ from pylab import rcParams
 
 """
 Created on Mon Feb 04 2019
-Updated on Fri Oct 11 2019
+Updated on Thr Apr 07 2020
 
 Creates figures that examine the chordal and pentagonal responses during a
 dilatation of a regular dodecahedron into a deformed regular dodecahedron.
@@ -26,7 +26,6 @@ def run():
 
     # basic properties for creating the figures
 
-    h = 0.1
     steps = 150
     gaussPts = 1
     maxDilatation = 1.75
@@ -68,7 +67,7 @@ def run():
     line1, = ax1.plot(dilatation, strain1, 'k-', linewidth=2)
     plt.title("Dodecahedral", fontsize=20)
     plt.xlabel(r'Far Field  $\Xi = \ln \sqrt[3]{V \! / V_0}$', fontsize=16)
-    plt.ylabel(r'Cordal Strain: $e = \ln (L/L_0)$', fontsize=16)
+    plt.ylabel(r'Chordal Strain: $e = \ln (L/L_0)$', fontsize=16)
 
     ax2 = plt.subplot(1, 2, 2)
     # add the curves
