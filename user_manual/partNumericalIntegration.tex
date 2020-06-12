@@ -1,20 +1,20 @@
 \part{Numerical Integrators}
 \label{partNumericalMethods}
 
-This analysis tool, which models alveolar geometry as a dodecahedron, requires numerical methods for the temporal integration of its constitutive equations (systems of first-order ODEs) and their governing equations of motion (systems of second-order ODEs), and for the spatial integration of lengths of line, areas of surface, and volumes of space that pertain to the various finite-element geometries used.  The numerical methods used in this work are discussed below.
+This analysis tool, which models alveolar geometry as a dodecahedron, requires numerical methods for the temporal integration of its constitutive equations (systems of first-order ODEs) and their governing equations of motion (systems of second-order ODEs), and for the spatial integration of lengths of line, areas of surface, and volumes of space that pertain to the various finite-element geometries used.  The numerical methods used in this work for these purposes are discussed below.
 
 \section{ODE Solvers}
 
 The various constitutive equations that describe our alveolar model present themselves as ordinary differential equations that need to be integrated, cf.\ \S\ref{secFE_CE}.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} suitable for solving stiff systems of first- and second-order differential equations.  These methods are based upon Gear's well-known, second-order, backward, difference formula (BDF2) that appears in Eqns.~(\ref{1stOrderCorrector} \& \ref{velocityCorrector}) below.
 
-Time $t$ is considered to be the independent variable, discretized over an interval in time $[t_0, t_N]$ for which $N$ solutions are to be extracted at nodes $n=1, 2, \ldots, N$ spaced at uniform intervals in time with a common step size of $\mathrm{d}t = (t_N - t_0)/N$ separating them, where time $t_0$ associates with the initial condition.  This is the \textit{global step size\/} at which solutions are to be gathered.  A dynamically controlled \textit{local step size}, whose size is adjusted on the fly via a PI controller used to manage truncation error, is implemented into code according to the scheme of Soderlind. \cite{Soderlind02} 
+Time $t$ is considered to be the independent variable, discretized over an interval in time $[t_0, t_N]$ for which $N$ solutions are to be extracted at nodes $n=1, 2, \ldots, N$ spaced at uniform intervals in time with a common step size of $\mathrm{d}t = (t_N - t_0)/N$ separating them, where time $t_0$ associates with the initial condition.
 
 \subsection{PECE Solver for First-Order ODEs}
 \label{sec:1stOrderPECE}
 
-Let $\mathbf{x}(t)$ be a vector of independent control variables described in terms of time $t$, and let $\mathbf{y} (\mathbf{x})$ be a vector of dependent response variables obeying a differential equation of evolution $\dot{\mathbf{y}} = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \dot{\mathbf{x}}$, or equivalently $\mathrm{d} \mathbf{y} = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \dot{\mathbf{x}} \, \mathrm{d} t = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \mathrm{d}\mathbf{x}$, subject to an initial condition $\mathbf{y}_0 = \mathbf{y}(\mathbf{x}_0)$ where $\mathbf{x}_0 = \mathbf{x} (t_0)$ wherein matrix $\mathbf{f} (\mathbf{x}, \mathbf{y})$ establishes the constitutive response for the system.
+Let $\mathbf{x}(t)$ be a vector of independent control variables described in terms of time $t$, and let $\mathbf{y} (\mathbf{x})$ be a vector of dependent response variables obeying a differential equation of evolution $\dot{\mathbf{y}} = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \dot{\mathbf{x}}$, or equivalently $\mathrm{d} \mathbf{y} = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \dot{\mathbf{x}} \, \mathrm{d} t = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \mathrm{d}\mathbf{x}$, subject to an initial condition $\mathbf{y}_0 = \mathbf{y}(\mathbf{x}_0)$ where $\mathbf{x}_0 = \mathbf{x} (t_0)$ with matrix $\mathbf{f} (\mathbf{x}, \mathbf{y})$ establishing the constitutive response for the system.
 
-The two-step method put forward here incrementally solves such an ODE, returning solutions associated with the next moment in time $t_{n+1}$, i.e., it acquires $\mathbf{y}_{n+1}$, given knowledge of the  previous $\mathbf{y}_{n-1}$ and current $\mathbf{y}_n$ solutions plus their rates $\dot{\mathbf{y}}_{n-1}$ and $\dot{\mathbf{y}}_n$, with the corrector also depending upon $\dot{\mathbf{y}}_{n+1}$; consequently, the corrector is an implicit method.
+The two-step method put forward here incrementally solves such an ODE, returning solutions associated with the next moment in time $t_{n+1}$, i.e., it acquires $\mathbf{y}_{n+1}$, given knowledge of the  previous $\mathbf{y}_{n-1}$ and current $\mathbf{y}_n$ solutions plus their rates $\dot{\mathbf{y}}_{n-1}$ and $\dot{\mathbf{y}}_n$, with the corrector also depending upon $\dot{\mathbf{y}}_{n+1}$; consequently, the corrector is an implicit method, which is the source of the method's stability properties.
 
 \subsubsection{Start-Up Algorithm}
 
@@ -35,13 +35,13 @@ Multi-step methods are not self starting.  As such, Heun's method (a forward-Eul
     \bigl( \dot{\mathbf{y}}_1^p + \dot{\mathbf{y}}_0 \bigr) \mathrm{d}t + 
     \mathcal{O} \bigl( (\mathrm{d}t)^3 \bigr)
     \label{startUp1stOrderCorrector} \\
-    \mbox{} & \text{Re-Evaluate} & 
+    \mbox{} & \text{re-Evaluate} & 
     \dot{\mathbf{y}}_1 & = \mathbf{f} (\mathbf{x}_1 , \mathbf{y}_1) \,
     \dot{\mathbf{x}}_1 
     \label{startUp1stReEvaluate}
     \end{align}
 \end{subequations}
-wherein $\dot{\mathbf{y}}_0 = \mathbf{f}(\mathbf{x}_0, \mathbf{y}_0) \, \dot{\mathbf{x}}_0$ with $\dot{\mathbf{x}}_0 \, \mathrm{d}t = \mathrm{d} \mathbf{x}_0 \equiv \dot{\mathbf{x}}_1 \, \mathrm{d}t = \mathrm{d} \mathbf{x}_1 = \mathbf{x}_1 - \mathbf{x}_0 + \mathcal{O}\bigl( (\mathrm{d}t)^2 \bigr)$ given that $\mathbf{x}_0 = \mathbf{x}(t_0)$, etc.  The correct\slash re-evaluate (CE) steps of this PECE method can be iterated over until a convergence criterion is satisfied, if need be.
+wherein $\dot{\mathbf{y}}_0 = \mathbf{f}(\mathbf{x}_0, \mathbf{y}_0) \, \dot{\mathbf{x}}_0$.  The predictor is forward Euler, and the corrector is the trapezoidal rule.  Here the order of accuracy for a method (the exponent on $\mathrm{d}t$ in $\mathcal{O}$), as they appear in the above big $\mathcal{O}$ operators, pertains to a single step of integration.  The overall order of the method, when integrated over a sequence of steps, is one less than the exponent inside the $\mathcal{O}$ operator.  Therefore, Heun's method is second-order accurate.
 
 \subsubsection{Two-Step ODE Solver}
 
@@ -64,15 +64,18 @@ The two-step method of Freed \cite{Freed17a} for solving first-order ODEs is
     \tfrac{2}{3} \dot{\mathbf{y}}^{p}_{n+1} \mathrm{d}t + 
     \mathcal{O} \bigl( (\mathrm{d}t)^3 \bigr)
     \label{1stOrderCorrector} \\
-    \mbox{} & \text{Re-Evaluate} & 
+    \mbox{} & \text{re-Evaluate} & 
     \dot{\mathbf{y}}_{n+1} & = \mathbf{f} (\mathbf{x}_{n+1} , \mathbf{y}_{n+1}) \, 
     \dot{\mathbf{x}}_{n+1}
     \label{1stOrderReEvaluate}
     \end{align}
 \end{subequations} 
-where $\dot{\mathbf{x}}_{n+1} \, \mathrm{d}t = \mathrm{d} \mathbf{x}_{n+1} = \tfrac{1}{2} ( 3 \mathbf{x}_{n+1} - 4 \mathbf{x}_n + \mathbf{x}_{n-1} ) + \mathcal{O}\bigl( (\mathrm{d}t)^3 \bigr)$.  This corrector is the well-known BDF2 formula made popular by Gear for which Freed has provided a predictor.  The CE steps of this PECE method can be iterated over until a convergence criterion is satisfied, if need be. 
+whose corrector is the well-known BDF2 formula made popular by Gear, for which Freed has provided a predictor.  Like Heun's method, Freed's method is second-order accurate.
 
-Both the predictor and corrector of this PECE scheme have a solution $\mathbf{y}$ with a weight of 1, and a rate $\dot{\mathbf{y}}$ with a weight of $\tfrac{2}{3} \mathrm{d}t$; hence, this predictor\slash corrector pair is internally consistent, i.e., the predictor and corrector produce the same result when integrating over a constant $\dot{\mathbf{y}}$ field.
+Both the predictor and corrector of this PECE scheme have a solution $\mathbf{y}$ with a weight of 1, and a rate $\dot{\mathbf{y}}$ with a weight of $\tfrac{2}{3} \mathrm{d}t$; hence, this predictor\slash corrector pair is internally consistent, i.e., the predictor and corrector produce the same result when integrating over a constant $\dot{\mathbf{y}}$ field. 
+
+The correct\slash re-evaluate (CE) steps of a PECE method are often iterated over until a convergence criterion is satisfied.  Such methods are typically denoted as $\text{PE}(\text{CE})^m$, where $m$ specifies the number of iterations imposed.
+
 
 \subsection{A Relevant Example}
 
@@ -84,13 +87,13 @@ In our finite element implementation, a hypo-elastic material model \cite{Truesd
 \end{displaymath} 
 where $\boldsymbol{\epsilon}$ is a vector of thermo\-dynamic strains, $\boldsymbol{\sigma}$ is a vector of thermo\-dynamic stresses, and $\mathbf{M}$ is a square matrix comprised of their tangent moduli, which can depend both upon both stress and strain.  In our application, the thermo\-dynamic stress attributes are 
 \begin{displaymath}
-   \boldsymbol{\sigma}_{1D} = \{ \eta , s \} , \quad
+   \boldsymbol{\sigma}_{1D} = \{ \eta , s \}^{\mathsf{T}} , \quad
    \boldsymbol{\sigma}_{2D} = \{ \eta , s^{\pi} , s^{\sigma} , s^{\tau} \}^{\mathsf{T}} , \quad
    \boldsymbol{\sigma}_{3D} = \{ \eta , \Pi , \sigma_1 , \sigma_2 , \tau_1 , \tau_2 , \tau_3 \}^{\mathsf{T}}
 \end{displaymath}
 where $\eta$ is entropy and the rest are stresses.  Their thermo\-dynamic conjugates are the strain attributes
 \begin{displaymath}
-\boldsymbol{\epsilon}_{1D} = \{ \theta , e \} , \quad
+\boldsymbol{\epsilon}_{1D} = \{ \theta , e \}^{\mathsf{T}} , \quad
 \boldsymbol{\epsilon}_{2D} = \{ \theta , \xi , \varepsilon , \gamma \}^{\mathsf{T}} , \quad
 \boldsymbol{\epsilon}_{3D} = \{ \theta , \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 \}^{\mathsf{T}}
 \end{displaymath}
@@ -108,11 +111,11 @@ Equation (\ref{startUp1stOrderODEs}) is used to take the first step of integrati
     \boldsymbol{\sigma}_1 & = \boldsymbol{\sigma}_0 + \tfrac{1}{2} 
     \bigl( \dot{\boldsymbol{\sigma}}_1^p + 
     \dot{\boldsymbol{\sigma}}_0 \bigr) \mathrm{d} t \\
-    \mbox{} & \text{Re-Evaluate} & 
+    \mbox{} & \text{re-Evaluate} & 
     \dot{\boldsymbol{\sigma}}_1 & = \mathbf{M} ( \boldsymbol{\epsilon}_1 , \boldsymbol{\sigma}_1 ) \, \dot{\boldsymbol{\epsilon}}_1
     \end{align}
 \end{subequations}
-where $\dot{\boldsymbol{\sigma}}_0 = \mathbf{M} ( \boldsymbol{\epsilon}_0 , \boldsymbol{\sigma}_0 ) \, \dot{\boldsymbol{\epsilon}}_0$ and $\dot{\boldsymbol{\epsilon}}_0 \equiv \dot{\boldsymbol{\epsilon}}_1 = ( \boldsymbol{\epsilon}_1 - \boldsymbol{\epsilon}_0 ) / \mathrm{d} t$, neglecting higher-order terms, with the remaining steps of integration following according to Eqn.~(\ref{1stOrderODEs}), specifically
+where $\dot{\boldsymbol{\sigma}}_0 = \mathbf{M} ( \boldsymbol{\epsilon}_0 , \boldsymbol{\sigma}_0 ) \, \dot{\boldsymbol{\epsilon}}_0$.  The remaining steps of integration follow according to Eqn.~(\ref{1stOrderODEs}), specifically
 \begin{subequations}
     \notag
     \begin{align}
@@ -127,7 +130,7 @@ where $\dot{\boldsymbol{\sigma}}_0 = \mathbf{M} ( \boldsymbol{\epsilon}_0 , \bol
     \boldsymbol{\sigma}_{n+1} & = \tfrac{1}{3} 
     \bigl( 4 \boldsymbol{\sigma}_n - \boldsymbol{\sigma}_{n-1} \bigr) + 
     \tfrac{2}{3} \, \dot{\boldsymbol{\sigma}}^{p}_{n+1} \, \mathrm{d}t \\
-    \mbox{} & \text{Re-Evaluate} & 
+    \mbox{} & \text{re-Evaluate} & 
     \dot{\boldsymbol{\sigma}}_{n+1} & = \mathbf{M} ( \boldsymbol{\epsilon}_{n+1} , 
     \boldsymbol{\sigma}_{n+1} ) \, \dot{\boldsymbol{\epsilon}}_{n+1}
     \end{align}
@@ -138,9 +141,11 @@ whose strain rates $\dot{\boldsymbol{\epsilon}}$ are computed according to \S\re
 \subsection{PECE Solver for Second-Order ODEs}
 \label{sec:2ndOrderPECE}
 
-Now let $\mathbf{x}$ denote a vector of dependent variables obeying a differential equation of evolution $\mathrm{d}^2 \mathbf{x}(t) / \mathrm{d} t^2 = \ddot{\mathbf{x}} = \mathbf{f} (t, \mathbf{x}, \dot{\mathbf{x}})$ subject to a pair  initial conditions of $\mathbf{x}_0 = \mathbf{x}(t_0)$ and $\dot{\mathbf{x}}_0 = \dot{\mathbf{x}}(t_0)$.  One may think of $\mathbf{x}$ as being displacements whose rates $\dot{\mathbf{x}}$ are velocities $\mathbf{v}$, with $\ddot{\mathbf{x}} = \dot{\mathbf{v}}$ representing their accelerations $\mathbf{a}$. 
+Now let $\mathbf{u}$ denote a vector of dependent variables obeying a differential equation of evolution $\mathrm{d}^2 \mathbf{u}(t) / \mathrm{d} t^2 = \ddot{\mathbf{u}} = \mathbf{f} (t, \mathbf{u}, \dot{\mathbf{u}})$ subject to a pair  initial conditions of $\mathbf{u}_0 = \mathbf{u}(t_0)$ and $\dot{\mathbf{u}}_0 = \dot{\mathbf{u}}(t_0)$.  One may think of $\mathbf{u}$ as being displacements whose rates $\dot{\mathbf{u}}$ are velocities $\mathbf{v}$, with $\ddot{\mathbf{u}} = \dot{\mathbf{v}}$ representing their accelerations $\mathbf{a}$. 
 
-The two-step method put forward here incrementally solves such an ODE, returning solutions associated with the next moment in time $t_{n+1}$ for both displacement $\mathbf{x}_{n+1}$ and velocity $\dot{\mathbf{x}}_{n+1}$.  To update the displacement to $\mathbf{x}_{n+1}$, the predictor requires knowledge of the previous fields $\mathbf{x}_{n-1}$, $\dot{\mathbf{x}}_{n-1}$ and $\ddot{\mathbf{x}}_{n-1}$ plus the current fields $\mathbf{x}_n$, $\dot{\mathbf{x}}_n$ and $\ddot{\mathbf{x}}_n$, with the corrector also requiring knowledge of $\dot{\mathbf{x}}_{n+1}$ and $\ddot{\mathbf{x}}_{n+1}$.  Likewise, to update the velocity to $\dot{\mathbf{x}}_{n+1}$, the predictor requires knowledge of the previous fields $\dot{\mathbf{x}}_{n-1}$ and $\ddot{\mathbf{x}}_{n-1}$ plus the current fields $\dot{\mathbf{x}}_n$ and $\ddot{\mathbf{x}}_n$, with the corrector also requiring knowledge of $\ddot{\mathbf{x}}_{n+1}$.  Both predictors are explicit, and both correctors are implicit.
+The two-step method put forward here incrementally solves such an ODE, returning solutions associated with the next moment in time $t_{n+1}$ for both displacement $\mathbf{u}_{n+1}$ and velocity $\dot{\mathbf{u}}_{n+1}$.  To update the displacement to $\mathbf{u}_{n+1}$, the predictor requires knowledge of the previous fields $\mathbf{u}_{n-1}$, $\dot{\mathbf{u}}_{n-1}$ and $\ddot{\mathbf{u}}_{n-1}$ plus the current fields $\mathbf{u}_n$, $\dot{\mathbf{u}}_n$ and $\ddot{\mathbf{u}}_n$, with the corrector also requiring knowledge of $\dot{\mathbf{u}}_{n+1}$ and $\ddot{\mathbf{u}}_{n+1}$.  Likewise, to update the velocity to $\dot{\mathbf{u}}_{n+1}$, the predictor requires knowledge of the previous fields $\dot{\mathbf{u}}_{n-1}$ and $\ddot{\mathbf{u}}_{n-1}$ plus the current fields $\dot{\mathbf{u}}_n$ and $\ddot{\mathbf{u}}_n$, with the corrector also requiring knowledge of $\ddot{\mathbf{u}}_{n+1}$.  Both predictors are explicit, and both correctors are implicit.
+
+The numerical method presented below is second-order accurate in velocities and third-order accurate in displacements.
 
 \subsubsection{Start-Up Algorithm}
 
@@ -149,34 +154,35 @@ Again, multi-step methods are not self starting, so a one-step method is needed 
     \label{pairedStartUp}
     \begin{align}
     \mbox{} & \text{Predict} & 
-    \mathbf{x}_1^p & = \mathbf{x}_0 + \dot{\mathbf{x}}_0 \, \mathrm{d}t +
-    \tfrac{1}{2} \ddot{\mathbf{x}}_0 (\mathrm{d}t)^2 + \mathcal{O} \bigl( ( \mathrm{d}t )^3 \bigr)
+    \mathbf{u}_1^p & = \mathbf{u}_0 + \dot{\mathbf{u}}_0 \, \mathrm{d}t +
+    \tfrac{1}{2} \ddot{\mathbf{u}}_0 (\mathrm{d}t)^2 + \mathcal{O} \bigl( ( \mathrm{d}t )^3 \bigr)
     \label{startupDisplacementPredictor} \\
     \mbox{} & &
-    \dot{\mathbf{x}}^p_1 & = 
-    \dot{\mathbf{x}}_0 + \ddot{\mathbf{x}}_0 \, \mathrm{d}t + 
+    \dot{\mathbf{u}}^p_1 & = 
+    \dot{\mathbf{u}}_0 + \ddot{\mathbf{u}}_0 \, \mathrm{d}t + 
     \mathcal{O} \bigl( ( \mathrm{d}t )^2 \bigr) 
     \label{startUpVelocityPredictor} \\
     \mbox{} & \text{Evaluate} &
-    \ddot{\mathbf{x}}^p_1 & = \mathbf{f} (t_1, \mathbf{x}^p_1, \dot{\mathbf{x}}^p_1)
+    \ddot{\mathbf{u}}^p_1 & = \mathbf{f} (t_1, \mathbf{u}^p_1, \dot{\mathbf{u}}^p_1)
     \label{startUpEvaluate} \\
     \mbox{} & \text{Correct} &
-    \mathbf{x}_1 & = \mathbf{x}_0 + \tfrac{1}{2} 
-    ( \dot{\mathbf{x}}^p_1 + \dot{\mathbf{x}}_0 ) \mathrm{d}t -
-    \tfrac{1}{12} ( \ddot{\mathbf{x}}^p_1 - 
-    \ddot{\mathbf{x}}_0 ) (\mathrm{d}t)^2 + \mathcal{O} \bigl( (\mathrm{d}t)^4 \bigr) 
+    \mathbf{u}_1 & = \mathbf{u}_0 + \tfrac{1}{2} 
+    ( \dot{\mathbf{u}}^p_1 + \dot{\mathbf{u}}_0 ) \mathrm{d}t -
+    \tfrac{1}{12} ( \ddot{\mathbf{u}}^p_1 - 
+    \ddot{\mathbf{u}}_0 ) (\mathrm{d}t)^2 + \mathcal{O} \bigl( (\mathrm{d}t)^4 \bigr) 
     \label{startupDisplacementCorrector} \\
     \mbox{} & &
-    \dot{\mathbf{x}}_1 & = \dot{\mathbf{x}}_0 + \tfrac{1}{2} 
-    ( \ddot{\mathbf{x}}_1^p + \ddot{\mathbf{x}}_0 ) \mathrm{d}t + 
+    \dot{\mathbf{u}}_1 & = \dot{\mathbf{u}}_0 + \tfrac{1}{2} 
+    ( \ddot{\mathbf{u}}_1^p + \ddot{\mathbf{u}}_0 ) \mathrm{d}t + 
     \mathcal{O} \bigl( (\mathrm{d}t)^3 \bigr)
     \label{startUpVelocityCorrector} \\
-    \mbox{} & \text{Re-Evaluate} &
-    \ddot{\mathbf{x}}_1 & = \mathbf{f} (t_1, \mathbf{x}_1, \dot{\mathbf{x}}_1) 
+    \mbox{} & \text{re-Evaluate} &
+    \ddot{\mathbf{u}}_1 & = \mathbf{f} (t_1, \mathbf{u}_1, \dot{\mathbf{u}}_1) 
     \label{startUpReEvaluate}
     \end{align}
 \end{subequations}
-wherein $\ddot{\mathbf{x}}_0 = \mathbf{f}(t_0, \mathbf{x}_0, \dot{\mathbf{x}}_0)$ and $t_1 = t_0 + \mathrm{d}t$.  The correct\slash re-evaluate steps can be iterated over until a convergence criterion is satisfied, if need be.
+wherein $\ddot{\mathbf{u}}_0 = \mathbf{f}(t_0, \mathbf{u}_0, \dot{\mathbf{u}}_0)$ and $t_1 = t_0 + \mathrm{d}t$. 
+
 
 \subsubsection{Two-Step ODE Solver}
 
@@ -185,55 +191,55 @@ The two-step method of Freed \cite{Freed17a} for solving second-order ODEs is
     \label{pairedMethods}
     \begin{align}
     \mbox{} & \text{Predict} &
-    \mathbf{x}_{n+1}^p & = \tfrac{1}{3} (
-    4 \mathbf{x}_n - \mathbf{x}_{n-1} ) + 
-    \tfrac{1}{6} ( 3 \dot{\mathbf{x}}_n + 
-    \dot{\mathbf{x}}_{n-1} ) \mathrm{d}t \notag \\ 
+    \mathbf{u}_{n+1}^p & = \tfrac{1}{3} (
+    4 \mathbf{u}_n - \mathbf{u}_{n-1} ) + 
+    \tfrac{1}{6} ( 3 \dot{\mathbf{u}}_n + 
+    \dot{\mathbf{u}}_{n-1} ) \mathrm{d}t \notag \\ 
     \mbox{} & & & \qquad + 
-    \tfrac{1}{36} ( 31 \ddot{\mathbf{x}}_n - 
-    \ddot{\mathbf{x}}_{n-1} ) (\mathrm{d}t)^2 + 
+    \tfrac{1}{36} ( 31 \ddot{\mathbf{u}}_n - 
+    \ddot{\mathbf{u}}_{n-1} ) (\mathrm{d}t)^2 + 
     \mathcal{O} \bigl( (\mathrm{d}t)^4 \bigr) 
     \label{displacementPredictor} \\
     \mbox{} & &
-    \dot{\mathbf{x}}_{n+1}^p & = \tfrac{1}{3} 
-    ( 4 \dot{\mathbf{x}}_n - \dot{\mathbf{x}}_{n-1} ) + 
-    \tfrac{2}{3} ( 2\ddot{\mathbf{x}}_n - \ddot{\mathbf{x}}_{n-1} )
+    \dot{\mathbf{u}}_{n+1}^p & = \tfrac{1}{3} 
+    ( 4 \dot{\mathbf{u}}_n - \dot{\mathbf{u}}_{n-1} ) + 
+    \tfrac{2}{3} ( 2\ddot{\mathbf{u}}_n - \ddot{\mathbf{u}}_{n-1} )
     \mathrm{d}t + \mathcal{O} \bigl( (\mathrm{d}t)^3 \bigr)
     \label{velocityPredictor} \\
     \mbox{} & \text{Evaluate} &
-    \ddot{\mathbf{x}}^p_{n+1} & = \mathbf{f} (t_{n+1}, \mathbf{x}^p_{n+1}, \dot{\mathbf{x}}^p_{n+1}) 
+    \ddot{\mathbf{u}}^p_{n+1} & = \mathbf{f} (t_{n+1}, \mathbf{u}^p_{n+1}, \dot{\mathbf{u}}^p_{n+1}) 
     \label{2ndEvaluate} \\
     \mbox{} & \text{Correct} & 
-    \mathbf{x}_{n+1} & = \tfrac{1}{3} (
-    4  \mathbf{x}_n - \mathbf{x}_{n-1} ) +
-    \tfrac{1}{24} ( \dot{\mathbf{x}}^p_{n+1} +
-    14 \dot{\mathbf{x}}_n + \dot{\mathbf{x}}_{n-1} ) \mathrm{d}t 
+    \mathbf{u}_{n+1} & = \tfrac{1}{3} (
+    4  \mathbf{u}_n - \mathbf{u}_{n-1} ) +
+    \tfrac{1}{24} ( \dot{\mathbf{u}}^p_{n+1} +
+    14 \dot{\mathbf{u}}_n + \dot{\mathbf{u}}_{n-1} ) \mathrm{d}t 
     \notag \\
     \mbox{} & & & \qquad +
-    \tfrac{1}{72} ( 10 \ddot{\mathbf{x}}^p_{n+1} + 
-    51 \ddot{\mathbf{x}}_n - \ddot{\mathbf{x}}_{n-1} ) (\mathrm{d}t)^2 + 
+    \tfrac{1}{72} ( 10 \ddot{\mathbf{u}}^p_{n+1} + 
+    51 \ddot{\mathbf{u}}_n - \ddot{\mathbf{u}}_{n-1} ) (\mathrm{d}t)^2 + 
     \mathcal{O} \bigl( (\mathrm{d}t)^4 \bigr)
     \label{displacementCorrector} \\ 
     \mbox{} & &
-    \dot{\mathbf{x}}_{n+1} & = \tfrac{1}{3} 
-    ( 4 \dot{\mathbf{x}}_n - \dot{\mathbf{x}}_{n-1} ) + 
-    \tfrac{2}{3} \ddot{\mathbf{x}}^p_{n+1} \, \mathrm{d}t + 
+    \dot{\mathbf{u}}_{n+1} & = \tfrac{1}{3} 
+    ( 4 \dot{\mathbf{u}}_n - \dot{\mathbf{u}}_{n-1} ) + 
+    \tfrac{2}{3} \ddot{\mathbf{u}}^p_{n+1} \, \mathrm{d}t + 
     \mathcal{O} \bigl( (\mathrm{d}t)^3 \bigr)
     \label{velocityCorrector} \\
-    \mbox{} & \text{Re-Evaluate} & 
-    \ddot{\mathbf{x}}_{n+1} & = \mathbf{f} (t_{n+1}, \mathbf{x}_{n+1}, \dot{\mathbf{x}}_{n+1})
+    \mbox{} & \text{re-Evaluate} & 
+    \ddot{\mathbf{u}}_{n+1} & = \mathbf{f} (t_{n+1}, \mathbf{u}_{n+1}, \dot{\mathbf{u}}_{n+1})
     \label{2ndReEvaluate}
     \end{align}
 \end{subequations}
-where $t_{n+1} = t_n + \mathrm{d}t$.  The CE steps in this PECE method are typically iterated over until a convergence criterion has been satisfied before the solution is advanced to the next step along its path.
+where $t_{n+1} = t_n + \mathrm{d}t$.  
 
-This PECE solver for velocity $\dot{\mathbf{x}}$ has a predictor and a corrector, i.e., Eqns.~(\ref{velocityPredictor} \& \ref{velocityCorrector}), that are the same as those of method~(\ref{1stOrderPredictor} \& \ref{1stOrderCorrector}), and as such, this predictor\slash corrector pair for integrating velocity is consistent.  Likewise, in both the predictor and corrector for displacement $\mathbf{x}$, contributions from the solution $\mathbf{x}$ have a weight of 1, contributions from the velocities $\dot{\mathbf{x}}$ have a weight of $\tfrac{2}{3} \mathrm{d}t$, and contributions from the accelerations $\ddot{\mathbf{x}}$ have a weight of $\tfrac{5}{6} (\mathrm{d}t)^2$; hence, this predictor\slash corrector pair is internally consistent, too.
+This PECE solver for velocity $\dot{\mathbf{u}}$ has a predictor and a corrector, i.e., Eqns.~(\ref{velocityPredictor} \& \ref{velocityCorrector}), that are the same as those of method~(\ref{1stOrderPredictor} \& \ref{1stOrderCorrector}), and as such, this predictor\slash corrector pair for integrating velocity is consistent.  Likewise, in both the predictor and corrector for displacement $\mathbf{u}$, contributions from the solution $\mathbf{u}$ have a weight of 1, contributions from the velocities $\dot{\mathbf{u}}$ have a weight of $\tfrac{2}{3} \mathrm{d}t$, and contributions from the accelerations $\ddot{\mathbf{u}}$ have a weight of $\tfrac{5}{6} (\mathrm{d}t)^2$; hence, this predictor\slash corrector pair is internally consistent, too.
 
 \subsection{A Relevant Example}
 \label{sec:solve2ndOrderODE}
 
 The finite element problem that we consider here requires solutions for the second-order ODE\footnote{
-    This solver can also get solutions for a system of equations $\mathbf{M} \ddot{\mathbf{u}} + \mathbf{C} \dot{\mathbf{u}} + \mathbf{K} \mathbf{u} = \mathbf{f}(t)$ wherein $\mathbf{M}$ is a mass matrix, $\mathbf{C}$ is a damping matrix, and $\mathbf{K}$ is a stiffness matrix.
+    This solver can also be used to get solutions for the system of equations $\mathbf{M} \ddot{\mathbf{u}} + \mathbf{C} \dot{\mathbf{u}} + \mathbf{K} \mathbf{u} = \mathbf{f}(t)$ wherein $\mathbf{M}$ is a mass matrix, $\mathbf{C}$ is a damping matrix, and $\mathbf{K}$ is a stiffness matrix.
 }
 \begin{displaymath}
     \mathbf{M} \ddot{\mathbf{u}} + \mathbf{K}\mathbf{u} = \mathbf{f}(t)
@@ -258,12 +264,12 @@ where $\mathbf{u}$ is a generalized displacement vector, $\ddot{\mathbf{u}}$ is 
     \mbox{} & &
     \dot{\mathbf{u}}_1 & = \dot{\mathbf{u}}_0 + \tfrac{1}{2}  
     ( \ddot{\mathbf{u}}_1^p + \ddot{\mathbf{u}}_0 ) \mathrm{d}t \\
-    \mbox{} & \text{Re-Evaluate} &
+    \mbox{} & \text{re-Evaluate} &
     \ddot{\mathbf{u}}_1 & = \mathbf{M}^{-1} \bigl( \mathbf{f}(t_1 ) - 
     \mathbf{K} \mathbf{u}_1 \bigr)
     \end{align}
 \end{subequations}
-where the correct\slash re-evaluate steps of the PECE sequence can be iterated upon to achieve a user-specified tolerance, which increases the methods stability as the corrector is implicit.  Continued solution steps are then governed by algorithm (\ref{pairedMethods}), which takes on the form of
+with continued solution steps being governed by algorithm (\ref{pairedMethods}), which takes on the form of
 \begin{subequations}
     \notag
     \begin{align}
@@ -293,14 +299,14 @@ where the correct\slash re-evaluate steps of the PECE sequence can be iterated u
     \dot{\mathbf{u}}_{n+1} & = \tfrac{1}{3} 
     ( 4 \dot{\mathbf{u}}_n - \dot{\mathbf{u}}_{n-1} ) + 
     \tfrac{2}{3} \ddot{\mathbf{u}}^p_{n+1} \, \mathrm{d}t \\
-    \mbox{} & \text{Re-Evaluate} & 
+    \mbox{} & \text{re-Evaluate} & 
     \ddot{\mathbf{u}}_{n+1} & = \mathbf{M}^{-1} \bigl( \mathbf{f}(t_{n+1} ) - 
     \mathbf{K} \mathbf{u}_{n+1} \bigr) 
     \end{align}
 \end{subequations}
-where, again, the correct\slash re-evaluate steps of the PECE sequence can be iterated upon to achieve a user-specified tolerance.  In this problem, velocities $\dot{\mathbf{u}}$ are not needed for the evaluation steps, but they are required by the prediction and correction steps of integration.
+where velocities $\dot{\mathbf{u}}$ are not needed for the evaluation steps, but they are required by the prediction and correction steps of integration.
 
-We observe that the mass matrix must not be ill conditioned in order for this algorithm to work as intended.  Because the mass matrix does not change with time, it only needs to be evaluated and inverted once.  This is an advantage over using the popular Newmark \cite{Newmark59} integrator where matrix re-evaluation and inversion is required at every step along a solution path.
+We observe that the mass matrix must not be ill conditioned in order for this algorithm to work as intended.  Because the mass matrix does not change with time, it only needs to be evaluated and inverted once.  This is an advantage over using the popular Newmark \cite{Newmark59} integrator, where matrix evaluation and inversion is required at every step along a solution path.
 
 \section{Quadrature Rules for Spatial Integration}
 \label{secGauss}

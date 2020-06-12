@@ -1,22 +1,91 @@
 \appendix{Implicit Elasticity}
 \label{appImplicitElasticity}
 
-Both explicit (i.e., Green \cite{Green41} elastic) and implicit (i.e., Rajagopal \cite{Rajagopal03} elastic) material models are put forward in this appendix for one's consideration when choosing a material model to represent biologic fibers and membranes.  We discuss thermo\-elastic fibers first, and then thermo\-elastic membranes.  We have no need to address thermo\-elastic volumes for our application beyond what has been presented in \S\ref{sec:IdealGasLaw}.  We employ Gibbs free-energy potential $\mathcal{G}$ instead of the internal-energy potential $\mathcal{U}$.  These potentials relate to one another through a well-known Legendre transformation.  A Gibbs energy approach implies that a change in the intensive variables (thermo\-dynamic forces) will cause a response in the extensive variables (thermo\-dynamic displacements), which is the exact opposite of an internal energy approach.  Cause and effect are correct in a Gibbs formulation.
+Both explicit (i.e., Green \cite{Green41}) and implicit (i.e., Rajagopal \cite{Rajagopal03}) elastic material models are put forward in this appendix for one's consideration when choosing a material model to represent biologic fibers and membranes.  We discuss thermo\-elastic fibers first, and then thermo\-elastic membranes.  We have no need to address thermo\-elastic bodies in 3D for our application, beyond what has been presented in \S\ref{sec:IdealGasLaw}.  In this appendix, we employ Gibbs free-energy potential $\mathcal{G}$ instead of the internal energy potential $U$, which we employ in the body of this report.  These potentials relate to one another through a well-known Legendre transformation.  A Gibbs energy approach implies that a change in the intensive variables (thermo\-dynamic forces) will cause a response in the extensive variables (thermo\-dynamic displacements), which is the exact opposite cause-and-effect arising from an internal energy approach.  Causality is correct whenever one uses a Gibbs approach, from a physics perspective.  Nevertheless, applications often find other approaches to be more useful, especially that of Helmholtz.  Here we present both secant and tangent moduli formulations for biologic fibers and membranes, as both are required by our variational formulation.
 
 \subsection{Alveolar Chords as Green (Explicit) Thermoelastic Fibers}
 
-For a 1D fiber with a mass density of $\rho$ per unit length, the conjugate fields are: temperature $\theta$ and entropy $\eta$, plus force $F$ and strain $e \defeq \ln (L/L_0)$ with $L_0$ and $L$ denoting the initial and current fiber lengths.  A Green elastic fiber adopts a Gibbs free-energy function with an explicit dependence upon state, viz., $\mathcal{G} (\theta , F)$ such that $\mathrm{d} \mathcal{G} = -\eta \, \mathrm{d} \theta - \tfrac{1}{\rho} e \, \mathrm{d}F$ (cf.~Eqn.~\ref{thermoelastic1Dlaw}), from which one derives its governing constitutive equations, they being
+For a 1D fiber with a mass density of $\rho$ per unit length, the thermo\-dynamic conjugate fields are: temperature $\theta$ and entropy $\eta$, plus force $F$ and length $L$, whose initial values in some reference configuration are denoted as $\theta_0$, $\eta_0$, $F_0$ and $L_0$.  In our construction, it is insightful to use $\ln (\theta / \theta_0)$ and $\ln (L/L_0)$ as measures for change in temperature and length, with the former changing how we interpret thermal strain, but not specific heat, while the latter is commonly referred to as mechanical strain, viz., $e \defeq \ln (L/L_0)$.
+
+A Green thermo\-elastic fiber has a Gibbs free-energy potential described by an explicit function of state, viz., $\mathcal{G} (\theta , F)$ where $\mathrm{d} \mathcal{G} = -\eta \, \mathrm{d} \theta - \tfrac{1}{\rho} e \, \mathrm{d}F$ (cf.~Eqn.~\ref{thermoelastic1Dlaw}), out of which one derives the governing thermo\-elastic constitutive equations, viz., for entropy
 \begin{subequations}
-    \label{fiberConstitutiveTheory}
+    \label{thermoelasticFiber}
     \begin{align}
-\eta & = -\partial_{\theta\,} \mathcal{G} (\theta , F)
-\quad \text{and} \quad
-e = -\rho \, \partial_{F\,} \mathcal{G} (\theta, F)
-\label{entropyStrain1D} \\
-\intertext{that, when differentiated, can be rearranged into the following hypo-elastic equation}
+    \eta & = - \partial_{\theta\,} \mathcal{G} (\theta , F) ,
+    \label{fiberEntropy} \\
+    \intertext{and for strain}
+    e & \defeq \ln ( L / L_0 ) = -\rho \, \partial_{F\,} \mathcal{G} (\theta, F) . 
+    \label{fiberStrain}
+    \end{align}
+\end{subequations}
+Providing an energy function establishes a material model.
+
+\subsubsection{Hookean Fibers}
+
+Herein we consider a Gibbs free-energy potential suitable for describing a Hookean fiber, i.e.,
+\begin{multline}
+    \mathcal{G} (\theta , F) = -\eta_0 (\theta - \theta_0) -
+    C \left( \theta \ln \left( \frac{\theta}{\theta_0} \right) - (\theta - \theta_0) \right) \\ - 
+    \frac{F - F_0}{\rho} \left( \alpha \ln \left( \frac{\theta}{\theta_0} \right) + \frac{F - F_0}{2E}  \right)
+    \label{GreenFiberEnergy}
+\end{multline}
+normalized so that $\mathcal{G}(\theta_0 , F_0) = 0$ with initial conditions of $\eta_0 = -\partial_{\theta\,} \mathcal{G} (\theta_0 , F_0)$ and $e_0 = -\rho \, \partial_F \mathcal{G} (\theta_0 , F_0) = 0$ in our reference state associated with fields $\theta_0$ and $F_0$.   
+
+The model's material properties are: a specific heat $C$, a thermal strain coefficient $\alpha$, and an elastic compliance $1/E$ or modulus $E$.  These properties are interpreted from the perspective of both secant and tangent functions of state in this appendix.
+
+\textit{In~vivo}, biologic fibers operate under cyclic loading conditions where, typically, \mbox{$0 < F_{\min} < F < F_{\max} < F_{\mathrm{ult}}$} that, under normal physiologic conditions, finds force $F$ traversing between $F_{\min}$ and $F_{\max}$ with $F_{\mathrm{ult}}$ designating ultimate rupture strength.  Here we take $F_0$ to associate with $F_{\min}$.  Consequently, strain is assigned to be zero in this reference state of $F_0>0$.  Similarly, physicians will reference against some physiologic state of relevance; however, their reference states usually associate with $F_{\max}$, not $F_{\min}$, e.g., total lung capacity for pulmonary applications, and max systole for cardiac applications.  \textit{Ex~vivo}, one typically selects $F_0 = 0$ for biologic fibers.
+
+\subsubsection{Secant Material Properties}
+
+Upon subtituting the Gibbs free-energy function (\ref{GreenFiberEnergy}) into the constitutive equations (\ref{fiberEntropy} \& \ref{fiberStrain}) governing entropy and strain, respectively, results in the matrix expression
+\begin{displaymath}
 \left\{ \begin{matrix}
-\mathrm{d} \eta \\ \mathrm{d} e 
-\end{matrix} \right\} & = -\begin{bmatrix}
+\eta - \eta_0 \\ \ln (L / L_0)
+\end{matrix} \right\} = \begin{bmatrix}
+C_s & \alpha_s / \rho \theta \\
+\alpha_s & 1 / E_s
+\end{bmatrix} \left\{ \begin{matrix}
+\ln ( \theta / \theta_0 ) \\ F - F_0
+\end{matrix} \right\}
+\end{displaymath}
+which rearranges into a form that is more suitable for our needs, specifically
+\begin{subequations}
+    \label{HookeanFiberModel}
+    \begin{align}
+    \left\{ \begin{matrix}
+        \eta - \eta_0 \\ F - F_0
+    \end{matrix} \right\} & = \begin{bmatrix}
+        C_s - \alpha^2_s E_s / \rho \theta & 
+        \alpha_s E_s / \rho \theta \\
+        -\alpha_s E_s & E_s
+    \end{bmatrix} \left\{ \begin{matrix}
+        \ln ( \theta / \theta_0 ) \\ \ln (L / L_0)
+    \end{matrix} \right\}
+    \label{elasticHookeanFiber} \\
+    \intertext{with material properties: a specific heat (evaluated at some reference force $F_0$) of}
+    C_s & \defeq 
+    \left. \frac{\eta - \eta_0}{\ln( \theta / \theta_0 )}
+    \right|_{F=F_0} 
+    \label{secantSpecificHeat} \\
+    \intertext{with $C_s - \alpha^2_s E_s / \rho \theta$ being a heat capacity (evaluated at some reference length $L_0$), plus a thermal strain coefficient (evaluated at some reference force $F_0$) of}
+    \alpha_s & \defeq \left. \frac{\ln(L/L_0)}{\ln(\theta/\theta_0)}
+    \right|_{F=F_0} ,
+    \label{secantThermalExpansion} \\
+    \intertext{and an elastic compliance (evaluated at some reference temperature $\theta_0$) of}
+    \frac{1}{E_s} & \defeq \left. \frac{\ln(L/L_0)}{F - F_0} \right|_{\theta=\theta_0} .
+    \end{align}
+\end{subequations}
+These are \textit{secant\/} material properties, hence the subscript `$s$', which can be measured through appropriate experiments.  The curves that they trace through state space are then to be approximated via a model.
+
+\textbf{Note}: Thermal elongation is typically modeled as $\alpha (\theta - \theta_0)$, wherein $\alpha$ is referred to as the coefficient for thermal expansion.  Our thermal strain coefficient $\alpha_s$, which is dimensionless, and the coefficient for thermal expansion $\alpha$, which has dimensions of reciprocal temperature, relate via $\alpha_s = \alpha \theta_0 + \mathcal{O}\bigl( ((\theta - \theta_0) / \theta_0)^2 \bigr)$ because $\ln ( \theta / \theta_0 ) = (\theta - \theta_0) / \theta_0 - (\theta - \theta_0)^2 / \theta_0^2 + (\theta - \theta_0)^3 / \theta_0^3 - \cdots$.
+
+\subsubsection{Tangent Material Properties}
+
+Upon differentiating the constitutive equations for entropy and strain found in Eqns.\ (\ref{fiberEntropy} \& \ref{fiberStrain}), respectively, assuming that they are both sufficiently differentiable functions of state, while adopting the expression for Gibbs free energy found in Eqn.~(\ref{GreenFiberEnergy}), results in the following constitutive equation
+\begin{displaymath}
+\left\{ \begin{matrix}
+\mathrm{d} \eta \\ L^{-1} \, \mathrm{d} L 
+\end{matrix} \right\} = -\begin{bmatrix}
 \partial_{\theta\theta\,} \mathcal{G} & \partial_{\theta F\,} \mathcal{G} \\
 \rho \, \partial_{F\theta\,} \mathcal{G} & \rho \, \partial_{FF\,} \mathcal{G}
 \end{bmatrix} 
@@ -24,307 +93,582 @@ e = -\rho \, \partial_{F\,} \mathcal{G} (\theta, F)
 \mathrm{d} \theta \\ \mathrm{d} F
 \end{matrix} \right\}
 = \begin{bmatrix}
-C / \theta & \alpha / \rho \\
-\alpha & 1 / E
+C_t & \alpha_t / \rho \theta \\
+\alpha_t & 1 / E_t
 \end{bmatrix}
 \left\{ \begin{matrix}
-\mathrm{d} \theta \\ \mathrm{d} F
+\theta^{-1} \, \mathrm{d} \theta \\ \mathrm{d} F
 \end{matrix} \right\}
-\label{thermoelasticCE1D} \\
-    \intertext{whose thermo-physical material properties are, in general, functions of state with}
-    C & \defeq \theta \, \partial_{\theta\,} \eta |_F = 
-    -\theta \, \partial_{\theta\theta\,} \mathcal{G} (\theta , F)
+\end{displaymath}
+where we observe that the intensive and extensive variables now appear in rate or differential form; hence, this formulation is hypo-elastic. \cite{Truesdell55}  This matrix equation can be rearranged into an expression that is more suitable for our needs, viz.,
+\begin{subequations}
+    \label{fiberConstitutiveTheory}
+    \begin{align}
+    \left\{ \begin{matrix}
+        \mathrm{d} \eta \\ \mathrm{d} F
+    \end{matrix} \right\} & = \begin{bmatrix}
+        C_t - \alpha^2_t E_t / \rho \theta & 
+        \alpha_t E_t / \rho \theta \\
+        -\alpha_t E_t & E_t
+    \end{bmatrix} \left\{ \begin{matrix}
+       \theta^{-1} \, \mathrm{d} \theta \\
+       L^{-1} \, \mathrm{d} L
+    \end{matrix} \right\} 
+    \label{thermoelasticCE1D} \\
+    \intertext{whose material properties are: a specific heat (at constant force) of}
+    C_t & \defeq
+    \left. \frac{\mathrm{d} \eta}{\theta^{-1} \, \mathrm{d} \theta} 
+    \right|_{\mathrm{d}F=0} = C_s - \frac{\alpha_s (F - F_0)}{\rho \, \theta} = -\theta \, \partial_{\theta\theta\,} \mathcal{G} (\theta, F) 
     \label{specificHeat} \\
-    \alpha & \defeq L^{-1} \, \partial_{\theta\,} L |_F = \partial_{\theta\,} e |_F =
-    -\rho \, \partial_{F\theta\,} \mathcal{G} (\theta , F) \equiv
-    -\rho \, \partial_{\theta F\,} \mathcal{G} (\theta , F)
+    \intertext{where the tangent response for specific heat $C_t$ relates to the secant response for specific heat $C_s$ via $C_t = C_s - \alpha_s (F - F_0) / \rho \theta$, with $C_t - \alpha_t^2 E_t / \rho \theta$ being a heat capacity (at constant strain), plus a thermal strain coefficient (at constant force) of}
+    \alpha_t & \defeq 
+    \left. \frac{L^{-1} \, \mathrm{d}L}
+    {\theta^{-1} \, \mathrm{d}\theta} \right|_{\mathrm{dF=0}} =
+    -\rho\theta \, \partial_{F\theta\,} \mathcal{G} (\theta , F) =
+    -\rho\theta \, \partial_{\theta F\,} \mathcal{G} (\theta , F) 
     \label{thermalExpansion} \\
-    1 / E & \defeq L^{-1} \, \partial_{F\,} L |_{\theta} = \partial_{F\,} e |_{\theta} =
-    -\rho \, \partial_{FF\,} \mathcal{G} (\theta , F)
+    \intertext{where, typically, $\alpha_t \equiv \alpha_s$, and an elastic compliance (at constant temperature) of}
+    \frac{1}{E_t} & \defeq 
+    \left. \frac{L^{-1} \, \mathrm{d}L}{\mathrm{d}F}
+    \right|_{\mathrm{d}\theta=0} =
+    -\rho \, \partial_{FF\,} \mathcal{G} (\theta , F) 
     \label{compliance}
     \end{align}
 \end{subequations}
-where the elastic compliance $1/E = L^{-1} \, \partial_{F\,} L |_{\theta } = \partial_{F} \ln (L / L_0) |_{\theta } = \partial_{F\,} e |_{\theta }$ has units of reciprocal force evaluated at a constant temperature, while the thermal expansion coefficient $\alpha = L^{-1} \, \partial_{\theta\,} L |_F = \partial_{\theta} \ln (L/L_0) |_F = \partial_{\theta\,} e |_F$ has units of reciprocal temperature evaluated at a constant force.  The mass density $\rho$ is one-dimensional in this presentation, i.e., it has units of mass per unit length of fiber; likewise, modulus $E$ has units of force, not stress.
+which is distinct from its secant compliance for the biologic fiber model that follows.  These are \textit{tangent\/} material properties, hence the subscript `$t$', whose values can be measured through appropriate experiments.
 
-\subsubsection{A Hookean Fiber}
+Matrix equation (\ref{thermoelasticCE1D}) is expressed in terms of Helmholtz causality, but is derived out of Gibbs causality to ensure that Maxwell's condition (present in Eqns.~\ref{thermoelasticCE1D} \& \ref{thermalExpansion}) is satisfied.
 
-A thermoelastic Hookean fiber is Green elastic with a Gibbs free energy given by
-\begin{equation}
-    \mathcal{G} (\theta , F) = -C \left( \theta \ln \left( \frac{\theta}{\theta_0} \right) - 
-    (\theta - \theta_0) \right) - 
-    \frac{F}{\rho} \left( \alpha ( \theta - \theta_0 ) + \frac{F}{2E} \right)
-    \label{GreenEnergy}
-\end{equation}
-which is a function of temperature $\theta$ and force $F$, normalized so $\mathcal{G} (\theta_0 , 0) = 0$.  This energy function is consistent with the thermo-physical material properties put forward in Eqn.~(\ref{specificHeat}--\ref{compliance}).  In this model the material properties $\rho$, $C$, $\alpha$ and $E$ are all considered to be of constant value across state space.
+It turns out that these tangent material properties correspond directly with components acquired from the Laplacian of one's Gibbs free-energy potential.
 
 \subsection{Alveolar Chords as Rajagopal (Implicit) Thermoelastic Fibers}
 
-In 2003, Rajagopal \cite{Rajagopal03} introduced the idea of an implicit elastic solid.  In 2016, Freed \&\ Rajagopal \cite{FreedRajagopal16} constructed an elastic fiber model that convolves an explicit energy with an implicit energy.  In their approach they decomposed strain $e \defeq \ln (L / L_0)$ into a sum of two strains, viz., $e = e_1 + e_2$ where $e_1 \defeq \ln (L_1 / L_0)$ and $e_2 \defeq \ln (L / L_1)$.  Length $L_0$ is an initial fiber length, viz., its length whenever $F = 0$.  Length $L_1$ can be thought of as the fiber's length caused solely by an unraveling of molecular configuration (e.g., an unraveling of collagen crimp) under an applied load of $F$.  The state associated with length $L_1$ is non-physical in that one cannot unravel molecules without also stretching their bonds to some extent.  Final length $L$ is the actual fiber length under an applied load $F$ caused by both a reconfiguration and a stretching of its molecular network.  Here we present their ideas in terms of a Gibbs free-energy function.\footnote{%
+In 2003, Rajagopal \cite{Rajagopal03} introduced the idea of an implicit elastic solid.  In 2016, Freed \&\ Rajagopal \cite{FreedRajagopal16} constructed an elastic fiber model that convolves an explicit energy with an implicit energy.  In their approach, they decomposed fiber strain $e \defeq \ln (L / L_0)$ into a sum of two strains, viz., $e = e_1 + e_2$ wherein $e_1 \defeq \ln (L_1 / L_0)$ and $e_2 \defeq \ln (L / L_1)$.  Length $L_0$ is a reference fiber length, viz., its length whereat $F = F_0$.  Length $L_1$ can be thought of as the fiber's length caused solely by a molecular reconfiguration under an applied load of $F$ (e.g., an unraveling of crimp in collagen, a network reorientation in elastin, a reconformation in structural proteins, etc.).  The state associated with length $L_1$ is non-physical in that one cannot unravel molecules without also stretching some of their bonds to a certain extent.  Final length $L$ is the actual fiber length under an applied load $F$ caused by both a reconfiguration and a stretching of its molecular network.  Here we present their ideas in terms of a Gibbs free-energy function, which leads naturally to additive compliances, instead of working with moduli, which do not add.\footnote{%
     Freed \& Rajagopal \cite{FreedRajagopal16} originally used a Helmholtz free-energy function.
 }
 
-Let the Gibbs free energy be described by a function of the form\footnote{
-    One might be tempted to consider an implicit energy function of the form $\mathcal{G} = \mathcal{G}_1 (\theta ,  e_1 , F ) + \mathcal{G}_2 (\theta , F)$, but this would lead to a non-symmetric susceptibility matrix.  Consequently, it would not satisfy Maxwell's thermo\-dynamic constraint, a.k.a.\ Sylvester's condition for integrability of a Pfaffian form.  Hence, it would be inadmissible as a Gibbs potential.
+Let the Gibbs free-energy potential be described by a function of the form\footnote{
+    One might be tempted to consider an implicit energy function of the form $\mathcal{G} = \mathcal{G}_1 (\theta ,  e , F ) + \mathcal{G}_2 (\theta , F)$, but this would lead to a non-symmetric susceptibility matrix.  Consequently, it would not satisfy Maxwell's thermo\-dynamic constraint, a.k.a.\ Sylvester's condition for integrability of a Pfaffian form.  Hence, it is an inadmissible functional dependence for a Gibbs potential.
 }
 \begin{equation}
 \mathcal{G} (\theta , e , F) \defeq \mathcal{G}_1 ( e_1 , F ) + \mathcal{G}_2 ( \theta , F )
-\quad \text{where} \quad
+\quad \text{with} \quad
 \mathrm{d} \mathcal{G} = -\eta \, \mathrm{d} \theta - 
 \tfrac{1}{\rho} e \, \mathrm{d} F
 \label{GibbsFreeEnergy}
 \end{equation}
-with $\mathcal{G}_1$ being an implicit potential (a configuration energy) and $\mathcal{G}_2$ being an explicit potential (a strain energy).  This energy function leads to the same constitutive equation displayed in Eqn.~(\ref{thermoelasticCE1D}), but whose material properties (\ref{specificHeat}--\ref{compliance}) are now interpreted according to the following formul\ae
+where $\mathcal{G}_1$ is an implicit potential (a configuration energy) and $\mathcal{G}_2$ is an explicit potential (a strain energy).  This energy function leads to the same constitutive equation displayed in Eqn.~(\ref{thermoelasticCE1D}), but whose material properties from Eqns.~(\ref{specificHeat}--\ref{compliance}) are now interpreted according to the following formul\ae
 \begin{subequations}
     \label{physicalFields1Dfiber}
     \begin{align}
-    C & \defeq \theta \, \partial_{\theta\,} \eta |_F = 
-    -\theta \, \partial_{\theta\theta\,} \mathcal{G}_2(\theta , F) =
-    -\theta \, \partial_{\theta\theta\,} \mathcal{G} ( \theta , e_1 , F )
+    C_t & \defeq 
+    \left. \frac{\mathrm{d} \eta}{\theta^{-1} \, \mathrm{d} \theta} 
+    \right|_{\mathrm{d}F=0} \; =
+    -\theta \, \partial_{\theta\theta\,} \mathcal{G} ( \theta , e , F ) = 
+    -\theta \, \partial_{\theta\theta\,} \mathcal{G}_2(\theta , F)
     \label{specificHeat1D} \\
-    \alpha & \defeq \partial_{\theta\,} e |_F = 
-    -\rho \, \partial_{F\theta\,} \mathcal{G}_2(\theta , F) =
-    -\rho \, \partial_{F\theta\,} \mathcal{G} (\theta , e_1 , F)
+    \alpha_t & \defeq
+    \left. \frac{L^{-1} \, \mathrm{d}L}
+    {\theta^{-1} \, \mathrm{d}\theta} \right|_{\mathrm{dF=0}} =
+    -\rho\theta \, \partial_{F\theta\,} \mathcal{G} (\theta , e , F) =
+    -\rho\theta \, \partial_{F\theta\,} \mathcal{G}_2(\theta , F)
     \label{thermalExpansion1D} \\
-    1/E & \defeq \partial_{F\,} e |_{\theta} = -
-    \bigl( \rho \, \partial_{e_1} \mathcal{G}_1 ( e_1, F ) \bigr)^{-1} 
-    \bigl( e + \rho \, \partial_{F\,} \mathcal{G} (\theta , e_1 , F) \bigr) -
+    \frac{1}{E_t} & \defeq 
+    \left. \frac{L^{-1} \, \mathrm{d}L}{\mathrm{d}F}
+    \right|_{\mathrm{d}\theta=0} = -
+    \bigl( \rho \, \partial_{e_1} \mathcal{G}_1 ( e_1 , F ) \bigr)^{-1} 
+    \bigl( e + \rho \, \partial_{F\,} \mathcal{G} (\theta , e , F) \bigr) \notag \\ \mbox{} & \hspace{33mm} -
     \rho \, \partial_{FF\,} \mathcal{G}_2(\theta , F)
     \label{compliance1D}
     \end{align}
 \end{subequations}
-where mass density $\rho$ is a mass per unit length of line.  The elastic compliance $1/E$ is found to be a sum of two compliances, independent of the functional forms for $\mathcal{G}_1 ( e_1 , F )$ and $\mathcal{G}_2 ( \theta , F )$.  One compliance is explicit in origin, i.e., $e_2 = -\rho \, \partial_{F\,} \mathcal{G}_2$ with rate $\mathrm{d} e_2 = -\rho \, \partial_{F\theta\,} \mathcal{G}_2 \, \mathrm{d} \theta - \rho \, \partial_{FF\,} \mathcal{G}_2 \, \mathrm{d}F$.  The other compliance is implicit in origin, viz., $\mathrm{d} e_1 = - ( \rho \, \partial_{e_1 \,} \mathcal{G}_1 )^{-1} ( e_1 + \rho \, \partial_{F\,} \mathcal{G} ) \mathrm{d}F$.  Also, $\partial_{F\theta\,} \mathcal{G} = \partial_{\theta F\,} \mathcal{G}$ because of Maxwell's thermo\-dynamic constraint.
+where mass density $\rho$ is a mass per unit length of line.  Elastic compliance $1/E_t$ is now found to be a sum of two compliances, independent of the functional forms that one might select for $\mathcal{G}_1 ( e_1 , F )$ and $\mathcal{G}_2 ( \theta , F )$.  One compliance is explicit in origin, i.e., $e_2 = -\rho \, \partial_{F\,} \mathcal{G}_2$ with rate $\mathrm{d} e_2 = -\rho \, \partial_{F\theta\,} \mathcal{G}_2 \, \mathrm{d} \theta - \rho \, \partial_{FF\,} \mathcal{G}_2 \, \mathrm{d}F$.  It comprises the second row in Eqn.~(\ref{compliance1D}).  The other compliance is implicit in origin, viz., $\mathrm{d} e_1 = - ( \rho \, \partial_{e_1 \,} \mathcal{G}_1 )^{-1} ( e_1 + \rho \, \partial_{F\,} \mathcal{G}_1 ) \mathrm{d}F \equiv - ( \rho \, \partial_{e_1 \,} \mathcal{G}_1 )^{-1} ( e + \rho \, \partial_{F\,} \mathcal{G} ) \mathrm{d}F$.  It comprises the first row in Eqn.~(\ref{compliance1D}). Also, $\partial_{F\theta\,} \mathcal{G} = \partial_{\theta F\,} \mathcal{G}$ because of Maxwell's thermo\-dynamic constraint.
 
-The material properties of Eqn.~(\ref{physicalFields1Dfiber}) apply to matrix equation~(\ref{thermoelasticCE1D}), just as those for a Hookean material (Eqn.~\ref{specificHeat}--\ref{compliance}) do.  The specific heat $C$ and thermal expansion coefficient $\alpha$ have the same interpretations for both the explicit and implicit fiber theories.  It is with respect to their compliances through which they differ.
+The material properties of Eqn.~(\ref{physicalFields1Dfiber}) apply to matrix equation~(\ref{thermoelasticCE1D}), just as those for a Hookean material do, viz., Eqns.~\ref{specificHeat}--\ref{compliance}).  The specific heat $C_t$ and thermal strain coefficient $\alpha_t$ have the same interpretations for both explicit and implicit fiber theories.  It is with respect to their compliances through which they differ.
 
 \medskip\noindent
 \textbf{Derivation}: 
-Because Gibbs free energy is a state function, its differential describes a Pfaffian form so that the left-hand side of the thermo\-dynamic expression $\mathrm{d} \mathcal{G} = -\eta \, \mathrm{d} \theta - \tfrac{1}{\rho} e \, \mathrm{d}F$ becomes $\mathrm{d} \mathcal{G} = \partial_{e_1} \mathcal{G}_1 \, \mathrm{d} e_1 + \partial_{F\,} \mathcal{G}_1 \, \mathrm{d}F + \partial_{\theta\,} \mathcal{G}_2 \, \mathrm{d} \theta + \partial_{F\,} \mathcal{G}_2 \, \mathrm{d}F$. Recalling that $e = e_1 + e_2$, the explicit (hyperelastic like) terms combine to produce constitutive equations
+Because Gibbs free energy is a state function, its differential describes a Pfaffian form, and as such, the left-hand side of the thermo\-dynamic expression $\mathrm{d} \mathcal{G} = -\eta \, \mathrm{d} \theta - \tfrac{1}{\rho} e \, \mathrm{d}F$ becomes $\mathrm{d} \mathcal{G} = \partial_{e_1} \mathcal{G}_1 \, \mathrm{d} e_1 + \partial_{F\,} \mathcal{G}_1 \, \mathrm{d}F + \partial_{\theta\,} \mathcal{G}_2 \, \mathrm{d} \theta + \partial_{F\,} \mathcal{G}_2 \, \mathrm{d}F$. Recalling that $e = e_1 + e_2$, the explicit (hyper-elastic like) terms combine to produce constitutive equations
 \begin{displaymath}
 \eta = -\partial_{\theta\,} \mathcal{G}_2 (\theta , F) 
 \quad \text{and} \quad
 e_2 = -\rho \, \partial_{F\,} \mathcal{G}_2 (\theta , F)
 \end{displaymath} 
-with the remaining implicit terms producing a differential constitutive equation
+while the remaining implicit terms collect to yield a differential constitutive equation of the form
 \begin{displaymath}
 \rho \, \partial_{e_1} \mathcal{G}_1 ( e_1 , F ) \, \mathrm{d} e_1 = 
 -\bigl( e_1 + \rho \, \partial_{F\,} \mathcal{G}_1 ( e_1 , F )
 \bigr) \mathrm{d}F .
 \end{displaymath}
-Differentiating the constitutive equation for entropy with respect to state leads directly to the expressions for specific heat $C$ and thermal expansion $\alpha$ stated in Eqns.~(\ref{specificHeat1D} \& \ref{thermalExpansion1D}).  Recalling that the strains add, i.e., $e = e_1 + e_2$, and therefore so do their rates, viz., $\mathrm{d} e = \mathrm{d} e_1 + \mathrm{d} e_2$, a consequence of them being logarithmic in construction, then upon rearranging the implicit constitutive equation to solve for $\mathrm{d} e_1$, while differentiating the explicit constitutive equation for $e_2$, and finally adding these strain increments to get $\mathrm{d} e$, one obtains the elastic compliance function stated in Eqn.~(\ref{compliance1D}) whose reciprocal appears in the matrix equation~(\ref{Helmholtz1D}).  \hfill $\qed$
+Differentiating the constitutive equation for entropy with respect to state leads directly to expressions for the specific heat $C_t$ and the thermal expansion coefficient $\alpha_t$ stated in Eqns.~(\ref{specificHeat1D} \& \ref{thermalExpansion1D}).  Recalling that the strains add, i.e., $e = e_1 + e_2$, and therefore so do their rates, viz., $\mathrm{d} e = \mathrm{d} e_1 + \mathrm{d} e_2$, a direct consequence of them being logarithmic in construction, it follows that upon rearranging the implicit constitutive equation to solve for $\mathrm{d} e_1$, while differentiating the explicit constitutive equation for $e_2$, and finally adding these strain increments to get $\mathrm{d} e$, one obtains the elastic compliance function stated in Eqn.~(\ref{compliance1D}).  \hfill $\qed$
 
-\subsubsection{Biologic Fibers}
+\subsubsection{Biologic Fibers with Tangent Material Properties}
 \label{secBioFiber}
 
-The fiber model of Freed \&\ Rajagopal \cite{FreedRajagopal16} imposes a strain-limiting constraint $e_t$ onto the internal strain $e_1$ by considering a Gibbs free-energy function of the form
+The fiber model of Freed \&\ Rajagopal \cite{FreedRajagopal16} imposes a limiting constraint $e_{1_{\max}}$ onto the internal strain of reconfiguration $e_1$, viz., $e_1 \leq e_{1_{\max}}$.  Their model, when cast in terms of a Gibbs free-energy function in the form of Eqn.~(\ref{GibbsFreeEnergy}), is described by an implicit energy contribution of\footnote{
+    In the paper of Freed \&\ Rajagopal \cite{FreedRajagopal16}, they adopted a Helmholtz free-energy potential of the form $E e_1 - F + \beta e_1 F$ where $\beta$ is a material parameter that relates to a limiting state of strain.  Here we adopt a Gibbs free-energy potential of like form, specifically $e_{1_{\max}} (E e_1 - F) + 2e_1 F$ where $e_{1_{\max}}$ is this limiting state of internal strain $e_1$.  We point out that an exponential response akin to Fung's material models will result whenever the energy of reconfiguration takes on a form of $E e_1 - F$.
+}
 \begin{subequations}
     \label{RajagopaleanFiber}
     \begin{align}
     \mathcal{G}_1 ( e_1 , F ) & = - \frac{1}{\rho} \Bigl(
-    e_t ( E_1 e_1 - F ) + 2 e_1 F \Bigr)
+    e_{1_{\max}} \bigl( E_1 e_1 - (F - F_0) \bigr) + 
+    2 e_1 (F - F_0) \Bigr)
     \label{FreedEnergy} \\
-    \mathcal{G}_2(\theta , F) & = -C \left( \theta \ln \left( \frac{\theta}{\theta_0} \right) - 
-    (\theta - \theta_0) \right) - 
-    \frac{F}{\rho} \left( \alpha ( \theta - \theta_0 ) + \frac{F}{2E_2} \right)
+    \intertext{and and explicit energy contribution of}
+    \mathcal{G}_2(\theta , F) & = -\eta_0 (\theta - \theta_0) -
+    C \left( \theta \ln \left( \frac{\theta}{\theta_0} \right) - 
+    (\theta - \theta_0) \right) \notag \\ 
+    \mbox{} & \qquad - \frac{F - F_0}{\rho} 
+    \left( \alpha \ln \left( \frac{\theta}{\theta_0} \right) + \frac{F - F_0}{2E_2} \right)
     \label{HookeanEnergy} \\
-    \intertext{that, collectively, depend upon tempreature $\theta$, force $F$, and an internal strain $e_1$, whose energy is normalized so that $\mathcal{G}_1(0, 0) = 0$ and $\mathcal{G}_2(\theta_0,0)=0$.  In fact, the explicit contribution to the free energy adopted here is Hookean, cf.\ Eqn.~(\ref{GreenEnergy}).  The resulting constitutive responses for entropy $\eta$ and strain $e=\ln (L/L_0)$ are therefore described by the following matrix differential equation}
+    \intertext{that, collectively, depend upon tempreature $\theta$, force $F$, and an internal strain $e_1$, whose free energy is normalized so that $\mathcal{G}_1(e_{1,0}, F_0) = 0$ and $\mathcal{G}_2(\theta_0, F_0)=0$ with initial conditions $e_{1,0}=0$, $e_{2,0} = -\rho \, \partial_{F\,} \mathcal{G}_2 ( \theta_0 , F_0 ) = 0$ and $\eta_0 = -\partial_{\theta\,} \mathcal{G}_2 ( \theta_0, F_0)$.  In fact, the explicit contribution to the free energy adopted here is Hookean, cf.\ Eqn.~(\ref{GreenFiberEnergy}).  The resulting constitutive responses for entropy $\eta$ and force $F$ are therefore described by the following differential matrix equation}
     \left\{ \begin{matrix}
-    \mathrm{d} \eta \\ \mathrm{d} e 
+    \mathrm{d} \eta \\ \mathrm{d} F
     \end{matrix} \right\} & = \begin{bmatrix}
-    C / \theta & \alpha / \rho  \\
-    \alpha & 1 / E
-    \end{bmatrix}
-    \left\{ \begin{matrix}
-    \mathrm{d} \theta \\ \mathrm{d} F
-    \end{matrix} \right\} .
-    \label{FungCE} \\
-    \intertext{This is a Gibbs version of Eqn.~(\ref{Helmholtz1D}), which is expressed in terms of Helmholtz's conjugate variables.  Here the elastic tangent compliance is described by}
-    \frac{1}{E(\theta , e , F)} & = 
-    \frac{e_t - e_1}{E_1 e_t + 2F} + \frac{1}{E_2} 
-    \quad \text{wherein} \quad
-    e_1 = e - \alpha (\theta - \theta_0) - \frac{F}{E_2}
-    \label{FRcompliance}
+    C_t - \alpha^2_t E_t / \rho \theta & 
+    \alpha_t E_t / \rho \theta \\
+    -\alpha_t E_t & E_t
+    \end{bmatrix} \left\{ \begin{matrix}
+    \theta^{-1} \, \mathrm{d} \theta \\
+    L^{-1} \, \mathrm{d} L
+    \end{matrix} \right\} 
+    \tag{\ref{thermoelasticCE1D}} \\
+    \intertext{whose elastic tangent compliance is now described by}
+    \frac{1}{E_t(\theta , e , F)} & = 
+    \frac{e_{1_{\max}} - e_1}{E_1 e_{1_{\max}} + 2(F - F_0)} + \frac{1}{E_2} 
+    \label{FRcompliance} \\
+    \intertext{wherein}
+    e_1 & = e - \alpha \ln \left( \frac{\theta}{\theta_0} \right) - \frac{F-F_0}{E_2}
+    \label{FRinternalStrain}
     \end{align}
 \end{subequations}
-with an initial tangent modulus $E(\theta_0, 0, 0)$ of $E_1 E_2 / (E_1 + E_2)$ ($\approx E_1$ whenever $E_2 \gg E_1 > 0$) while the terminal tangent modulus $E(e_1 \! = \! e_t)$ is $E_2$.  A transition strain occurs at $e_t$ $(> 0)$, which establishes a limiting state for internal strain $e_1$, i.e., $0 \leq e_1 \leq e_t$.  This is a strain whereat the fiber's molecular configuration becomes completely unraveled.  The 2 in term $2 e_1 F$ of Eqn.~(\ref{FreedEnergy}) leads to the desired numerator, viz., $e_t - e_1$, for the implicit contribution to compliance in Eqn.~(\ref{FRcompliance}).  This fiber model has been found to be superior to other models commonly employed in the literature for modeling biologic fibers \cite{AkintundeMiller18,Robbinsetal20}.
+and whose initial tangent modulus $E_t(\theta_0, e_0, F_0)$ is $E_1 E_2 / (E_1 + E_2)$ ($\approx E_1$ whenever $E_2 \gg E_1 > 0$) while its terminal tangent modulus $E_t(e_1 \! = \! e_{1_{\max}})$ is $E_2$.  A transition strain occurs at $e_{1_{\max}}$ $(> 0)$, which establishes the limiting state for internal strain $e_1$, i.e., $e_1 \leq e_{1_{\max}}$.  This is a strain whereat the fiber's molecular configuration becomes completely unraveled.  The 2 in term $2 e_1 (F - F_0)$ of Eqn.~(\ref{FreedEnergy}) leads to the desired numerator for the implicit contribution to compliance established in Eqn.~(\ref{FRcompliance}), viz., $e_{1_{\max}} - e_1$, which is the source of the strain limiting quality of the model.  This fiber model has been found to be superior to other models commonly employed in the literature for modeling biologic fibers \cite{AkintundeMiller18,Robbinsetal20}.
 
-Here $\rho$ is a mass per unit length of fiber, $C$ is a specific heat per unit mass measured at a constant force, and $\alpha$ is a coefficient of linear thermal expansion evaluated at a constant force, all of which have the same physical interpretation as their Hookean counterparts.  Only their elastic compliances are interpreted differently.
+Both the explicit and implicit models have the same hypo-elastic structure, viz., Eqn.~(\ref{thermoelasticCE1D}).  Furthermore, their thermal properties $C_t$ and $\alpha_t$ have the same physical interpretations. Only their elastic compliances\slash moduli are interpreted differently.  Even so, they are related because $1/E_s = \int_{F_0}^F (1/E_t) \, \mathrm{d}F$.
 
-The sum of implicit and explicit fiber compliances, as established in Eqn.~(\ref{FRcompliance}), was originally a conjecture by Freed \& Rajagopal \cite{FreedRajagopal16}; whereas, here it is a derived consequence from thermo\-dynamics provided that $\mathcal{G} ( \theta , e , F) = \mathcal{G}_1 ( e_1 , F ) + \mathcal{G}_2 ( \theta , F )$ and given that $e = e_1 + e_2$ with $e_2 = - \rho \, \partial_{F\,} \mathcal{G}_2$.  This follows because here a Gibbs free-energy is used, whereas Freed \& Rajagopal employed a Helmholtz free-energy.
+The sum of implicit and explicit fiber compliances, as established in Eqn.~(\ref{FRcompliance}), was originally a conjecture by Freed \& Rajagopal \cite{FreedRajagopal16}.  Here it is shown to be a thermo\-dynamic consequence, provided that $\mathcal{G} ( \theta , e , F) = \mathcal{G}_1 ( e_1 , F ) + \mathcal{G}_2 ( \theta , F )$ and that $e = e_1 + e_2$ with $e_2 = - \rho \, \partial_{F\,} \mathcal{G}_2$.  This follows because a Gibbs free energy is used here; whereas, Freed \& Rajagopal employed a Helmholtz free energy.
 
-Biologic fibers, per our application, are long and slender.  Consequently, they will buckle under compression.  Buckling is not accounted for in our modeling of alveolar chords.  Rather, it is assumed that the compliant response at the origin, with a modulus of $E_1 E_2 / ( E_1 + E_2 )$, continues into compression, thereby ensuring some measure of numeric stability in our software.
+Biologic fibers, per our application, are long and slender.  Consequently, they will buckle under compression.  Buckling is not accounted for in our modeling of alveolar chords.  Rather, it is assumed that the compliant response at $F_0$, with a modulus of $E_1 E_2 / ( E_1 + E_2 )$, continues over the non-physiologic loading range of $0 < F \leq F_{\min} = F_0$, which is the body's way of ensuring structural integrity of its biologic fibers.
 
-The above methodology would allow us to construct a suite of thermo\-dynamically admissible elastic compliance functions, but we will only have need for the fiber model put forward in Eqn.~(\ref{RajagopaleanFiber}).
+The above methodology would allow us to construct a suite of thermo\-dynamically admissible, elastic, compliance functions, but we will only have need for the simple fiber model put forward in Eqn.~(\ref{RajagopaleanFiber}).
+
+\subsubsection{Biologic Fibers with Secant Material Properties}
+
+Material properties $C_t$, $\alpha_t$ and $E_t$ for the above model, viz., those of Eqn.~(\ref{RajagopaleanFiber}), describe tangents to material response functions.  For the thermal properties, their secant counterparts $C_s$ and $\alpha_s$ relate to their tangent properties $C_t$ and $\alpha_t$ just as they do for a Green elastic fiber.  Only the elastic compliance needs to be addressed.
+
+The tangent modulus $E_t$ is established through the relationship
+\begin{subequations}
+    \label{tangentModuliFiber}
+    \begin{align}
+    \frac{1}{E_t} & \defeq 
+    \left. \frac{\mathrm{d}e}{\mathrm{d}F}
+    \right|_{\mathrm{d}\theta = 0} = 
+    \left. \frac{\mathrm{d}e_1}{\mathrm{d}F}
+    \right|_{\mathrm{d}\theta = 0} + 
+    \left. \frac{\mathrm{d}e_2}{\mathrm{d}F}
+    \right|_{\mathrm{d}\theta = 0} \eqdef
+    \frac{1}{E_{1t}} + \frac{1}{E_{2t}}
+    \label{defineTangentModuliFiber} \\
+    \intertext{so that a fiber's elastic compliance is described by}
+    \mathrm{d}e & = \frac{\mathrm{d}F}{E_t} 
+    \quad \text{where} \quad
+    \frac{1}{E_t} = \frac{1}{E_{1t}} + \frac{1}{E_{2t}} \\
+    \intertext{and, consequently, its elastic modulus is described by}
+    \mathrm{d}F & = E_t \, \mathrm{d}e
+    \quad \text{where} \quad
+    E_t = \frac{E_{1t} E_{2t}}{E_{1t} + E_{2t}} . \\
+    \intertext{The implicit free-energy function introduced through Eqn.~(\ref{RajagopaleanFiber}) produces a tangent compliance of}
+    \frac{1}{E_t} & =
+    \frac{e_{1_{\max}} - e_1}{E_1 e_{1_{\max}} + 2(F - F_0)} + \frac{1}{E_2} 
+    \label{tangentModuliBioFiber} \\
+    \intertext{whose internal strain caused by molecular reconfiguration comes from}
+    e_1 & = e - \alpha_t \ln \left( \frac{\theta}{\theta_0} \right) -
+    \frac{F-F_0}{E_2} .
+    \label{reconfigurationStrainFiber}
+    \end{align}
+\end{subequations}
+The material properties of this model are: $E_1 E_2 / (E_1 + E_2)$ $(>0)$ is the initial tangent modulus, $E_2$ $(\gg E_1 > 0)$ is the terminal tangent modulus, $e_{1_{\max}}$ is the maximum strain that can arise from a molecular reconfiguration, and $\alpha_t$ is the thermal strain coefficient, all quantified against a reference state described by $\theta_0$ and $F_0$. 
+ 
+It follows then that its associated secant compliance obeys
+\begin{subequations}
+    \label{secantFiberModulus}
+    \begin{align}
+    \frac{1}{E_s} & \defeq 
+    \left. \frac{e}{F-F_0} \right|_{\theta = \theta_0} = 
+    \left. \frac{e_1}{F-F_0} \right|_{\theta = \theta_0} + 
+    \left. \frac{e_2}{F-F_0} \right|_{\theta = \theta_0} \eqdef 
+    \frac{1}{E_{1s}} + \frac{1}{E_{2s}} \\
+    \intertext{so the fiber's compliance representation is described by}
+    e & = \frac{F - F_0}{E_s} 
+    \quad \text{where} \quad
+    \frac{1}{E_s} = \frac{1}{E_{1s}} + \frac{1}{E_{2s}} \\
+    \intertext{and, therefore, its modulus representation is described by}
+    F & = F_0 + E_s \, e
+    \quad \text{where} \quad
+    E_s = \frac{E_{1s} E_{2s}}{E_{1s} + E_{2s}} . \\
+    \intertext{where, upon integrating Eqn.~(\ref{tangentModuliBioFiber}) by parts, one arrives at a secant compliance comprised of a sum between}
+    \frac{1}{E_{1s}} & = \frac{e_{1_{\max}}}{F-F_0} \left( 1 - 
+    \frac{\sqrt{E_1 e_{1_{\max}}}}
+    {\sqrt{E_1 e_{1_{\max}} + 2(F-F_0)}} \right)  \\
+    \intertext{and}
+    \frac{1}{E_{2s}} & = \frac{1}{E_2}
+    \end{align}
+\end{subequations}
+with $E_s(F \! \leq \! F_0) = E_1 E_2 / (E_1 + E_2)$.
 
 \subsubsection{Viscoelastic Biologic Fibers}
 
-Freed \& Rajagopal \cite{FreedRajagopal16a} have shown that realistic visco\-elastic responses for biologic fibers can be constructed by keeping the implicit contribution of the compliance modulus $1/E$ elastic, while only extending its explicit contribution into the visco\-elastic domain.  This finding is significant!  It allows one to model the visco\-elastic response of non-linear biologic fibers by employing a \textit{linear\/} theory for visco\-elasticity.  Effectively, elastic modulus $E_2$ in Eqn.~(\ref{FRcompliance}) becomes a visco\-elastic function of state.  This is a topic for future work.
+Freed \& Rajagopal \cite{FreedRajagopal16a} have shown that realistic visco\-elastic responses for biologic fibers can be based upon the above thermo\-elastic fiber model by retaining the implicit contribution to the compliance, i.e., $1/E_1$, as elastic, while only extending the explicit contribution to the compliance, viz., $1/E_2$, into the visco\-elastic domain.  This finding is significant!  It allows one to model the visco\-elastic response of non-linear biologic fibers by employing a \textit{linear\/} theory for visco\-elasticity.  Effectively, elastic compliance $1/E_2$ in Eqn.~(\ref{FRcompliance}) becomes a visco\-elastic function of state.  This is a topic for future work.
 
 \subsection{Alveolar Septa as Green (Explicit) Thermoelastic Membranes}
 
-We observed in \S\ref{secNonuniform2D} that an alveolar membrane has a response comprised of uniform and non-uniform contributions and that, for our application, these two contributions are not coupled.  Consequently, their internal energies add $\mathcal{G} (\theta , \pi , \sigma , \tau ) = \mathcal{G}_u (\theta , \pi ) + \mathcal{G}_n (\sigma , \tau)$, with $\mathcal{G}_u$ being the uniform contribution of $\mathcal{G}$ and $\mathcal{G}_n$ being the non-uniform contribution of $\mathcal{G}$.
+For a 2D membrane with a mass density of $\rho$ per unit area, its response is comprised of uniform and non-uniform contributions.  The thermo\-dynamic conjugate fields pertaining to uniform behaviors are: temperature $\theta$ and entropy $\eta$, and surface tension $\pi$ and dilation $\xi$, cf.\ Eqn.~(\ref{Helmholtz2Duniform}).  While the conjugate fields pertaining to non-uniform behaviors are: normal stress difference $\sigma$ and squeeze strain $\varepsilon$, and shear stress $\tau$ and shear strain $\gamma$, cf.\ Eqn.~(\ref{Helmholtz2Dnonuniform}).
 
-\subsubsection{Uniform Response}
+We observed in \S\ref{secNonuniform2D} that the uniform and non-uniform contributions of an alveloar membrane are not coupled.  Consequently, their Gibbs free energies add in such a manner that $\mathcal{G} (\theta , \pi , \sigma , \tau ) = \mathcal{G}_u (\theta , \pi ) + \mathcal{G}_n (\sigma , \tau)$, with $\mathcal{G}_u$ being the uniform contribution of $\mathcal{G}$, and $\mathcal{G}_n$ being the non-uniform contribution of $\mathcal{G}$.
 
-From thermo\-dynamics, Eqn.~(\ref{thermoelastic2Dlaw}), comes $\mathrm{d}\hspace{1pt}\mathcal{U}_u = \theta \, \mathrm{d} \eta + \tfrac{1}{\rho} T \, \mathrm{d}A / \! A = \theta \, \mathrm{d} \eta + \tfrac{1}{\rho} \pi \, \mathrm{d}\xi$ where $\pi = 2T$ and $\mathrm{d}\xi = \tfrac{1}{2} A^{-1} \, \mathrm{d}A$, and whose mass density $\rho$ has units of mass per unit area of surface.  Writing this in its Gibbs format $\mathrm{d} \mathcal{G}_u = -\eta \, \mathrm{d} \theta - \tfrac{1}{\rho} \xi \, \mathrm{d} \pi$ via a Legendre transformation, one gets a constitutive equation appropriate for describing the uniform response of a thermo\-elastic planar membrane, namely
+A Green thermo\-elastic membrane has a Gibbs free-energy potential described by $\mathcal{G} ( \theta , \pi , \sigma , \tau ) = \mathcal{G}_u (\theta , \pi ) + \mathcal{G}_n (\sigma , \tau)$ where $\mathrm{d} \mathcal{G} = -\eta \, \mathrm{d} \theta - \tfrac{1}{\rho} \bigl( \xi \, \mathrm{d} \pi + \varepsilon \, \mathrm{d} \sigma + \gamma \, \mathrm{d} \tau \bigr)$ from which one derives its governing thermo\-elastic constitutive equations; specifically, for entropy
 \begin{subequations}
-    \label{uniformMembraneModel}
+    \label{membraneCEs}
     \begin{align}
+    \eta & = - \partial_{\theta\,} \mathcal{G}
+    ( \theta , \pi , \sigma , \tau ) = 
+    - \partial_{\theta\,} \mathcal{G}_u
+    ( \theta , \pi ) ,
+    \label{membraneEntropy} \\
+    \intertext{for dilation}
+    \xi & = -\rho \, \partial_{\pi\,} \mathcal{G}
+    ( \theta , \pi , \sigma , \tau ) = 
+    -\rho \, \partial_{\pi\,} \mathcal{G}_u
+    ( \theta , \pi )  ,
+    \label{membraneDilation} \\
+    \intertext{for squeeze}
+    \varepsilon & = -\rho \, 
+    \partial_{\sigma\,} \mathcal{G}
+    ( \theta , \pi , \sigma , \tau ) = 
+    -\rho \, \partial_{\sigma\,} \mathcal{G}_n
+    ( \sigma , \tau ) ,
+    \label{membraneSqueeze} \\
+    \intertext{and for shear}
+    \gamma & = - \rho \,
+    \partial_{\tau\,} \mathcal{G}
+    ( \theta , \pi , \sigma , \tau ) = 
+    - \rho \, \partial_{\tau\,} \mathcal{G}_n
+    ( \sigma , \tau ) 
+    \label{membraneShear} 
+    \end{align}
+\end{subequations}
+whereby specifying energies $\mathcal{G}_u$ and $\mathcal{G}_n$ produces a material model for membranes.
+
+\subsubsection{Hookean Membranes}
+
+In this appendix, we consider a function for the Gibbs free-energy potential that is suitable for describing biologic Hookean membranes; specifically: for governing their uniform response, let
+\begin{subequations}
+    \label{GibbsMembraneEnergy}
+    \begin{align}
+    \mathcal{G}_u ( \theta , \pi ) & = -\eta_0 (\theta - \theta_0) -
+    C \left( \theta \ln \left( \frac{\theta}{\theta_0} \right) - 
+    ( \theta - \theta_0 ) \right) \notag \\
+    \mbox{} & \qquad - \frac{\pi - \pi_0}{2 \rho} \left( 
+    2\alpha \ln \left( \frac{\theta}{\theta_0} \right) + 
+    \frac{\pi - \pi_0}{4M} \right) 
+    \label{membraneUniform} \\
+    \intertext{and for governing their non-uniform response, let}
+    \mathcal{G}_n ( \sigma , \tau ) & = -\frac{1}{2 \rho} 
+    \left( \frac{\sigma^2}{2N} + \frac{\tau^2}{G} \right)
+    \label{membraneNonUniform}
+    \end{align}
+\end{subequations}
+where symmetries $\mathcal{G}_n ( \sigma , \tau ) = \mathcal{G}_n ( -\sigma , \tau ) = \mathcal{G}_n ( \sigma , -\tau ) = \mathcal{G}_n ( -\sigma , -\tau )$ must hold because the squeeze and shear variables can take on either sign.  These free energies are normalized so that $\mathcal{G}_u (\theta_0 , \pi_0) = 0$ and $\mathcal{G}_n ( \sigma_0, \tau_0 ) = 0$ with initial conditions of $\eta_0 = -\partial_{\theta\,} \mathcal{G}_u (\theta_0 , \pi_0)$, $\xi_0 = -\rho \, \partial_{\pi\,} \mathcal{G}_u (\theta_0 , \pi_0) = 0$, $\varepsilon_0 = -\rho \, \partial_{\sigma\,} \mathcal{G}_n (0 , 0) = 0$ and $\gamma_0 = -\rho \, \partial_{\tau\,} \mathcal{G}_n (0 , 0) = 0$ for a reference state with fields $\theta_0$, $\pi_0$, $\sigma_0 = 0$ and $\tau_0 = 0$.
+
+Here we presume that the reference values for the non-uniform stresses, viz., $\sigma_0$ and $\tau_0$, are both zero, i.e., $\sigma_0 = 0$ and $\tau_0 = 0$.  This follows because these fields can be either positive or negative in their values; whereas, surface tension $\pi$ is a positive only field, and as such, the notion of a non-zero reference value $\pi_0$ is physiologically sound; it is nature's way of helping to stabilize a membrane.
+
+\subsubsection{Secant Material Properties}
+
+\paragraph{Uniform Response}
+
+Substituting the Gibbs free-energy function of Eqn.~(\ref{membraneUniform}) into the constitutive equations governing entropy (\ref{membraneEntropy}) and dilation (\ref{membraneDilation}) results in a matrix expression of
+\begin{displaymath}
+    \left\{ \begin{matrix} 
+        \eta - \eta_0 \\ \ln \sqrt{A / \! A_0}
+    \end{matrix} \right\} = \begin{bmatrix}
+        C_s & \alpha_s / \rho \theta \\
+        \alpha_s & 1 / 4 M_s
+    \end{bmatrix} \left\{ \begin{matrix} 
+        \ln ( \theta / \theta_0 ) \\ \pi - \pi_0
+    \end{matrix} \right\}
+\end{displaymath}
+where $\xi \defeq \ln \sqrt{A / \! A_0}$.  This matrix equation can be rearranged into a form that is more suitable for our needs, viz.,
+\begin{subequations}
+    \label{uniformGreenCEs}
+    \begin{align}
+        \left\{ \begin{matrix}
+            \eta - \eta_0 \\ \pi - \pi_0
+        \end{matrix} \right\} & = \begin{bmatrix}
+            C_s - 4 \alpha_s^2 M_s / \rho \theta & 
+            4 \alpha_s M_s / \rho \theta \\
+            -4 \alpha_s M_s & 4 M_s
+        \end{bmatrix} \left\{ \begin{matrix}
+            \ln ( \theta / \theta_0 ) \\
+            \ln \sqrt{ A / \! A_0 }
+        \end{matrix} \right\} 
+        \label{uniformGreenMembrane} \\
+        \intertext{whose material properties are: a specific heat (evaluated at a reference surface tension $\pi_0$) of}
+        C_s & \defeq \left. \frac{\eta - \eta_0}
+        {\ln ( \theta / \theta_0 )} \right|_{\pi = \pi_0} 
+        \label{membraneSpecificHeat} \\
+        \intertext{with $C_s - 4 \alpha_s^2 M_s / \rho \theta$ being a heat capacity in an absence of dilation, plus a thermal strain coefficient (evaluated at a reference surface tension $\pi_0$) of}
+        \alpha_s & \defeq \left. \frac{\ln (L / L_0)}
+        {\ln ( \theta / \theta_0 )} \right|_{\pi = \pi_0} = 
+        \frac{1}{2}\left. \frac{\ln (A / \! A_0)}
+        {\ln ( \theta / \theta_0 )} \right|_{\pi = \pi_0} , 
+        \label{membraneThermalStraining} \\
+        \intertext{where $\ln (A / \!A_0) = 2 \ln (L / L_0)$ is the surface dilation, with $L/L_0$ being the stretch between any two points on its surface, plus an elastic membrane compliance (evaluated at a reference temperature $\theta_0$) of}
+        \frac{1}{M_s} & \defeq \left. \frac{\ln (A / \! A_0)}{T-T_0}
+        \right|_{\theta = \theta_0} = 
+        4 \left. \frac{\xi}{\pi - \pi_0} 
+        \right|_{\theta = \theta_0} ,
+    \end{align}
+\end{subequations}
+where $T \defeq \tfrac{1}{2} ( \sigma_{11} + \sigma_{22} ) \eqdef \tfrac{1}{2} \, \pi$ is the surface tension, with $\sigma_{ij}$ being components of the Cauchy stress in this two-dimensional space.  These are \textit{secant\/} material properties, hence the subscript `$s$', whose values can be measured in experiments.
+
+\textbf{Note}: Thermal strain is typically modeled as $\alpha (\theta - \theta_0)$, wherein $\alpha$ is referred to as the coefficient for lineal thermal expansion.  Our thermal strain coefficient $\alpha_s$ and the coefficient for lineal thermal expansion $\alpha$ relate via $\alpha_s = \alpha \theta_0 + \mathcal{O}\bigl( ((\theta - \theta_0) / \theta_0)^2 \bigr)$ because $\ln ( \theta / \theta_0 ) = (\theta - \theta_0) / \theta_0 - (\theta - \theta_0)^2 / \theta_0^2 + (\theta - \theta_0)^3 / \theta_0^3 - \cdots$.
+
+\paragraph{Non-Uniform Response}
+
+Substituting the Gibbs free-energy function of Eqn.~(\ref{membraneNonUniform}) into the constitutive equations governing squeeze (\ref{membraneSqueeze}) and shear (\ref{membraneShear}) leads to the following matrix equation
+\begin{displaymath}
+    \left\{ \begin{matrix}
+        \varepsilon \\ \gamma 
+    \end{matrix} \right\} = \begin{bmatrix}
+        1 / 2 N_s & 0 \\ 0 & 1 / G_s
+    \end{bmatrix} \left\{ \begin{matrix}
+        \sigma \\ \tau
+    \end{matrix} \right\}
+\end{displaymath}
+that when inverted becomes
+\begin{subequations}
+    \label{nonuniformGreenMembraneCEs}
+    \begin{align}
+    \left\{ \begin{matrix}
+    \sigma \\ \tau
+    \end{matrix} \right\} & = \begin{bmatrix}
+        2 N_s & 0 \\ 0 & G_s
+    \end{bmatrix} 
+    \left\{ \begin{matrix}
+        \varepsilon \\ \gamma 
+    \end{matrix} \right\} 
+    \label{nonuniformGreenMembrane} \\
+    \intertext{whose material properties are: a squeeze compliance (in an absence of shear $\gamma$) of}
+    \frac{1}{N_s} & \defeq 
+    \left. \frac{\ln ( \Gamma / \Gamma_0 )}
+    {\sigma_{11} - \sigma_{22}} \right|_{g=g_0} = 
+    2 \left. \frac{\varepsilon}{\sigma} \right|_{\gamma=0}
+    \label{squeezeModulus2D} \\
+    \intertext{where $\Gamma \defeq a / b$ and $\Gamma_0 = a_0 / b_0$ are the current and reference stretches of squeeze, with $\varepsilon \defeq \ln \sqrt{\Gamma / \Gamma_0}$ being the squeeze strain, and where $\sigma \defeq \sigma_{11} - \sigma_{22}$ establishes a normal stress difference, plus a shear compliance (in an absence of squeeze $\varepsilon$) of}
+    \frac{1}{G_s} & \defeq 
+    \left. \frac{g - g_0}{\Gamma \sigma_{21}} \right|_{\Gamma = \Gamma_0} =
+    \left. \frac{\gamma}{\tau} \right|_{\varepsilon=0}
+    \end{align}
+\end{subequations}
+where $g$ and $g_0$ are the current and reference magnitudes of shear, with $\gamma \defeq g - g_0$ denoting shear strain, and where $\tau \defeq \Gamma \sigma_{21}$ establishes the thermo\-dynamic shear stress.  These are \textit{secant\/} material properties, hence the subscript `$s$', whose values can be measured in experiments.
+
+\subsubsection{Tangent Material Properties}
+
+\paragraph{Uniform Response}
+
+Upon differentiating the constitutive equations for entropy and dilation found in Eqns.~(\ref{membraneEntropy} \& \ref{membraneDilation}), respectively, assuming they are both sufficiently differentiable functions of state, while adopting the Gibbs free energy from Eqn.~(\ref{membraneUniform}), results in the following matrix constitutive equation
+\begin{displaymath}
 \left\{ \begin{matrix}
 \mathrm{d} \eta \\ \mathrm{d} \xi
-\end{matrix} \right\} & = -\begin{bmatrix}
+\end{matrix} \right\} = -\begin{bmatrix}
 \partial_{\theta\theta\,} \mathcal{G}_u & \partial_{\theta\pi\,} \mathcal{G}_u \\
 \rho \, \partial_{\pi\theta\,} \mathcal{G}_u & \rho \, \partial_{\pi\pi\,} \mathcal{G}_u
 \end{bmatrix} 
 \left\{ \begin{matrix}
 \mathrm{d} \theta \\ \mathrm{d} \pi
 \end{matrix} \right\} = \begin{bmatrix}
-C / \theta & \alpha / \rho \\ \alpha & 1 / 4 M
+C_t & \alpha_t / \rho \theta \\ \alpha_t & 1 / 4 M_t
 \end{bmatrix} \left\{ \begin{matrix}
-\mathrm{d} \theta \\ \mathrm{d} \pi
+\theta^{-1} \, \mathrm{d} \theta \\ \mathrm{d} \pi
 \end{matrix} \right\}
-\label{thermoelasticCE2D} \\
-\intertext{with material properties defined accordingly}
-    C & \defeq \theta \, \partial_{\theta\,} \eta |_{\pi} = -\theta \, \partial_{\theta\theta\,} \mathcal{G}_u \\
-    \alpha & \defeq L^{-1} \, \partial_{\theta\,} L |_T = \tfrac{1}{2} A^{-1} \, \partial_{\theta\,} A |_T = \partial_{\theta\,} \xi |_{\pi} = -\rho \, \partial_{\pi\theta\,} \mathcal{G}_u = -\rho \, \partial_{\theta\pi\,} \mathcal{G}_u \\
-    1/M & \defeq A^{-1} \, \partial_{T\,} A |_{\theta} = 2 \, \partial_{T\,} \xi |_{\theta} = 4 \, \partial_{\pi\,} \xi |_{\theta} = -4\rho \, \partial_{\pi\pi\,} \mathcal{G}_u
+\end{displaymath}
+which is hypo-elastic in its construction. \cite{Truesdell55}  This expression can be rearranged into
+\begin{subequations}
+\label{uniformMembraneModel}
+\begin{align}
+    \left\{ \begin{matrix} 
+        \mathrm{d}\eta \\ \mathrm{d}\pi
+    \end{matrix} \right\} & = \begin{bmatrix}
+        C_t - 4 \alpha_t^2 M_t / \rho \theta & 
+        4 \alpha_t M_t / \rho \theta \\
+        -4 \alpha_t M_t & 4 M_t
+    \end{bmatrix} \left\{ \begin{matrix} 
+        \theta^{-1} \, \mathrm{d} \theta \\
+        \tfrac{1}{2} A^{-1} \, \mathrm{d}A
+    \end{matrix} \right\}
+    \intertext{recalling that $\mathrm{d}\xi = \mathrm{d}A / 2A$, and with material properties defined accordingly: a specific heat (at constant surface tension) of}
+    C_t & \defeq \left. \frac{\mathrm{d} \eta}{\theta^{-1} \, 
+    \mathrm{d}\theta} \right|_{\mathrm{d}\pi=0} = 
+    C_s - \alpha_s \pi / \rho \theta = -\theta \, \partial_{\theta\theta\,} \mathcal{G}_u \\
+    \intertext{with $C_t - 4 \alpha_t^2 M_t / \rho \theta$ denoting a heat capacity at constant dilation, and a lineal thermal strain coefficient (at constant surface tension) of}
+    \alpha_t & \defeq \left. \frac{L^{-1} \, \mathrm{d}L}
+    {\theta^{-1} \, \mathrm{d}\theta} \right|_{\mathrm{d}\pi=0} =
+    \frac{1}{2} \left. \frac{A^{-1} \, \mathrm{d}A}
+    {\theta^{-1} \, \mathrm{d}\theta} \right|_{\mathrm{d}\pi=0} =
+    \begin{cases} -\rho\theta \, \partial_{\pi\theta\,} \mathcal{G}_u \\ -\rho\theta \, \partial_{\theta\pi\,} \mathcal{G}_u 
+    \end{cases} \\
+    \intertext{plus a compliance (at constant temperature) of}
+    \frac{1}{M_t} & \defeq \left. \frac{A^{-1} \, \mathrm{d}A}
+    {\mathrm{d} T} \right|_{\mathrm{d}\theta = 0} =
+    4 \left. \frac{\mathrm{d} \xi}
+    {\mathrm{d}\pi} \right|_{\mathrm{d} \theta = 0} =
+    -4\rho \, \partial_{\pi\pi\,} \mathcal{G}_u .
     \end{align}
 \end{subequations}
-where $C$ is the specific heat, $\alpha$ is the coefficient of thermal expansion, and $M$ is the modulus of dilation (uniform expansion).  Here $\eta$ is entropy, $\theta$ is temperature, $T \defeq \tfrac{1}{2} ( \sigma_{11} + \sigma_{22})$ is surface tension (an invariant in 2D whose intensive variable is $\pi \defeq \sigma_{11} + \sigma_{22} = 2T$ with $\sigma_{ij}$ being components of Cauchy stress quantified in 2D), and $A$ is area (whose extensive variable is $\xi \defeq \ln \sqrt{A / \! A_0}$, which denotes dilation, i.e., that strain describing an uniform areal expansion).  
+These are \textit{tangent\/} material properties, hence the subscript `$t$', whose values can be measured in experiments.
 
-\subsubsection{Non-Uniform Response}
+\paragraph{Non-Uniform Response}
 
-From $\mathrm{d} \mathcal{G} = \mathrm{d} \mathcal{G}_u + \mathrm{d} \mathcal{G}_n$ with $\mathrm{d} \mathcal{G}_u = -\eta \, \mathrm{d} \theta - \tfrac{1}{\rho} \xi \, \mathrm{d} \pi$ comes $\mathrm{d} \mathcal{G}_n = -\tfrac{1}{\rho} ( \varepsilon \, \mathrm{d} \sigma + \gamma \, \mathrm{d} \tau )$ out of which come the constitutive equations governing the non-uniform response of a Green elastic membrane, viz., $\varepsilon = -\rho \, \partial_{\sigma\,} \mathcal{G}_n$ and $\gamma = -\rho \, \partial_{\tau\,} \mathcal{G}_n$, that, assuming they are continuous and differentiable functions of state, can be expressed as the matrix differential equation
+From $\mathrm{d} \mathcal{G} = \mathrm{d} \mathcal{G}_u + \mathrm{d} \mathcal{G}_n$ with $\mathrm{d} \mathcal{G}_u = -\eta \, \mathrm{d} \theta - \tfrac{1}{\rho} \xi \, \mathrm{d} \pi$ comes $\mathrm{d} \mathcal{G}_n = -\tfrac{1}{\rho} ( \varepsilon \, \mathrm{d} \sigma + \gamma \, \mathrm{d} \tau )$ out of which one obtains the constitutive equations governing non-uniform responses in a Green elastic membrane, viz., $\varepsilon = -\rho \, \partial_{\sigma\,} \mathcal{G}_n$ and $\gamma = -\rho \, \partial_{\tau\,} \mathcal{G}_n$, that, assuming they are continuous and differentiable functions of state, can be expressed as the matrix differential equation
+\begin{displaymath}
+\left\{ \begin{matrix}
+\mathrm{d} \varepsilon \\ \mathrm{d} \gamma
+\end{matrix} \right\} = -\rho \begin{bmatrix}
+\partial_{\sigma\sigma\,} \mathcal{G}_n & 
+\partial_{\sigma\tau\,} \mathcal{G}_n \\
+\partial_{\tau\sigma\,} \mathcal{G}_n &
+\partial_{\tau\tau\,} \mathcal{G}_n
+\end{bmatrix}
+\left\{ \begin{matrix}  
+\mathrm{d} \sigma \\ \mathrm{d} \tau
+\end{matrix} \right\} = \begin{bmatrix}
+1/2 N_t & 0 \\ 
+0 & 1 / G_t
+\end{bmatrix} \left\{ \begin{matrix}
+\mathrm{d} \sigma \\ \mathrm{d} \tau
+\end{matrix} \right\}
+\end{displaymath}
+where $\partial_{\sigma\tau\,} \mathcal{G}_n = \partial_{\tau\sigma\,} \mathcal{G}_n = 0$, because the modes of squeeze and shear are taken to be decoupled.  The resulting matrix is readily inverted into a form that is more useful for us, namely
 \begin{subequations}
     \begin{align}
     \left\{ \begin{matrix}
-    \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
-    \end{matrix} \right\}  & = -\rho \begin{bmatrix}
-    \partial_{\sigma\sigma\,} \mathcal{G}_n & 
-    \partial_{\sigma\tau\,} \mathcal{G}_n \\
-    \partial_{\tau\sigma\,} \mathcal{G}_n &
-    \partial_{\tau\tau\,} \mathcal{G}_n
-    \end{bmatrix}
+    \mathrm{d} \sigma \\ \mathrm{d} \tau
+    \end{matrix} \right\}
+    & = \begin{bmatrix}
+    2 N_t & 0 \\ 
+    0 & G_t
+    \end{bmatrix} 
     \left\{ \begin{matrix}  
-    \mathrm{d} \sigma \\ \mathrm{d} \tau
-    \end{matrix} \right\} = \begin{bmatrix}
-    1/2 N & 0 \\ 
-    0 & 1 / G
-    \end{bmatrix} \left\{ \begin{matrix}
-    \mathrm{d} \sigma \\ \mathrm{d} \tau
+    \mathrm{d} \varepsilon \\ \mathrm{d} \gamma
     \end{matrix} \right\} \\
-    \intertext{where $\partial_{\sigma\tau\,} \mathcal{G}_n = \partial_{\tau\sigma\,} \mathcal{G}_n = 0$ because the modes of squeeze and shear are taken to be decoupled.  The associated material properties are established via}
-    \frac{1}{N} & \defeq \Gamma^{-1} \, \partial_{\sigma_{11} - \sigma_{22}} \Gamma |_g = 2 \, \partial_{\sigma\,} \varepsilon |_{\gamma} = -2 \rho \, \partial_{\sigma\sigma\,} \mathcal{G}_n 
+    \intertext{whose associated material properties are established via}
+    \frac{1}{N_t} & \defeq \left.
+    \frac{\Gamma^{-1} \, \mathrm{d}\Gamma}
+    {\mathrm{d} (\sigma_{11} - \sigma_{22})} \right|_{\mathrm{d}\gamma = 0} = 
+    2 \left. \frac{\mathrm{d} \varepsilon}{\mathrm{d} \sigma} \right|_{\mathrm{d}\gamma = 0} = -2 \rho \, \partial_{\sigma\sigma\,} \mathcal{G}_n 
     \label{squeezeModulus} \\
-    \frac{1}{G} & \defeq \Gamma^{-1} \, \partial_{\sigma_{21}} g |_{\Gamma} = \partial_{\tau\,} \gamma |_{\varepsilon} = -\rho \, \partial_{\tau\tau\,} \mathcal{G}_n 
+    \intertext{and}
+    \frac{1}{G_t} & \defeq \left. \frac{1}{\Gamma}
+    \frac{\mathrm{d}g}{\mathrm{d} \sigma_{21}} 
+    \right|_{\mathrm{d} \Gamma = 0} = \left.
+    \frac{\mathrm{d} \gamma}{\mathrm{d} \tau} \right|_{\mathrm{d}\varepsilon = 0} = -\rho \, \partial_{\tau\tau\,} \mathcal{G}_n 
     \label{shearModulus}
     \end{align}
 \end{subequations}
-where the conjugate stresses are defined as $\sigma \defeq \sigma_{11} - \sigma_{22}$ and $\tau \defeq \Gamma \sigma_{21}$ with $\Gamma \defeq a/b$ being the stretch of squeeze from which it follows that $\Gamma^{-1} \mathrm{d} \Gamma = 2 \, \mathrm{d} \varepsilon$ because the strain of squeeze is given by $\varepsilon = \ln \sqrt{ \Gamma / \Gamma_0 }$.  The squeeze compliance $1/N = 2 \, \mathrm{d} \varepsilon / \mathrm{d} \sigma |_{\gamma}$ is evaluated at a constant shear $\gamma$, while the shear compliance $1/G = \mathrm{d} \gamma / \mathrm{d} \tau |_{\varepsilon}$ is evaluated at a constant squeeze $\varepsilon$.
-
-\subsubsection{A Hookean Membrane}
-
-Uniform response in a Green elastic membrane is described by a Gibbs free-energy function of the form
-\begin{subequations}
-\label{membraneHookeanEnergies}
-\begin{align}
-\mathcal{G}_u (\theta , \pi) & = -C \left( \theta \ln \left( \frac{\theta}{\theta_0} \right) -
-(\theta - \theta_0) \right) - 
-\frac{\pi}{2\rho} \left( 2 \alpha ( \theta - \theta_0 ) + \frac{\pi}{4M} \right)
-\label{Gibbs2DHookean} \\
-   \intertext{whose non-uniform response satisfies a Gibbs free-energy function of the form}
-\mathcal{G}_n (\sigma , \tau) & = \mathcal{G}_n (-\sigma , \tau) = \mathcal{G}_n (\sigma , -\tau ) = \mathcal{G}_n ( -\sigma , -\tau ) = \frac{1}{2\rho} \Bigl( \frac{\sigma^2}{2N} + \frac{\tau^2}{G} \Bigr) \\
-\intertext{with negative arguments ensuring necessary symmetries in response, which are pertinent for all terms in a non-uniform energy function.  Form these formul\ae\ come the following system of differential equations}
-\left\{ \begin{matrix}
-\mathrm{d} \eta \\ \mathrm{d} \pi \\
-\mathrm{d} \sigma \\ \mathrm{d} \tau
-\end{matrix} \right\} & = \begin{bmatrix}
-C / \theta - 4 \alpha^2 M / \rho & 4 \alpha M / \rho & 0 & 0 \\
--4 \alpha M & 4 M & 0 & 0 \\
-0 & 0 & 2 N & 0 \\
-0 & 0 & 0 & G 
-\end{bmatrix} \left\{ \begin{matrix}
-\mathrm{d} \theta \\ \mathrm{d} \xi \\
-\mathrm{d} \varepsilon \\ \mathrm{d} \gamma
-\end{matrix} \right\}
-\label{elasticMembrane}
-\end{align}
-\end{subequations}
-that describe a thermo\-elastic Hookean membrane, expressed in terms of Helm\-holtz state variables, whose material properties $\rho$, $C$, $\alpha$, $M$, $N$ and $G$ are each constant valued across state space, cf.\ Eqn.(\ref{HelmholtzMembraneODEs}).  It is in terms of the Helmholtz conjugate pairs that our alveolar modeling is most adept to, even though cause and effect are incorrect.
+where the conjugate stresses are defined as $\sigma \defeq \sigma_{11} - \sigma_{22}$ and $\tau \defeq \Gamma \sigma_{21}$ with $\Gamma \defeq a/b$ being the stretch of squeeze from which it follows that $\Gamma^{-1} \mathrm{d} \Gamma = 2 \, \mathrm{d} \varepsilon$ because the strain of squeeze is given by $\varepsilon = \ln \sqrt{ \Gamma / \Gamma_0 }$.  The squeeze compliance $1/N_t = 2 \, \mathrm{d} \varepsilon / \mathrm{d} \sigma |_{\gamma}$ is evaluated at a constant shear $\gamma$, while the shear compliance $1/G_t = \mathrm{d} \gamma / \mathrm{d} \tau |_{\varepsilon}$ is evaluated at a constant squeeze $\varepsilon$.
 
 \subsection{Alveolar Septa as Rajagopal (Implicit) Thermoelastic Membranes}
 
 We employ implicit elasticity here to derive a constitutive theory suitable for describing biologic membranes.
 
-\subsubsection{Biologic Membranes Under Uniform Motions}
+\subsubsection{Tangent Material Properties}
 
-Like the implicit elastic fiber introduced in Eqn.~(\ref{RajagopaleanFiber}), the uniform response of an implicit elastic membrane with a strain-limiting dilation can be modeled using a Gibbs free energy $\mathcal{G}_u (\theta , \xi , \pi ) \defeq \mathcal{G}_1 (\xi_1 ,\pi) + \mathcal{G}_2 (\theta , \pi)$ where our definition for dilation $\xi \defeq \ln \sqrt{A / \! A_0}$ decomposes into a sum of two dilations: $\xi_1 \defeq \ln \sqrt{A_1 / \! A_0}$ and $\xi_2 \defeq \ln \sqrt{A / \! A_1}$ so that $\xi = \xi_1 + \xi_2$, with like interpretations as those from their 1D fiber counterparts, viz., $e$, $e_1$ and $e_2$; specifically, its material properties are
+\paragraph{Uniform Response}
+
+Like the implicit elastic fiber introduced in Eqn.~(\ref{RajagopaleanFiber}), the uniform response of an implicit elastic membrane with a strain-limiting dilation can be modeled using a Gibbs free energy of the form $\mathcal{G}_u (\theta , \xi , \pi ) \defeq \mathcal{G}_1 (\xi_1 ,\pi) + \mathcal{G}_2 (\theta , \pi)$ where our definition for dilation $\xi \defeq \ln \sqrt{A / \! A_0}$ decomposes into a sum of two dilations: $\xi_1 \defeq \ln \sqrt{A_1 / \! A_0}$ and $\xi_2 \defeq \ln \sqrt{A / \! A_1}$ so that $\xi = \xi_1 + \xi_2$, with like interpretations as those from their 1D fiber counterparts, viz., $e$, $e_1$ and $e_2$.  Such a membrane's tangent material properties are then given by
 \begin{subequations}
     \label{physicalFields2Dmembrane}
     \begin{align}
-    C & \defeq \theta \, \partial_{\theta\,} \eta |_{\pi} = 
-    -\theta \, \partial_{\theta\theta\,} \mathcal{G}_2 (\theta , \pi) =
-    -\theta \, \partial_{\theta\theta\,} \mathcal{G}_u  (\theta , \xi_1 , \pi)
+    C_t & \defeq 
+    -\theta \, \partial_{\theta\theta\,} 
+    \mathcal{G}_u  (\theta , \xi , \pi) =
+    -\theta \, \partial_{\theta\theta\,} 
+    \mathcal{G}_2 (\theta , \pi)
     \label{specificHeat2Dmembrane} \\
-    \alpha & \defeq \partial_{\theta\,} \xi |_{\pi} = 
-    -\rho \, \partial_{\pi\theta\,} \mathcal{G}_2 (\theta , \pi) = 
-    -\rho \, \partial_{\pi\theta\,} \mathcal{G}_u (\theta , \xi_1 , \pi)
+    \alpha_t & \defeq 
+    -\rho\theta \, \partial_{\pi\theta\,} 
+    \mathcal{G}_u (\theta , \xi , \pi) =
+    -\rho\theta \, \partial_{\pi\theta\,} 
+    \mathcal{G}_2 (\theta , \pi)  =
+    -\rho\theta \, \partial_{\theta\pi\,} 
+    \mathcal{G}_2 (\theta , \pi)
     \label{thermalExpansion2Dmembrane} \\
-    1/4M & \defeq \partial_{\pi\,} \xi |_{\theta} = -
+    1/4M_t & \defeq -
     \bigl( \rho \, \partial_{\xi_1} \mathcal{G}_1 ( \xi_1, \pi ) \bigr)^{-1} 
-    \bigl( \xi + \rho \, \partial_{\pi\,} \mathcal{G}_u (\theta , \xi_1 , \pi ) \bigr) -
+    \bigl( \xi + \rho \, \partial_{\pi\,} \mathcal{G}_u (\theta , \xi , \pi ) \bigr)  -
     \rho \, \partial_{\pi\pi\,} \mathcal{G}_2(\theta , \pi)
     \label{compliance2Dmembrane}
     \end{align}
 \end{subequations}
-where $\partial_{\pi\theta\,} \mathcal{G}_u = \partial_{\theta\pi\,} \mathcal{G}_u$ because of Maxwell's constraint.  Their derivations are analogous to those for the implicit fiber derived above.    These material properties pertain to the matrix constitutive equations found in Eqns.~(\ref{HelmholtzMembraneODEs} \& \ref{elasticMembrane}).
+whose derivations are analogous to those for the implicit fiber derived in Eqn.~(\ref{physicalFields1Dfiber}). 
 
-Like our model for a biologic fiber, we consider a Gibbs free-energy function for describing the uniform response of a biologic membrane that takes on the form of
+\paragraph{Uniform Biologic Membrane Model}
+
+Like our model for a biologic fiber, we consider a Gibbs free-energy function for describing the uniform response of a biologic membrane whose implicit energy function takes on the form of
 \begin{subequations} 
     \label{uniformMembrane}
     \begin{align}
     \mathcal{G}_1 (\xi_1 , \pi) & = - \frac{1}{\rho} 
-    \Bigl( \xi_t (4M_1 \xi_1 - \pi ) + 2 \xi_1 \pi \Bigr) \\
-    \mathcal{G}_2 (\theta , \pi) & = -C \left( \theta \ln \left( \frac{\theta}{\theta_0} \right) -
-    (\theta - \theta_0) \right) - \frac{\pi}{2\rho} \left( 
-    2 \alpha ( \theta - \theta_0 ) + \frac{\pi}{4M_2} \right) \\
-    \intertext{whose resulting elastic compliance, as established through Eqn.~(\ref{compliance2Dmembrane}), is}
-    \frac{1}{M(\theta, \xi, \pi)} & = 
-    \frac{\xi_t - \xi_1}{M_1 \xi_t + \pi / 2} + \frac{1}{M_2} 
-    \quad \text{wherein} \quad 
-    \xi_1 = \xi - \alpha (\theta - \theta_0) - \frac{\pi}{4M_2}
-    \label{membraneCompliance}
+    \Bigl( \xi_{1_{\max}} \bigl( 4M_1 \xi_1 - (\pi - \pi_0) \bigr) + 2 \xi_1 (\pi - \pi_0) \Bigr) \\
+    \intertext{and whose explicit energy function is}
+    \mathcal{G}_2 (\theta , \pi) & = 
+    -\eta_0 ( \theta - \theta_0 )
+    -C_t \left( \theta \ln \left( \frac{\theta}{\theta_0} \right) -
+    (\theta - \theta_0) \right) \notag \\ 
+    \mbox{} & \quad - \frac{\pi - \pi_0}{2\rho} \left( 
+    2 \alpha_t \ln \left( \frac{\theta}{\theta_0} \right) + \frac{\pi - \pi_0}{4M_2} \right) \\
+    \intertext{thereby resulting an elastic tangent compliance, as established in Eqn.~(\ref{compliance2Dmembrane}), of}
+    \frac{1}{4M_t(\theta, \xi, \pi)} & = 
+    \frac{\xi_{1_{\max}} - \xi_1}
+    {4M_1 \xi_{1_{\max}} + 2 (\pi - \pi_0)} + \frac{1}{4M_2}
+    \label{membraneCompliance} \\
+    \intertext{wherein} 
+    \xi_1 & = \xi - 
+    \alpha_t \ln \left( \frac{\theta}{\theta_0} \right) - 
+    \frac{\pi - \pi_0}{4M_2}
     \end{align}
 \end{subequations}
-with $\xi_t > 0$ being an upper bound on strain $\xi_1$, i.e., $0 \leq \xi_1 \leq \xi_t$.  Such a membrane has an initial tangent stiffness $M(\theta_0, 0, 0)$ of $M_1 M_2 / ( M_1 + M_2 )$ ($\approx M_1$ whenever $M_2 \gg M_1 > 0$) and it has a terminal tangent stiffness $M(\xi_1 \! = \! \xi_t)$ of $M_2$.
+with $\xi_{1_{\max}} > 0$ being an upper bound on strain $\xi_1$, i.e., $\xi_1 \leq \xi_{{\max}}$.  Such a membrane has an initial tangent stiffness $M_t(\theta_0, \xi_0, \pi_0)$ of $M_1 M_2 / ( M_1 + M_2 )$ ($\approx M_1$ whenever $M_2 \gg M_1 > 0$) and it has a terminal tangent stiffness $M_t(\xi_1 \! = \! \xi_{1_{\max}})$ of $M_2$.
 
-Membranes will wrinkle under states of negative surface tension (or dilation).  In alveolar mechanics, surfactant helps to prevent this, and a possible ensuing alveolar collapse.  Wrinkling is not accounted for in our modeling of alveolar septa.  Rather, like fibers, membranes are assumed to support compression with a soft modulus of $M_1 M_2 / ( M_1 + M_2 )$, which associates with the compliant response found at the origin (zero surface tension and zero dilation).  This is done to help ensure numeric stability in our software.
+Membranes will wrinkle under states of negative surface tension (or dilation).  In alveolar mechanics, surfactant helps to prevent this, and a possible ensuing alveolar collapse.  Wrinkling is not accounted for in our modeling of alveolar septa.  Rather, like fibers, it is assumed that the compliant response at $\pi_0$, with modulus $M_1 M_2 / ( M_1 + M_2 )$, continues over the non-physiologic regime of loading $0 < \pi \leq \pi_0$, which is a body's way of ensuring structural stability in its membranes.
 
-The difference between a Green and Rajagopal thermo\-elastic membrane under\-going a dilation is in their definitions for elastic compliance.  There is no difference in their properties for specific heat or thermal expansion.  The above model has been successfully applied to a visceral pleura membrane \cite{Freedetal17}.
+The difference between a Green and Rajagopal thermo\-elastic membrane under\-going a dilation is in their definitions for elastic compliance.  There is no difference in their properties for the specific heat or the thermal strain coefficient.  The above model has been successfully applied to a visceral pleura membrane \cite{Freedetal17}.
 
-\subsection{Biologic Membranes Under Non-Uniform Motions}
+\paragraph{Non-Uniform Response}
 
 We seek an energetic construction that is consistent with the Freed \& Rajagopal \cite{FreedRajagopal16} fiber model, but which is applicable to the non-uniform responses that planar membranes can support.  A Rajagopal elastic solid is implicit. Therefore, we choose a Gibbs free-energy function for governing non-uniform behavior that looks like
 \begin{equation}
-\mathcal{G}_n ( \varepsilon_1 , \gamma_1 , \sigma , \tau ) = \mathcal{G}_1 ( \varepsilon_1 , \sigma ) + \mathcal{G}_2 ( \sigma ) + \mathcal{G}_3 ( \gamma_1 , \tau ) + \mathcal{G}_4 ( \tau )
+\mathcal{G}_n ( \varepsilon , \gamma , \sigma , \tau ) = \mathcal{G}_1 ( \varepsilon_1 , \sigma ) + \mathcal{G}_2 ( \sigma ) + \mathcal{G}_3 ( \gamma_1 , \tau ) + \mathcal{G}_4 ( \tau )
 \label{nonuniformEnergy}
 \end{equation}
-which depend upon three squeeze strains $\varepsilon \defeq \ln \sqrt{\Gamma \! / \Gamma_0}$, $\varepsilon_1 \defeq \ln \sqrt{ \Gamma_1 / \Gamma_0}$ and $\varepsilon_2 \defeq \ln \sqrt{ \Gamma \! / \Gamma_1}$, and three shear strains $\gamma \defeq g - g_0$, $\gamma_1 \defeq g_1 - g_0$ and $\gamma_2 \defeq g - g_1$, both of which are additive in the sense that $\varepsilon = \varepsilon_1 + \varepsilon_2$ and $\gamma = \gamma_1 + \gamma_2$, and as such, so are their differential rates of change $\mathrm{d} \varepsilon = \mathrm{d} \varepsilon_1 + \mathrm{d} \varepsilon_2$ and $\mathrm{d} \gamma = \mathrm{d} \gamma_1 + \mathrm{d} \gamma_2$.  Strains $\varepsilon_1$ and $\gamma_1$ may be thought of as describing an unraveling of molecular configuration, analogous to $e_1$ in the fiber model of Eqn.~(\ref{RajagopaleanFiber}) and $\xi_1$ in the uniform membrane model of Eqn.~(\ref{membraneCompliance}).  No coupling between squeeze and shear is assumed in this energy function.  Energies $\mathcal{G}_1$ and $\mathcal{G}_3$ are Rajagopal elastic (implicit), while energies $\mathcal{G}_2$ and $\mathcal{G}_4$ are Green elastic (explicit).
+which depend upon three squeeze strains $\varepsilon \defeq \ln \sqrt{\Gamma \! / \Gamma_0}$, $\varepsilon_1 \defeq \ln \sqrt{ \Gamma_1 / \Gamma_0}$ and $\varepsilon_2 \defeq \ln \sqrt{ \Gamma \! / \Gamma_1}$, and three shear strains $\gamma \defeq g - g_0$, $\gamma_1 \defeq g_1 - g_0$ and $\gamma_2 \defeq g - g_1$, both of which are additive in the sense that $\varepsilon = \varepsilon_1 + \varepsilon_2$ and $\gamma = \gamma_1 + \gamma_2$, and as such, so are their differential rates of change $\mathrm{d} \varepsilon = \mathrm{d} \varepsilon_1 + \mathrm{d} \varepsilon_2$ and $\mathrm{d} \gamma = \mathrm{d} \gamma_1 + \mathrm{d} \gamma_2$.  Strains $\varepsilon_1$ and $\gamma_1$ may be thought of as describing an unraveling of molecular configuration, analogous to $e_1$ in the fiber model of Eqn.~(\ref{RajagopaleanFiber}), and $\xi_1$ in the uniform membrane model of Eqn.~(\ref{uniformMembrane}).  No coupling between squeeze and shear is assumed in this energy function.  Energies $\mathcal{G}_1$ and $\mathcal{G}_3$ are Rajagopal elastic (they have implicit dependencies upon state), while energies $\mathcal{G}_2$ and $\mathcal{G}_4$ are Green elastic (they have explicit dependencies upon state).
 
-From the thermo\-dynamic expression $-\rho \, \mathrm{d} \mathcal{G}_n = \varepsilon \, \mathrm{d} \sigma + \gamma \, \mathrm{d} \tau$, the non-uniform Gibbs free energy $\mathcal{G}_n$, when expressed in the form of Eqn.~(\ref{nonuniformEnergy}), and given the definitions for squeeze $1/N$ and shear $1/G$ compliances put forward in Eqns.~(\ref{squeezeModulus} \& \ref{shearModulus}), one determines a squeeze compliance that is described by
+From the thermo\-dynamic expression $-\rho \, \mathrm{d} \mathcal{G}_n = \varepsilon \, \mathrm{d} \sigma + \gamma \, \mathrm{d} \tau$, the non-uniform Gibbs free energy $\mathcal{G}_n$, when expressed in the form of Eqn.~(\ref{nonuniformEnergy}), and given the definitions for squeeze $1/N$ and shear $1/G$ compliances put forward in Eqns.~(\ref{squeezeModulus} \& \ref{shearModulus}), one determines that the tangent squeeze compliance is described by
 \begin{subequations}
     \label{nonuniformCompliances}
     \begin{align}
-    \frac{1}{2N} & \defeq \frac{\mathrm{d} \varepsilon}{\mathrm{d} \sigma} = - \bigl( \rho \, \partial_{\varepsilon_1} \mathcal{G}_1 \bigr)^{-1} \bigl( \varepsilon + \rho \, \partial_{\sigma} ( \mathcal{G}_1 + \mathcal{G}_2 ) \bigr) - \rho \, \partial_{\sigma\sigma\,} \mathcal{G}_2
+    \frac{1}{2N_t} & \defeq \frac{\mathrm{d} \varepsilon}{\mathrm{d} \sigma} = - \bigl( \rho \, \partial_{\varepsilon_1} \mathcal{G}_1 \bigr)^{-1} \bigl( \varepsilon + \rho \, \partial_{\sigma} ( \mathcal{G}_1 + \mathcal{G}_2 ) \bigr) - \rho \, \partial_{\sigma\sigma\,} \mathcal{G}_2
     \label{squeezeCompliance} \\
-    \intertext{and a shear compliance that is described by}
-    \frac{1}{G} & \defeq \frac{\mathrm{d} \gamma}{\mathrm{d} \tau} = - \bigl( \rho \, \partial_{\gamma_1} \mathcal{G}_3 \bigr)^{-1} \bigl( \gamma + \rho \, \partial_{\tau} ( \mathcal{G}_3 + \mathcal{G}_4 ) \bigr) - \rho \, \partial_{\tau\tau\,} \mathcal{G}_4
+    \intertext{and that the tangent shear compliance is described by}
+    \frac{1}{G_t} & \defeq \frac{\mathrm{d} \gamma}{\mathrm{d} \tau} = - \bigl( \rho \, \partial_{\gamma_1} \mathcal{G}_3 \bigr)^{-1} \bigl( \gamma + \rho \, \partial_{\tau} ( \mathcal{G}_3 + \mathcal{G}_4 ) \bigr) - \rho \, \partial_{\tau\tau\,} \mathcal{G}_4
     \label{shearCompliance}
     \end{align}
 \end{subequations}
-whose mathematical structure is similar to that of the fiber model presented in Eqn.~(\ref{RajagopaleanFiber}).  The first collection of terms on the right-hand side of both formul\ae\ is Rajagopal elastic; the second is Green elastic.  
+whose mathematical structure is similar to that of the Freed-Rajagopal fiber model presented in Eqn.~(\ref{RajagopaleanFiber}).  The first collection of terms on the right-hand side of both formul\ae\ is Rajagopal elastic; the second is Green elastic.  
 
 \medskip\noindent
-\textbf{Derivation}: The First and Second Laws of Thermo\-dynamics, as they pertain to non-uniform contributions of stress power, have energetic components described in Eqn.~(\ref{nonuniformEnergy}) so that $\rho \, \mathrm{d} \mathcal{G}_n = \rho \, \partial_{\varepsilon_1} \mathcal{G}_1 ( \varepsilon_1 , \sigma ) \, \mathrm{d} \varepsilon_1 + \rho \, \partial_{\sigma\,} \mathcal{G}_1 ( \varepsilon_1 , \sigma ) \, \mathrm{d} \sigma + \rho \, \partial_{\sigma} \mathcal{G}_2 ( \sigma ) \, \mathrm{d} \sigma + \rho \, \partial_{\gamma_1} \mathcal{G}_3 ( \gamma_1 , \tau ) \, \mathrm{d} \gamma_1 + \rho \, \partial_{\tau\,} \mathcal{G}_3 ( \gamma_1 , \tau ) \, \mathrm{d} \tau + \rho \, \partial_{\tau\,} \mathcal{G}_4 ( \tau ) \, \mathrm{d} \tau$ that associate with the conjugate pairings $-\varepsilon_1 \, \mathrm{d} \sigma - \varepsilon_2 \, \mathrm{d} \sigma - \gamma_1 \, \mathrm{d} \tau - \gamma_2 \, \mathrm{d} \tau$ because of the prescribed additivity in strains.  These follow from a Legendre transformation of the internal energy.  Gathering like terms result in a pair of Green elastic formul\ae\ that describe two of the internal strains
+\textbf{Derivation}: The First and Second Laws of Thermo\-dynamics, as they pertain to non-uniform contributions of stress power, have energetic components described in Eqn.~(\ref{nonuniformEnergy}) so that $\rho \, \mathrm{d} \mathcal{G}_n = \rho \, \partial_{\varepsilon_1} \mathcal{G}_1 ( \varepsilon_1 , \sigma ) \, \mathrm{d} \varepsilon_1 + \rho \, \partial_{\sigma\,} \mathcal{G}_1 ( \varepsilon_1 , \sigma ) \, \mathrm{d} \sigma + \rho \, \partial_{\sigma} \mathcal{G}_2 ( \sigma ) \, \mathrm{d} \sigma + \rho \, \partial_{\gamma_1} \mathcal{G}_3 ( \gamma_1 , \tau ) \, \mathrm{d} \gamma_1 + \rho \, \partial_{\tau\,} \mathcal{G}_3 ( \gamma_1 , \tau ) \, \mathrm{d} \tau + \rho \, \partial_{\tau\,} \mathcal{G}_4 ( \tau ) \, \mathrm{d} \tau$ that associate with the conjugate pairings $-\varepsilon_1 \, \mathrm{d} \sigma - \varepsilon_2 \, \mathrm{d} \sigma - \gamma_1 \, \mathrm{d} \tau - \gamma_2 \, \mathrm{d} \tau$ because of the prescribed additivity in strains.  These follow from a Legendre transformation of the internal energy.  Gathering like terms result in a pair of Green elastic formul\ae\ that describe two of the four internal strains
 \begin{displaymath}
 \varepsilon_2 = -\rho \, \partial_{\sigma\,} \mathcal{G}_2 ( \sigma ) 
 \quad \text{and} \quad
@@ -337,32 +681,74 @@ and two Rajagopal elastic formul\ae\ whose ODEs describe the other internal stra
 \end{align*}
 that when combined as rates become the constitutive formul\ae\ in Eqn.~(\ref{nonuniformCompliances}). \hfill $\qed$
 
-We now seek a specific free-energy function for Eqn.~(\ref{nonuniformEnergy}) that produces compliances $1/N$ and $1/G$ with like mathematical structure to Eqn.~(\ref{membraneCompliance}) for dilation, viz., $1/M$; specifically, we consider Gibbs free-energy functions of the form
+\paragraph{Non-Uniform Biologic Membrane Model}
+
+We now specify the Gibbs free-energy functions of Eqn.~(\ref{nonuniformEnergy}) such that they produce tangent compliances $1/N_t$ and $1/G_t$ with like mathematical structure to Eqn.~(\ref{membraneCompliance}) for dilation, viz., $1/M_t$. Specifically, we consider Gibbs free-energy functions of the form
 \begin{subequations}
     \label{nonuniformComplianceEnergies}
     \begin{align}
-    -\rho \, \mathcal{G}_1 ( \varepsilon_1 , \sigma ) & = \mathrm{sgn} ( \varepsilon_1 ) \, \varepsilon_t \bigl( 2 N_1 \varepsilon_1 - \sigma \bigr) + 2 \varepsilon_1 \sigma &
+    -\rho \, \mathcal{G}_1 ( \varepsilon_1 , \sigma ) & = \mathrm{sgn} ( \varepsilon_1 ) \, \varepsilon_{1_{\max}} \bigl( 2 N_1 \varepsilon_1 - \sigma \bigr) + 2 \varepsilon_1 \sigma
+    \label{squeezeImplicitEnergy} \\
     -\rho \, \mathcal{G}_2 ( \sigma ) & = \sigma^2 / 4 N_2
-    \label{squeezeEnergy} \\
-    -\rho \, \mathcal{G}_3 ( \gamma_1 , \tau ) & = \mathrm{sgn} ( \gamma_1 ) \, \gamma_t \bigl( G_1 \gamma_1 - \tau \bigr) + 2 \gamma_1 \tau &
+    \label{squeezeExplicitEnergy} \\
+    -\rho \, \mathcal{G}_3 ( \gamma_1 , \tau ) & = \mathrm{sgn} ( \gamma_1 ) \, \gamma_{1_{\max}} \bigl( G_1 \gamma_1 - \tau \bigr) + 2 \gamma_1 \tau 
+    \label{shearImplicitEnergy} \\
     -\rho \, \mathcal{G}_4 ( \tau ) & = \tau^2 / 2 G_2 
-    \label{shearEnergy}
+    \label{shearExplicitEnergy}
     \end{align}
 \end{subequations}
-which have the same mathematical structure as the energies for the biologic fiber (\ref{RajagopaleanFiber}) and uniform membrane (\ref{uniformMembrane}), less their temperature dependence.  The sign functions, viz., $\mathrm{sgn}( \varepsilon_1 )$ and $\mathrm{sgn} ( \gamma_1 )$, account for the fact that squeeze and shear strains can be of either sign, but the Gibbs energy must remain negative.  In effect, the sign functions flip the limiting state between tension and compression, i.e., they change the signs of $\varepsilon_t$ and $\gamma_t$, respectively.  When substituted into Eqn.~(\ref{nonuniformCompliances}), these energy functions produce the following thermo\-elastic compliances
+where these energy functions have the same mathematical structure as the energies for biologic fibers (Eqn.~\ref{RajagopaleanFiber}) and uniform membranes (Eqn.~\ref{uniformMembrane}), less their temperature dependence, and less their states of pre-stress, i.e., $\sigma_0 = 0$ and $\tau_0 = 0$.  
+
+The sign functions, viz., $\mathrm{sgn}( \varepsilon_1 )$ and $\mathrm{sgn} ( \gamma_1 )$, account for the fact that squeeze and shear strains can be of either sign, but the Gibbs energy must remain negative.  In effect, the sign functions flip the limiting state between tension and compression, i.e., they change the signs of $\varepsilon_{1_{\max}}$ and $\gamma_{1_{\max}}$ depending upon the respective signs of $\varepsilon_1$ and $\gamma_1$. As a consequence, $\mathcal{G}_1 (\varepsilon_1 , \sigma) = \mathcal{G}_1 (-\varepsilon_1 , -\sigma)$, $\mathcal{G}_2 (\sigma) = \mathcal{G}_2 (-\sigma)$, $\mathcal{G}_3 (\gamma_1 , \tau) = \mathcal{G}_3 (-\gamma_1 , -\tau)$ and $\mathcal{G}_4 (\tau) = \mathcal{G}_4 (-\tau)$.  
+
+When substituted into Eqn.~(\ref{nonuniformCompliances}), these energy functions produce the following thermo\-elastic compliances
 \begin{subequations}
     \label{nonuniformComplianceFns}
     \begin{align}
-    \frac{1}{N(\varepsilon , \sigma)} & = \frac{ \mathrm{sgn} (\varepsilon_1) \, \varepsilon_t - \varepsilon_1}{N_1 \, \mathrm{sgn} (\varepsilon_1) \, \varepsilon_t + \sigma} + \frac{1}{N_2} &
+    \frac{1}{2N(\varepsilon , \sigma)} & = \frac{ \mathrm{sgn} (\varepsilon_1) \, \varepsilon_{1_{\max}} - \varepsilon_1}{2N_1 \, \mathrm{sgn} (\varepsilon_1) \, \varepsilon_{1_{\max}} + 2\sigma} + \frac{1}{2N_2} &
     \varepsilon_1 & = \varepsilon - \frac{\sigma}{2N_2}
     \label{squeezeCompliance2D} \\
-    \frac{1}{G(\gamma , \tau)} & = \frac{ \mathrm{sgn} (\gamma_1) \, \gamma_t - \gamma_1}{G_1 \, \mathrm{sgn} (\gamma_1) \, \gamma_t + 2 \tau} + \frac{1}{G_2} & 
+    \frac{1}{G(\gamma , \tau)} & = \frac{ \mathrm{sgn} (\gamma_1) \, \gamma_{1_{\max}} - \gamma_1}{G_1 \, \mathrm{sgn} (\gamma_1) \, \gamma_{1_{\max}} + 2 \tau} + \frac{1}{G_2} & 
     \gamma_1 & = \gamma - \frac{\tau}{G_2}
     \label{shearCompliance2D}
     \end{align}
 \end{subequations}
 which provide the tangent operators that we will use to describe the non-uniform behavior of a biologic membrane.
 
-Like our other biologic models, the squeeze compliance $1/N$ is described by three material properties: an asymptotic modulus at the reference state of $N_1 N_2 / (N_1 + N_2)$ ($\approx N_1$ whenever $N_2 \gg N_1 > 0$) where $N_1$ may be thought of as the stiffness of an unstretched molecular network, and a terminal modulus $N_2$ designating a stiffness after its molecular network has been stretched out at a limiting state of configurational squeeze $\varepsilon_t$.  The shear compliance $1/G$ is also described by three material properties: an asymptotic modulus at the reference state of $G_1 G_2 / ( G_1 + G_2 )$ ($\approx G_1$ whenever $G_2 \gg G_1 > 0$), a terminal modulus $G_2$, and a limiting state of configurational shear $\gamma_t$.  
+Like our other biologic models, the tangent squeeze compliance $1/N_t$ is described by three material properties: an asymptotic modulus at the reference state of $N_1 N_2 /$ $(N_1 + N_2)$ ($\approx N_1$ whenever $N_2 \gg N_1 > 0$) where $N_1$ may be thought of as the stiffness of an unstretched molecular network, and a terminal modulus $N_2$ designating a stiffness after its molecular network has been stretched out at a limiting state of configurational squeeze $\varepsilon_{1_{\max}}$.  The tangent shear compliance $1/G_t$ is also described by three material properties: an asymptotic modulus at the reference state of $G_1 G_2 / ( G_1 + G_2 )$ ($\approx G_1$ whenever $G_2 \gg G_1 > 0$), a terminal modulus $G_2$, and a limiting state of configurational shear $\gamma_{1_{\max}}$.  
 
 In soft biological tissues, the shear moduli $G_1$ and $G_2$ will be several orders in magnitude smaller than their respective squeeze moduli $N_1$ and $N_2$.  Classical theories cannot make such a distinction.
+
+\subsubsection{Secant Material Properties}
+
+\paragraph{Uniform Response}
+
+Integrating by parts the tangent compliance governing dilation found in Eqn.~(\ref{membraneCompliance}) results in a secant compliance of
+\begin{equation}
+    \frac{1}{4M_s (\pi)} = \frac{\xi_{1_{\max}}}{\pi - \pi_0} \left( 
+    1 - \frac{\sqrt{M_1 \xi_{1_{\max}}}}
+    {\sqrt{M_1 \xi_{1_{\max}} + \tfrac{1}{2} ( \pi - \pi_0 )}} \right) + 
+    \frac{1}{4M_2}
+\end{equation}
+where $M_s (\pi \! \leq \! \pi_0) = M_1 M_2 / ( M_1 + M_2 )$.  This compliance applies to the thermo\-dynamic equations governing the uniform secant response of our membranes, as established in Eqn.~(\ref{uniformGreenMembrane}).
+
+\paragraph{Non-Uniform Response}
+
+Integrating by parts the tangent compliance governing squeeze in Eqn.~(\ref{squeezeCompliance2D}) provides its secant compliance of
+\begin{equation}
+\frac{1}{2N_s (\sigma)} = 
+\frac{\varepsilon_{1_{\max}}}{|\sigma|} \left(
+1 - \frac{\sqrt{N_1 \varepsilon_{1_{\max}}}}
+{\sqrt{N_1 \varepsilon_{1_{\max}} + | \sigma |}} \right) + 
+\frac{1}{2N_2}
+\end{equation}
+where $N_s (\sigma \! = \! 0) = N_1 N_2 / (N_1 + N_2)$, while
+integrating by parts the tangent compliance governing shear in Eqn.~(\ref{shearCompliance2D}) results in its secant compliance of
+\begin{equation}
+    \frac{1}{G_s (\tau)} = 
+    \frac{\gamma_{1_{\max}}}{|\tau|} \left(
+    1 - \frac{\sqrt{G_1 \gamma_{1_{\max}}}}
+    {\sqrt{G_1 \gamma_{1_{\max}} + 2 | \tau |}} \right) + 
+    \frac{1}{G_2}
+\end{equation}
+where $G_s (\tau \! = \! 0) = G_1 G_2 / (G_1 + G_2)$.  These compliances apply to the thermo\-dynamic equations governing the non-uniform secant response of our membranes, as established in Eqn.~(\ref{nonuniformGreenMembrane}).

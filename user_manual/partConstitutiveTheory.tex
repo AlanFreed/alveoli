@@ -1,11 +1,11 @@
 \part{Constitutive Theory}
 \label{partConstitutive}
 
-Roan \& Waters \cite{RoanWaters11} and Suki \textit{et~al}.\ \cite{Sukietal05,Sukietal11} have both written extensive review articles on the mechanics of parenchyma.  They have provided detailed information about the structural constituents of alveoli.  And they have discussed their influence on the overall mechanical response of parenchyma.  Of particular relevance, from a mechanics perspective, are the constituent building blocks of alveolar tissue: collagen (types I and III, predominantly), elastin, proteoglycans and other proteins, surfactant and cells (epithelial and endothelial, predominantly).  These constituents are assembled in such a manner so as to produce a variety of alveolar sub-structures that are essentially 1D (alveolar chords), 2D (alveolar septa) and 3D (alveolar sacs) in their geometric construction.  
+Roan \& Waters \cite{RoanWaters11} and Suki \textit{et~al}.\ \cite{Sukietal05,Sukietal11} have both written extensive review articles on the mechanics of parenchyma.  They have provided detailed information about the structural constituents of alveoli.  And they have discussed their influence on the overall mechanical response of parenchyma.  Of particular relevance, from a mechanics perspective, are the constituent building blocks of alveolar tissue: collagen (types I and III, predominantly), elastin, proteoglycans and other structural proteins, surfactant, and cells (epithelial and endothelial, predominantly).  These constituents are assembled in such a manner so as to produce a variety of alveolar sub-structures that are essentially 1D (alveolar chords), 2D (alveolar septa) and 3D (alveolar sacs) in their geometric construction.  
 
-Birzle \textit{et~al}.\ \cite{Birzleetal19} performed a set of uniaxial experiments on rat parenchyma in an effort to delineate the separate effects of elastin, collagen and the ground substance (everything else) on the collective mechanical response of these tissues.  This information should be useful, especially in the construction of a mixture theory for alveolar septa, which is a topic of research of another member in our group.  Results from their research will also be a useful aid in our modeling efforts of septal planes.
+Birzle \textit{et~al}.\ \cite{Birzleetal19} performed a set of uniaxial experiments on rat parenchyma in an effort to delineate the separate effects of elastin, collagen and the ground substance (everything else) on the collective mechanical response of these tissues.  This information should be useful, especially in the construction of a mixture theory for alveolar septa, which is a topic of research by another member in our group.  Results from their research will also be a useful aid in our modeling efforts of septal planes.
 
-A dodecahedron is used here as a geometric model for an alveolus \cite{FrankusLee74}, cf.\ Figs.~\ref{figRatLung} \& \ref{figDodecahedron}.  It is comprised of: thirty 1D rods that represent alveolar chords, twelve 2D membranes that represent alveolar septa, considered here to be pentagonal in shape, and one 3D cavity filled with air (or fluid in the case of a contusion caused by injury, or an edema caused by disease) whose geometry is considered to be dodecahedral in shape.  The thermo\-elastic constitutive equations presented in this chapter for spatial chords and membranes are derived in Appendix~\ref{appImplicitElasticity}.  Elastic behavior is sufficient for our intended application of studying alveoli subjected to traveling waves.
+A dodecahedron is used here as a geometric model for an alveolus \cite{FrankusLee74}, cf.\ Figs.~\ref{figRatLung} \& \ref{figDodecahedron}.  It is comprised of: thirty 1D rods that represent alveolar chords, twelve 2D membranes that represent alveolar septa, considered here to be pentagonal in shape, and one 3D cavity filled with air (or fluid in the case of a contusion caused by injury, or edema caused by disease) whose geometry is considered to be dodecahedral in shape.  The thermo\-elastic constitutive equations presented in this chapter for spatial chords and membranes are derived in Appendix~\ref{appImplicitElasticity}.  Elastic behavior is sufficient for our intended application of studying alveoli subjected to traveling waves.
 
 We recall from our kinematic study of a dodecahedron that the geometric strains (i.e., $e \defeq \ln ( L / L_0 )$ for the elongation of septal chords, $\xi \defeq \ln \sqrt{A / A_0}$ for the dilation of septal membranes, and $\Xi \defeq \ln \sqrt[3]{V / V_0}$ for the dilatation of alveolar volume) are equivalent to one another under motions of uniform compression\slash expansion.  These three, geometric, strain measures also exist as thermo\-dynamic strains, each associating with a distinct and unique conjugate stress. \cite{Freed17,FreedZamani19}
 
@@ -97,64 +97,79 @@ We consider response variables for temperature and force\slash surface-tension\s
 \end{subequations}
 where mixed partial derivatives obey $\partial_{e \eta} U = \partial^2 U / \partial e \partial \eta = \partial^2 U / \partial \eta \partial e = \partial_{\eta e} U$, etc., that in the thermo\-dynamics literature are referred to as Maxwell's relations; they are also known as Silvester's criteria for the integrability of a Pfaffian form.
 
-Exchanging cause and effect between entropy and temperature in Eqn.~(\ref{GreenElasticODEs}) gives
+Exchanging cause and effect between entropy and temperature in Eqn.~(\ref{GreenElasticODEs}) gives In 1D:
 \small
 \begin{subequations}
     \label{HelmholtzElasticODEs}
     \begin{align}
-    \mbox{} & \text{In 1D:} &
     \left\{ \begin{matrix} \mathrm{d} \eta \\ 
     \mathrm{d} F \end{matrix} \right\} & = \begin{bmatrix}
-    1/\partial_{\eta\eta} U & -\partial_{\eta e} U / 
+    \theta /\partial_{\eta\eta} U & -\partial_{\eta e} U / 
     \partial_{\eta\eta} U \\
-    \rho_{1D} \, \partial_{e\eta} U / \partial_{\eta\eta} U & \rho_{1D} ( \partial_{ee} U - \partial_{e\eta} U \!\cdot\! \partial_{\eta e} U / \partial_{\eta\eta} U ) \end{bmatrix} 
-    \left\{ \begin{matrix} \mathrm{d} \theta \\
+    \rho_{1D} \theta \, \partial_{e\eta} U / \partial_{\eta\eta} U & \rho_{1D} ( \partial_{ee} U - \partial_{e\eta} U \!\cdot\! \partial_{\eta e} U / \partial_{\eta\eta} U ) \end{bmatrix} 
+    \left\{ \begin{matrix} \theta^{-1} \, \mathrm{d} \theta \\
     \mathrm{d} e \end{matrix} \right\} \\
     % second formula
-    \mbox{} & \text{In 2D:} &
+    \intertext{In 2D:}
     \left\{ \begin{matrix} \mathrm{d} \eta \\ 
     \mathrm{d} \pi \end{matrix} \right\} & = \begin{bmatrix}
-    1/\partial_{\eta\eta} U & -\partial_{\eta \xi} U / \partial_{\eta\eta} U \\
-    \rho_{2D} \, \partial_{\xi\eta} U / \partial_{\eta\eta} U & \rho_{2D} ( \partial_{\xi\xi} U - \partial_{\xi\eta} U \!\cdot\! \partial_{\eta \xi} U / \partial_{\eta\eta} U ) \end{bmatrix} \left\{ \begin{matrix} \mathrm{d} \theta \\
+    \theta /\partial_{\eta\eta} U & -\partial_{\eta \xi} U / \partial_{\eta\eta} U \\
+    \rho_{2D} \theta \, \partial_{\xi\eta} U / \partial_{\eta\eta} U & \rho_{2D} ( \partial_{\xi\xi} U - \partial_{\xi\eta} U \!\cdot\! \partial_{\eta \xi} U / \partial_{\eta\eta} U ) \end{bmatrix} \left\{ \begin{matrix} \theta^{-1} \, \mathrm{d} \theta \\
     \mathrm{d} \xi \end{matrix} \right\} \label{HelmholtzMembrane} \\
     % thrid formula
-    \mbox{} & \text{In 3D:} &
+    \intertext{In 3D:}
     \left\{ \begin{matrix} \mathrm{d} \eta \\ 
     \mathrm{d} \Pi \end{matrix} \right\} & = \begin{bmatrix}
-    1/\partial_{\eta\eta} U & -\partial_{\eta \Xi} U / \partial_{\eta\eta} U \\
-    \rho_{3D} \, \partial_{\Xi\eta} U / \partial_{\eta\eta} U & \rho_{3D} ( \partial_{\Xi\Xi} U - \partial_{\Xi\eta} U \!\cdot\! \partial_{\eta \Xi} U / \partial_{\eta\eta} U ) \end{bmatrix} \left\{ \begin{matrix} \mathrm{d} \theta \\
+    \theta /\partial_{\eta\eta} U & -\partial_{\eta \Xi} U / \partial_{\eta\eta} U \\
+    \rho_{3D} \theta \, \partial_{\Xi\eta} U / \partial_{\eta\eta} U & \rho_{3D} ( \partial_{\Xi\Xi} U - \partial_{\Xi\eta} U \!\cdot\! \partial_{\eta \Xi} U / \partial_{\eta\eta} U ) \end{bmatrix} \left\{ \begin{matrix} \theta^{-1} \, \mathrm{d} \theta \\
     \mathrm{d} \Xi \end{matrix} \right\}
     \end{align}
 \end{subequations}
 \normalsize
-where we employ the independent variables of a Helmholtz free energy, namely temperature and strain, but we do not adopt his potential, preferring to retain the internal energy potential so as to ensure a proper incorporation of Maxwell's constraint. 
+where we recall that $\mathrm{d}e = L^{-1} \, \mathrm{d}L$, $\mathrm{d}\xi = \tfrac{1}{2} A^{-1} \, \mathrm{d}A$ and $\mathrm{d}\Xi = \tfrac{1}{3} V^{-1} \, \mathrm{d}V$, so we have logarithmic rates in both components of each right-hand vector above.  We employ the independent variables of a Helmholtz free energy, namely temperature and strain, but we do not adopt his potential, preferring to retain the internal energy potential so as to ensure a proper incorporation of Maxwell's constraint. 
 
 Constitutive equations (\ref{GreenElasticODEs} \& \ref{HelmholtzElasticODEs}) take on the form of a hypo-elastic material model \cite{Truesdell55}, which is ideal for numerical implementation whenever one uses solution techniques like those presented in Part~\ref{partNumericalMethods}.  
 
 \subsection{Material Response Functions}
 
-Experiments are performed for the purpose of characterizing material behavior.  In mechanics, we relate measured material constants to gradients and curvatures of thermo\-dynamic potentials out of which material models are created.  Experiments are typically done to quantify the following material properties, selected per a material's physical dimension:
+Experiments are performed for the purpose of characterizing material behavior.  In mechanics, we relate measured material constants to gradients and curvatures of thermo\-dynamic potentials out of which material models are created.  Experiments are typically done to quantify the following material properties, defined here as tangents to response curves, and selected per a material's physical dimension. 
+\newline
+In 1D:
 \begin{subequations}
-\label{materialConstants}
-\begin{align}
-C_f & \defeq \theta \, \partial_{\theta} \eta |_F & 
-\alpha_f & \defeq L^{-1} \, \partial_{\theta} L |_F \eqdef \alpha \:\: =
-\partial_{\theta} e |_F &
-E_{\theta} & \defeq L \, \partial_L F |_{\theta} = 
-\partial_e F |_{\theta} \\
-C_t & \defeq \theta \, \partial_{\theta} \eta |_T & 
-\alpha_t & \defeq A^{-1} \, \partial_{\theta} A |_T = 2 \alpha \hspace{1pt} =
-2 \, \partial_{\theta} \xi |_T &
-M_{\theta} & \defeq A \, \partial_A T |_{\theta} = 
-\tfrac{1}{4} \, \partial_{\xi} \pi |_{\theta} \\
-C_p & \defeq \theta \, \partial_{\theta} \eta |_P & 
-\alpha_p & \defeq V^{-1} \, \partial_{\theta} V |_P = 3 \alpha =
-3 \, \partial_{\theta} \Xi |_P &
-K_{\theta} & \defeq -V \, \partial_V P |_{\theta} = 
-\tfrac{1}{9} \, \partial_{\Xi} \Pi |_{\theta}
-\end{align}
+    \label{materialConstants}
+    \begin{align}
+    C_F & \defeq \left. \frac{\mathrm{d} \eta}
+    {\theta^{-1} \, \mathrm{d}\theta} \right|_{\mathrm{d}F=0} & 
+    \alpha_F & \defeq \left. \frac{L^{-1} \, \mathrm{d}L}
+    {\theta^{-1} \, \mathrm{d} \theta} \right|_{\mathrm{d}F=0} &
+    E_{\theta} & \defeq \left. \frac{\mathrm{d}F}
+    {L^{-1} \, \mathrm{d}L} \right|_{\mathrm{d}\theta=0} \\
+    \intertext{In 2D:}
+    C_T & \defeq \left. \frac{\mathrm{d} \eta}
+    {\theta^{-1} \, \mathrm{d}\theta} \right|_{\mathrm{d}T=0} & 
+    \alpha_T & \defeq \left. \frac{A^{-1} \, \mathrm{d}A}
+    {\theta^{-1} \, \mathrm{d} \theta} \right|_{\mathrm{d}T=0} =
+    2 \alpha_F &
+    M_{\theta} & \defeq \left. \frac{\mathrm{d}T}
+    {A^{-1} \, \mathrm{d}A} \right|_{\mathrm{d}\theta=0} \\
+    \intertext{In 3D:}
+    C_P & \defeq \left. \frac{\mathrm{d} \eta}
+    {\theta^{-1} \, \mathrm{d}\theta} \right|_{\mathrm{d}P=0} & 
+    \alpha_P & \defeq \left. \frac{V^{-1} \, \mathrm{d}V}
+    {\theta^{-1} \, \mathrm{d} \theta} \right|_{\mathrm{d}P=0} = 
+    3 \alpha_F &
+    K_{\theta} & \defeq \left. \frac{-\mathrm{d}P}
+    {V^{-1} \, \mathrm{d}V} \right|_{\mathrm{d}\theta=0} 
+    \end{align}
 \end{subequations}
-where we employ the commonly used notation $\partial_{\theta} \eta |_F \defeq ( \partial \eta / \partial \theta ) |_F$, etc.  The various specific heats $C_f$, $C_t$, $C_p$ (erg/g.K) introduced here are, essentially, all equivalent as they are all defined per unit mass, insensitive to dimension.  They are evaluated at a fixed thermo\-dynamic force, which does depend on dimension, but this does not impact the value for specific heat.  Hereafter they will be denoted simply as $C$.  The various thermal expansions $\alpha_f$, $\alpha_t$, $\alpha_p$ (1/K) are, however, all distinct as they are each defined with respect to their physical dimension, viz., $\alpha_f \defeq L^{-1} \, \partial L / \partial \theta |_F$, $\alpha_t \defeq A^{-1} \, \partial A / \partial \theta |_T$ and $\alpha_p \defeq V^{-1} \, \partial V / \partial \theta |_P$.  Nevertheless, they relate to one another because $\ln \sqrt{A / \! A_0} = \ln (L / L_0) \implies \alpha_t = 2 \alpha_f$ and $\ln \sqrt[3]{V \! / V_0} = \ln (L / L_0) \implies \alpha_p = 3 \alpha_f$ for uniform motions.  Hereafter, only the linear coefficient for thermal expansion, denoted as $\alpha \defeq \alpha_f$, will be used.  Parameter $E_{\theta}$ is a modulus of extension (dyne), parameter $M_{\theta}$ is a modulus of dilation (dyne/cm), and parameter $K_{\theta}$ is a modulus of dilatation ($\mathrm{dyne/cm}^2$), a.k.a.\ the bulk modulus, with each modulus being measured at fixed temperature.  Shear moduli are discussed later in Sections~\ref{secNonuniform2D} \& \ref{secNonuniform3D}.  The above material constants are gradients.  They constitute tangents to their associated physical response curves.  Consequently, they need not be of constant value throughout state space, like a Hookean material would suppose them to be.  This is an important characteristic of the hypo-elastic constructions of Eqns.~(\ref{GreenElasticODEs} \& \ref{HelmholtzElasticODEs}), as they pertain to our application. 
+The various specific heats $C_F$, $C_T$, $C_P$ (erg/g.K) are, essentially, equivalent as they are each defined per unit mass, insensitive to dimension.  They are evaluated at a fixed thermo\-dynamic force, which does depend on dimension, but this does not impact the value for specific heat.  Hereafter they will be denoted simply as $C_t$ where subscript `$t$' denotes \textit{tangent}.\footnote{
+    In App.~\ref{appImplicitElasticity}, subsrcipt `$t$' is used to denote \textit{tangent\/}; whereas, subscript `$s$' is used to denote \textit{secant}, e.g., $\mathrm{d}F = E_t \, \mathrm{d} e$ whereas $F = E_s \, e$.  Here, the defined material properties are tangent properties.  Secant properties, and their definitions, can be found in App.~\ref{appImplicitElasticity}.  Both secant and tangent moduli are needed by the variational formulation put forward in Part~\ref{partVariational}.
+}
+
+The various thermal strain coefficients $\alpha_F$, $\alpha_T$, $\alpha_P$ are, however, distinct from one another, even though they are each dimensionless.  Each is defined with respect to its physical dimension.  Nevertheless, because $\ln(L / L_0) = \tfrac{1}{2} \ln (A / \! A_0) = \tfrac{1}{3} \ln (V \! / V_0)$, it follows that $\alpha_T = 2 \alpha_F$ and $\alpha_P = 3 \alpha_F$, so there is really just one thermal strain coefficient, i.e., $\alpha_F$, that, hereafter, is denoted as $\alpha_t$.  It is noteworthy to point out that what one typically refers to as the coefficient of thermal expansion, i.e., $\alpha$ (1/K), is distinct from the thermal strain coefficient, viz., $\alpha_t$ (dimensionless); specifically, $\alpha_t \simeq \alpha \theta_0$, cf.\ App.~\ref{appImplicitElasticity}.
+
+The various tangent moduli $E_{\theta}$ (dyne), $M_{\theta}$ (dyne/cm) and $K_{\theta}$ ($\mathrm{dyne/cm}^2$) are distinct also.  They have different dimensions.  
+aterial property $E_{\theta}$ is a modulus of extension (dyne), parameter $M_{\theta}$ is a modulus of dilation (dyne/cm), and parameter $K_{\theta}$ is a modulus of dilatation ($\mathrm{dyne/cm}^2$), a.k.a.\ the bulk modulus, with each modulus being measured at fixed temperature.  Shear moduli are discussed later in Sections~\ref{secNonuniform2D} \& \ref{secNonuniform3D}.  The above material constants are gradients.  They constitute tangents to their associated physical response curves.  Consequently, they need not be of constant value throughout state space, like a Hookean material would suppose them to be.  This is an important characteristic of the hypo-elastic constructions of Eqns.~(\ref{GreenElasticODEs} \& \ref{HelmholtzElasticODEs}), as they pertain to our application. 
 
 In terms of the material properties given in Eqn.~(\ref{materialConstants}), of which there are three per dimension, the internal energy density has three curvatures that associate with it.  For 1D materials:
 \begin{subequations}
@@ -980,10 +995,6 @@ Collagen is a fiber comprised of numerous, long, slender, wavy filaments whose w
 \end{subequations}
 where $\theta_0$ is body temperature, i.e., 310~K.  Material constants $E_1^c$ and $E_2^c$ are the two asymptotic moduli for collagen that bound its response, i.e., $E_1^c \leq E^c \leq E^c_2$, while $E_1^e$ and $E_2^e$ are the two asymptotic moduli for elastin that bound its response, viz., $E^e_1 \leq E^e \leq E^e_2$, both having units of stress (barye = dyne/$\text{cm}^2$), with $e_t^c$ and $e_t^e$ being their respective transition strains (see their derivation in App.~\ref{appImplicitElasticity}).  
 
-In compression, it is assumed $E^c = E^c_1 E^c_2 / ( E^c_1 + E^c_2 )$ and $E^e = E^e_1 E^e_2 / ( E^e_1 + E^e_2 )$, which are the elastic moduli for collagen and elastin at zero fiber stress.  This is done to help ensure a stable numerical implementation, as long slender rods readily buckle under compressive loads---a phenomenon not modeled here.
-
-The material properties needed to model septal chords are listed in Tables~\ref{tab:alveolarProp} \& \ref{tableCollagenElastin}.  From Eqn.~(\ref{thermodynamicConstraints}), these moduli are bound from above by $E^c_{\max} = 4.9 \times 10^9$~barye ($\text{dyne/cm}^2$) and $E^e_{\max} = 1.7 \times 10^9$~barye.  We therefore observe that $E^c_2$ and $E^e_2$ are about 100 times smaller than $E^c_{\max}$ and $E^e_{\max}$.
-
 \begin{table}
     \centering
     \begin{tabular}{|l|l|l|}
@@ -996,9 +1007,10 @@ The material properties needed to model septal chords are listed in Tables~\ref{
         Kanagy \cite{Kanagy55} \\
         $\alpha^c$ \hfill [1/C] & $1.8 \times 10^{-4}$ & 
         Weir \cite{Weir48}  \\
-        $e^c_t$ & $0.09$ & estimated from TLC $\approx$ 30\% \\
-        $E_1^c$ \hfill [barye] & $5.0 \times 10^5$ & authors experience \\
-        $E_2^c$ \hfill [barye] & $3.0 \times 10^7$ & authors experience \\ \hline
+        $e^c_t$ & $0.09 \pm 0.018$ & estimated from TLC $\approx$ 30\% \\
+        $e^c_{\max}$ & $0.25 \pm 0.025$ & author's experience \\
+        $E_1^c$ \hfill [barye] & $5.0 \pm 1.0 \times 10^5$ & author's experience \\
+        $E_2^c$ \hfill [barye] & $5.0 \pm 0.5 \times 10^7$ & author's experience \\ \hline
         \multicolumn{3}{|c|}{Elastin$\vphantom{|^{|^|}}$} \\ \hline 
         Parameter & Value & Reference \\ \hline
         $\rho^e$ \hfill [$\textrm{g/cm}^{3^{\phantom{|}}}$] & $1.31$ & 
@@ -1009,14 +1021,19 @@ The material properties needed to model septal chords are listed in Tables~\ref{
         Kakivaya \& Hoeve \cite{KakivayaHoeve75} \\
         $\alpha^e$ \hfill [1/C] & $3.2\times 10^{-4}$ & 
         Lillie \& Gosline \cite{LillieGosline02a} \\ 
-        $e^e_t$ & 0.4 & Shadwick \& Gosline \cite{ShadwickGosline85} \\
-        $E^e_1$ \hfill [barye] & $2.3 \times 10^6$ & Urry \cite[Fig.~18]{Urry89} \\ 
-        $E^e_2$ \hfill [barye] & $1.0 \times 10^7$ & 
+        $e^e_t$ & $0.4 \pm 0.08$ & Shadwick \& Gosline \cite{ShadwickGosline85} \\
+        $e^e_{\max}$ & $0.3 \pm 0.03$ & author's experience \\
+        $E^e_1$ \hfill [barye] & $2.3 \pm 0.3 \times 10^6$ & Urry \cite[Fig.~18]{Urry89} \\ 
+        $E^e_2$ \hfill [barye] & $1.0 \pm 0.1 \times 10^7$ & 
         Lillie \& Gosline \cite[Fig.~5]{LillieGosline07} \\ \hline
     \end{tabular}
     \caption{Physical properties for hydrated collagen and elastin fibers.  Collagen denatures at around $60^\circ$C \cite{HoermannSchlebusch71}, i.e., above this temperature collagen will shrink rapidly---an effect not modeled here.}
     \label{tableCollagenElastin}
 \end{table}
+
+In compression, it is assumed $E^c = E^c_1 E^c_2 / ( E^c_1 + E^c_2 )$ and $E^e = E^e_1 E^e_2 / ( E^e_1 + E^e_2 )$, which are the elastic moduli for collagen and elastin at zero fiber stress.  This is done to help ensure a stable numerical implementation, as long slender rods readily buckle under compressive loads---a phenomenon not modeled here.
+
+The material properties needed to model septal chords are listed in Tables~\ref{tab:alveolarProp} \& \ref{tableCollagenElastin}.  Here $e_{\max}$ denotes a strain at fiber rupture defined as $e_{\max} \defeq s_f / E_2$ where $s_f$ is the fracture stress.  From Eqn.~(\ref{thermodynamicConstraints}), these elastic moduli are bound from above by $E^c_{\max} = 4.9 \times 10^9$~barye ($\text{dyne/cm}^2$) and $E^e_{\max} = 1.7 \times 10^9$~barye.  We therefore observe that $E^c_2$ and $E^e_2$ are about 100 times smaller than $E^c_{\max}$ and $E^e_{\max}$, which seems reasonable for \textit{in~vivo\/} fibers.  These theoretical upper bounds have been measured for collagen fascicles under ideal laboratory conditions \cite{Svenssonetal10}.
 
 \subsection{Modeling Alveolar Septa Subjected to Shock Waves}
 \label{secConjugatePairs}
@@ -1066,15 +1083,16 @@ It is not known how much of the mechanical load is actually carried by the cells
         $\eta_0$ \hfill [erg/g.K] & $5.0 \times 10^6$ \\
         $C$ \hfill [erg/g.K] & $2.1 \times 10^7$ \\
         $\alpha$ \hfill [1/C] & $1.2 \times 10^{-4}$ \\ \hline
-        $\xi_t$ & $0.24$ \\
-        $M_1$ \hfill [barye] & $8.0 \times 10^2$ \\
-        $M_2$ \hfill [barye] & $2.2 \times 10^5$ \\ \hline
-        $\varepsilon_t$ & $0.06$ \\
+        $\xi_t$ & $0.24 \pm 0.24$ \\
+        $\xi_{\max}$ & $0.2$ \\
+        $M_1$ \hfill [barye] & $5.0 \pm 0.1 \times 10^4$ \\
+        $M_2$ \hfill [barye] & $2.0 \pm 0.1 \times 10^6$ \\ \hline
+        $\varepsilon_t$ & $2 \xi_t / 3$ \\
         $N_1$ \hfill [barye] & $2M_1/3$ \\
         $N_2$ \hfill [barye] & $2M_2/3$ \\ \hline
-        $\gamma_t$ & $0.4$ \\
-        $G_1$ \hfill [barye] & $5.0 \times 10^2$ \\
-        $G_2$ \hfill [barye] & $5.0 \times 10^3$ \\ \hline
+        $\gamma_t$ & $\xi_t$ \\
+        $G_1$ \hfill [barye] & $M_1 / 250$ \\
+        $G_2$ \hfill [barye] & $M_2 / 1000$ \\ \hline
     \end{tabular}
     \caption{The elastic properties reported here are for visceral pleura taken from Freed \textit{et~al}.\ \cite{Freedetal17} and parenchyma taken from Saraf \text{et~al}., \cite{Sarafetal07} divided by 10 to adjust for septal thickness vs.\ basement membrane thickness.  The thermo\-physical properties lie between that of water and collagen, weighted towards that of water, and evaluated at body temperature.}
     \label{tableVisceralPleura}
@@ -1375,32 +1393,39 @@ where $\mathbfsf{P}$ is an orthogonal matrix defined in \S\ref{reindexing3D}.
 \section{Code Verification and Constitutive Parameterization}
 \label{secCE_verifyCode}
 
-All material parameters are assigned from their respective statistical distributions.  For example, there are thirty chords in a dodecahedron comprised of collagen and elastin fibers that are loaded in parallel.  Figure~\ref{figStressStrainFibers} presents a typical set of stress\slash strain response curves for the chords of a dodecahedron whose parameters are displayed in Table~\ref{tabStressStrainFibers}.
+\begin{figure}
+    \mbox{}\hspace{-1.5cm}
+    \includegraphics[width=1.2\textwidth]{figures/bioFibers10.jpg}
+    \mbox{}\hspace{-1.5cm}
+    \includegraphics[width=1.2\textwidth]{figures/bioFibers20.jpg}
+    \mbox{}\hspace{-1.5cm}
+    \includegraphics[width=1.2\textwidth]{figures/bioFibers30.jpg}
+    \mbox{}\hspace{-1.5cm}
+    \includegraphics[width=1.2\textwidth]{figures/bioFibers40.jpg}
+    \caption{Stress\slash strain (left column), entropy density\slash strain (center column), and local truncation error\slash strain (right column) curves for collagen using the material parameters listed in Table~\ref{tableCollagenElastin}, which are described in terms of probability distributions.  The top row is for strains out to 10\%, the second row is for strains out to 20\%, the third row is for strains out to 30\%, and the fourth row is for strains out to 40\%.  There were no fiber failures in those that were stretched out to 10\%\ and 20\%\ strain.  Five of the thirty fibers failed in those stretched out to 30\%\ strain, while twenty seven of the thirty fibers failed for those stretched out to 40\%\ strain.  The local truncation errors plotted here associate with the PECE integrator presented in Eqn.~(\ref{1stOrderODEs}) of Part~\ref{partNumericalMethods} using 75 steps of integration.  The reported truncation errors never exceeded 0.001\%.}
+    \label{figCollagenFiber}
+\end{figure}
+
+An illustration is presented in Fig.~\ref{figCollagenFiber} of what a typical thermo-mechanical response for a collagen fiber looks like (left column).  The additional contribution to entropy (center column) caused by deformation is negligible (less than $2 \times 10^3$ out of $3.7 \times 10^7$). These curves show a fiber rupture event, triggered at a maximum stress of $E_2 e_{\max}$, that starts at around 30\%\ strain for the specified material parameters.  In these plots, material properties  $E_1$, $E_2$, $e_t$ and $e_{\max}$ for collagen were all assigned random values according to their respective probabilistic distributions taken from Table~\ref{tableCollagenElastin}.  Employing 75 steps to integrate each curve, the numerical error of integration (right column) was found to be on the order of the square root of machine precision, which is considered to be very good.
+
+For the 30 curves presented in each plot of Fig.~\ref{figStressStrainFibers}, fiber length and diameter, plus material properties $E_1$, $E_2$, $e_t$ and $e_{\max}$ were all assigned random values according to their respective probabilistic distributions taken from Table~\ref{tableCollagenElastin} for both elastin and collagen.  Figure~\ref{figStressStrainFibers} presents realistic variability with what one could expect for chordal responses in the alveoli of lung.  Both the chordal force and entropy are calculated from a rule of mixtures based on the volume fractions of collagen vs.\ elastin.  The change in chordal entropy was so small that only variability caused by variation in volume fraction is visible in the plots (right column) of this figure.  In the septal chords that failed, it was the collagen fiber that ruptured with the elastin fiber continuing to carry load.  
 
 \begin{figure}
-    \centering
-    \includegraphics[width=0.45\textwidth]{figures/collagenStressStrain.jpg}
-    \includegraphics[width=0.45\textwidth]{figures/elastinStressStrain.jpg}
-    \caption{Typical stress\slash strain curves for collagen (left) and elastin (right) fibers that make up a septal chord.  Their material parameters have been assigned via statistical distributions.}
+    \includegraphics[width=\textwidth]{figures/septalChords10.jpg}
+    \includegraphics[width=\textwidth]{figures/septalChords20.jpg}
+    \includegraphics[width=\textwidth]{figures/septalChords30.jpg}
+    \includegraphics[width=\textwidth]{figures/septalChords40.jpg}
+    \caption{Force\slash strain (left column) and entropy\slash strain (right column) curves for septal fibers comprised of collagen and elastin fibers whose material parameters are listed in Table~\ref{tableCollagenElastin}, which are described in terms of probability distributions.  The top row is for strains out to 10\%, the second row is for strains out to 20\%, the third row is for strains out to 30\%, and the fourth row is for strains out to 40\%.  There were no fiber failures in those that were stretched out to 10\%\ and 20\%\ strain.  Three of the thirty fibers failed in those stretched out to 30\%\ strain, while twenty seven of the thirty fibers failed for those stretched out to 40\%\ strain.}
     \label{figStressStrainFibers}
 \end{figure}
 
-\begin{table}
-    \centering
-    \begin{tabular}{|l|l|l|l|}
-        \hline
-        \multicolumn{2}{|c|}{Collagen$\vphantom{|^{|^|}}$} & 
-        \multicolumn{2}{|c|}{Elastin} \\ \hline
-        $E_1^c$ \hfill [barye] & $5.0 \times 10^{5^{\vphantom{|}}} \pm 2.0 \times 10^5$ &  
-        $E_1^e$ \hfill [barye] & $2.3 \times 10^6 \pm 1.0 \times 10^6$ \\
-        $E_2^c$ \hfill [barye] & $5.0 \times 10^7 \pm 1.0 \times 10^7$ &  
-        $E_2^e$ \hfill [barye] & $1.0 \times 10^7 \pm 2.0 \times 10^6$ \\
-        $e^c_t$ & $0.09 \pm 0.015$ &
-        $e^e_t$ & $0.4 \pm 0.1$ \\ 
-        \hline
-    \end{tabular}
-    \caption{Physical properties for hydrated collagen and elastin fibers when described with the fiber model of Freed \& Rajagopal \cite{FreedRajagopal16}.}
-    \label{tabStressStrainFibers}
-\end{table}
+For the 30 curves presented in each plot of Fig.~\ref{figStressStrainMembranes}, the three conjugate pairs describing a membrane response are presented for three experiments: uniform dilation, non-uniform pure shear, and non-uniform simple shear.  The constitutive model is that of Eqns.~(\ref{HelmholtzMembraneODEs} \& \ref{septalCompliances}) using the material parameters (and their variability) found in Table~\ref{tableVisceralPleura}.  In the dilation experiment (top row) there is only a $( s^{\pi} \! , \xi)$ response.  There is no $( s^{\sigma} \! , \varepsilon)$ or $( s^{\tau} \! , \gamma)$ response in an uniform dilation.  The conjugate pairs are uncoupled here.  Likewise, in the simple shear experiment (bottom row) there is only a $( s^{\tau} \! , \gamma)$ response.  There is no $( s^{\pi} \! , \xi)$ or $( s^{\sigma} \! , \varepsilon)$ response in an non-uniform simple shear.  The pure shear experiment (middle row) is dominated by the squeeze response of pair $( s^{\sigma} \! , \varepsilon)$, with there being a small ($\sim 1$\%) dilation coupling via pair $( s^{\pi} \! , \xi)$ but no shear coupling through $( s^{\tau} \! , \gamma)$.  One of the thirty dilation experiments resulted in membrane rupture.  As currently modeled, rupture only associates with the dilation response.
 
-Recently, Birzle \textit{et~al}.\ \cite{Birzleetal19} performed experiments on thin slices of rat parenchyma loaded in tension where they removed the collagen and\slash or elastin fiber through collagenase and elastase baths to study their individual behaviors and their interactions under load.
+\begin{figure}
+    \mbox{} \hspace{-25mm}
+    \includegraphics[width=1.3\textwidth]{figures/septalMembranes.jpg}
+    \caption{Membrane response of thirty numerical experiments whose constitutive behavior is described by Eqns.~(\ref{HelmholtzMembraneODEs} \& \ref{septalCompliances}) using the parameters listed in Table~\ref{tableVisceralPleura}. The first column gives the $( s^{\pi} \! , \xi)$ conjugate pair response, the second column gives the $( s^{\sigma} \! , \varepsilon)$ conjugate pair response, while the third column gives the $( s^{\tau} \! , \gamma)$ conjugate pair response.  The first row represents a dilation experiment where $a = b$ and $g = g_0$, the second row represents a pure shear experiment $a = 1/b$ and $g=g_0$, while the third row represents a simple shear experiment $a=a_0$, $b=b_0$ and $g$.}
+    \label{figStressStrainMembranes}
+\end{figure}
+
+Recently, Birzle \textit{et~al}.\ \cite{Birzleetal19} performed experiments on thin slices of rat parenchyma loaded in tension where they removed the collagen and\slash or elastin fiber content through collagenase and elastase treatment baths to study their individual behaviors and their interactions under load.
