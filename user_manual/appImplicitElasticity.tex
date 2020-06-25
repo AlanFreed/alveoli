@@ -29,7 +29,7 @@ Herein we consider a Gibbs free-energy potential suitable for describing a Hooke
     \frac{F - F_0}{\rho} \left( \alpha \ln \left( \frac{\theta}{\theta_0} \right) + \frac{F - F_0}{2E}  \right)
     \label{GreenFiberEnergy}
 \end{multline}
-normalized so that $\mathcal{G}(\theta_0 , F_0) = 0$ with initial conditions of $\eta_0 = -\partial_{\theta\,} \mathcal{G} (\theta_0 , F_0)$ and $e_0 = -\rho \, \partial_F \mathcal{G} (\theta_0 , F_0) = 0$ in our reference state associated with fields $\theta_0$ and $F_0$.   
+normalized so that $\mathcal{G}(\theta_0 , F_0) = 0$ with initial conditions of $\eta_0 = -\partial_{\theta\,} \mathcal{G} (\theta_0 , F_0)$ and $e_0 = -\rho \, \partial_F \mathcal{G} (\theta_0 , F_0) = 0$ in our reference state associated with fields $\theta_0$ and $F_0$.  Introducing $\ln ( \theta / \theta_0 )$ presumes that temperature $\theta$ is absolute, i.e., it is measured in Kelvin, not centigrade, so in our application $\theta_0 = 310$~K is body temperature.
 
 The model's material properties are: a specific heat $C$, a thermal strain coefficient $\alpha$, and an elastic compliance $1/E$ or modulus $E$.  These properties are interpreted from the perspective of both secant and tangent functions of state in this appendix.
 
@@ -510,7 +510,7 @@ which is hypo-elastic in its construction. \cite{Truesdell55}  This expression c
     \intertext{recalling that $\mathrm{d}\xi = \mathrm{d}A / 2A$, and with material properties defined accordingly: a specific heat (at constant surface tension) of}
     C_t & \defeq \left. \frac{\mathrm{d} \eta}{\theta^{-1} \, 
     \mathrm{d}\theta} \right|_{\mathrm{d}\pi=0} = 
-    C_s - \alpha_s \pi / \rho \theta = -\theta \, \partial_{\theta\theta\,} \mathcal{G}_u \\
+    C_s - \alpha_s ( \pi - \pi_0 ) / \rho \theta = -\theta \, \partial_{\theta\theta\,} \mathcal{G}_u \\
     \intertext{with $C_t - 4 \alpha_t^2 M_t / \rho \theta$ denoting a heat capacity at constant dilation, and a lineal thermal strain coefficient (at constant surface tension) of}
     \alpha_t & \defeq \left. \frac{L^{-1} \, \mathrm{d}L}
     {\theta^{-1} \, \mathrm{d}\theta} \right|_{\mathrm{d}\pi=0} =
