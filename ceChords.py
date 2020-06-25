@@ -9,26 +9,25 @@ from peceHE import control, response
 """
 Module ceChords.py provides a constitutive description for alveolar chords.
 
-Copyright (c) 2020 Alan D. Freed
+Copyright (c) 2019-2020 Alan D. Freed
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "09-24-2019"
-__update__ = "05-28-2020"
+__update__ = "06-22-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -44,11 +43,15 @@ temperature and strain but carrying different states of entropy and stress.
 Their geometric properties, and some of their constitutive parameters, are
 described by probability distributions exported from materialProperties.py.
 Given these properties, one can create objects describing realistic septal
-chords, and thereby, realistic alveoli.  This module exports two classes:
-    bioFiber:     provides response of a Freed-Rajagopal biologic fiber, and
-    septalChord:  provides response of a septal chord.
-Septal chords form a network of fibers that circumscribe the septa that
-collectively envelop an alveolar sac.
+chords, and thereby, realistic alveoli.  Septal chords form a network of
+fibers which circumscribe the septa that collectively envelop an alveolar sac.
+
+This module exports three classes:
+    controlFiber  provides a user interface to control fiber deformation
+    bioFiber:     provides the response of a Freed-Rajagopal biologic fiber
+    septalChord:  provides a user interface for the response of septal chords
+These objects are to used by the PECE solver of peceHE.py to update the
+material response of septal chords.
 
 The CGS system of physical units adopted:
     length          centimeters (cm)
@@ -70,9 +73,10 @@ For 1D fibers, the control vectors have components:
 
 constructor
 
-    E.g.: ctrl = controlFiber(ctrlVec0, dt)
-        ctrlVec0    a vector of control variables at the reference node, xR
-        dt          size of the time step to be used for integration
+    E.g.:  ctrl = controlFiber(eVec0, xVec0, dt)
+        eVec0       initial conditions for the thermodynamic control variables
+        xVec0       initial conditions for the physical control variables
+        dt          size of the time step to be used throughout for integration
 
 variables: treat these as read-only
 
@@ -80,43 +84,47 @@ variables: treat these as read-only
     node            an integer specifying the current node of integration,
                     which is reset to 0 whenever the integrator is restarted
     dt              a floating point number specifying the time-step size
-    xR              a vector holding control variables for the reference node
-    xP              a vector holding control variables for the previous node
-    xC              a vector holding control variables for the current node
-    xN              a vector holding control variables for the next node
+    eR              a vector of initial conditions for thermodynamic controls
+    eP              a vector of thermodynamic control vars at the previous node
+    eC              a vector of thermodynamic control vars at the current node
+    eN              a vector of thermodynamic control vars at the next node
+    xR              a vector of initial conditions for the physical  controls
+    xP              a vector of physical control variables at the previous node
+    xC              a vector of physical control variables at the current node
+    xN              a vector of physical control variables at the next node
 
 methods
 
-update(ctrlVec)
-    E.g., ctrl.update(ctrlVec)
-        ctrlVec     a vector of control variables for the next node
-    This method may be called multiple times before freezing its values with a
-    call to ctrl.advance.
+update(xVec, restart=False)
+    E.g.:  ctrl.update(xVec, restart)
+        xVec        a vector of physical control variables for the next node
+        restart     whenever restart is True, the trapezoidal method is used;
+                    otherwise, Gear's BDF2 method is used for integration
+    ctrl.update may be called multiple times before freezing its values with a
+    call to ctrl.advance.  This is important in a finite element application.
 
 advance()
-    E.g., ctrl.advance()
-    Updates the object's data structure in preparation for the next integration
+    E.g.:  ctrl.advance()
+    Updates an object's data structure in preparation for the next integration
     step.  It moves current data into their previous fields, and then it moves
     next data into their current fields.  This method is called internally by
     the pece object and should not be called by the user.
 
 dedx()
-    E.g., dedxMtx = ctrl.dedx()
+    E.g.:  dedxMtx = ctrl.dedx()
         dedxMtx     a matrix containing the mapping of physical control rates
                     into their thermodynamic control rates.
-    This transformation associates with the next node.  It is a phantom method
-    that must be overwritten.
+    This transformation associates with the next node.  It is created as an
+    identity matrix in the base class whose components are overwritten here.
 
-dxdt(restart)
-    E.g., dxdtVec = ctrl.dxdt(restart=False)
+dxdt()
+    E.g.:  dxdtVec = ctrl.dxdt()
         dxdtVec     is a vector containing the rate-of-change in control
-        restart     set to True whenever there is a discontinuity in control
     This base method implements finite difference formulae to approximate this
-    derivative.  A first-order difference formula is used for the reference and
-    first nodes, plus whenever a restart is mandated.  A second-order backward
-    difference formula is used for all other nodes.  All derivatives associate
-    with the next node.  If these approximations are not appropriate for your
-    application, then you will need to overwrite them.
+    derivative. A first-order difference formula is used for the reference and
+    first nodes, plus the first two nodes after a restart has been mandated.
+    A second-order backward difference formula is used for all other nodes.
+    All derivatives associate with the next node.
 
 
 class bioFiber:  It implements and extends class 'response'.
@@ -124,81 +132,99 @@ class bioFiber:  It implements and extends class 'response'.
 
 Creates objects that implement the Freed-Rajagopal biologic fiber model.
 For this model
-    ctrlVec[0]  contains fiber temperature (in centigrade)
-    ctrlVec[1]  contains fiber length (in cm)
+    eVec[0]  contains fiber temperature strain:  ln(T/T_0)
+    eVec[1]  contains fiber mechanical  strain:  ln(L/L_0)
 and
-    respVec[0]  contains fiber entropy density (in erg/g.K)
-    respVec[1]  contains fiber stress (in dyne/cm^2 or barye)
+    xVec[0]  contains fiber temperature          (in centigrade)
+    xVec[1]  contains fiber length               (in cm)
+while
+    yVec[0]  contains fiber entropy density      (in erg/g.K)
+    yVec[1]  contains fiber stress               (in dyne/cm^2 or barye)
 
 constructor
 
-    E.g.: ce = bioFiber(ctrlVec0, respVec0, rho, Cp, alpha, E1, E2, e_t, e_max)
-        ctrlVec0    contains the control variables in the reference state
-        respVec0    contains the initial response variables: initial conditions
-        rho         mass density for the fiber
-        Cp          specific heat at constant pressure for the fiber
-        alpha       coefficient of thermal expansion for the fiber
+    E.g.:  ce = bioFiber(yVec0, rho, Cp, alpha, E1, E2, e_t, e_f=float("inf"))
+        yVec0       initial conditions for the response variables
+        rho         density of mass for the fiber
+        Cp          density of specific heat at constant pressure for the fiber
+        alpha       lineal thermal strain coefficient for the fiber
         E1          compliant modulus, i.e., at zero stress and zero strain
         E2          stiff modulus, i.e., elastic modulus at terminal strain
         e_t         transition strain between compliant and stiff behaviors
-        e_max       sets rupture, where s_r = e_max * E2 is the rupture stress
+        e_f         rupture strain, where s_f = E2 * e_f is the rupture stress.
+                    If the default is accepted then it is assigned a rupture
+                    strength of 1/100th of its theoretical strength.
 
 variables: treat these as read-only
 
-    controls        an integer specifying the number of control variables
     responses       an integer specifying the number of response variables
-    xR              a vector containing the initial condition for control
     yR              a vector containing the initial condition for response
 
 methods
 
-tanMod(ctrlVec, respVec)
-    E.g., dyde = ce.tanMod(ctrlVec, respVec)
-        dyde        the matrix of tangent moduli dy/de (constitutive equation)
-    The constitutive equation considered is hypo-elastic like; specifically,
-        dy/dt = dy/de de/dx dx/dt
+secMod(eVec, xVec, yVec)
+    E.g.:  E = ce.secMod(eVec, xVec, yVec)
+        Es          a matrix of secant moduli, i.e., the constitutive matrix
+        eVec        a vector of thermodynamic control variables  (strains)
+        xVec        a vector of physical control variables       (stretches)
+        yVec        a vector of thermodynamic response variables (stresses)
+    Solves:
+    / eta - eta_0 \ - /   C        alpha Es / rho theta \ / ln(theta/theta_0) \
+    \   s - s_0   / - \ -alpha Es           Es          / \     ln(L/L_0)     /
+    This constitutive expression is hyper-elastic:  s = s_0 + Es * ln(L/L_0).
+
+tanMod(eVec, xVec, yVec)
+    E.g.:  Et = ce.tanMod(eVec, xVec, yVec)
+        dyde        a matrix of tangent moduli, i.e., a constitutive equation
+        eVec        a vector of thermodynamic control variables  (strains)
+        xVec        a vector of physical control variables       (stretches)
+        yVec        a vector of thermodynamic response variables (stresses)
+    The constitutive equation considered here is hypo-elastic; specifically,
+        dy/dt = dy/de de/dt  where  Et = dy/de  and  de/dt = de/dx dx/dt
     wherein
         dy/dt       a vector of thermodynamic response rates
         dy/de       a matrix of tangent moduli (the constitutive equation)
-        de/dx       a matrix that converts physical into thermodynamic rates
-        dx/dt       a vector of physical control rates
+        de/dt       is supplied by objects from class controlFiber
+    Solves:
+    / dEta \ - /   C        alpha Et / rho theta \ / dTheta / Theta \
+    \  ds  / - \ -alpha Et           Et          / \     dL / L     /
+    Modulus E differs between the secant and tangent moduli implementations.
 
 isRuptured()
-    E.g., ruptured = ce.isRuptured()
-        ruptured    is True if the fiber has ruptured; False otherwise
+    E.g.:  ruptured = ce.isRuptured()
+        ruptured    is a boolean result specifying if a fiber has ruptured
 
-rupturedRespVec(ctrlVec, respVec)
-    E.g., rVec = ce.rupturedRespVec(ctrlVec)
-        rVec        the response vector after rupture, viz., y after rupture
-        ctrlVec     the vector of physical control variables
-        respVec     the vector of response variables just before fiber rupture
-
-rupturedTanMod(ctrlVec, respVec)
-    E.g., dyde = ce.rupturedTanMod(ctrlVec, respVec)
-        dyde        the matrix of tangent moduli after fiber rupture
-        ctrlVec     the vector of physical control variables
-        respVec     the vector of response variables after fiber rupture
+rupturedResponse(eVec, xVec, yBeforeVec)
+    E.g., yAfterVec = ce.rupturedResponse(eVec, xVec, yBeforeVec)
+        eVec        vector of thermodynamic control variables at rupture
+        xVec        vector of physical control variables at rupture
+        yBeforeVec  vector of response variables just before rupture occurs
+    returns
+        yAfterVec   vector of response variables just after a rupture event
+    Calling this method, which is done internally by the 'pece' integrator,
+    allows for a discontinuity in the field of thermodynamic responses.
 
 
-class septalChord, which also implements and extends class 'response'
+class ceChord, which also implements and extends class 'response'
 
 
-Creates objects that implement the Freed-Rajagopal thermoelastic fiber of class
-bioFiber for septal chords that are made up of collagen and elastin fibers.
+Creates objects that establish a thermoelastic constitutive equation for
+septal chords comprised of collagen and elastin fibers laid up in parallel.
 For this model
-    ctrlVec[0]  contains fiber temperature (in centigrade)
-    ctrlVec[1]  contains fiber length (in cm)
+    eVec[0]  contains fiber temperature strain:       ln(T/T_0)
+    eVec[1]  contains fiber mechanical  strain:       ln(L/L_0)
+while
+    xVec[0]  contains fiber temperature               (in centigrade)
+    xVec[1]  contains fiber length                    (in cm)
 and
-    respVec[0]  contains collagen fiber entropy density (in erg/g.K)
-    respVec[1]  contains collagen fiber stress (in dyne/cm^2 or barye)
-    respVec[2]  contains elastin fiber entropy density (in erg/g.K)
-    respVec[3]  contains elastin fiber stress (in dyne/cm^2 or barye)
+    yVec[0]  contains collagen fiber entropy density  (in erg/g.K)
+    yVec[1]  contains collagen fiber stress           (in dyne/cm^2 or barye)
+    yVec[2]  contains elastin  fiber entropy density  (in erg/g.K)
+    yVec[3]  contains elastin  fiber stress           (in dyne/cm^2 or barye)
 
 constructor
 
-    E.g.: ce = ceFiber(ctrlVec0, respVec0, diaCollagen=None, diaElastin=None)
-        ctrlVec         the vector of physical control variables, i.e., x
-        respVec         the vector of response variables, viz, y
+    E.g.:  ce = ceChord(diaCollagen=None, diaElastin=None)
         diaCollagen     the reference diameter of the collagen fiber
         diaElastin      the reference diameter of the elastin fiber
     If the diameters take on their default values of None, then they are
@@ -208,79 +234,138 @@ variables: treat these as read-only
 
     controls        an integer specifying the number of control variables
     responses       an integer specifying the number of response variables
-    xR              a vector containing the initial condition for control
-    yR              a vector containing the initial condition for response
+    eR              a vector containing the initial thermodynamic controls
+    xR              a vector containing the initial physical controls
+    yR              a vector containing the initial conditions for responses
 
-methods
+inherited methods
 
-tanMod(ctrlVec, respVec)
-    E.g., dyde = ce.tanMod(ctrlVec, respVec)
-        dyde        the matrix of tangent moduli dy/de (constitutive equation)
-    The constitutive equation considered is hypo-elastic like; specifically,
-        dy/dt = dy/de de/dx dx/dt
+secMod(eVec, xVec, yVec)
+    E.g.:  Es = ce.secMod(eVec, xVec, yVec)
+        Es          a matrix of secant moduli, i.e., the constitutive matrix
+        eVec        a vector of thermodynamic control variables  (strains)
+        xVec        a vector of physical control variables       (stretches)
+        yVec        a vector of thermodynamic response variables (stresses)
+    Solves:
+    / eta - eta_0 \ - /   C        alpha Es / rho theta \ / ln(theta/theta_0) \
+    \   s - s_0   / - \ -alpha Es           Es          / \     ln(L/L_0)     /
+    This constitutive expression is hyper-elastic:  s = s_0 + Es * ln(L/L0).
+
+tanMod(eVec, xVec, yVec)
+    E.g.:  Et = ce.tanMod(eVec, xVec, yVec)
+        dyde        a matrix of tangent moduli, i.e., a constitutive equation
+        eVec        a vector of thermodynamic control variables  (strains)
+        xVec        a vector of physical control variables       (stretches)
+        yVec        a vector of thermodynamic response variables (stresses)
+    The constitutive equation considered here is hypo-elastic; specifically,
+        dy/dt = dy/de de/dt  where  Et = dy/de  and  de/dt = de/dx dx/dt
     wherein
         dy/dt       a vector of thermodynamic response rates
         dy/de       a matrix of tangent moduli (the constitutive equation)
-        de/dx       a matrix that converts physical into thermodynamic rates
-        dx/dt       a vector of physical control rates
+    Solves:
+    / dEta \ - /   C        alpha Et / rho theta \ / dTheta / Theta \
+    \  dS  / - \ -alpha Et           Et          / \     dL / L     /
+    Modulus E differs between the secant and tangent moduli implementations.
 
 isRuptured()
-    E.g., ruptured = ce.isRuptured()
-        ruptured    is True if a fiber has ruptured; False otherwise
+    E.g.:  ruptured = ce.isRuptured()
+        ruptured    is a boolean result specifying if the material has ruptured
 
-rupturedRespVec(ctrlVec, respVec)
-    E.g., rVec = ce.rupturedRespVec(ctrlVec)
-        rVec        the response vector after rupture, viz., y after rupture
-        ctrlVec     the vector of physical control variables
-        respVec     the vector of response variables just before fiber rupture
-
-rupturedTanMod(ctrlVec, respVec)
-    E.g., dyde = ce.rupturedTanMod(ctrlVec, respVec)
-        dyde        the matrix of tangent moduli after fiber rupture
-        ctrlVec     the vector of physical control variables
-        respVec     the vector of response variables after fiber rupture
+rupturedResponse(eVec, xVec, yBeforeVec)
+    E.g., yAfterVec = ce.rupturedResponse(eVec, xVec, yBeforeVec)
+        eVec        vector of thermodynamic control variables at rupture
+        xVec        vector of physical control variables at rupture
+        yBeforeVec  vector of response variables just before rupture occurs
+    returns
+        yAfterVec   vector of response variables just after a rupture event
+    Calling this method, which is done internally by the 'pece' integrator,
+    allows for a discontinuity in the field of thermodynamic responses.
 
 additional methods
 
 bioFiberCollagen()
-    E.g., fiber_c = ce.bioFiberCollagen()
-        fiber_c     an instance of bioFiber representing a collagen fiber
+    E.g.:  fiberC = ce.bioFiberCollagen()
+        fiberC     an instance of bioFiber representing a collagen fiber
 
 bioFiberElastin()
-    E.g., fiber_e = ce.bioFiberElastin()
-        fiber_e     an instance of bioFiber representing an elastin fiber
+    E.g.:  fiberE = ce.bioFiberElastin()
+        fiberE     an instance of bioFiber representing an elastin fiber
+
+massDensity()
+    E.g.:  rho = ce.massDensity()
+        rho         the mass density of the septal chord
+
+length()
+    E.g.:  len = ce.length()
+        len         the current length of the septal chord
 
 areaCollagen()
-    E.g., a_c = ce.areaCollagen()
+    E.g.:  a_c = ce.areaCollagen()
         a_c         the current cross-sectional area of the collagen fiber
 
 areaElastin()
-    E.g., a_e = ce.areaElastin()
+    E.g.:  a_e = ce.areaElastin()
         a_e         the current cross-sectional area of the elastin fiber
 
-massDensity()
-    E.g., rho = ce.massDensity()
-        rho         the mass density of the septal chord
+area()
+    E.g.:  a = ce.area()
+        a           the collective areas of both fibers in the septal chord
+
+volumeCollagen()
+    E.g.:  vol = ce.volumeCollagen()
+        vol         the volume of the collagen fiber in the chord
+
+volumeElastin()
+    E.g.:  vol = ce.volumeElastin()
+        vol         the volume of the elastin fiber in the chord
 
 volume()
-    E.g., vol = ce.volume()
-        vol         the volume of the septal chord
+    E.g.:  vol = ce.volume()
+        vol         the collective volume of both fibers in the septal chord
+
+# absolute measures
 
 temperature()
-    E.g., temp = ce.temperature()
+    E.g.:  temp = ce.temperature()
         temp        the temperature in degrees Centigrade
 
+entropy()
+    E.g.:  s = ce.entropy()
+        s           the total entropy of the septal chord (not entropy density)
+
 strain()
-    E.g., e = ce.strain()
-        e           the natural or logarithmic strain
+    E.g.:  e = ce.strain()
+        e           the natural or logarithmic strain of the chord
+
+stress()
+    E.g.:  s = ce.stress()
+        s           the nominal stress carried by the septal chord
 
 force()
-    E.g., f = ce.force()
+    E.g.:  f = ce.force()
         f           the total force carried by the septal chord
 
-entropy()
-    E.g., s = ce.entropy()
-        s           the total entropy of the septal chord (not entropy density)
+# relative measures, i.e., current minus initial; they are 0 in initial states
+
+relativeTemperature()
+    E.g.:  temp = ce.relativeTemperature()
+        temp        the relative temperature of the septal chord
+
+relativeEntropy()
+    E.g.:  s = ce.relativeEntropy()
+        s           the relative entropy of the septal chord
+
+relativeStrain()
+    E.g.:  e = ce.relativeStrain()
+        e           the relative natural or logarithmic strain of the chord
+
+relativeStress()
+    E.g.:  s = ce.relativeStress()
+        s           the relative nominal stress carried by the septal chord
+
+relativeForce()
+    E.g.:  f = ce.relativeForce()
+        f           the relative total force carried by the septal chord
 
 
 Reference:
@@ -297,48 +382,60 @@ class controlFiber(control):
     #   node        an integer specifying the current node of integration,
     #               which is reset to 0 whenever the integrator is restarted
     #   dt          a floating point number specifying the time-step size
+    #   eR          a vector of initial conditions for thermodynamic controls
+    #   eP          a vector of thermodynamic control vars at the previous node
+    #   eC          a vector of thermodynamic control vars at the current node
+    #   eN          a vector of thermodynamic control vars at the next node
     #   xR          a vector holding control variables for the reference node
     #   xP          a vector holding control variables for the previous node
     #   xC          a vector holding control variables for the current node
     #   xN          a vector holding control variables for the next node
     # control vector arguments have interpretations of:
-    #   ctrlVec[0]  contains the fiber temperature (in centigrade)
-    #   ctrlVec[1]  contains the fiber length (in cm)
+    #   eVec[0]     contains the fiber temperature strain:  ln(T/T_0)
+    #   eVec[1]     contains the fiber mechanical  strain:  ln(L/L_0)
+    # while
+    #   xVec[0]     contains the fiber temperature (in centigrade)
+    #   xVec[1]     contains the fiber length      (in cm)
 
-    def __init__(self, ctrlVec0, dt):
-        # Call the constructor of the base type.
-        super().__init__(ctrlVec0, dt)
-        # Verify and initialize other data, as required.
+    def __init__(self, eVec0, xVec0, dt):
+        # Call the constructor of the base type to create and initialize the
+        # exported variables.
+        super().__init__(eVec0, xVec0, dt)
+        # Create and initialize any additional fields introduced by the user.
         if self.controls != 2:
             raise RuntimeError("There are only 2 control variables for 1D " +
                                "fibers: temperature and length.")
-        return  # a new instance of type control1D
+        return  # a new instance of type controlFiber
 
-    def update(self, ctrlVec):
-        # Call the base implementation of this method to insert this vector
-        # into the class' data structure.
-        super().update(ctrlVec)
+    def update(self, xVec, restart=False):
+        # Call the base implementation of this method to insert this physical
+        # control variable into the data structure of this object, and then to
+        # integrate the thermodynamic control variables, eVec, for this update.
+        super().update(xVec, restart)
+        # Update any additional fields introduced by the user.
         return  # nothing
 
     def advance(self):
-        # Call the base implementation of this method to advance its data.
-        # This moves current data to their previous fields, and then it moves
-        # next data to their current fields.
+        # Call the base implementation of this method to advance its data
+        # structure by copying the current data into their previous fields,
+        # and then copying the next data into their current fields.
         super().advance()
-        # This method is called internally by the pece integrator and should
-        # not be called by the user.
+        # Advance any additional data introduced by the user.
+        # This method is called internally by the pece integrator and must not
+        # be called by the user.
         return  # nothing
 
     def dedx(self):
-        # Call the base implementation of this method to create dedxMtx.
+        # Call the base implementation of this method to create matrix dedxMtx.
         dedxMtx = super().dedx()
-        # Because the matrix created by the super call is an identity matrix
-        dedxMtx[1, 1] = 1.0 / self.xN[1]
+        # Assign elements to this matrix per the user's application.
+        dedxMtx[0, 0] = 1.0 / (273.0 + self.xN[0])   # 1/temperature (in K)
+        dedxMtx[1, 1] = 1.0 / self.xN[1]             # 1/length
         return dedxMtx
 
-    def dxdt(self, restart=False):
-        # Call the base implementation of this method to create dxdtVec.
-        dxdtVec = super().dxdt(restart)
+    def dxdt(self):
+        # Call the base implementation of this method to create vector dxdtVec.
+        dxdtVec = super().dxdt()
         # The returned dxdtVec is computed via finite difference formulae;
         # specifically,
         #   if self.node is 0, 1   use first-order difference formula
@@ -351,30 +448,24 @@ class controlFiber(control):
 
 
 class bioFiber(response):
-    # implements the Freed-Rajagopal model for biologic fibers where
-    #   ctrlVec[0]  contains fiber temperature (in centigrade)
-    #   ctrlVec[1]  contains fiber length (in cm)
-    #   respVec[0]  contains fiber entropy density (in erg/g.K)
-    #   respVec[1]  contains fiber stress (in dyne/cm^2 or barye)
+    # Implements the Freed-Rajagopal model for biologic fibers where
+    # for this model
+    #     eVec[0]  contains fiber temperature strain:  ln(T/T_0)
+    #     eVec[1]  contains fiber mechanical  strain:  ln(L/L_0)
+    # while
+    #     xVec[0]  contains fiber temperature          (in centigrade)
+    #     xVec[1]  contains fiber length               (in cm)
+    # and
+    #     yVec[0]  contains fiber entropy density      (in erg/g.K)
+    #     yVec[1]  contains fiber stress               (in barye)
 
-    def __init__(self, ctrlVec0, respVec0, rho, Cp, alpha, E1, E2, e_t, e_max):
-        # call the base type to verify the inputs and to create variables
-        #    self.controls  the number of control variables
-        #    self.responses the number of response variables
-        super().__init__(ctrlVec0, respVec0)
-        # verify inputs for the constructor of the base class
-        if self.controls != 2:
-            raise RuntimeError("A biologic fiber has two control variables.")
+    def __init__(self, yVec0, rho, Cp, alpha, E1, E2, e_t, e_f=float("inf")):
+        # A call to the base constructor creates and initializes the exported
+        # variables.
+        super().__init__(yVec0)
+        # Create and initialize any additional fields introduced by the user.
         if self.responses != 2:
             raise RuntimeError("A biologic fiber has two response variables.")
-        if ctrlVec0[0] < 33.0 or ctrlVec0[0] > 41.0:
-            raise RuntimeError("The initial temperature must be within the " +
-                               "range of 33 to 41 degrees Centigrade.")
-        if ctrlVec0[1] < 0.0000001:
-            raise RuntimeError('The initial fiber length must be greater ' +
-                               'than a nanometer.')
-        self.ctrlVec0 = np.zeros((self.controls,), dtype=float)
-        self.ctrlVec0[:] = ctrlVec0[:]
         # verify and initialize the remaining data
         if rho > np.finfo(float).eps:
             self.rho = rho
@@ -387,7 +478,7 @@ class bioFiber(response):
         if alpha > np.finfo(float).eps:
             self.alpha = alpha
         else:
-            raise RuntimeError("Fiber thermal expansion coefficient " +
+            raise RuntimeError("Fiber thermal strain coefficient " +
                                "must be positive.")
         if E1 > np.finfo(float).eps:
             self.E1 = E1
@@ -397,132 +488,187 @@ class bioFiber(response):
             self.E2 = E2
         else:
             raise RuntimeError('Terminal fiber modulus E2 must be greater ' +
-                               'than E1.')
+                               'than the initial fiber modulus E1.')
         if e_t > np.finfo(float).eps:
             self.e_t = e_t
         else:
-            raise RuntimeError('Limiting fiber strain e_t must be positive.')
-        if e_max > np.finfo(float).eps:
-            self.e_max = e_max
+            raise RuntimeError('Limiting fiber reconfiguration strain e_t ' +
+                               'must be positive.')
+        # one one-hundredth of the theoretical upper bound on fiber strength
+        bodyTemp = 310.0  # Kelvin
+        e_fmax = 0.01 * rho * Cp * bodyTemp / (alpha**2 * E2)
+        # establish the strain at fracture
+        if e_f > e_fmax:
+            self.e_f = e_fmax
+        elif e_f > np.finfo(float).eps:
+            self.e_f = e_f
         else:
-            raise RuntimeError('Maximum fiber strain e_max must be positive.')
+            raise RuntimeError('Fiber failure strain e_f must be positive.')
         self.ruptured = False
         return  # a new instance of a fiber object
 
-    def _compliance(self, deltaTemp, strain, stress):
-        if stress > self.e_max * self.E2:
+    def _secCompliance(self, stress):
+        if stress > self.e_f * self.E2:
             self.ruptured = True
-        if self.ruptured is True:
+        if self.ruptured:
             # a small but positive modulus helps to maintain numeric stability
-            E = 100.0 * np.finfo(float).eps
-            c = 1.0 / E
-        elif stress <= 0.0:
-            # same elastic compliance as at zero stress and zero strain
+            c = 1.0 / (100.0 * np.finfo(float).eps)
+            return c
+        stress0 = self.yR[1]
+        if stress <= abs(stress0) * (1.0 + 1000.0 * np.finfo(float).eps):
+            # same elastic compliance as at zero strain
             c = (self.E1 + self.E2) / (self.E1 * self.E2)
         else:
-            # Freed-Rajagopal elastic fiber model
-            e1 = strain - self.alpha * deltaTemp - stress / self.E2
+            # Freed-Rajagopal elastic fiber model in hyper-elastic form
+            stress_t = self.E1 * self.e_t
+            c = ((self.e_t / (stress - stress0)) *
+                 (1.0 - m.sqrt(stress_t) /
+                  m.sqrt(stress_t + 2.0 * (stress - stress0))) +
+                 1.0 / self.E2)
+        return c
+
+    def secMod(self, eVec, xVec, yVec):
+        # call the base type to verify the inputs and to create the matrix E
+        Es = super().secMod(eVec, xVec, yVec)
+        # y - y0 = E * e
+        #    e   is a vector of thermodynamic control variables  (strains)
+        #    x   is a vector of physical control variables       (stretches)
+        #    y   is a vector of thermodynamic response variables (stresses)
+        # populate the entries of E for the user's secant moduli below
+        temperature = xVec[0]       # temperature                (in C)
+        stress0 = self.yR[1]        # initial or residual stress (in barye)
+        stress = yVec[1]            # stress                     (in barye)
+        E = 1.0 / self._secCompliance(stress)
+        rhoT = self.rho * (273.0 + temperature)
+        Cs = self.alpha * (stress - stress0) / rhoT
+        Ce = self.alpha**2 * E / rhoT
+        # compute the tangent modulus
+        Es[0, 0] = self.Cp - Cs - Ce
+        Es[0, 1] = Ce / self.alpha
+        Es[1, 0] = -self.alpha * E
+        Es[1, 1] = E
+        return Es
+
+    def _tanCompliance(self, stress, mechanicalStrain, thermalStrain):
+        if stress > self.e_f * self.E2:
+            self.ruptured = True
+        if self.ruptured:
+            # a small but positive modulus helps to maintain numeric stability
+            c = 1.0 / (100.0 * np.finfo(float).eps)
+            return c
+        stress0 = self.yR[1]
+        if stress <= abs(stress0):
+            # same elastic compliance as at zero strain
+            c = (self.E1 + self.E2) / (self.E1 * self.E2)
+        else:
+            # Freed-Rajagopal elastic fiber model in hypo-elastic form
+            e1 = mechanicalStrain - (self.alpha * thermalStrain +
+                                     (stress - stress0) / self.E2)
             if e1 < self.e_t:
-                c = ((self.e_t - e1) / (self.E1 * self.e_t + 2.0 * stress) +
+                c = ((self.e_t - e1) /
+                     (self.E1 * self.e_t + 2.0 * (stress - stress0)) +
                      1.0 / self.E2)
             else:
                 c = 1.0 / self.E2
         return c
 
-    def tanMod(self, ctrlVec, respVec):
-        # call the base type to verify the inputs and to create matrix ceMtx
-        dyde = super().tanMod(ctrlVec, respVec)
-        # populate the entries of dyde for the tangent moduli below
-        temp0 = self.ctrlVec0[0]    # initial temperature (in centigrade)
-        len0 = self.ctrlVec0[1]     # initial length (in cm)
-        tempN = ctrlVec[0]          # temperature at next node (in centigrade)
-        lenN = ctrlVec[1]           # length at the next node (in cm)
-        # entropy = respVec[0]      # is not needed in this model
-        stress = respVec[1]         # stress at the next node (in barye)
-        deltaTemp = tempN - temp0
-        strain = m.log(lenN / len0)
-        E = 1.0 / self._compliance(deltaTemp, strain, stress)
+    def tanMod(self, eVec, xVec, yVec):
+        # call the base type to verify the inputs and to create matrix dyde
+        Et = super().tanMod(eVec, xVec, yVec)
+        # dy = dyde * de  where  de = de/dx dx/dt
+        #    e   is a vector of thermodynamic control variables  (strains)
+        #    x   is a vector of physical control variables       (stretches)
+        #    y   is a vector of thermodynamic response variables (stresses)
+        # populate the entries of dyde for the user's tangent moduli below
+        temperature = xVec[0]       # temperature    (in centigrade)
+        thermalStrain = eVec[0]     # ln(T/T_0)      (dimensionless)
+        mechanicalStrain = eVec[1]  # ln(L/L_0)      (dimensionless)
+        stress0 = self.yR[1]        # initial stress (in barye)
+        stress = yVec[1]            # stress         (in barye)
+        E = 1.0 / self._tanCompliance(stress, mechanicalStrain, thermalStrain)
+        rhoT = self.rho * (273.0 + temperature)
+        Cs = self.alpha * (stress - stress0) / rhoT
+        Ce = self.alpha**2 * E / rhoT
         # compute the tangent modulus
-        dyde[0, 0] = self.Cp / (tempN + 273.0) - self.alpha**2 * E / self.rho
-        dyde[0, 1] = self.alpha * E / self.rho
-        dyde[1, 0] = -self.alpha * E
-        dyde[1, 1] = E
-        return dyde
+        Et[0, 0] = self.Cp - Cs - Ce
+        Et[0, 1] = Ce / self.alpha
+        Et[1, 0] = -self.alpha * E
+        Et[1, 1] = E
+        return Et
 
     def isRuptured(self):
-        # no super call is required here, ruptured is to have a boolean value
-        return self.ruptured
+        if not self.ruptured:
+            hasRuptured = super().isRuptured()
+        else:
+            hasRuptured = (True,)
+        return hasRuptured
 
-    def rupturedRespVec(self, ctrlVec, respVec):
+    def rupturedResponse(self, eVec, xVec, yBeforeVec):
         # call the base type to verify the input and to create vector rVec
-        rVec = super().rupturedRespVec(ctrlVec, respVec)
+        yAfterVec = super().rupturedResponse(eVec, xVec, yBeforeVec)
         # populate the entries for the ruptured response in rVec below
         # this will result in discontinuities in the response fields
-        temp0 = self.xR[0]      # initial temperature (in centigrade)
-        len0 = self.xR[1]       # initial length (in cm)
-        tempN = ctrlVec[0]      # temperature at the next node (in centigrade)
-        lenN = ctrlVec[1]       # length at the next node (in cm)
-        # entropy = respVec[0]  # is not needed in this model
-        # stress = respVec[1]   # is not needed in this model
-        deltaTemp = tempN - temp0
-        strain = m.log(lenN / len0)
+        TN = xVec[0]                 # temperature at next node (centigrade)
+        # compute the strains at rupture
+        lnTonT0 = eVec[0]            # thermal strain
+        epsilon = eVec[1]            # mechanical strain
         # a small but positive modulus helps to maintain numeric stability
         E = 100.0 * np.finfo(float).eps
         # provides for a discontinuity in the response vector
-        rVec = np.zeros((2,), dtype=float)
-        rVec[0] = (self.yR[0] + self.alpha * E *
-                   (strain - self.alpha * deltaTemp) / self.rho)
-        rVec[1] = E * strain
-        return rVec
-
-    def rupturedTanMod(self, ctrlVec, respVec):
-        # call the base type to verify the inputs and to create matrix ceMtx
-        dyde = super().rupturedTanMod(ctrlVec, respVec)
-        # populate the entries of ceMtx for the ruptured tangent moduli below
-        # temp0 = self.xR[0]    # is not needed in this model
-        # len0 = self.xR[1]     # is not needed in this model
-        tempN = ctrlVec[0]      # temperature at the next node (in centigrade)
-        # lenN = ctrlVec[1]       # length at the next node (in cm)
-        # entropy = respVec[0]  # is not needed in this model
-        # stress = respVec[1]   # is not needed in this model
-        # a small but positive modulus helps to maintain numeric stability
-        E = 100.0 * np.finfo(float).eps
-        # compute the tangent modulus is
-        dyde = np.zeros((2, 2), dtype=float)
-        dyde[0, 0] = self.C / (tempN + 273.0) - self.alpha**2 * E / self.rho
-        dyde[0, 1] = self.alpha * E / self.rho
-        dyde[1, 0] = -self.alpha * E
-        dyde[1, 1] = E
-        return dyde
+        yAfterVec[0] = (self.yR[0] + (self.Cp - 4.0 * self.alpha**2 * E /
+                                      (self.rho * (273.0 + TN))) * lnTonT0)
+        yAfterVec[1] = E * epsilon
+        return yAfterVec
 
 
 # constitutive class for alveolar chords
 
 
-class septalChord(response):
+class ceChord(response):
     # implements the Freed-Rajagopal model for septal chords, which are
-    # comprised of collagen and elastin fibers loaded in parallel, where:
-    #   ctrlVec[0]  contains fiber temperature (in centigrade)
-    #   ctrlVec[1]  contains fiber length (in cm)
-    #   respVec[0]  contains collagen fiber entropy density (in erg/g.K)
-    #   respVec[1]  contains collagen fiber stress (in dyne/cm^2 or barye)
-    #   respVec[0]  contains elastin fiber entropy density (in erg/g.K)
-    #   respVec[1]  contains elastin fiber stress (in dyne/cm^2 or barye)
+    # comprised of collagen and elastin fibers loaded in parallel, where
+    # for this model
+    #     eVec[0]  contains fiber temperature strain:       ln(T/T_0)
+    #     eVec[1]  contains fiber mechanical  strain:       ln(L/L_0)
+    # while
+    #     xVec[0]  contains fiber temperature               (in centigrade)
+    #     xVec[1]  contains fiber length                    (in cm)
+    # and
+    #     yVec[0]  contains collagen fiber entropy density  (in erg/g.K)
+    #     yVec[1]  contains collagen fiber stress           (in barye)
+    #     yVec[2]  contains elastin  fiber entropy density  (in erg/g.K)
+    #     yVec[3]  contains elastin  fiber stress           (in barye)
 
-    def __init__(self, ctrlVec0, respVec0, diaCollagen=None, diaElastin=None):
-        # call the base type to verify the inputs and to create variables
-        super().__init__(ctrlVec0, respVec0)
-        # verify inputs for the constructor of the base class
-        if self.controls != 2:
-            raise RuntimeError("A septal chord has two control variables.")
-        if self.responses != 4:
-            raise RuntimeError("A septal chord has four response variables.")
-        if ctrlVec0[0] < 33.0 or ctrlVec0[0] > 41.0:
-            raise RuntimeError("The initial temperature must be within the " +
-                               "range of 33 to 41 degrees Centigrade.")
-        if ctrlVec0[1] < 0.001 or ctrlVec0[1] > 0.02:
-            raise RuntimeError('The initial fiber length must be within ' +
-                               'the range of 10 to 200 microns.')
+    def __init__(self, diaCollagen=None, diaElastin=None):
+        fiberResponses = 2
+        yFiber0 = np.zeros((fiberResponses,), dtype=float)
+        chordResponses = 2 * fiberResponses
+        yChord0 = np.zeros((chordResponses,), dtype=float)
+        # create the collagen fiber
+        rho_c = mp.rhoCollagen()
+        Cp_c = mp.CpCollagen()
+        alpha_c = mp.alphaCollagen()
+        # the mechanical properties below come from probability distributions
+        E1_c, E2_c, et_c, ef_c, s0_c = mp.collagenFiber()
+        yFiber0[0] = mp.etaCollagen()
+        yFiber0[1] = s0_c
+        self.fiberC = bioFiber(yFiber0, rho_c, Cp_c, alpha_c,
+                               E1_c, E2_c, et_c, ef_c)
+        yChord0[0] = yFiber0[0]        # initial collagen entropy density
+        yChord0[1] = yFiber0[1]        # initial collagen pre-stress
+        # create the elastin fiber
+        rho_e = mp.rhoElastin()
+        Cp_e = mp.CpElastin()
+        alpha_e = mp.alphaElastin()
+        # the mechanical properties below come from probability distributions
+        E1_e, E2_e, et_e, s0_e = mp.elastinFiber()
+        yFiber0[0] = mp.etaElastin()
+        yFiber0[1] = s0_e
+        self.fiberE = bioFiber(yFiber0, rho_e, Cp_e, alpha_e, E1_e, E2_e, et_e)
+        yChord0[2] = yFiber0[0]         # initial elastin engropy density
+        yChord0[3] = yFiber0[1]         # initial elastin pre-stress
+        # call the base type constructor to create its data structure
+        super().__init__(yChord0)
         # verify and initialize the remaining data
         if diaCollagen is None:
             diaCollagen = mp.fiberDiameterCollagen()
@@ -540,145 +686,128 @@ class septalChord(response):
             pass
         self.A0_c = m.pi * diaCollagen**2 / 4.0
         self.A0_e = m.pi * diaElastin**2 / 4.0
-        self.temperature = ctrlVec0[0]
-        self.length = ctrlVec0[1]
-        self.len0 = ctrlVec0[1]
-        # create constitutive objects for the collagen and elastin fibers
-        # elastic properties are assigned via their probability distributions
-        collagenRespVec0 = np.zeros((2,), dtype=float)
-        collagenRespVec0[0] = respVec0[0]
-        collagenRespVec0[1] = respVec0[1]
-        rho_c = mp.rhoCollagen()
-        C_c = mp.CpCollagen()
-        alpha_c = mp.alphaCollagen()
-        E1_c, E2_c, et_c, emax_c = mp.collagenFiber()
-        self.fiberC = bioFiber(ctrlVec0, collagenRespVec0,
-                               rho_c, C_c, alpha_c, E1_c, E2_c, et_c, emax_c)
-        elastinRespVec0 = np.zeros((2,), dtype=float)
-        elastinRespVec0[0] = respVec0[2]
-        elastinRespVec0[1] = respVec0[3]
-        rho_e = mp.rhoElastin()
-        C_e = mp.CpElastin()
-        alpha_e = mp.alphaElastin()
-        E1_e, E2_e, et_e, emax_e = mp.elastinFiber()
-        self.fiberE = bioFiber(ctrlVec0, elastinRespVec0,
-                               rho_e, C_e, alpha_e, E1_e, E2_e, et_e, emax_e)
-        # provide initial conditions for the various responses
-        self.etaC = respVec0[0]
-        self.stressC = respVec0[1]
-        self.etaE = respVec0[2]
-        self.stressE = respVec0[3]
+        # set a hook for initializing the control fields in the data structure
+        # extract the response variables for export
+        self.eta0_c = mp.etaCollagen()
+        self.stress0_c = s0_c
+        self.eta0_e = mp.etaElastin()
+        self.stress0_e = s0_e
+        self.eta_c = mp.etaCollagen()
+        self.stress_c = s0_c
+        self.eta_e = mp.etaElastin()
+        self.stress_e = s0_e
         return  # a new instance of type ceChord
 
-    def tanMod(self, ctrlVec, respVec):
-        # call the base type to verify the inputs and to create matrix ceMtx
-        ceMtx = super().tanMod(ctrlVec, respVec)
+    def secMod(self, eVec, xVec, yVec):
+        # extract initial control variables for export: must be before super
+        if self.firstCall:
+            self.strn0 = eVec[1]
+            self.temp0 = xVec[0]
+            self.len0 = xVec[1]
+        # verify inputs and create the matrix for the secant modulus
+        Es = super().secMod(eVec, xVec, yVec)
+        # assemble the secant moduli
+        fiberResp = np.zeros((2,), dtype=float)
+        for i in range(2):
+            fiberResp[i] = yVec[i]
+        EsC = self.fiberC.secMod(eVec, xVec, fiberResp)
+        for i in range(2):
+            fiberResp[i] = yVec[2 + i]
+        EsE = self.fiberE.secMod(eVec, xVec, fiberResp)
+        for i in range(2):
+            Es[i, :] = EsC[i, :]
+            Es[2 + i, :] = EsE[i, :]
         # extract the controlled variables for export
-        self.temperature = ctrlVec[0]
-        self.length = ctrlVec[1]
+        self.strn = eVec[1]
+        self.temp = xVec[0]
+        self.len = xVec[1]
         # extract the response variables for export
-        self.etaC = respVec[0]
-        self.stressC = respVec[1]
-        self.etaE = respVec[2]
-        self.stressE = respVec[3]
+        self.eta_c = yVec[0]
+        self.stress_c = yVec[1]
+        self.eta_e = yVec[2]
+        self.stress_e = yVec[3]
+        return Es
+
+    def tanMod(self, eVec, xVec, yVec):
+        # extract initial control variables for export: must be before super
+        if self.firstCall:
+            self.strn0 = eVec[1]
+            self.temp0 = xVec[0]
+            self.len0 = xVec[1]
+        # verify inputs and create the matrix for the secant modulus
+        Et = super().tanMod(eVec, xVec, yVec)
         # assemble the tangent moduli
         fiberResp = np.zeros((2,), dtype=float)
         for i in range(2):
-            fiberResp[i] = respVec[i]
-        ceMtxC = self.fiberC.tanMod(ctrlVec, fiberResp)
+            fiberResp[i] = yVec[i]
+        EtC = self.fiberC.tanMod(eVec, xVec, fiberResp)
         for i in range(2):
-            fiberResp[i] = respVec[2 + i]
-        ceMtxE = self.fiberE.tanMod(ctrlVec, fiberResp)
+            fiberResp[i] = yVec[2 + i]
+        EtE = self.fiberE.tanMod(eVec, xVec, fiberResp)
         for i in range(2):
-            ceMtx[i, :] = ceMtxC[i, :]
-            ceMtx[2 + i, :] = ceMtxE[i, :]
-        return ceMtx
+            Et[i, :] = EtC[i, :]
+            Et[2 + i, :] = EtE[i, :]
+        # extract the controlled variables for export
+        self.strn = eVec[1]
+        self.temp = xVec[0]
+        self.len = xVec[1]
+        # extract the response variables for export
+        self.eta_c = yVec[0]
+        self.stress_c = yVec[1]
+        self.eta_e = yVec[2]
+        self.stress_e = yVec[3]
+        return Et
 
     def isRuptured(self):
-        # no super call is required here
-        if (self.fiberC.isRuptured() is True or
-           self.fiberE.isRuptured() is True):
-            return True
-        else:
-            return False
+        ruptured_c = self.fiberC.isRuptured()
+        ruptured_e = self.fiberE.isRuptured()
+        ruptured = ruptured_c + ruptured_e
+        return ruptured
 
-    def rupturedRespVec(self, ctrlVec, respVec):
-        # call the base type to verify the input and to create vector rVec
-        rVec = super().rupturedRespVec(ctrlVec, respVec)
-        # populate the entries for the ruptured response in rVec below
-        # this will result in discontinuities in the response fields
+    def rupturedResponse(self, eVec, xVec, yBeforeVec):
+        # call the base type to verify the input and to create vector yAfterVec
+        yAfterVec = super().rupturedResponse(eVec, xVec, yBeforeVec)
+        # populate the entries for the ruptured response in yAfterVec below
+        # this will result in a discontinuity in the response fields
+        yVec = np.zeros((2,), dtype=float)
+        # for collagen
+        (ruptured,) = self.fiberC.isRuptured()
+        if ruptured:
+            yVec[0] = yBeforeVec[0]
+            yVec[1] = yBeforeVec[1]
+            rupC = self.fiberC.rupturedResponse(eVec, xVec, yVec)
+            yAfterVec[0] = rupC[0]
+            yAfterVec[1] = rupC[1]
+        else:
+            yAfterVec[0] = yBeforeVec[0]
+            yAfterVec[1] = yBeforeVec[1]
+        # for elastin
+        (ruptured,) = self.fiberE.isRuptured()
+        if ruptured:
+            yVec[0] = yBeforeVec[2]
+            yVec[1] = yBeforeVec[3]
+            rupE = self.fiberE.rupturedResponse(eVec, xVec, yVec)
+            yAfterVec[2] = rupE[0]
+            yAfterVec[3] = rupE[1]
+        else:
+            yAfterVec[2] = yBeforeVec[2]
+            yAfterVec[3] = yBeforeVec[3]
         # extract the controlled variables for export
-        self.temperature = ctrlVec[0]
-        self.length = ctrlVec[1]
-        # assemble the response vector
-        fiberResp = np.zeros((2,), dtype=float)
-        fiberResp[0] = respVec[0]
-        fiberResp[1] = respVec[1]
-        if self.fiberC.isRuptured() is True:
-            respVecC = self.fiberC.rupturedRespVec(ctrlVec, fiberResp)
-        else:
-            respVecC = np.zeros((2,), dtype=float)
-            respVecC[:] = fiberResp[:]
-        fiberResp[0] = respVec[2]
-        fiberResp[1] = respVec[3]
-        if self.fiberE.isRuptured() is True:
-            respVecE = self.fiberE.rupturedRespVec(ctrlVec, fiberResp)
-        else:
-            respVecE = np.zeros((2,), dtype=float)
-            respVecE[:] = fiberResp[:]
-        for i in range(2):
-            rVec[i] = respVecC[i]
-            rVec[i + 2] = respVecE[i]
+        self.strn = eVec[1]
+        self.temp = xVec[0]
+        self.len = xVec[1]
         # extract the response variables for export
-        self.etaC = respVecC[0]
-        self.stressC = respVecC[1]
-        self.etaE = respVecE[0]
-        self.stressE = respVecE[1]
-        return rVec
-
-    def rupturedTanMod(self, ctrlVec, respVec):
-        # call the base type to verify the inputs and to create matrix ceMtx
-        ceMtx = super().rupturedTanMod(ctrlVec, respVec)
-        # extract the controlled variables for export
-        self.temperature = ctrlVec[0]
-        self.length = ctrlVec[1]
-        # extract the response variables for export
-        self.etaC = respVec[0]
-        self.stressC = respVec[1]
-        self.etaE = respVec[2]
-        self.stressE = respVec[3]
-        # assemble the ruptured tangent moduli
-        fiberResp = np.zeros((2,), dtype=float)
-        fiberResp[0] = respVec[0]
-        fiberResp[1] = respVec[1]
-        if self.fiberC.isRuptured() is True:
-            tanModC = self.fiberC.rupturedTanMod(ctrlVec, fiberResp)
-        else:
-            tanModC = self.fiberC.tanMod(ctrlVec, fiberResp)
-        fiberResp[0] = respVec[2]
-        fiberResp[1] = respVec[3]
-        if self.fiberE.isRuptured() is True:
-            tanModE = self.fiberE.rupturedTanMod(ctrlVec, fiberResp)
-        else:
-            tanModE = self.fiberE.tanMod(ctrlVec, fiberResp)
-        for i in range(2):
-            ceMtx[i, :] = tanModC[i, :]
-            ceMtx[i + 2, :] = tanModE[i, :]
-        return ceMtx
+        self.eta_c = yAfterVec[0]
+        self.stress_c = yAfterVec[1]
+        self.eta_e = yAfterVec[2]
+        self.stress_e = yAfterVec[3]
+        return yAfterVec
 
     def bioFiberCollagen(self):
-        return self.fiber_c
+        return self.fiberC
 
     def bioFiberElastin(self):
-        return self.fiber_e
-
-    def areaCollagen(self):
-        a = self.A0_c * self.len0 / self.length
-        return a
-
-    def areaElastin(self):
-        a = self.A0_e * self.len0 / self.length
-        return a
+        return self.fiberE
 
     def massDensity(self):
         mass_c = mp.rhoCollagen() * self.A0_c * self.len0
@@ -686,26 +815,128 @@ class septalChord(response):
         massDensity = ((mass_c + mass_e) / self.volume())
         return massDensity  # in g/cm^3
 
+    def length(self):
+        if self.firstCall:
+            L = self.len0
+        else:
+            L = self.len
+        return L
+
+    def areaCollagen(self):
+        if self.firstCall:
+            a = self.A0_c
+        else:
+            (ruptured,) = self.fiberC.isRuptured()
+            if ruptured:
+                a = self.A0_c
+            else:
+                a = self.A0_c * self.len0 / self.len
+        return a
+
+    def areaElastin(self):
+        if self.firstCall:
+            a = self.A0_e
+        else:
+            (ruptured,) = self.fiberE.isRuptured()
+            if ruptured:
+                a = self.A0_e
+            else:
+                a = self.A0_e * self.len0 / self.len
+        return a
+
+    def area(self):
+        a = self.areaCollagen() + self.areaElastin()
+        return a
+
+    def volumeCollagen(self):
+        vol = self.A0_c * self.len0
+        return vol
+
+    def volumeElastin(self):
+        vol = self.A0_e * self.len0
+        return vol
+
     def volume(self):
         vol = (self.A0_c + self.A0_e) * self.len0
         return vol
 
+    # absolute measures
+
     def temperature(self):
-        return self.temperature
-
-    def strain(self):
-        return m.log(self.length / self.len0)
-
-    def force(self):
-        f = (self.stressC * self.areaCollagen() +
-             self.stressE * self.areaElastin())
-        return f
+        bodyTemp = 37.0  # centigrade
+        if self.firstCall:
+            theta = bodyTemp
+        else:
+            theta = self.temp
+        return theta
 
     def entropy(self):
-        s = (self.etaC * mp.rhoCollagen() * self.A0_c * self.len0 +
-             self.etaE * mp.rhoElastin() * self.A0_e * self.len0)
-        return s
+        if self.firstCall:
+            S = (self.eta0_c * mp.rhoCollagen() * self.A0_c * self.len0 +
+                 self.eta0_e * mp.rhoElastin() * self.A0_e * self.len0)
+        else:
+            S = (self.eta_c * mp.rhoCollagen() * self.A0_c * self.len0 +
+                 self.eta_e * mp.rhoElastin() * self.A0_e * self.len0)
+        return S
 
+    def strain(self):
+        if self.firstCall:
+            e = 0
+        else:
+            e = self.strn
+        return e
+
+    def stress(self):
+        sigma = self.force() / self.area()
+        return sigma
+
+    def force(self):
+        if self.firstCall:
+            f = self.stress0_c * self.A0_c + self.stress0_e * self.A0_e
+        else:
+            f = (self.stress_c * self.areaCollagen() +
+                 self.stress_e * self.areaElastin())
+        return f
+
+    # relative measures, i.e., current minus initial values for the fields
+
+    def relativeTemperature(self):
+        if self.firstCall:
+            delTemp = 0.0
+        else:
+            delTemp = self.temp - self.temp0
+        return delTemp
+
+    def relativeEntropy(self):
+        if self.firstCall:
+            delEta = 0.0
+        else:
+            delEta = (((self.eta_c - self.eta0_c) *
+                       mp.rhoCollagen() * self.A0_c * self.len0) +
+                      ((self.eta_e - self.eta0_e) *
+                       mp.rhoElastin() * self.A0_e * self.len0))
+        return delEta
+
+    def relativeStrain(self):
+        if self.firstCall:
+            delStrain = 0.0
+        else:
+            delStrain = self.strn - self.strn0
+        return delStrain
+
+    def relativeStress(self):
+        sigma = self.relativeForce() / self.area()
+        return sigma
+
+    def relativeForce(self):
+        if self.firstCall:
+            delF = 0.0
+        else:
+            f0 = self.stress0_c * self.A0_c + self.stress0_e * self.A0_e
+            f = (self.stress_c * self.areaCollagen() +
+                 self.stress_e * self.areaElastin())
+            delF = f - f0
+        return delF
 
 """
 Changes made in version "1.0.0":

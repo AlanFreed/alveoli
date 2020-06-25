@@ -16,24 +16,23 @@ Module ceMembranes.py provides a constitutive description for alveolar septa.
 
 Copyright (c) 2020 Alan D. Freed
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "05-28-2020"
-__update__ = "05-29-2020"
+__update__ = "06-24-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -44,44 +43,50 @@ A listing of changes made wrt version release can be found at the end of file.
 This module describes septal membranes.  From histological studies, septa
 are found to be comprised of both collagen and elastin fibers, randomly and
 somewhat uniformly oriented, with minimal chemical bonding between them.
-And also cells and extracellular protiens collectively known as the ground
-substance along with interstitual fluids and blood.  Unlike septal chords,
-where we know enough to implement a mixture theory, septal membranes are less
-well known from a mechanics perspective, and as such, are modeled as an
-homogeneous membrane whose constitutive parameters described by probability
-distributions that are exported from materialProperties.py.  Given these
-material properties, one can create objects describing realistic septa.
-This module exports two classes:
+Also present are cells and extracellular protiens that are collectively known
+as the ground substance, along with interstitual fluids and blood.  Unlike
+septal chords, where we know enough to implement a mixture theory, septal
+membranes are less well known from a mechanics perspective, and as such, are
+modeled as an homogeneous membrane whose constitutive parameters are described
+by probability distributions that are exported from materialProperties.py.
+Given these material properties, one can create objects describing realistic
+septal membranes.  This module exports two classes:
     controlMembrane: manages the control variables for a biologic membrane, and
-    septalMembrane:  manages the response variables of a biologic membrane.
+    ceMembrane:      manages the response variables of a biologic membrane.
 
 The CGS system of physical units adopted:
-    length          centimeters [cm]
-    mass            grams       [g]
-    time            seconds     [s]
-    temperature     centigrade  [C]
+    length          centimeters   [cm]
+    mass            grams         [g]
+    time            seconds       [s]
+    temperature     centigrade    [C]
 where
-    force           dynes       [g.cm/s^2]      1 Newton = 10^5 dyne
-    pressure        barye       [dyne/cm^2]     1 Pascal = 10 barye
-    energy          erg         [dyne.cm]       1 Joule  = 10^7 ergs
+    force           dynes         [g.cm/s^2]      1 Newton = 10^5 dyne
+    pressure        barye         [dyne/cm^2]     1 Pascal = 10 barye
+    energy          erg           [dyne.cm]       1 Joule  = 10^7 ergs
 
 
 class controlMembrane:  It implements and extends class 'control'
 
 
-For 2D membranes, the control vectors have components:
-    ctrlVec[0]  membrane temperature     'theta' (centigrade)
-    ctrlVec[1]  membrane elongation      'a'     (dimensionless)
-    ctrlVec[2]  membrane elongation      'b'     (dimensionless)
-    ctrlVec[3]  membrane shear magnitude 'g'     (dimensionless)
+For 2D membranes, the physical control vector has components of:
+    xVec[0]  temperature                'T'                   (centigrade)
+    xVec[1]  elongation in 1 direction  'a'                   (dimensionless)
+    xVec[2]  elongation in 2 direction  'b'                   (dimensionless)
+    xVec[3]  magnitude of shear         'g'                   (dimensionless)
+while the thermodynamic control vector has strain components of:
+    eVec[0]  thermal strain:            ln(T/T_0)             (dimensionless)
+    eVec[1]  dilation:                  ln(a/a_0 * b/b_0)     (dimensionless)
+    eVec[2]  squeeze:                   ln(a/a_0 * b_0/b)     (dimensionless)
+    eVec[3]  shear:                     g - g_0               (dimensionless)
 where a, b and g come from the QR decomposition of a deformation gradient,
 which needs to be pivoted prior to its decomposition into a, b and g.
 
 constructor
 
-    E.g.: ctrl = controlMembrane(ctrlVec0, dt)
-        ctrlVec0    a vector of control variables at the reference node, xR
-        dt          size of the time step to be used for integration
+    E.g.: ctrl = controlMembrane(eVec0, xVec0, dt)
+        eVec0       a vector of thermodynamic control variables at reference
+        xVec0       a vector of physical control variables at the reference
+        dt          size of the time step to be used for numeric integration
 
 variables: treat these as read-only
 
@@ -89,18 +94,24 @@ variables: treat these as read-only
     node            an integer specifying the current node of integration,
                     which is reset to 0 whenever the integrator is restarted
     dt              a floating point number specifying the time-step size
-    xR              a vector holding control variables for the reference node
-    xP              a vector holding control variables for the previous node
-    xC              a vector holding control variables for the current node
-    xN              a vector holding control variables for the next node
+    eR              a vector of initial conditions for thermodynamic controls
+    eP              a vector of thermodynamic control vars at the previous node
+    eC              a vector of thermodynamic control vars at the current node
+    eN              a vector of thermodynamic control vars at the next node
+    xR              a vector of initial conditions for the physical controls
+    xP              a vector of physical control variables at the previous node
+    xC              a vector of physical control variables at the current node
+    xN              a vector of physical control variables at the next node
 
 inherited methods
 
-update(ctrlVec)
-    E.g., ctrl.update(ctrlVec)
-        ctrlVec     a vector of control variables for the next node
-    This method may be called multiple times before freezing its values with a
-    call to ctrl.advance.
+update(xVec, restart=False)
+    E.g.:  ctrl.update(xVec, restart)
+        xVec        a vector of physical control variables for the next node
+        restart     whenever restart is True, the trapezoidal method is used;
+                    otherwise, Gear's BDF2 method is used for integration
+    ctrl.update may be called multiple times before freezing its values with a
+    call to ctrl.advance.  This is important in a finite element application.
 
 advance()
     E.g., ctrl.advance()
@@ -110,94 +121,102 @@ advance()
     the pece object in peceHE.py and should not be called by the user.
 
 dedx()
-    E.g., dedxMtx = ctrl.dedx()
-        dedxMtx     a matrix containing the mapping the user's physical control
-                    rates into their thermodynamic equivalent control rates.
-    This transformation associates with the next node.  The base method is a
-    phantom method that is overwritten here for membranes.
+    E.g.:  dedxMtx = ctrl.dedx()
+        dedxMtx     a matrix containing the mapping of physical control rates
+                    into their thermodynamic control rates.
+    This transformation associates with the next node.  It is created as an
+    identity matrix in the base class whose components are overwritten here.
 
-dxdt(restart)
-    E.g., dxdtVec = ctrl.dxdt(restart=False)
-        dxdtVec     is a vector returning the rate-of-change in the controls
-        restart     set to True whenever there is a discontinuity in control
+dxdt()
+    E.g.:  dxdtVec = ctrl.dxdt()
+        dxdtVec     is a vector containing a rate-of-change in the controls
     This base method implements finite difference formulae to approximate this
-    derivative.  A first-order difference formula is used for the initial and
-    first nodes, plus whenever a restart is mandated.  A second-order backward
-    difference formula is used for all other nodes.  All derivatives associate
-    with the next node.  These rates are overwritten for the shear term.
+    derivative. A first-order difference formula is used for the reference and
+    first nodes, plus the first two nodes after a restart has been mandated.
+    A second-order backward difference formula is used for all other nodes.
+    All derivatives associate with the next node.  These rates are overwritten
+    in this implementation for the shear term, but not the others.
 
 
-class bioMembrane:  It implements and extends class 'response'.
+class ceMembrane:  It implements and extends class 'response'.
 
 
 Creates objects that implement a biologic membrane model.
-For this model
-    ctrlVec[0]  membrane temperature               'theta'  (centigrade)
-    ctrlVec[1]  membrane elongation in 1 direction  'a'      (dimensionless)
-    ctrlVec[2]  membrane elongation in 2 direction  'b'      (dimensionless)
-    ctrlVec[3]  membrane in-plane shear magnitude   'g'      (dimensionless)
-and
-    respVec[0]  membrane entropy density            'eta'    (erg/g.K)
-    respVec[1]  membrane surface tension            'pi'     (barye)
-    respVec[2]  membrane normal stress difference   'sigma'  (barye)
-    respVec[3]  membrane shear stress               'tau'    (barye)
+For this model, the physical control vector has components of:
+    xVec[0]  temperature                'T'                   (centigrade)
+    xVec[1]  elongation in 1 direction  'a'                   (dimensionless)
+    xVec[2]  elongation in 2 direction  'b'                   (dimensionless)
+    xVec[3]  magnitude of shear         'g'                   (dimensionless)
+while the thermodynamic control vector has strain components of:
+    eVec[0]  thermal strain:            ln(T/T_0)             (dimensionless)
+    eVec[1]  dilation:                  ln(a/a_0 * b/b_0)     (dimensionless)
+    eVec[2]  squeeze:                   ln(a/a_0 * b_0/b)     (dimensionless)
+    eVec[3]  shear:                     g - g_0               (dimensionless)
+and the thermodynamic response vector has componenents of:
+    yVec[0]  entropy density            'eta'                 (erg/g.K)
+    yVec[1]  surface tension            'pi'                  (barye)
+    yVec[2]  normal stress difference   'sigma'               (barye)
+    yVec[3]  shear stress               'tau'                 (barye)
 
 constructor
 
-    E.g.: ce = bioMembrane(ctrlVec0, respVec0, rho, Cp, alpha, M1, M2, e_Mt,
-                           e_max, N1, N2, e_Nt, G1, G2, e_Gt, thickness=None)
-        ctrlVec0    control variables in a reference state
-        respVec0    response variables in a reference state: initial conditions
-        rho         mass density
-        Cp          specific heat at constant pressure
-        alpha       coefficient of axial thermal expansion
-        M1          compliant areal modulus
-        M2          terminal areal modulus
-        e_Mt        transition (compliant to stiff) areal strain
-        e_max       sets rupture, where s_r = e_max * M2 is the rupture stress
-        N1          compliant squeeze modulus
-        N2          terminal squeeze modulus
-        e_Nt        transition (compliant to stiff) squeeze strain
-        G1          compliant shear modulus
-        G2          termainal shear modulus
-        e_Gt        transition (compliant to stiff) shear strain
+    E.g.: ce = ceMembrane(thickness=None)
         thickness   width of the membrane
+    If the thickness takes on its default value of None, then it is assigned
+    via its respective probability distribution; otherwise, it must be between
+    2 and 7.5 microns in size for our application.
 
 variables: treat these as read-only
 
     controls        an integer specifying the number of control variables
     responses       an integer specifying the number of response variables
-    xR              a vector containing the initial condition for control
-    yR              a vector containing the initial condition for response
+    eR              a vector containing the initial thermodynamic controls
+    xR              a vector containing the initial physical controls
+    yR              a vector containing the initial conditions for responses
+    eN              a vector of thermodynamic controls at the next node
+    xN              a vector of physical controls at the next node
+    yN              a vector of thermodynamic responses at the next node
 
 inherited methods
 
-tanMod(ctrlVec, respVec)
-    E.g., dyde = ce.tanMod(ctrlVec, respVec)
-        dyde        the matrix of tangent moduli dy/de (constitutive equation)
-    The constitutive equation considered is hypo-elastic like; specifically,
-        dy/dt = dy/de de/dx dx/dt
+secMod(eVec, xVec, yVec)
+    E.g.:  E = ce.secMod(eVec, xVec, yVec)
+        Es          a matrix of secant moduli, i.e., the constitutive matrix
+        eVec        a vector of thermodynamic control variables  (strains)
+        xVec        a vector of physical control variables       (stretches)
+        yVec        a vector of thermodynamic response variables (stresses)
+    Solves hyper-elastic equation of form:  s - s_0 = Es * e.
+
+tanMod(eVec, xVec, yVec)
+    E.g.:  Et = ce.tanMod(eVec, xVec, yVec)
+        dyde        a matrix of tangent moduli, i.e., a constitutive equation
+        eVec        a vector of thermodynamic control variables  (strains)
+        xVec        a vector of physical control variables       (stretches)
+        yVec        a vector of thermodynamic response variables (stresses)
+    The constitutive equation considered here is hypo-elastic; specifically,
+        dy/dt = dy/de de/dt  where  Et = dy/de  and  de/dt = de/dx dx/dt
     wherein
         dy/dt       a vector of thermodynamic response rates
         dy/de       a matrix of tangent moduli (the constitutive equation)
-        de/dx       a matrix that converts physical into thermodynamic rates
-        dx/dt       a vector of physical control rates
+        de/dt       is supplied by objects from class controlMembrane
+    Solves a hypo-elastic equation of the form: ds = Et * de.
 
 isRuptured()
-    E.g., ruptured = ce.isRuptured()
-        ruptured    is True if the membrane has ruptured; False otherwise
+    E.g.:  ruptured = ce.isRuptured()
+        ruptured    a tuple of boolean results specifying if a specific
+                    constituent has failed.  For a membrane, there is no
+                    mixture theory applied so the tuple has length of one.
 
-rupturedRespVec(ctrlVec, respVec)
-    E.g., rVec = ce.rupturedRespVec(ctrlVec)
-        rVec        returns the response vector after rupture: y after rupture
-        ctrlVec     the vector of physical control variables
-        respVec     vector of response variables just before membrane rupture
-
-rupturedTanMod(ctrlVec, respVec)
-    E.g., dyde = ce.rupturedTanMod(ctrlVec, respVec)
-        dyde        returns the matrix of tangent moduli after membrane rupture
-        ctrlVec     the vector of physical control variables
-        respVec     the vector of response variables after membrane rupture
+rupturedResponse(eVec, xVec, yBeforeVec)
+    E.g., yAfterVec = ce.rupturedResponse(eVec, xVec, yBeforeVec)
+        eVec        vector of thermodynamic control variables at rupture
+        xVec        vector of physical control variables at rupture
+        yBeforeVec  vector of response variables just before rupture occurs
+    returns
+        yAfterVec   vector of response variables just after a rupture event
+    Calling this method, which is done internally by the 'pece' integrator,
+    allows for a discontinuity in the field of thermodynamic responses.  Only
+    the dilational response is considered capable of rupture in this modeling.
 
 additional methods
 
@@ -205,9 +224,9 @@ massDensity()
     E.g., rho = ce.massDensity()
         rho         returns the mass density of the septal membrane
 
-temperature()
-    E.g., temp = ce.temperature()
-        temp        returns the temperature of the septal membrane
+thickness()
+    E.g., w = ce.thickness()
+        w           returns the width or thickness of the membrane
 
 stretch()
     E.g., U = ce.stretch()
@@ -217,6 +236,12 @@ stretchInv()
     E.g., Uinv = ce.stretchInv()
         Uinv        returns the inverse of Laplace stretch
 
+# absolute measures
+
+temperature()
+    E.g., temp = ce.temperature()
+        temp        returns the temperature of the septal membrane
+
 entropyDensity()
     E.g., eta = ce.entropyDensity()
         eta         returns the entropy density of the septal membrane
@@ -225,76 +250,111 @@ stress()
     E.g., S = ce.stress()
         S           returns stress in the co-ordinate frame of the membrane
 
-thickness()
-    E.g., w = ce.thickness()
-        w           returns the width or thickness of the membrane
+# relative measures
+
+relativeTemperature()
+    E.g., temp = ce.relativeTemperature()
+        temp        returns the relative temperature of the septal membrane
+
+relativeEntropyDensity()
+    E.g., eta = ce.relativeEntropyDensity()
+        eta         returns the relative entropy density of the septal membrane
+
+relativeStress()
+    E.g., S = ce.relativeStress()
+        S           returns relative stress in the membrane's co-ordinate frame
+
+References:
+    1) Freed, A. D. and Rajagopal, K. R., “A Promising Approach for Modeling
+       Biological Fibers,” ACTA Mechanica, 227 (2016), 1609-1619.
+       DOI: 10.1007/s00707-016-1583-8.  Errata: DOI: 10.1007/s00707-018-2183-6
+    2) Freed, A. D., Erel, V. and Moreno, M. R., “Conjugate Stress/Strain Base
+       Pairs for the Analysis of Planar Biologic Tissues”, Journal of Mechanics
+       of Materials and Structures, 12 (2017), 219-247.
+       DOI: 10.2140/jomms.2017.12.219
 """
 
 
 class controlMembrane(control):
 
+    # control vector arguments have interpretations of:
     # variables inherited from the base type: treat these as read-only:
     #   controls    an integer specifying the number of control variables
     #   node        an integer specifying the current node of integration,
     #               which is reset to 0 whenever the integrator is restarted
     #   dt          a floating point number specifying the time-step size
+    #   eR          a vector of initial conditions for thermodynamic controls
+    #   eP          a vector of thermodynamic control vars at the previous node
+    #   eC          a vector of thermodynamic control vars at the current node
+    #   eN          a vector of thermodynamic control vars at the next node
     #   xR          a vector holding control variables for the reference node
     #   xP          a vector holding control variables for the previous node
     #   xC          a vector holding control variables for the current node
     #   xN          a vector holding control variables for the next node
-    # control vector arguments have interpretations of:
-    #   ctrlVec[0]  membrane temperature      'theta'  (centigrade)
-    #   ctrlVec[1]  membrane elongation       'a'      (dimensionless)
-    #   ctrlVec[2]  membrane elongation       'b'      (dimensionless)
-    #   ctrlVec[3]  membrane shear magnitude  'g'      (dimensionless)
+    # For this model, the physical control vector has components of:
+    #     xVec[0]  temperature                   'T'           (centigrade)
+    #     xVec[1]  elongation in 1 direction     'a'           (dimensionless)
+    #     xVec[2]  elongation in 2 direction     'b'           (dimensionless)
+    #     xVec[3]  shear magnitude               'g'           (dimensionless)
+    # while the thermodynamic control vector has strain components of:
+    #     eVec[0]  thermal strain:       ln(T/T_0)             (dimensionless)
+    #     eVec[1]  dilation:             ln(a/a_0 * b/b_0)     (dimensionless)
+    #     eVec[2]  squeeze:              ln(a/a_0 * b_0/b)     (dimensionless)
+    #     eVec[3]  shear:                g - g_0               (dimensionless)
 
-    def __init__(self, ctrlVec0, dt):
-        # Call the constructor of the base type.
-        super().__init__(ctrlVec0, dt)
-        # Verify and initialize other data, as required.
+    def __init__(self, eVec0, xVec0, dt):
+        # Call the constructor of the base type to create and initialize the
+        # exported variables.
+        super().__init__(eVec0, xVec0, dt)
+        # Create and initialize any additional fields introduced by the user.
         if self.controls != 4:
-            raise RuntimeError("There are 4 control variables for 2D " +
-                               "membranes: temperature, two elongation " +
+            raise RuntimeError("There are 4 control variables for a 2D " +
+                               "membrane: temperature, two elongation " +
                                "ratios, and a shear.")
         return  # a new instance of type controlMembrane
 
-    def update(self, ctrlVec):
-        # Call the base implementation of this method to insert this vector
-        # into the class' data structure.
-        super().update(ctrlVec)
+    def update(self, xVec, restart=False):
+        # Call the base implementation of this method to insert this physical
+        # control variable into the data structure of this object, and then to
+        # integrate the thermodynamic control variables, eVec, for this update.
+        super().update(xVec, restart)
+        # Update any additional fields introduced by the user.
         return  # nothing
 
     def advance(self):
-        # Call the base implementation of this method to advance its data.
-        # This moves current data to their previous fields, and then it moves
-        # next data to their current fields.
+        # Call the base implementation of this method to advance its data
+        # structure by copying the current data into their previous fields,
+        # and then copying the next data into their current fields.
         super().advance()
-        # This method is called internally by the pece integrator and should
-        # not be called by the user.
+        # Advance any additional data introduced by the user.
+        # This method is called internally by the pece integrator and must not
+        # be called by the user.
         return  # nothing
 
     def dedx(self):
-        # Call the base implementation of this method to create dedxMtx.
+        # Call the base implementation of this method to create matrix dedxMtx.
         dedxMtx = super().dedx()
         # Because the matrix created by the super call is an identity matrix,
         # only a few of the cells need to be overwritten
+        T = 273.0 + self.xN[0]   # convert Centigrade into Kelvin
         a = self.xN[1]
         b = self.xN[2]
+        dedxMtx[0, 0] = 1.0 / T
         dedxMtx[1, 1] = 1.0 / (2.0 * a)
         dedxMtx[1, 2] = 1.0 / (2.0 * b)
         dedxMtx[2, 1] = 1.0 / (2.0 * a)
         dedxMtx[2, 2] = -1.0 / (2.0 * b)
         return dedxMtx
 
-    def dxdt(self, restart=False):
-        # Call the base implementation of this method to create dxdtVec.
-        dxdtVec = super().dxdt(restart)
+    def dxdt(self):
+        # Call the base implementation of this method to create vector dxdtVec.
+        dxdtVec = super().dxdt()
         # The returned dxdtVec is computed via finite difference formulae;
         # specifically,
         #   if self.node is 0, 1   use first-order difference formula
         #   if restart is True     use first-order difference formula
         #   otherwise              use second-order backward difference formula
-        # This is correct for all but the shear term, which is different.
+        # This is correct for all but the shear term, which is redefined below.
         aN = self.xN[1]
         aC = self.xC[1]
         if self.node == 0:
@@ -313,200 +373,322 @@ class controlMembrane(control):
 
 # constitutive class for biologic membranes
 
-class bioMembrane(response):
-    # implements the Freed-Rajagopal model for biologic fibers where
-    #   ctrlVec[0]  membrane temperature 'theta' (centigrade)
-    #   ctrlVec[1]  membrane stretch 'a'
-    #   ctrlVec[2]  membrane stretch 'b'
-    #   ctrlVec[3]  membrane shear 'g'
-    #   respVec[0]  membrane entropy density 'rho' (erg/g.K)
-    #   respVec[1]  membrane surface tension stress 'pi' (barye)
-    #   respVec[2]  membrane normal stress difference 'sigma' (barye)
-    #   respVec[3]  membrane shear stress 'tau' (barye)
+class ceMembrane(response):
+    # implements the Freed-Rajagopal model for biologic fibers as a membrane
+    # model, akin to that of Freed, Erel and Moreno, where
+    #   xVec[0]  temperature                  'T'            (centigrade)
+    #   xVec[1]  elongation in 1 direction    'a'            (dimensionless)
+    #   xVec[2]  elongation in 2 direction    'b'            (dimensionless)
+    #   xVec[3]  magnitude of shear           'g'            (dimensionless)
+    # while the thermodynamic control vector has strain-like components of:
+    #   eVec[0]  thermal strain:    ln(T/T_0)                (dimensionless)
+    #   eVec[1]  dilation:          ln(sqrt(a/a_0 * b/b_0))  (dimensionless)
+    #   eVec[2]  squeeze:           ln(sqrt(a/a_0 * b_0/b))  (dimensionless)
+    #   eVec[3]  shear:             g - g_0                  (dimensionless)
+    # and the thermodynamic response vector has stress-like components of:
+    #   yVec[0]  entropy density              'eta'          (erg/g.K)
+    #   yVec[1]  surface tension              'pi'           (barye)
+    #   yVec[2]  normal stress difference     'sigma'        (barye)
+    #   yVec[3]  shear stress                 'tau'          (barye)
 
-    def __init__(self, ctrlVec0, respVec0, rho, Cp, alpha, M1, M2, e_Mt,
-                 e_max, N1, N2, e_Nt, G1, G2, e_Gt, thickness=None):
-        # call the base type to verify the inputs and to create variables
-        #    self.controls  the number of control variables
-        #    self.responses the number of response variables
-        super().__init__(ctrlVec0, respVec0)
-        # verify inputs for the constructor of the base class
-        if self.controls != 4:
-            raise RuntimeError("A biologic membrane has 4 control variables.")
-        if self.responses != 4:
-            raise RuntimeError("A biologic membrane has 4 response variables.")
-        if ctrlVec0[0] < 33.0 or ctrlVec0[0] > 41.0:
-            raise RuntimeError("The initial temperature must be within the " +
-                               "range of 33 to 41 degrees Centigrade.")
-        # initialize the remaining data
-        self.rho = rho
-        self.Cp = Cp
-        self.alpha = alpha
+    def __init__(self, thickness=None):
+        # dimension the problem
+        controls = 4
+        responses = 4
+        # get the material properties
+        M1, M2, e_1, N1, N2, e_2, G1, G2, e_3, e_f, pi_0 = mp.septalMembrane()
+        # assign these material properties to the object
+        self.rho = mp.rhoSepta()
+        self.Cp = mp.CpSepta()
+        self.alpha = mp.alphaSepta()
         self.M1 = M1
         self.M2 = M2
-        self.e_Mt = e_Mt
-        self.e_max = e_max
+        self.xi_t = e_1
         self.N1 = N1
         self.N2 = N2
-        self.e_Nt = e_Nt
+        self.epsilon_t = e_2
         self.G1 = G1
         self.G2 = G2
-        self.e_Gt = e_Gt
-        if thickness is None or thickness < 0.000025 or thickness > 0.000065:
+        self.gamma_t = e_3
+        self.xi_f = e_f
+        # establish the initial conditions for the thermodynamic responses
+        yVec0 = np.zeros((responses,), dtype=float)
+        yVec0[0] = mp.etaSepta()   # initial entropy density
+        yVec0[1] = pi_0            # initial surface tension
+        yVec0[2] = 0.0             # initial normal stress difference
+        yVec0[3] = 0.0             # initial shear stress
+        # now call the base type to create the exported response fields
+        super().__init__(yVec0)
+        # establish the geometric property of thickness
+        if thickness is None:
             self.thickness = mp.septalWidth()
-        else:
+        elif thickness >= 0.0002 and thickness <= 0.00075:
             self.thickness = thickness
+        else:
+            raise RuntimeError("Thickness of a septal membrane must lie " +
+                               "within the range of 2 to 7.5 microns.")
+        # set default value for membrane rupture
         self.ruptured = False
-        return  # a new instance of a constitutive membrane object
+        # create vectors for the next node used in the output methods
+        self.eN = np.zeros((controls,), dtype=float)
+        self.xN = np.zeros((controls,), dtype=float)
+        self.yN = np.zeros((responses,), dtype=float)
+        return  # a new instance of this constitutive membrane object
 
-    def M_compliance(self, temp, xi, s_pi):
-        if s_pi > self.e_max * self.M2:
+    def _M_secCompliance(self, s_pi):
+        # a membrane can only rupture under an excessive surface tension
+        if s_pi > self.xi_f * self.M2:
             self.ruptured = True
-        if self.ruptured is True:
+        # construct the secant compliance governing the dilation response
+        s0_pi = self.yR[1]
+        if self.ruptured:
             # a small but positive modulus helps to maintain numeric stability
             M = 100.0 * np.finfo(float).eps
             c = 1.0 / M
-        elif s_pi <= 0.0:
-            # same elastic compliance as at zero stress and zero strain
+        elif s_pi < abs(s0_pi) * (1.0 + 1000.0 * np.finfo(float).eps):
+            # same elastic compliance as at zero strain
             c = (self.M1 + self.M2) / (self.M1 * self.M2)
         else:
             # bio membrane model for uniform response
-            dT = temp - self.xR[0]
-            xi1 = xi - self.alpha * dT - s_pi / (4.0 * self.M2)
-            if xi1 < self.e_Mt:
-                c = ((self.e_Mt - xi1) /
-                     (self.M1 * self.e_Mt + s_pi / 2.0) + 1.0 / self.M2)
+            c = ((4.0 * self.xi_t) / (s_pi - s0_pi) *
+                 (1.0 - m.sqrt(self.M1 * self.xi_t) /
+                  m.sqrt(self.M1 * self.xi_t + (s_pi - s0_pi) / 2.0)) +
+                 1.0 / self.M2)
+        return c
+
+    def _N_secCompliance(self, s_sigma):
+        # construct the secant compliance governing the squeeze response
+        if self.ruptured:
+            # a small but positive modulus helps to maintain numeric stability
+            N = 100.0 * np.finfo(float).eps
+            c = 1.0 / N
+        elif abs(s_sigma) < (1000.0 * np.finfo(float).eps):
+            # same elastic compliance as at zero strain
+            c = (self.N1 + self.N2) / (self.N1 * self.N2)
+        else:
+            c = ((2.0 * self.epsilon_t) / abs(s_sigma) *
+                 (1.0 - m.sqrt(self.N1 * self.epsilon_t) /
+                  m.sqrt(self.N1 * self.epsilon_t + abs(s_sigma))) +
+                 1.0 / self.N2)
+        return c
+
+    def _G_secCompliance(self, s_tau):
+        # construct the secant compliance governing the shear response
+        if self.ruptured:
+            # a small but positive modulus helps to maintain numeric stability
+            G = 100.0 * np.finfo(float).eps
+            c = 1.0 / G
+        elif abs(s_tau) < (1000.0 * np.finfo(float).eps):
+            # same elastic compliance as at zero strain
+            c = (self.G1 + self.G2) / (self.G1 * self.G2)
+        else:
+            c = (self.gamma_t / abs(s_tau) *
+                 (1.0 - m.sqrt(self.G1 * self.gamma_t) /
+                  m.sqrt(self.G1 * self.gamma_t + 2.0 * abs(s_tau))) +
+                 1.0 / self.G2)
+        return c
+
+    def secMod(self, eVec, xVec, yVec):
+        # call the base type to verify the inputs and to create matrix ceMtx
+        Es = super().secMod(eVec, xVec, yVec)
+        # assemble the secant moduli
+        # y = y0 + Es * e
+        #    e   is a vector of thermodynamic control variables  (strains)
+        #    x   is a vector of physical control variables       (stretches)
+        #    y   is a vector of thermodynamic response variables (stresses)
+        # populate the entries of Es for the user's secant moduli below
+        temperature = xVec[0]       # temperature                (C)
+        s_pi0 = self.yR[1]          # initial surface tension    (barye)
+        s_pi = yVec[1]              # surface tension            (barye)
+        s_sigma = yVec[2]           # normal stress difference   (barye)
+        s_tau = yVec[3]             # shear stress               (barye)
+        M = 1.0 / self._M_secCompliance(s_pi)
+        N = 1.0 / self._N_secCompliance(s_sigma)
+        G = 1.0 / self._G_secCompliance(s_tau)
+        rhoT = self.rho * (273.0 + temperature)
+        Cs = self.alpha * (s_pi - s_pi0) / rhoT
+        Ce = 4.0 * self.alpha**2 * M / rhoT
+        # compute the tangent modulus
+        Es[0, 0] = self.Cp - Cs - Ce
+        Es[0, 1] = Ce / self.alpha
+        Es[1, 0] = -4.0 * self.alpha * M
+        Es[1, 1] = 4.0 * M
+        Es[2, 2] = 2.0 * N
+        Es[3, 3] = G
+        # update the exported vector fields
+        self.eN[:] = eVec[:]
+        self.xN[:] = xVec[:]
+        self.yN[:] = yVec[:]
+        return Es
+
+    def _M_tanCompliance(self, temp, xi, s_pi):
+        # a membrane can only rupture under an excessive surface tension
+        if s_pi > self.xi_f * self.M2:
+            self.ruptured = True
+        # construct the tangent compliance governing the dilation response
+        s0_pi = self.yR[1]
+        if self.ruptured:
+            # a small but positive modulus helps to maintain numeric stability
+            M = 100.0 * np.finfo(float).eps
+            c = 1.0 / M
+        elif s_pi < abs(s0_pi):
+            # same elastic compliance as at zero strain
+            c = (self.M1 + self.M2) / (self.M1 * self.M2)
+        else:
+            # bio membrane model for uniform response
+            temp0 = self.xR[0]
+            lnTonT0 = m.log((273.0 + temp) / (273.0 + temp0))
+            xi1 = xi - self.alpha * lnTonT0 - (s_pi - s0_pi) / (4.0 * self.M2)
+            if xi1 < self.xi_t:
+                c = ((self.xi_t - xi1) /
+                     (self.M1 * self.xi_t + (s_pi - s0_pi) / 2.0) +
+                     1.0 / self.M2)
             else:
                 c = 1.0 / self.M2
         return c
 
-    def N_compliance(self, epsilon, s_sigma):
-        # bio membrane model for non-uniform squeeze response
-        if self.ruptured is True:
+    def _N_tanCompliance(self, epsilon, s_sigma):
+        # construct the tangent compliance that governs the squeeze response
+        if self.ruptured:
             # a small but positive modulus helps to maintain numeric stability
             N = 100.0 * np.finfo(float).eps
             c = 1.0 / N
         else:
             epsilon1 = epsilon - s_sigma / (2.0 * self.N2)
-            if epsilon1 > 0.0:
-                if epsilon1 < self.e_Nt:
-                    c = ((self.e_Nt - epsilon1) /
-                         (self.N1 * self.e_Nt + s_sigma) + 1.0 / self.N2)
+            if epsilon1 > np.finfo(float).eps:
+                if epsilon1 < self.epsilon_t:
+                    c = ((self.epsilon_t - epsilon1) /
+                         (self.N1 * self.epsilon_t + s_sigma) + 1.0 / self.N2)
                 else:
                     c = 1.0 / self.N2
-            elif epsilon1 < -0.0:
-                if epsilon1 > -self.e_Nt:
-                    c = ((-self.e_Nt - epsilon1) /
-                         (-self.N1 * self.e_Nt + s_sigma) + 1.0 / self.N2)
+            elif epsilon1 < -np.finfo(float).eps:
+                if epsilon1 > -self.epsilon_t:
+                    c = ((-self.epsilon_t - epsilon1) /
+                         (-self.N1 * self.epsilon_t + s_sigma) + 1.0 / self.N2)
                 else:
                     c = 1.0 / self.N2
             else:
                 c = (self.N1 + self.N2) / (self.N1 * self.N2)
         return c
 
-    def G_compliance(self, gamma, s_tau):
-        # bio membrane model for non-uniform shear response
+    def _G_tanCompliance(self, gamma, s_tau):
+        # construct the tangent compliance that governs the shear response
         if self.ruptured is True:
             # a small but positive modulus helps to maintain numeric stability
             G = 100.0 * np.finfo(float).eps
             c = 1.0 / G
         else:
             gamma1 = gamma - s_tau / self.G2
-            if gamma1 > 0.0:
-                if gamma1 < self.e_Gt:
-                    c = ((self.e_Gt - gamma1) /
-                         (self.G1 * self.e_Gt + 2.0 * s_tau) + 1.0 / self.G2)
+            if gamma1 > np.finfo(float).eps:
+                if gamma1 < self.gamma_t:
+                    c = ((self.gamma_t - gamma1) /
+                         (self.G1 * self.gamma_t + 2.0 * s_tau) +
+                         1.0 / self.G2)
                 else:
                     c = 1.0 / self.G2
-            elif gamma1 < -0.0:
-                if gamma1 > -self.e_Gt:
-                    c = ((-self.e_Gt - gamma1) /
-                         (-self.G1 * self.e_Gt + 2.0 * s_tau) + 1.0 / self.G2)
+            elif gamma1 < -np.finfo(float).eps:
+                if gamma1 > -self.gamma_t:
+                    c = ((-self.gamma_t - gamma1) /
+                         (-self.G1 * self.gamma_t + 2.0 * s_tau) +
+                         1.0 / self.G2)
                 else:
                     c = 1.0 / self.G2
             else:
                 c = (self.G1 + self.G2) / (self.G1 * self.G2)
         return c
 
-    def tanMod(self, ctrlVec, respVec):
+    def tanMod(self, eVec, xVec, yVec):
         # call the base type to verify the inputs and to create matrix ceMtx
-        dyde = super().tanMod(ctrlVec, respVec)
-        # populate the entries of dyde for the tangent moduli below
-        # T0 = self.xR[0]         # is introduced and used in M_compliance
-        a0 = self.xR[1]           # initial elongation ratio denoted as a
-        b0 = self.xR[2]           # initial elongation ratio denoted as b
-        g0 = self.xR[3]           # initial magnitude of shear denoted as g
-        TN = ctrlVec[0]           # temperature at next node (centigrade)
-        aN = ctrlVec[1]           # elongation ratio a at the next node
-        bN = ctrlVec[2]           # elongation ratio b at the next node
-        gN = ctrlVec[3]           # magintude of shear g at the next node
-        # entropy = respVec[0]    # is not needed in this model
-        s_pi = respVec[1]         # uniform areal stress at next node (barye)
-        s_sigma = respVec[2]      # non-uniform squeeze stress (barye)
-        s_tau = respVec[3]        # non-uniform shear stress (barye)
-        xi = m.log(m.sqrt((aN * bN) / (a0 * b0)))       # dilation
-        epsilon = m.log(m.sqrt((aN * b0) / (a0 * bN)))  # squeeze
-        gamma = gN - g0                                 # shear
-        M = 1.0 / self.M_compliance(TN, xi, s_pi)
-        N = 1.0 / self.N_compliance(epsilon, s_sigma)
-        G = 1.0 / self.G_compliance(gamma, s_tau)
+        Et = super().tanMod(eVec, xVec, yVec)
+        # assemble the tangent moduli
+        # dy = Et * de
+        #    e   a vector of thermodynamic control variables  (strains)
+        #    x   a vector of physical control variables       (stretches)
+        #    y   a vector of thermodynamic response variables (stresses)
+        # populate the entries of Et for the user's tangent moduli below
+        temperature = xVec[0]    # temperature                (C)
+        xi = eVec[1]             # dilation                   (dimensionless)
+        epsilon = eVec[2]        # squeeze                    (dimensionless)
+        gamma = eVec[3]          # shear                      (dimensionless)
+        s0_pi = self.yR[1]       # initial or residual stress (barye)
+        s_pi = yVec[1]           # surface tension            (barye)
+        s_sigma = yVec[2]        # normal stress difference   (barye)
+        s_tau = yVec[3]          # shear stress               (barye)
+        M = 1.0 / self._M_tanCompliance(temperature, xi, s_pi)
+        N = 1.0 / self._N_tanCompliance(epsilon, s_sigma)
+        G = 1.0 / self._G_tanCompliance(gamma, s_tau)
+        rhoT = self.rho * (273.0 + temperature)
+        Cs = self.alpha * (s_pi - s0_pi) / rhoT
+        Ce = 4.0 * self.alpha**2 * M / rhoT
         # compute the tangent modulus
-        dyde[0, 0] = (self.Cp / (TN + 273.0) -
-                      4.0 * self.alpha**2 * M / self.rho)
-        dyde[0, 1] = 4.0 * self.alpha * M / self.rho
-        dyde[1, 0] = -4.0 * self.alpha * M
-        dyde[1, 1] = 4.0 * M
-        dyde[2, 2] = 2.0 * N
-        dyde[3, 3] = G
-        return dyde
+        Et[0, 0] = self.Cp - Cs - Ce
+        Et[0, 1] = Ce / self.alpha
+        Et[1, 0] = -4.0 * self.alpha * M
+        Et[1, 1] = 4.0 * M
+        Et[2, 2] = 2.0 * N
+        Et[3, 3] = G
+        # update the exported fields
+        self.eN[:] = eVec[:]
+        self.xN[:] = xVec[:]
+        self.yN[:] = yVec[:]
+        return Et
 
     def isRuptured(self):
-        # no super call is required here, ruptured is to have a boolean value
-        return self.ruptured
+        if self.firstCall:
+            hasRuptured = (False,)
+        elif not self.ruptured:
+            hasRuptured = super().isRuptured()
+        else:
+            hasRuptured = (True,)
+        return hasRuptured
 
-    def rupturedRespVec(self, ctrlVec, respVec):
+    def rupturedRespVec(self, eVec, xVec, yBeforeVec):
         # call the base type to verify the input and to create vector rVec
-        rVec = super().rupturedRespVec(ctrlVec, respVec)
+        yAfterVec = super().rupturedRespVec(eVec, xVec, yBeforeVec)
         # populate the entries for the ruptured response in rVec below
         # this will result in discontinuities in the response fields
-        T0 = self.xR[0]           # initial temperature (centigrade)
-        a0 = self.xR[1]           # initial elongation ratio denoted as a
-        b0 = self.xR[2]           # initial elongation ratio denoted as b
-        g0 = self.xR[3]           # initial magnitude of shear denoted as g
-        TN = ctrlVec[0]           # temperature at next node (centigrade)
-        aN = ctrlVec[1]           # elongation ratio a at the next node
-        bN = ctrlVec[2]           # elongation ratio b at the next node
-        gN = ctrlVec[3]           # magintude of shear g at the next node
+        TN = xVec[0]              # temperature at next node (centigrade)
         # compute the strains at rupture
-        xi = m.log(m.sqrt((aN * bN) / (a0 * b0)))       # dilation
-        epsilon = m.log(m.sqrt((aN * b0) / (a0 * bN)))  # squeeze
-        gamma = gN - g0                                 # shear
+        lnTonT0 = eVec[0]         # thermal strain
+        xi = eVec[1]              # dilation
+        epsilon = eVec[2]         # squeeze
+        gamma = eVec[3]           # shear
         # a small but positive modulus helps to maintain numeric stability
         E = 100.0 * np.finfo(float).eps
         # provides for a discontinuity in the response vector
-        rVec = np.zeros((4,), dtype=float)
-        rVec[0] = (self.yR[0] + 4.0 * self.alpha * E *
-                   (xi - self.alpha * (TN - T0)) / self.rho)
-        rVec[1] = 4.0 * E * xi
-        rVec[2] = 2.0 * E * epsilon
-        rVec[3] = E * gamma
-        return rVec
+        yAfterVec[0] = (self.yR[0] + (self.Cp - 4.0 * self.alpha**2 * E /
+                                      (self.rho * (273.0 + TN))) * lnTonT0)
+        yAfterVec[1] = 4.0 * E * xi
+        yAfterVec[2] = 2.0 * E * epsilon
+        yAfterVec[3] = E * gamma
+        return yAfterVec
 
-    def rupturedTanMod(self, ctrlVec, respVec):
-        # No need for a super call in this case, just simply call
-        return self.tanMod(ctrlVec, respVec)
+    # additional methods
 
     def massDensity(self):
         return self.rho
 
-    def temperature(self):
-        return self.xN[0]
+    def thickness(self):
+        if self.firstCall:
+            width = self.thickness
+        else:
+            a0 = self.xR[1]
+            b0 = self.xR[2]
+            a = self.xN[1]
+            b = self.xN[2]
+            width = self.thickness * a0 * b0 / (a * b)
+        return width
 
     def stretch(self):
         U = np.zeros((2, 2), dtype=float)
-        a = self.xN[1]
-        b = self.xN[2]
-        g = self.xN[3]
+        if self.firstCall:
+            a = self.xR[1]
+            b = self.xR[2]
+            g = self.xR[3]
+        else:
+            a = self.xN[1]
+            b = self.xN[2]
+            g = self.xN[3]
         U[0, 0] = a
         U[0, 1] = a * g
         U[1, 1] = b
@@ -514,23 +696,49 @@ class bioMembrane(response):
 
     def stretchInv(self):
         Uinv = np.zeros((2, 2), dtype=float)
-        a = self.xN[1]
-        b = self.xN[2]
-        g = self.xN[3]
+        if self.firstCall:
+            a = self.xR[1]
+            b = self.xR[2]
+            g = self.xR[3]
+        else:
+            a = self.xN[1]
+            b = self.xN[2]
+            g = self.xN[3]
         Uinv[0, 0] = 1.0 / a
         Uinv[0, 1] = -g / b
         Uinv[1, 1] = 1.0 / b
         return Uinv
 
+    # absolute measures
+
+    def temperature(self):
+        bodyTemp = 37.0
+        if self.firstCall:
+            theta = bodyTemp
+        else:
+            theta = self.xN[0]
+        return theta
+
     def entropyDensity(self):
-        return self.yN[0]
+        if self.firtsCall:
+            eta = mp.etaSepta()
+        else:
+            eta = self.yN[0]
+        return eta
 
     def stress(self):
-        a = self.xN[1]
-        b = self.xN[2]
-        pi = self.yN[1]
-        sigma = self.yN[2]
-        tau = self.yN[3]
+        if self.firstCall:
+            a = self.xR[1]
+            b = self.xR[2]
+            pi = self.yR[1]
+            sigma = self.yR[2]
+            tau = self.yR[3]
+        else:
+            a = self.xN[1]
+            b = self.xN[2]
+            pi = self.yN[1]
+            sigma = self.yN[2]
+            tau = self.yN[3]
         s = np.zeros((2, 2), dtype=float)
         s[0, 0] = (pi + sigma) / 2.0
         s[0, 1] = b * tau / a
@@ -538,8 +746,35 @@ class bioMembrane(response):
         s[1, 1] = (pi - sigma) / 2.0
         return s
 
-    def thickness(self):
-        return self.thickness
+    # relative measures
+
+    def relativeTemperature(self):
+        if self.firstCall:
+            theta = 0.0
+        else:
+            theta = self.xN[0] - self.xR[0]
+        return theta
+
+    def relativeEntropyDensity(self):
+        if self.firstCall:
+            S = 0.0
+        else:
+            S = self.yN[0] - self.yR[0]
+        return S
+
+    def relativeStress(self):
+        s = np.zeros((2, 2), dtype=float)
+        if not self.firstCall:
+            a = self.xN[1]
+            b = self.xN[2]
+            pi = self.yN[1] - self.yR[1]   # only surface tension has a prestress
+            sigma = self.yN[2]
+            tau = self.yN[3]
+            s[0, 0] = (pi + sigma) / 2.0
+            s[0, 1] = b * tau / a
+            s[1, 0] = s[0, 1]
+            s[1, 1] = (pi - sigma) / 2.0
+        return s
 
 
 """
