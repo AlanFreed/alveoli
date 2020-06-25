@@ -13,7 +13,7 @@ from pylab import rcParams
 
 """
 Created on Wed May 27 2020
-Updated on Wed May 27 2020
+Updated on Wed Jun 22 2020
 
 A test file for the bioFiber constitutive response in file ceChords.py.
 
@@ -111,10 +111,6 @@ def run():
         didRupture = resp.isRuptured()
         if didRupture[0]:
             ruptured += 1
-        if j == curves - 1:
-            print('y0     - ' + y0.__str__())
-            print('y      = ' + y.__str__())
-            print('y - y0 = ' + ymy0.__str__())
 
     print("\nOut of {}, ".format(curves) +
           "{} fibers ruptured.\n".format(ruptured))
@@ -210,7 +206,7 @@ def run():
     line28, = ax1.plot(strain[:, 27], stress[:, 27], 'k-', linewidth=2)
     line29, = ax1.plot(strain[:, 28], stress[:, 28], 'k-', linewidth=2)
     line30, = ax1.plot(strain[:, 29], stress[:, 29], 'k-', linewidth=2)
-    plt.title("30 Absolute Stress/Strain Curves", fontsize=20)
+    plt.title("30 Stress/Strain Curves", fontsize=20)
     plt.xlabel(r'strain  $e$', fontsize=18)
     plt.ylabel(r'absolute stress  $s$  (barye)', fontsize=18)
 
@@ -247,7 +243,7 @@ def run():
     line28, = ax2.plot(strain[:, 27], entropy[:, 27], 'k-', linewidth=2)
     line29, = ax2.plot(strain[:, 28], entropy[:, 28], 'k-', linewidth=2)
     line30, = ax2.plot(strain[:, 29], entropy[:, 29], 'k-', linewidth=2)
-    plt.title("30 Absolute Entropy/Strain Curves", fontsize=20)
+    plt.title("30 Entropy/Strain Curves", fontsize=20)
     plt.xlabel(r'strain  $e$', fontsize=16)
     plt.ylabel(r'absolute entropy density  $\eta$  (erg/g.K)', fontsize=16)
 
@@ -284,7 +280,6 @@ def run():
     line28, = ax3.plot(strain[:, 27], relStress[:, 27], 'k-', linewidth=2)
     line29, = ax3.plot(strain[:, 28], relStress[:, 28], 'k-', linewidth=2)
     line30, = ax3.plot(strain[:, 29], relStress[:, 29], 'k-', linewidth=2)
-    plt.title("30 Relative Stress/Strain Curves", fontsize=20)
     plt.xlabel(r'strain  $e$', fontsize=18)
     plt.ylabel(r'relative stress  $s - s_0$  (barye)', fontsize=18)
 
@@ -321,7 +316,6 @@ def run():
     line28, = ax4.plot(strain[:, 27], relEntropy[:, 27], 'k-', linewidth=2)
     line29, = ax4.plot(strain[:, 28], relEntropy[:, 28], 'k-', linewidth=2)
     line30, = ax4.plot(strain[:, 29], relEntropy[:, 29], 'k-', linewidth=2)
-    plt.title("30 Relative Entropy/Strain Curves", fontsize=20)
     plt.xlabel(r'strain  $e$', fontsize=16)
     plt.ylabel(r'relative entropy density  $\eta - \eta_0$  (erg/g.K)',
                fontsize=16)

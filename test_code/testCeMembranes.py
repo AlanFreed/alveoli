@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ceMembranes import controlMembrane, bioMembrane
+from ceMembranes import controlMembrane, ceMembrane
 import math
 from peceHE import pece
 # for creating graphics
 from matplotlib import pyplot as plt
-from matplotlib import ticker
-import materialProperties as mp
+# from matplotlib import ticker
+# import materialProperties as mp
 import numpy as np
 from pylab import rcParams
 
 """
 Created on Fri May 29 2020
-Updated on Fri May 29 2020
+Updated on Wed Jun 24 2020
 
 A test file for the membrane constitutive response in file ceMembranes.py.
 
@@ -24,12 +24,6 @@ author: Prof. Alan Freed
 m = 2
 # assign the number of integration steps to be applied per experiment
 N = 75
-# assign the number of curves to plot per experiment and number of experiments
-curves = 30
-experiments = 5
-# assign number of variables
-ctrlVars = 4
-respVars = 4
 # assign the time variables used
 t0 = 0.0
 tN = 1.0
@@ -37,16 +31,12 @@ dt = (tN - t0) / N
 # assign the temperature variables used
 T0 = 37.0
 TN = 37.0
-# assign initial conditions for the deformation variables used
-a0 = 1.0
-b0 = 1.0
-g0 = 0.0
-# assign the initial conditions
-eta0 = mp.etaSepta()
-pi0 = 0.0
-sigma0 = 0.0
-tau0 = 0.0
-
+# assign the number of curves to plot per experiment and number of experiments
+curves = 30
+experiments = 5
+# assign number of variables
+ctrlVars = 4
+respVars = 4
 
 def run():
     # create the data arrays used for plotting
@@ -66,248 +56,235 @@ def run():
     # uniform dilation experiment
 
     experiment = 0
-    aN = a0 * math.exp(0.2)
-    bN = b0 * math.exp(0.2)
-    gN = g0
-    for j in range(curves):
-        # create and initialize the control vector
-        ctrlVec = np.zeros((ctrlVars,), dtype=float)
-        ctrlVec[0] = T0
-        ctrlVec[1] = a0
-        ctrlVec[2] = b0
-        ctrlVec[3] = g0
-        # create the control object
-        ctrl = controlMembrane(ctrlVec, dt)
-        # create and initialize the response vector
-        respVec = np.zeros((respVars,), dtype=float)
-        respVec[0] = eta0
-        respVec[1] = pi0
-        respVec[2] = sigma0
-        respVec[3] = tau0
-        # create the response object
-        rho = mp.rhoSepta()
-        Cp = mp.CpSepta()
-        alpha = mp.alphaSepta()
-        M1, M2, e_Mt, e_max, N1, N2, e_Nt, G1, G2, e_Gt = mp.septalMembrane()
-        resp = bioMembrane(ctrlVec, respVec, rho, Cp, alpha, M1, M2, e_Mt,
-                           e_max, N1, N2, e_Nt, G1, G2, e_Gt)
-        # assign initial conditions for the plotting arrays
-        xi[0, experiment, j] = 0.0
-        pi[0, experiment, j] = pi0
-        epsilon[0, experiment, j] = 0.0
-        sigma[0, experiment, j] = sigma0
-        gamma[0, experiment, j] = 0.0
-        tau[0, experiment, j] = tau0
-        # create the integrator
-        solver = pece(ctrl, resp, m)
-        # integrate the constitutive equation for this boundary value problem
-        for i in range(1, N+1):
-            ctrlVec[0] = T0 + (TN - T0) * i / N
-            ctrlVec[1] = a0 + (aN - a0) * i / N
-            ctrlVec[2] = b0 + (bN - b0) * i / N
-            ctrlVec[3] = g0 + (gN - g0) * i / N
-            solver.integrate(ctrlVec)
-            solver.advance()
-            x = solver.getX()
-            ai = x[1]
-            bi = x[2]
-            gi = x[3]
-            xi[i, experiment, j] = math.log(math.sqrt((ai * bi) / (a0 * b0)))
-            epsilon[i, experiment, j] = (math.log(math.sqrt((ai * b0) /
-                                                            (a0 * bi))))
-            gamma[i, experiment, j] = gi - g0
-            y = solver.getY()
-            pi[i, experiment, j] = y[1]
-            sigma[i, experiment, j] = y[2]
-            tau[i, experiment, j] = y[3]
-        if resp.isRuptured() is True:
-            ruptured[experiment] += 1
-
-    # non-uniform squeeze experiment
-
-    experiment = 1
-    aN = a0 * math.exp(0.2)
-    bN = 1.0 / aN
+    a0 = 1.0
+    b0 = 1.0
+    g0 = 0.0
+    aN = a0 * math.exp(0.25)
+    bN = b0 * math.exp(0.25)
     gN = g0
     for j in range(curves):
         ctrl = None
         resp = None
         solver = None
-        # create and initialize the control vector
-        ctrlVec = np.zeros((ctrlVars,), dtype=float)
-        ctrlVec[0] = T0
-        ctrlVec[1] = a0
-        ctrlVec[2] = b0
-        ctrlVec[3] = g0
+        # create and initialize the two control vectors
+        eVec0 = np.zeros((ctrlVars,), dtype=float)
+        xVec0 = np.zeros((ctrlVars,), dtype=float)
+        xVec0[0] = T0
+        xVec0[1] = a0
+        xVec0[2] = b0
+        xVec0[3] = g0
         # create the control object
-        ctrlT = controlMembrane(ctrlVec, dt)
-        ctrlC = controlMembrane(ctrlVec, dt)
-        # create and initialize the response vector
-        respVec = np.zeros((respVars,), dtype=float)
-        respVec[0] = eta0
-        respVec[1] = pi0
-        respVec[2] = sigma0
-        respVec[3] = tau0
-        # create the response object
-        rho = mp.rhoSepta()
-        Cp = mp.CpSepta()
-        alpha = mp.alphaSepta()
-        M1, M2, e_Mt, e_max, N1, N2, e_Nt, G1, G2, e_Gt = mp.septalMembrane()
-        respT = bioMembrane(ctrlVec, respVec, rho, Cp, alpha, M1, M2, e_Mt,
-                            e_max, N1, N2, e_Nt, G1, G2, e_Gt)
-        respC = bioMembrane(ctrlVec, respVec, rho, Cp, alpha, M1, M2, e_Mt,
-                            e_max, N1, N2, e_Nt, G1, G2, e_Gt)
+        ctrl = controlMembrane(eVec0, xVec0, dt)
+        # create the response object with random thickness assignment
+        resp = ceMembrane()
+        # create the integrator
+        solver = pece(ctrl, resp, m)
         # assign initial conditions for the plotting arrays
-        xi[0, experiment, j] = 0.0
-        pi[0, experiment, j] = pi0
-        epsilon[0, experiment, j] = 0.0
-        sigma[0, experiment, j] = sigma0
-        gamma[0, experiment, j] = 0.0
-        tau[0, experiment, j] = tau0
-        xi[0, experiment+1, j] = 0.0
-        pi[0, experiment+1, j] = pi0
-        epsilon[0, experiment+1, j] = 0.0
-        sigma[0, experiment+1, j] = sigma0
-        gamma[0, experiment+1, j] = 0.0
-        tau[0, experiment+1, j] = tau0
-        # create the integrators
-        solverT = pece(ctrlT, respT, m)  # tension
-        solverC = pece(ctrlC, respC, m)  # compression
+        e0 = solver.getE()
+        y0 = solver.getYminusY0()
+        xi[0, experiment, j] = e0[1]
+        pi[0, experiment, j] = y0[1]
+        epsilon[0, experiment, j] = e0[2]
+        sigma[0, experiment, j] = y0[2]
+        gamma[0, experiment, j] = e0[3]
+        tau[0, experiment, j] = y0[3]
         # integrate the constitutive equation for this boundary value problem
+        xVec = np.zeros((ctrlVars,), dtype=float)
         for i in range(1, N+1):
-            # elongation a is > 1, b < 1
-            ctrlVec[0] = T0 + (TN - T0) * i / N
-            ctrlVec[1] = a0 + (aN - a0) * i / N
-            ctrlVec[2] = b0 + (bN - b0) * i / N
-            ctrlVec[3] = g0 + (gN - g0) * i / N
-            solverT.integrate(ctrlVec)
-            solverT.advance()
-            x = solverT.getX()
-            ai = x[1]
-            bi = x[2]
-            gi = x[3]
-            xi[i, experiment, j] = math.log(math.sqrt((ai * bi) / (a0 * b0)))
-            epsilon[i, experiment, j] = (math.log(math.sqrt((ai * b0) /
-                                                            (a0 * bi))))
-            gamma[i, experiment, j] = gi - g0
-            y = solverT.getY()
+            xVec[0] = T0 + (TN - T0) * i / N
+            xVec[1] = a0 + (aN - a0) * i / N
+            xVec[2] = b0 + (bN - b0) * i / N
+            xVec[3] = g0 + (gN - g0) * i / N
+            solver.integrate(xVec)
+            solver.advance()
+            e = solver.getE()
+            xi[i, experiment, j] = e[1]
+            epsilon[i, experiment, j] = e[2]
+            gamma[i, experiment, j] = e[3]
+            y = solver.getYminusY0()
             pi[i, experiment, j] = y[1]
             sigma[i, experiment, j] = y[2]
             tau[i, experiment, j] = y[3]
-            # elongation a < 1, b > 1
-            temp = ctrlVec[2]
-            ctrlVec[2] = ctrlVec[1]
-            ctrlVec[1] = temp
-            solverC.integrate(ctrlVec)
+        (hasRuptured,) = resp.isRuptured()
+        if hasRuptured:
+            ruptured[experiment] += 1
+
+    # pure shear: experiments 1 & 2
+
+    experiment = 1
+    lamda0 = 1.0     # initial stretch of pure shear
+    lamdaN = 1.107   # final stretch for pure shear => gamma_max = 0.2
+    for j in range(curves):
+        ctrl = None
+        resp = None
+        solver = None
+        # create and initialize the two control vectors
+        eVec0 = np.zeros((ctrlVars,), dtype=float)
+        xVec0 = np.zeros((ctrlVars,), dtype=float)
+        xVec0[0] = T0
+        xVec0[1] = a0
+        xVec0[2] = b0
+        xVec0[3] = g0
+        # create the control objects
+        ctrlT = controlMembrane(eVec0, xVec0, dt)   # tension
+        ctrlC = controlMembrane(eVec0, xVec0, dt)   # compression
+        # create the response objects with random thickness assignments
+        respT = ceMembrane()                        # tension
+        respC = ceMembrane()                        # compression
+        # create the integrators
+        solverT = pece(ctrlT, respT, m)             # tension
+        solverC = pece(ctrlC, respC, m)             # compression
+        # assign initial conditions for the plotting arrays
+        # tension: a > b
+        e0 = solverT.getE()
+        y0 = solverT.getYminusY0()
+        xi[0, experiment, j] = e0[1]
+        pi[0, experiment, j] = y0[1]
+        epsilon[0, experiment, j] = e0[2]
+        sigma[0, experiment, j] = y0[2]
+        gamma[0, experiment, j] = e0[3]
+        tau[0, experiment, j] = y0[3]
+        # compression: b > a
+        e0 = solverC.getE()
+        y0 = solverC.getYminusY0()
+        xi[0, experiment+1, j] = e0[1]
+        pi[0, experiment+1, j] = y0[1]
+        epsilon[0, experiment+1, j] = e0[2]
+        sigma[0, experiment+1, j] = y0[2]
+        gamma[0, experiment+1, j] = e0[3]
+        tau[0, experiment+1, j] = y0[3]
+        # integrate the constitutive equation for this boundary value problem
+        xVec = np.zeros((ctrlVars,), dtype=float)
+        for i in range(1, N+1):
+            # elongation, case tension: a > 1, b < 1
+            xVec[0] = T0 + (TN - T0) * i / N
+            lamda = lamda0 + (lamdaN - lamda0) * i / N
+            xVec[1] = math.sqrt(lamda**2 + 1.0 / lamda**2) / math.sqrt(2.0)
+            xVec[2] = 1.0 / xVec[1]
+            xVec[3] = ((lamda**2 - 1.0 / lamda**2) /
+                       (lamda**2 + 1.0 / lamda**2))
+            solverT.integrate(xVec)
+            solverT.advance()
+            e = solverT.getE()
+            xi[i, experiment, j] = e[1]
+            epsilon[i, experiment, j] = e[2]
+            gamma[i, experiment, j] = e[3]
+            y = solverT.getYminusY0()
+            pi[i, experiment, j] = y[1]
+            sigma[i, experiment, j] = y[2]
+            tau[i, experiment, j] = y[3]
+            # elongation case compression: a < 1, b > 1
+            xVec[3] = ((1.0 / lamda**2 - lamda**2) /
+                       (lamda**2 + 1.0 / lamda**2))
+            solverC.integrate(xVec)
             solverC.advance()
-            x = solverC.getX()
-            ai = x[1]
-            bi = x[2]
-            gi = x[3]
-            xi[i, experiment+1, j] = math.log(math.sqrt((ai * bi) / (a0 * b0)))
-            epsilon[i, experiment+1, j] = (math.log(math.sqrt((ai * b0) /
-                                                              (a0 * bi))))
-            gamma[i, experiment+1, j] = gi - g0
-            y = solverC.getY()
+            e = solverC.getE()
+            xi[i, experiment+1, j] = e[1]
+            epsilon[i, experiment+1, j] = e[2]
+            gamma[i, experiment+1, j] = e[3]
+            y = solverC.getYminusY0()
             pi[i, experiment+1, j] = y[1]
             sigma[i, experiment+1, j] = y[2]
             tau[i, experiment+1, j] = y[3]
-        if respT.isRuptured() is True or respC.isRuptured() is True:
+        (hasRupturedT,) = respT.isRuptured()
+        (hasRupturedC,) = respC.isRuptured()
+        if hasRupturedT:
             ruptured[experiment] += 1
+        if hasRupturedC:
+            ruptured[experiment+1] += 1
 
-    # non-uniform shear experiment
+    # non-uniform shear: experiments 3 & 4
 
     experiment = 3
-    aN = a0
-    bN = b0
+    a0 = 1.0
+    b0 = 1.0
+    g0 = 0.0
+    aN = 1.0
+    bN = 1.0
     gN = 0.2
     for j in range(curves):
         ctrl = None
         resp = None
         solver = None
-        # create and initialize the control vector
-        ctrlVec = np.zeros((ctrlVars,), dtype=float)
-        ctrlVec[0] = T0
-        ctrlVec[1] = a0
-        ctrlVec[2] = b0
-        ctrlVec[3] = g0
-        # create the control object
-        ctrlT = controlMembrane(ctrlVec, dt)
-        ctrlC = controlMembrane(ctrlVec, dt)
-        # create and initialize the response vector
-        respVec = np.zeros((respVars,), dtype=float)
-        respVec[0] = eta0
-        respVec[1] = pi0
-        respVec[2] = sigma0
-        respVec[3] = tau0
-        # create the response object
-        rho = mp.rhoSepta()
-        Cp = mp.CpSepta()
-        alpha = mp.alphaSepta()
-        M1, M2, e_Mt, e_max, N1, N2, e_Nt, G1, G2, e_Gt = mp.septalMembrane()
-        respT = bioMembrane(ctrlVec, respVec, rho, Cp, alpha, M1, M2, e_Mt,
-                            e_max, N1, N2, e_Nt, G1, G2, e_Gt)
-        respC = bioMembrane(ctrlVec, respVec, rho, Cp, alpha, M1, M2, e_Mt,
-                            e_max, N1, N2, e_Nt, G1, G2, e_Gt)
+        # create and initialize the two control vectors
+        eVec0 = np.zeros((ctrlVars,), dtype=float)
+        xVec0 = np.zeros((ctrlVars,), dtype=float)
+        xVec0[0] = T0
+        xVec0[1] = a0
+        xVec0[2] = b0
+        xVec0[3] = g0
+        # create the control objects
+        ctrlT = controlMembrane(eVec0, xVec0, dt)   # tension
+        ctrlC = controlMembrane(eVec0, xVec0, dt)   # compression
+        # create the response objects with random thickness assignments
+        respT = ceMembrane()                        # tension
+        respC = ceMembrane()                        # compression
+        # create the integrators
+        solverT = pece(ctrlT, respT, m)             # tension
+        solverC = pece(ctrlC, respC, m)             # compression
         # assign initial conditions for the plotting arrays
-        xi[0, experiment, j] = 0.0
-        pi[0, experiment, j] = pi0
-        epsilon[0, experiment, j] = 0.0
-        sigma[0, experiment, j] = sigma0
-        gamma[0, experiment, j] = 0.0
-        tau[0, experiment, j] = tau0
-        xi[0, experiment+1, j] = 0.0
-        pi[0, experiment+1, j] = pi0
-        epsilon[0, experiment+1, j] = 0.0
-        sigma[0, experiment+1, j] = sigma0
-        gamma[0, experiment+1, j] = 0.0
-        tau[0, experiment+1, j] = tau0
-        # create the integrator
-        solverT = pece(ctrlT, respT, m)
-        solverC = pece(ctrlC, respC, m)
+        # tension: gamma > 0
+        e0 = solverT.getE()
+        y0 = solverT.getYminusY0()
+        xi[0, experiment, j] = e0[1]
+        pi[0, experiment, j] = y0[1]
+        epsilon[0, experiment, j] = e0[2]
+        sigma[0, experiment, j] = y0[2]
+        gamma[0, experiment, j] = e0[3]
+        tau[0, experiment, j] = y0[3]
+        # compression: b > a
+        e0 = solverC.getE()
+        y0 = solverC.getYminusY0()
+        xi[0, experiment+1, j] = e0[1]
+        pi[0, experiment+1, j] = y0[1]
+        epsilon[0, experiment+1, j] = e0[2]
+        sigma[0, experiment+1, j] = y0[2]
+        gamma[0, experiment+1, j] = e0[3]
+        tau[0, experiment+1, j] = y0[3]
         # integrate the constitutive equation for this boundary value problem
+        xVec = np.zeros((ctrlVars,), dtype=float)
         for i in range(1, N+1):
-            ctrlVec[0] = T0 + (TN - T0) * i / N
-            ctrlVec[1] = a0 + (aN - a0) * i / N
-            ctrlVec[2] = b0 + (bN - b0) * i / N
-            ctrlVec[3] = g0 + (gN - g0) * i / N
-            solverT.integrate(ctrlVec)
+            # elongation, case tension: a > 1, b < 1
+            xVec[0] = T0 + (TN - T0) * i / N
+            xVec[1] = a0 + (aN - a0) * i / N
+            xVec[2] = b0 + (bN - b0) * i / N
+            xVec[3] = g0 + (gN - g0) * i / N
+            solverT.integrate(xVec)
             solverT.advance()
-            x = solverT.getX()
-            ai = x[1]
-            bi = x[2]
-            gi = x[3]
-            xi[i, experiment, j] = math.log(math.sqrt((ai * bi) / (a0 * b0)))
-            epsilon[i, experiment, j] = (math.log(math.sqrt((ai * b0) /
-                                                            (a0 * bi))))
-            gamma[i, experiment, j] = gi - g0
-            y = solverT.getY()
+            e = solverT.getE()
+            xi[i, experiment, j] = e[1]
+            epsilon[i, experiment, j] = e[2]
+            gamma[i, experiment, j] = e[3]
+            y = solverT.getYminusY0()
             pi[i, experiment, j] = y[1]
             sigma[i, experiment, j] = y[2]
             tau[i, experiment, j] = y[3]
-            # negative shear
-            ctrlVec[3] = g0 + (-gN - g0) * i / N
-            solverC.integrate(ctrlVec)
+            # elongation case compression: a < 1, b > 1
+            xVec[3] = -xVec[3]
+            solverC.integrate(xVec)
+            xVec[3] = -xVec[3]
             solverC.advance()
-            x = solverC.getX()
-            ai = x[1]
-            bi = x[2]
-            gi = x[3]
-            xi[i, experiment+1, j] = math.log(math.sqrt((ai * bi) / (a0 * b0)))
-            epsilon[i, experiment+1, j] = (math.log(math.sqrt((ai * b0) /
-                                                              (a0 * bi))))
-            gamma[i, experiment+1, j] = gi - g0
-            y = solverC.getY()
+            e = solverC.getE()
+            xi[i, experiment+1, j] = e[1]
+            epsilon[i, experiment+1, j] = e[2]
+            gamma[i, experiment+1, j] = e[3]
+            y = solverC.getYminusY0()
             pi[i, experiment+1, j] = y[1]
             sigma[i, experiment+1, j] = y[2]
             tau[i, experiment+1, j] = y[3]
-        if respT.isRuptured() is True or respC.isRuptured() is True:
+        (hasRupturedT,) = respT.isRuptured()
+        (hasRupturedC,) = respC.isRuptured()
+        if hasRupturedT:
             ruptured[experiment] += 1
+        if hasRupturedC:
+            ruptured[experiment+1] += 1
 
     print("Out of {} septal membranes tested per condition, ".format(curves) +
           "\n   {} membranes ruptured during dilation,".format(ruptured[0]) +
-          "\n   {} membranes ruptured during squeeze,".format(ruptured[1]) +
-          "\n   {} membranes ruptured during shear.".format(ruptured[2]))
+          "\n   {}, {} ".format(ruptured[1], ruptured[2]) +
+          " membranes ruptured during pure shear (tension vs. compression)," +
+          "\n   {}, {} ".format(ruptured[3], ruptured[4]) +
+          " membranes ruptured during simple shear (tension vs. compression).")
 
     # change fontsize of minor and major tick labels
     plt.tick_params(axis='both', which='major', labelsize=16)
@@ -350,9 +327,10 @@ def run():
     line28, = ax1.plot(xi[:, 0, 27], pi[:, 0, 27], 'k-', linewidth=2)
     line29, = ax1.plot(xi[:, 0, 28], pi[:, 0, 28], 'k-', linewidth=2)
     line30, = ax1.plot(xi[:, 0, 29], pi[:, 0, 29], 'k-', linewidth=2)
-    plt.title("30", fontsize=20)
-    plt.xlabel(r'dilation  $\xi$', fontsize=18)
-    plt.ylabel(r'surface tension  $s^{\pi}$  (dynes)', fontsize=18)
+    plt.title("Thirty", fontsize=20)
+    plt.xlabel(r'dilation:  $\xi$', fontsize=18)
+    plt.ylabel(r'surface tension:  $s^{\pi} - s_0^{\pi}$  (dynes)',
+               fontsize=18)
 
     # add the curves
     ax2 = plt.subplot(3, 3, 2)
@@ -388,8 +366,9 @@ def run():
     line29, = ax2.plot(epsilon[:, 0, 28], sigma[:, 0, 28], 'k-', linewidth=2)
     line30, = ax2.plot(epsilon[:, 0, 29], sigma[:, 0, 29], 'k-', linewidth=2)
     plt.title("Dilation", fontsize=20)
-    plt.xlabel(r'squeeze strain  $\epsilon$', fontsize=16)
-    plt.ylabel(r'squeeze stress  $s^{\sigma}$  (dynes)', fontsize=16)
+    plt.xlabel(r'squeeze strain:  $\epsilon$', fontsize=16)
+    plt.ylabel(r'squeeze stress:  $s^{\sigma} - s_0^{\sigma}$  (dynes)',
+               fontsize=16)
 
     # add the curves
     ax3 = plt.subplot(3, 3, 3)
@@ -425,8 +404,8 @@ def run():
     line29, = ax3.plot(gamma[:, 0, 28], tau[:, 0, 28], 'k-', linewidth=2)
     line30, = ax3.plot(gamma[:, 0, 29], tau[:, 0, 29], 'k-', linewidth=2)
     plt.title("Experiments", fontsize=20)
-    plt.xlabel(r'shear strain  $\gamma$', fontsize=16)
-    plt.ylabel(r'shear stress  $s^{\tau}$  (dynes)', fontsize=16)
+    plt.xlabel(r'shear strain:  $\gamma$', fontsize=16)
+    plt.ylabel(r'shear stress:  $s^{\tau} - s_0^{\tau}$  (dynes)', fontsize=16)
 
     # the pure shear experiment
 
@@ -492,9 +471,10 @@ def run():
     line58, = ax4.plot(xi[:, 2, 27], pi[:, 2, 27], 'k-', linewidth=2)
     line59, = ax4.plot(xi[:, 2, 28], pi[:, 2, 28], 'k-', linewidth=2)
     line60, = ax4.plot(xi[:, 2, 29], pi[:, 2, 29], 'k-', linewidth=2)
-    plt.title("30", fontsize=20)
-    plt.xlabel(r'dilation  $\xi$', fontsize=18)
-    plt.ylabel(r'surface tension  $s^{\pi}$  (dynes)', fontsize=18)
+    plt.title("Thirty", fontsize=20)
+    plt.xlabel(r'dilation:  $\xi$', fontsize=18)
+    plt.ylabel(r'surface tension:  $s^{\pi} - s_0^{\pi}$  (dynes)',
+               fontsize=18)
 
     # add the curves
     ax5 = plt.subplot(3, 3, 5)
@@ -560,8 +540,9 @@ def run():
     line59, = ax5.plot(epsilon[:, 2, 28], sigma[:, 2, 28], 'k-', linewidth=2)
     line60, = ax5.plot(epsilon[:, 2, 29], sigma[:, 2, 29], 'k-', linewidth=2)
     plt.title("Pure Shear", fontsize=20)
-    plt.xlabel(r'squeeze strain  $\epsilon$', fontsize=16)
-    plt.ylabel(r'squeeze stress  $s^{\sigma}$  (dynes)', fontsize=16)
+    plt.xlabel(r'squeeze strain:  $\epsilon$', fontsize=16)
+    plt.ylabel(r'squeeze stress:  $s^{\sigma} - s_0^{\sigma}$  (dynes)',
+               fontsize=16)
 
     # add the curves
     ax6 = plt.subplot(3, 3, 6)
@@ -627,8 +608,8 @@ def run():
     line59, = ax6.plot(gamma[:, 2, 28], tau[:, 2, 28], 'k-', linewidth=2)
     line60, = ax6.plot(gamma[:, 2, 29], tau[:, 2, 29], 'k-', linewidth=2)
     plt.title("Experiments", fontsize=20)
-    plt.xlabel(r'shear strain  $\gamma$', fontsize=16)
-    plt.ylabel(r'shear stress  $s^{\tau}$  (dynes)', fontsize=16)
+    plt.xlabel(r'shear strain:  $\gamma$', fontsize=16)
+    plt.ylabel(r'shear stress:  $s^{\tau} - s_0^{\tau}$  (dynes)', fontsize=16)
 
     # the simple shear experiment
 
@@ -694,9 +675,10 @@ def run():
     line58, = ax7.plot(xi[:, 4, 27], pi[:, 4, 27], 'k-', linewidth=2)
     line59, = ax7.plot(xi[:, 4, 28], pi[:, 4, 28], 'k-', linewidth=2)
     line60, = ax7.plot(xi[:, 4, 29], pi[:, 4, 29], 'k-', linewidth=2)
-    plt.title("30", fontsize=20)
-    plt.xlabel(r'dilation  $\xi$', fontsize=18)
-    plt.ylabel(r'surface tension  $s^{\pi}$  (dynes)', fontsize=18)
+    plt.title("Thirty", fontsize=20)
+    plt.xlabel(r'dilation:  $\xi$', fontsize=18)
+    plt.ylabel(r'surface tension:  $s^{\pi} - s_0^{\pi}$  (dynes)',
+               fontsize=18)
 
     # add the curves
     ax8 = plt.subplot(3, 3, 8)
@@ -762,8 +744,9 @@ def run():
     line59, = ax8.plot(epsilon[:, 4, 28], sigma[:, 4, 28], 'k-', linewidth=2)
     line60, = ax8.plot(epsilon[:, 4, 29], sigma[:, 4, 29], 'k-', linewidth=2)
     plt.title("Simple Shear", fontsize=20)
-    plt.xlabel(r'squeeze strain  $\epsilon$', fontsize=16)
-    plt.ylabel(r'squeeze stress  $s^{\sigma}$  (dynes)', fontsize=16)
+    plt.xlabel(r'squeeze strain:  $\epsilon$', fontsize=16)
+    plt.ylabel(r'squeeze stress:  $s^{\sigma} - s_0^{\sigma}$  (dynes)',
+               fontsize=16)
 
     # add the curves
     ax9 = plt.subplot(3, 3, 9)
@@ -829,8 +812,8 @@ def run():
     line59, = ax9.plot(gamma[:, 4, 28], tau[:, 4, 28], 'k-', linewidth=2)
     line60, = ax9.plot(gamma[:, 4, 29], tau[:, 4, 29], 'k-', linewidth=2)
     plt.title("Experiments", fontsize=20)
-    plt.xlabel(r'shear strain  $\gamma$', fontsize=16)
-    plt.ylabel(r'shear stress  $s^{\tau}$  (dynes)', fontsize=16)
+    plt.xlabel(r'shear strain:  $\gamma$', fontsize=16)
+    plt.ylabel(r'shear stress:  $s^{\tau} - s_0^{\tau}$  (dynes)', fontsize=16)
 
     plt.savefig('septalMembranes.jpg')
 
