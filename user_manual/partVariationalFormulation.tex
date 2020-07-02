@@ -530,57 +530,64 @@ N_{1,\xi} &   N_{2,\xi} \,
 Thereby the total stiffness matrix $\mathbf{K}_T$ can be obtained by summation of stress stiffness matrix, small and large displacement stiffness matrices.
 
 \subsection{Stiffness Matrix for Pentagon}
-The components of Laplace stretch $\boldsymbol{\mathcal{U}}$ associated with a planar membrane has a  Cholesky factorization expressed in terms of the right Cauchy-Green deformation tensor $\mathbf{C} \defeq \mathbf{F}^{\mathsf{T}} \mathbf{F} = \boldsymbol{\mathcal{U}}^{\mathsf{T}} \boldsymbol{\mathcal{U}}$, which is a symmetric second-order tensor. 
+\textcolor{red}{For a planar member, the components of Laplace stretch $\boldsymbol{\mathcal{U}}$, obtained from a Cholesky factorization of the right Cauchy-Green tensor $\mathbf{C}\defeq \mathbf{F}^{\mathsf{T}} \mathbf{F} = \boldsymbol{\mathcal{U}}^{\mathsf{T}} \boldsymbol{\mathcal{U}}$, can be written as}
 \begin{equation}
 \begin{aligned}
-{\mathcal{U}}_{11} & = \sqrt{C_{11}} \;\; & 
-{\mathcal{U}}_{12} & = C_{12} / {\mathcal{U}_{11}} \\
+{\mathcal{U}}_{11} = a & = \sqrt{C_{11}} \;\; & 
+{\mathcal{U}}_{12} = a\:g & = C_{12} / {\mathcal{U}_{11}} \\
 {\mathcal{U}}_{21} & = 0 &
-{\mathcal{U}}_{22} & = \sqrt{C_{22} - ({\mathcal{U}}_{12})^2} 
+{\mathcal{U}}_{22} = b & = \sqrt{C_{22} - ({\mathcal{U}}_{12})^2} 
 \end{aligned}
 \label{Laplace stretchComponents}
 \end{equation} 
-where ${C_{11}}$, ${C_{12}}$, ${C_{21}}$ and ${C_{22}}$ are components of the Green deformation matrix $\mathbf{C}$ wherein  $\mathbf{F}$ is the deformation gradient.
+\textcolor{red}{where ${C_{11}}$, ${C_{12}}$=${C_{21}}$ and ${C_{22}}$ are the components of the right Cauchy-Green tensor $\mathbf{C}$. Furthermore, these components of Cauchy-Green tensor can be expressed in terms of the components of the deformation gradient $\mathbf{F}$ as}
 \begin{subequations}
 	\begin{align}
-	\mathbf{C} &= \mathbf{F}^{\mathsf{T}} \mathbf{F} =
-	\begin{bmatrix}
-	C_{11} & C_{12}  \\
-	C_{12} & C_{22} 
-	\end{bmatrix} \quad \textrm{,} \quad
-	\mathbf{F} =  
-	\begin{bmatrix}
-	1+\mathrm{\partial u / \partial x} & \mathrm{\partial u / \partial y}  \\
-	\mathrm{\partial v / \partial x} & 1+\mathrm{\partial v / \partial y}
-	\end{bmatrix}\\
-	\intertext{with}
 	\mathrm{C_{11}}&= \left(\frac{\mathrm{\partial u}}{\partial x}\right)^2+ \left(\frac{\mathrm{\partial v}}{\partial x}\right)^2 + 2\, \frac{\mathrm{\partial u}}{\partial x}  + 1\\
 	\mathrm{C_{12}}&= \frac{\mathrm{\partial u}}{\partial y} + \frac{\mathrm{\partial v}}{\partial x} + \frac{\mathrm{\partial u}}{\partial x} \cdot \frac{\mathrm{\partial u}}{\partial y} + \frac{\mathrm{\partial v}}{\partial x} \cdot \frac{\mathrm{\partial v}}{\partial y}\\
 	\mathrm{C_{22}}&= \left(\frac{\mathrm{\partial u}}{\partial y}\right)^2 + \left(\frac{\mathrm{\partial v}}{\partial y}\right)^2 + 2\, \frac{\mathrm{\partial v}}{\partial y} + 1
+	\intertext{wherein}
+	\mathbf{F} &=  
+	\begin{bmatrix}
+	1+\mathrm{\partial u / \partial x} & \mathrm{\partial u / \partial y}  \\
+	\mathrm{\partial v / \partial x} & 1+\mathrm{\partial v / \partial y}
+	\end{bmatrix}
 	\end{align}
 \end{subequations}
-It is useful to define the total virtual strains Eq.~(\ref{conjugateStrains}) in terms of linear and nonlinear incremental strains as follow
+\textcolor{red}{Here, $u$ and $v$ are the displacements associated with the deformation of the planar member.}
+
+\textcolor{red}{Now, the thermodynamic strain attributes, as defined earlier, can be expressed in terms of the components of Laplace stretch as}
+\begin{equation}
+\xi=\ln\left(\sqrt{\dfrac{a\:b}{a_0\:b_0}}\right);\quad\varepsilon=\ln\left(\sqrt{\dfrac{a\:b_0}{b\:a_0}}\right);\quad \gamma=g-g_0.
+\end{equation}
+\textcolor{red}{Without loss of generality, we can assume the membrane to be initially undeformed which allows us to assume $a_0$ and $b_0$ to be $1$ whereas the initial shear $g_0$ is taken as zero. To gain computational advantage, we decompose the total strain increments, thus obtained, into their linear and two nonlinear components as}
 \begin{subequations}
 	\begin{align}
 	\mathrm  \xi & = \mathrm \xi_{L} + \mathrm  \xi_{N1} + \mathrm  \xi_{N2}\\
 	\mathrm  \varepsilon & = \mathrm  \varepsilon_{L} + \mathrm  \varepsilon_{N1} + \mathrm  \varepsilon_{N2}\\
-	\mathrm \gamma & = \mathrm  \gamma_{L} + \mathrm  \gamma_{N1} + \mathrm  \gamma_{N2}
+	\mathrm \gamma & = \mathrm  \gamma_{L} + \mathrm  \gamma_{N1} + \mathrm  \gamma_{N2}.
 	\end{align}
 	\label{totalvirtualstrain}
 \end{subequations}
-Taylor series are used here to obtain the linear and nonlinear part of displacements 
+\textcolor{red}{Traditionally, the total strain increment is decomposed into a linear and a nonlinear components. However, in our case, further decomposition of the nonlinear strain component makes our computation much easier as will be realized later. The decomposition of total strain increment is achieved by using Taylor series expansion up to second-order terms. The linear and nonlinear components of total strain increments, thus obtained, are given as}
 \begin{subequations}
 	\begin{align}
 	\mathrm \xi_{L} & = \frac{1}{2} \, \left(\mathrm{\frac{\partial u}{\partial x}} + \mathrm{\frac{\partial v}{\partial y}}\right)\\
-	\mathrm \xi_{N} & = \frac{1}{4} \, \left(- \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} - 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
+	\mathrm \xi_{N1} & = \frac{1}{4} \, \left(- \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}}\right)\\
+	\mathrm{\xi_{N2}} & = - \frac{1}{2} \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\\
 	\mathrm \varepsilon_{L} & = \frac{1}{2} \, \left(\mathrm{\frac{\partial u}{\partial x}} - \mathrm{\frac{\partial v}{\partial y}}\right)\\
-	\mathrm \varepsilon_{N} & = \frac{1}{4} \, \left(2 \, \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial x}} + \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} + 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
+	\mathrm \varepsilon_{N1} & = \frac{1}{4} \, \left(\mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} \right)\\
+	\mathrm{\varepsilon_{N2}} & = \frac{1}{2} \left(\mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial x}} + \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}} \right)\\
 	\mathrm \gamma_{L} & = \mathrm{\frac{\partial u}{\partial y}} + \mathrm{\frac{\partial v}{\partial x}}\\
-	\mathrm \gamma_{N} & = \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial y}} - 2\, \mathrm{\frac{ \partial u}{\partial x}}\, \mathrm{\frac{ \partial v}{\partial x}} 
-	-\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial y}}
+	\mathrm \gamma_{N1} & = \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial y}}-\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial y}}\\
+	\mathrm{\gamma_{N2}} & =  - 2\, \mathrm{\frac{ \partial u}{\partial x}}\, \mathrm{\frac{ \partial v}{\partial x}}.  
 	\end{align}
 \end{subequations}
-The linear strain displacement matrix $\mathbf{B}_L$ can be obtained by differentiation of displacements expressed through the nodal displacements and shape functions from infinitesimal linear strain vector that take the form of
+\textcolor{red}{The linear components of strain attributes consist of only first-order derivatives of the displacements whereas the nonlinear components contain the second-order terms. The nonlinear components of strains are arranged in a way such that when represented in a set of bases, they can be written as a product of matrix and a vector containing the derivatives of displacements. To achieve that, for the dilatation and squeeze strains, the first nonlinear components consist of the squares of derivatives whereas the second nonlinear components are made up of products between different derivatives of the displacements, e.g., the component $\xi_{N1}$ contains terms of the form $\left(\dfrac{\partial u}{\partial x}\right)^2$ whereas its other counterpart, $\xi_{N2}$ is made up of a cross term like $\dfrac{\partial u}{\partial y}\dfrac{\partial v}{\partial x}$. Note that the nonlinear part of the total shear strain contains only products of different derivatives of displacements, i.e., no square term is present in its expression. Therefore, we club together the terms containing the products of derivatives of the \textit{same} displacement with respect to different spatial variables, e.g., $\dfrac{\partial v}{\partial x}\,\dfrac{\partial v}{\partial y}$ in $\gamma_{N1}$ whereas $\gamma_{N2}$ comprises the rest of the terms. This organization allows one to write the linear and the two nonlinear components of \textit{all} the strain attributes in a matrix form. Moreover, this procedure helps us to write the strain--displacement matrix corresponding to the linear and two nonlinear components of strain and thus, provides additional computational advantage.}
+
+\textcolor{red}{To obtain the stiffness matrix for the planar membrane, first we need to compute the strain--displacement matrices as mentioned earlier. The strain--displacement matrices are obtained by expressing the corresponding strain components in terms of the five nodal displacements with the help of shape functions.}
+
+\textcolor{red}{In terms of the nodal displacements the vector containing the linear strain attributes, $\mathbf{E}_L$ can be written as}
 \begin{equation}
 \begin{aligned}
 \mathbf{E}_L & =  \begin{Bmatrix}
@@ -601,7 +608,7 @@ v_{i} \end{Bmatrix} \\
 = [\mathbf{B}_L] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} 
 \end{aligned}
 \end{equation}
-wherein 
+\textcolor{red}{wherein the components of the linear strain--displacement matrix can be written in terms of the derivatives of the shape function as}
 \begin{subequations}
 	\begin{align}
 	\mathbf{b}_{Li} = & \begin{bmatrix}
@@ -612,10 +619,10 @@ wherein
 	\mathbf{\Delta}^T  = &
 	\begin{Bmatrix}
 	u_1, v_1, u_2, v_2, ...,u_n, v_n
-	\end{Bmatrix}
+	\end{Bmatrix}.
 	\end{align}
 \end{subequations}
-The first nonlinear strain terms can be written as 
+\textcolor{red}{The two nonlinear parts of strain are expressed as products of a matrix, $\mathbf{A}$ containing the elements of the displacement gradient and a vector, $\boldsymbol{\theta}$ that contains the derivatives of displacements. Following this procedure, the first nonlinear strain can be written as}
 \begin{equation}
 \begin{aligned}
 \mathbf{E}_{N1} & =  \begin{Bmatrix}
@@ -635,7 +642,7 @@ The first nonlinear strain terms can be written as
 = \tfrac{1}{2} \, [\mathbf{A}_{N1}] \, [\boldsymbol{\theta}_{N1}]
 \end{aligned}
 \end{equation}
-the derivative of displacement can be related to the nodal parameters via
+\textcolor{red}{To obtain the nonlinear strain--displacement matrix, we require the nonlinear strain to be expressed in terms of the nodal displacements. This is achieved by expressing the elements of displacement gradient in terms of the nodal displacements by using the shape functions, specifically, the vector $\boldsymbol{\theta}_{N1}$ can be written as}
 \begin{equation}
 [\boldsymbol{\theta}_{N1}] =  \begin{Bmatrix}
 \partial u / \partial x\\
@@ -650,28 +657,28 @@ the derivative of displacement can be related to the nodal parameters via
 \end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
 = [\mathbf{H}_{N1}] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} 
 \end{equation}
-where 
+\textcolor{red}{where the components of $\mathbf{H}_{N1}$ contains the derivatives of shape functions with respect to spatial variables, i.e.,}
 \begin{equation}
 \mathbf{h}_{Ni} = \begin{bmatrix}
 N_{i,x} &  0  \\
 0 & N_{i,y}  \end{bmatrix} 
 \end{equation}
-hence $\mathbf{B}_{N1}$ become
+\textcolor{red}{Therefore, the first nonlinear strain--displacement matrix $\mathbf{B}_{N1}$ can be written as}
 \begin{equation}
 \mathbf{B}_{N1} = [\mathbf{A}_{N1}] \, [\mathbf{H}_{N1}] = \begin{bmatrix}
 [\mathbf{b}_{N1}], & [\mathbf{b}_{N2}], & [\mathbf{b}_{N3}], & [\mathbf{b}_{N4}], & [\mathbf{b}_{N5}] 
 \end{bmatrix} 
 \end{equation}
-where
+\textcolor{red}{where the components of $\mathbf{B}_{N1}$ are given as}
 \begin{equation}
 \mathbf{b}_{Ni} = \begin{bmatrix}
 -\tfrac{1}{2} \, \partial u / \partial x &  - \tfrac{1}{2} \, \partial v / \partial y \\
 -\tfrac{1}{2} \, \partial u / \partial x &  \tfrac{1}{2} \, \partial v / \partial y \\
 -2 \, \partial u / \partial y  & 2 \, \partial v / \partial x  \end{bmatrix}  \, \begin{bmatrix}
 N_{i,x} &  0  \\
-0 & N_{i,y}  \end{bmatrix} 
+0 & N_{i,y}  \end{bmatrix}. 
 \end{equation}
-The second nonlinear strain terms can be written as 
+\textcolor{red}{In a similar manner, the second nonlinear strain terms can be written as} 
 \begin{equation}
 \begin{aligned}
 \mathbf{E}_{N2} & =  \begin{Bmatrix}
@@ -689,9 +696,9 @@ The second nonlinear strain terms can be written as
 \partial v / \partial x
 \end{Bmatrix}
 = \tfrac{1}{2} \, [\mathbf{A}_{N2}] \, [\boldsymbol{\theta}_{N2}]
-\end{aligned}
+\end{aligned}.
 \end{equation}
-the derivative of displacement can be related to the nodal parameters via
+\textcolor{red}{The vector $\boldsymbol{\theta}_{N2}$ is expressed in terms of the nodal displacements with the use of shape functions as}
 \begin{equation}
 [\boldsymbol{\theta}_{N2}] =  \begin{Bmatrix}
 \partial u / \partial y\\
@@ -706,50 +713,50 @@ the derivative of displacement can be related to the nodal parameters via
 \end{bmatrix}  \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix}  
 = [\mathbf{H}_2] \begin{Bmatrix} \boldsymbol{\Delta} \end{Bmatrix} 
 \end{equation}
-where 
+\textcolor{red}{where the elements of $\mathbf{H}_{N2}$ are given as}
 \begin{equation}
 \mathbf{h}_{Ni} = \begin{bmatrix}
 N_{i,y} &  0  \\
-0 & N_{i,x}  \end{bmatrix} 
+0 & N_{i,x}  \end{bmatrix}. 
 \end{equation}
-hence $\mathbf{B}_{N2}$ become
+\textcolor{red}{Hence, the second nonlinear strain--displacement matrix $\mathbf{B}_{N2}$ becomes}
 \begin{equation}
 \mathbf{B}_{N2} = [\mathbf{A}_{N2}] \, [\mathbf{H}_{N2}] = \begin{bmatrix}
 [\mathbf{b}_{N1}], & [\mathbf{b}_{N2}], & [\mathbf{b}_{N3}], & [\mathbf{b}_{N4}], & [\mathbf{b}_{N5}] 
 \end{bmatrix} 
 \end{equation}
-where
+\textcolor{red}{where its elements are given as}
 \begin{equation}
 \mathbf{b}_{Ni} = \begin{bmatrix}
 - \partial v / \partial x &  0 \\
 \partial v / \partial x &  \partial v / \partial x \\
 0 & -4 \, \partial u / \partial x  \end{bmatrix} \, \begin{bmatrix}
 N_{i,y} &  0  \\
-0 & N_{i,x}  \end{bmatrix} 
+0 & N_{i,x}  \end{bmatrix}. 
 \end{equation}
-In order to be able to evaluate the nonlinear stiffness matrix, $[\mathbf{\bar{B}}]$ should be established as the summation of $ \mathbf{B}_{N1}$ and $\mathbf{B}_{N2}$.
-Hence, the stress stiffness matrix for a 2-D alveolar septa take the form of
+\textcolor{red}{The total nonlinear strain--displacement matrix is evaluated as the summation of its components $ \mathbf{B}_{N1}$ and $\mathbf{B}_{N2}$. Now, with all the strain--displacement matrices evaluated, we are ready to compute the stiffness matrix for a planar membrane.}
+
+\textcolor{red}{The total stiffness matrix is additively decomposed into three components: the stiffness matrix associated with initial stress $\mathbf{K_S}$, the linear stiffness matrix $\mathbf{K}_L$ and the nonlinear stiffness matrix $\mathbf{K}_N$. The initial stress stiffness matrix  for a 2-D alveolar septa is given as}
 \begin{equation}
-\mathbf{K}_\mathbf{S} = \int_{\pentagon} \int_{\pentagon}  \mathrm{d} \mathbf{B}_N^{\mathsf{T}} \, \mathbf{T} \, |\mathbf{J}|  \, h \,  \mathrm{d} \xi \,  \mathrm{d} \eta =  \sum_{i=1}^{n}  \sum_{j=1}^{n}  \mathrm{d} \mathbf{B}_N^{\mathsf{T}} \, \mathbf{T} \, |\mathbf{J}| \, h \, \mathrm{w}_i \mathrm{w}_j
-\label{stressstif}
+\mathbf{K}_\mathbf{S}\,\mathrm{d}\boldsymbol{\Delta} = \int_{\pentagon} \int_{\pentagon}  \mathrm{d} \mathbf{B}_N^{\mathsf{T}} \, \mathbf{T} \, |\mathbf{J}|  \, h \,  \mathrm{d} \xi \,  \mathrm{d} \eta \label{stressstif}
 \end{equation}
-where $n$ stands for number of Gauss points, $\mathrm{w}_i$ and $\mathrm{w}_j$ denote the natural weight of the element demonstrated in Table~\ref{tabQuadrature}
-By taking the variation of Eq.~(\ref{straindis}) and substituting the definition of first and second nonlinear strain displacement matrices, the total nonlinear strain displacement matrix becomes
+\textcolor{red}{From the expression of $\mathbf{K_{\mathbf{S}}}$, it is easily understood that we need to express $\mathrm{d}\mathbf{B}_N$ in terms of the incremental nodal displacements $\mathrm{d}\boldsymbol{\Delta}$. Using Eqn.~\eqref{nonlinStrainDisp}, we get}
 \begin{equation}
 \mathrm{d}[\mathbf{B}_N]^{\mathsf{T}} = [\mathbf{H}_{N1}^{\mathsf{T}}] \mathrm{d} [\mathbf{A}_{N1}^{\mathsf{T}}] + [\mathbf{H}_{N2}^{\mathsf{T}}] \mathrm{d} [\mathbf{A}_{N2}^{\mathsf{T}}] 
 \end{equation}
-which on substituting into Eq.~(\ref{stressstif}) gives 
+\textcolor{red}{which on substitution into Eq.~(\ref{stressstif}) yields} 
 \begin{equation}
 \mathbf{K_\mathbf{S}} \mathrm{d} \boldsymbol{\Delta} = \int_A \left(
 [\mathbf{H}_1^{\mathsf{T}}] \mathrm{d} [\mathbf{A}_1^{\mathsf{T}}] + [\mathbf{H}_2^{\mathsf{T}}] \mathrm{d} [\mathbf{A}_2^{\mathsf{T}}]\right) \, \begin{Bmatrix} s^{\pi} \\ s^{\sigma} \\  s^{\tau} \end{Bmatrix} \, \mathrm{d} A
+\label{initstiff}
 \end{equation}
-However, using the mathematical properties of the matrix $\mathbf{A}$, the following expression will appear
+\textcolor{red}{Furthermore, from the definition of $\mathbf{A}$, one can observe that}
 \begin{equation}
 \mathrm{d} [\mathbf{A}_1^{\mathsf{T}}] \, \begin{Bmatrix} s^{\pi} \\ s^{\sigma} \\  s^{\tau} \end{Bmatrix} = \begin{bmatrix}s^{\pi} & s^{\tau} \\ 
 s^{\tau} & s^{\sigma} \end{bmatrix} \, [\mathbf{H}_1] \, \mathrm{d} \boldsymbol{\Delta} \quad \text{and} \quad \mathrm{d} [\mathbf{A}_2^{\mathsf{T}}] \, \begin{Bmatrix} s^{\pi} \\ s^{\sigma} \\  s^{\tau} \end{Bmatrix} = \begin{bmatrix} s^{\pi} & s^{\tau} \\ 
 s^{\tau} & s^{\sigma} \end{bmatrix} \, [\mathbf{H}_2] \, \mathrm{d} \boldsymbol{\Delta}
-\end{equation}
-and finally the stress/geometric stiffness matrix can be expressed as follow
+\end{equation}.
+\textcolor{red}{Using the above relation in Eqn.~\eqref{initstiff}, finally we obtain the stiffness matrix associated with initial stress as}
 \begin{equation}
 \begin{aligned}
 \mathbf{K_{\mathbf{S}}} & =  \int_A \, [\mathbf{H}_1]^{\mathsf{T}}  \begin{bmatrix} s^{\pi} & s^{\tau} \\ 
@@ -764,19 +771,24 @@ s^{\tau} & s^{\sigma}
 \end{bmatrix} \, [\mathbf{H}_2] \, |\mathbf{J}| \, h \right) \,  w_i \, w_j
 \end{aligned}
 \end{equation}
-The small/linear displacement stiffness matrix for pentagon is evaluated numerically as 
+\textcolor{red}{where $n$ denotes the number of Gauss points, $\mathrm{w}_i$ and $\mathrm{w}_j$ denote the natural weight of the element demonstrated in Table~\ref{tabQuadrature}.}
+
+\textcolor{red}{The linear and nonlinear stiffness matrices are rather easy to calculate from their definitions provided in Eqn.~\eqref{stiffnessMatrices}. For the sake of completeness their expressions are provided below.}
+
+\textcolor{red}{The small/linear displacement stiffness matrix for the membrane is evaluated numerically as} 
 \begin{equation}
 \mathbf{K}_{L} = \int_{\pentagon} \int_{\pentagon} \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, |\mathbf{J}| \, h \,  \mathrm{d} \xi \,  \mathrm{d} \eta =  \sum_{i=1}^{n} \sum_{j=1}^{n} \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, |\mathbf{J}|  \, h \, \mathrm{w}_i \mathrm{w}_j
 \end{equation}
-The large/nonlinear displacement stiffness matrix for chord can be presented as follow
+\textcolor{red}{whereas the large/nonlinear displacement stiffness matrix takes the form of}
 \begin{equation}
 \mathbf{K}_{N} = \int_{\pentagon} \int_{\pentagon} \mathbf{D} \, |\mathbf{J}|\, h \, \mathrm{d} \xi \, \mathrm{d} \eta 
 = \sum_{i=1}^{n} \sum_{j=1}^{n} \mathbf{D} \, |\mathbf{J}| \, h \, \mathrm{w}_i \mathrm{w}_j
 \end{equation}
-where $\mathbf{D}$ have the expression 
+\textcolor{red}{where $\mathbf{D}$ contains the products of linear and nonlinear strain--displacement matrices and is given as} 
 \begin{equation}
-\mathbf{D} = \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N
+\mathbf{D} = \mathbf{B}_L^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_L \, + \mathbf{B}_N^{\mathsf{T}} \, \mathbf{M} \, \mathbf{B}_N.
 \end{equation}
+\textcolor{red}{Once the number of Gauss points and their corresponding weights have been selected, one can numerically evaluate all the components of stiffness matrices, addition of which yields the total stiffness matrix for the pentagonal membrane.}
 
 
 \subsection{Stiffness Matrix for a tetrahedron}
@@ -1322,3 +1334,4 @@ wherein $ \mathbf{N}$ being the shape function matrix for a triangle with the ma
 	\caption{Generalized, Gaussian, weights and nodes for integrating over a triangle in its natural co-ordinate system.}
 	\label{tabGaussPointsTriangle}
 \end{table}
+
