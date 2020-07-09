@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from pivotIncomingF import pivot
+from pivotIncomingF import Pivot
 
 """
 Created on Fri Apr 17 2020
-Updated on Fri Apr 17 2020
+Updated on Mon Jul 06 2020
 
 A test file for class pivot in file pivotIncomingF.py.
 
@@ -17,14 +17,14 @@ author: Prof. Alan Freed
 def run():
     F0 = np.eye(3, dtype=float)
     F0[0, 2] = 1.0
-    p = pivot(F0)
+    p = Pivot(F0)
     print('\nFor F0 =')
     print(F0)
     print('the pivoted F belongs to case {} and has components'
           .format(p.pivotCase('ref')))
     print(p.pivotedF("ref"))
     print('whose orthogonal matrix is')
-    print(p.pivotMtx('ref'))
+    print(p.pivotMatrix('ref'))
     F1 = np.eye(3, dtype=float)
     F1[1, 2] = 1.0
     p.update(F1)
@@ -34,7 +34,7 @@ def run():
           .format(p.pivotCase('next')))
     print(p.pivotedF("next"))
     print('whose orthogonal matrix is')
-    print(p.pivotMtx('next'))
+    print(p.pivotMatrix('next'))
     F2 = np.eye(3, dtype=float)
     F2[0, 1] = 1.0
     p.update(F2)
@@ -45,7 +45,7 @@ def run():
           .format(p.pivotCase('next')))
     print(p.pivotedF("next"))
     print('whose orthogonal matrix is')
-    print(p.pivotMtx('next'))
+    print(p.pivotMatrix('next'))
     F3 = np.eye(3, dtype=float)
     F3[2, 0] = 1.0
     p.update(F3)
@@ -56,7 +56,7 @@ def run():
           .format(p.pivotCase('next')))
     print(p.pivotedF("next"))
     print('whose orthogonal matrix is')
-    print(p.pivotMtx('next'))
+    print(p.pivotMatrix('next'))
     F4 = np.eye(3, dtype=float)
     F4[1, 0] = 1.0
     p.update(F4)
@@ -67,7 +67,7 @@ def run():
           .format(p.pivotCase('next')))
     print(p.pivotedF("next"))
     print('whose orthogonal matrix is')
-    print(p.pivotMtx('next'))
+    print(p.pivotMatrix('next'))
     F5 = np.eye(3, dtype=float)
     F5[2, 1] = 1.0
     p.update(F5)
@@ -78,7 +78,7 @@ def run():
           .format(p.pivotCase('next')))
     print(p.pivotedF("next"))
     print('whose orthogonal matrix is')
-    print(p.pivotMtx('next'))
+    print(p.pivotMatrix('next'))
     F6 = np.eye(3, dtype=float)
     F6[0, 1] = 1.0
     F6[1, 0] = 1.0
@@ -90,7 +90,7 @@ def run():
           .format(p.pivotCase('next')))
     print(p.pivotedF("next"))
     print('whose orthogonal matrix is')
-    print(p.pivotMtx('next'))
+    print(p.pivotMatrix('next'))
     F7 = np.eye(3, dtype=float)
     F7[1, 0] = 1.0
     F7[2, 0] = 1.0
@@ -103,11 +103,11 @@ def run():
           .format(p.pivotCase('next')))
     print(p.pivotedF("next"))
     print('whose orthogonal matrix is')
-    print(p.pivotMtx('next'))
+    print(p.pivotMatrix('next'))
 
     print('\nTest vector and tensor transformations')
     print('given the orthogonal matrix')
-    print(p.pivotMtx('prev'))
+    print(p.pivotMatrix('prev'))
     print('\nTesting vectors that were created as arrays:\n')
     vec1 = np.zeros(3, dtype=float)
     vec1[0] = 1.0

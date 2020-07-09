@@ -3,7 +3,7 @@
 
 import math
 import numpy as np
-from peceEoM import pece
+from peceEoM import PECE
 # for making plots
 from matplotlib import pyplot as plt
 from pylab import rcParams
@@ -198,7 +198,7 @@ def roadwayDR(t):
     return mogul(position, speed)
 
 
-class fsae(object):
+class FSAE(object):
 
     # asign the parameters that define a car
 
@@ -220,7 +220,7 @@ class fsae(object):
     k4 = 3600   # driver rear spring stiffness in lbs/ft
 
     def __init__(self):
-        return  # new instance of object fsae
+        return  # new instance of class FSAE
 
     def getMInv(self):
         # the inverse of the mass matrix
@@ -308,7 +308,7 @@ def test():
     T = 2.5        # time at the end of the run/analysis
     h = T / N      # global step size
 
-    car = fsae()
+    car = FSAE()
     # establish the initial state
     t0 = 0.
     x0, v0 = car.getICs()
@@ -320,7 +320,7 @@ def test():
     print("  theta = {:7.4f} degrees.".format((180. / math.pi) * x0[1]))
     print("  phi   = {:7.4f} degrees.".format((180. / math.pi) * x0[2]))
 
-    solver = pece(x0, v0, t0, h, car.getA)
+    solver = PECE(x0, v0, t0, h, car.getA)
 
     resultsE = []
     resultsH = []

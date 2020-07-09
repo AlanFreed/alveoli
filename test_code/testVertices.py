@@ -3,14 +3,14 @@
 
 from math import cos, sqrt, tan
 import numpy as np
-from pivotIncomingF import pivot
-from vertices import vectorToString, matrixToString, vertex
+from pivotIncomingF import Pivot
+from vertices import vectorToString, matrixToString, Vertex
 
 """
 Created on Mon Jan 21 2019
-Updated on Mon May 04 2020
+Updated on Mon Jul 06 2020
 
-A test file for class vertex in file vertices.py.
+A test file for class Vertex in file vertices.py.
 
 author: Prof. Alan Freed
 """
@@ -53,7 +53,7 @@ def run():
     F3[1, 1] -= 0.02
     F3[0, 2] -= 0.01
     F3[2, 1] += 0.02
-    p = pivot(F0)
+    p = Pivot(F0)
     p.update(F1)
     p.advance()
     p.update(F2)
@@ -86,7 +86,7 @@ def run():
     number = 1
     coordinates = (x0[0], x0[1], x0[2])
     h = 0.001
-    v = vertex(number, coordinates, h)
+    v = Vertex(number, coordinates, h)
     coordinates = (x1[0], x1[1], x1[2])
     v.update(coordinates)
     v.advance()
@@ -148,7 +148,7 @@ def run():
     print('   next:      ' + vectorToString(d2u0))
     print('which are the same, as they ought to be.')
 
-    print('\nTest printing a vertex object with the print(object) command.')
+    print('\nTest printing a Vertex object with the print(object) command.')
     print(v)
     print("Notice: the current state is printed when using the print command.")
 
