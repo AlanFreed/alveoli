@@ -3,31 +3,31 @@
 
 from math import sqrt
 from numpy import sign
-import sys
 
 """
 Module ridder.py provides a root finding algorithm.
 
 Copyright (c) 2020 Alan D. Freed
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
+Copyright (c) 2020 Alan D. Freed
 """
 
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-06-2018"
-__update__ = "05-20-2020"
+__update__ = "07-06-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -51,54 +51,53 @@ where
     tol  is the error tolerance in input variable x
 """
 
-maxIter = 30
+MAX_ITERATIONS = 30
 
 
 def findRoot(xL, xU, f, tol=1.0e-9):
     # analyze the original interval
-    xl = xL         # x at the left end of the interval
-    fl = f(xl)
-    if fl == 0.0:
-        return xl
-    xr = xU         # x at the right end of an interval
-    fr = f(xr)
-    if fr == 0.0:
-        return xr
-    if sign(fl) == sign(fr):
-        print('Error: root is not bracketed')
-        sys.exit
+    x_left = xL          # x at the left end of the interval
+    f_left = f(x_left)
+    if f_left == 0.0 or f_left == -0.0:
+        return x_left
+    x_right = xU         # x at the right end of an interval
+    f_right = f(x_right)
+    if f_right == 0.0 or f_right == -0.0:
+        return x_right
+    if sign(f_left) == sign(f_right):
+        raise RuntimeError('Error: root is not bracketed')
 
     # perform Ridder's algorithm for root finding
-    xiOld = (xl + xr) / 2.0
-    for i in range(maxIter):
-        xm = (xl + xr) / 2.0         # x at the midpoint
-        fm = f(xm)
-        s = sqrt(fm**2 - fl*fr)
+    xi_old = (x_left + x_right) / 2.0               # previous midpoint
+    for i in range(MAX_ITERATIONS):
+        x_middle = (x_left + x_right) / 2.0         # x at the midpoint
+        f_middle = f(x_middle)
+        s = sqrt(f_middle**2 - f_left*f_right)
         if s == 0.0:
             return None
-        dx = (xm - xl) * fm / s
-        if (fl - fr) < 0.0:
+        dx = (x_middle - x_left) * f_middle / s
+        if (f_left - f_right) < -0.0:
             dx = -dx
-        xi = xm + dx              # estimate for the root
-        fxi = f(xi)
+        xi = x_middle + dx                          # estimate for the root
+        f_xi = f(xi)
         # test for convergence
-        if abs(xi - xiOld) < tol*max(abs(xi), 1.0):
+        if abs(xi-xi_old) < tol*max(abs(xi), 1.0):
             return xi
-        xiOld = xi
+        xi_old = xi
         # rebracket the root as tightly as possible
-        if sign(fm) == sign(fxi):
-            if sign(fl) != sign(fxi):
-                xr = xi
-                fr = fxi
+        if sign(f_middle) == sign(f_xi):
+            if sign(f_left) != sign(f_xi):
+                x_right = xi
+                f_right = f_xi
             else:
-                xl = xi
-                fl = fxi
+                x_left = xi
+                f_left = f_xi
         else:
-            xl = xm
-            fl = fm
-            xr = xi
-            fr = fxi
-    print('Warning: iterations exceeded maxIter in findRoot.')
+            x_left = x_middle
+            f_left = f_middle
+            x_right = xi
+            f_right = f_xi
+    print('\nWarning: iterations exceeded MAX_ITERATIONS in findRoot.\n')
     return xi
 
 

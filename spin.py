@@ -3,31 +3,30 @@
 
 from math import acos, cos, sin, sqrt
 import numpy as np
-from pivotIncomingF import pivot
+from pivotIncomingF import Pivot
 
 """
 Module spin.py provides the co-ordinate spin tensor.
 
-Copyright (c) 2020 Alan D. Freed
+Copyright (c) 2019-2020 Alan D. Freed
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "04-30-2019"
-__update__ = "05-20-2020"
+__update__ = "07-06-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "adfreed@tamu.edu"
 
@@ -141,9 +140,9 @@ def quaternion(rotationMtx):
 def prevSpin(prevRotationMtx, currRotationMtx, nextRotationMtx,
              reindex, dTime):
     # verify the input
-    if not isinstance(reindex, pivot):
+    if not isinstance(reindex, Pivot):
         raise RuntimeError("The 'reindex' variable sent to prevSpin " +
-                           "must be of type pivot.")
+                           "must be of type Pivot.")
     if dTime < 100 * np.finfo(float).eps:
         raise RuntimeError("The 'dTime' sent to prevSpin must be greater " +
                            "than 100 times machine epsilon.")
@@ -211,9 +210,9 @@ def prevSpin(prevRotationMtx, currRotationMtx, nextRotationMtx,
 def currSpin(prevRotationMtx, currRotationMtx, nextRotationMtx,
              reindex, dTime):
     # verify the input
-    if not isinstance(reindex, pivot):
+    if not isinstance(reindex, Pivot):
         raise RuntimeError("The 'reindex' variable sent to currSpin " +
-                           "must be of type pivot.")
+                           "must be of type Pivot.")
     if dTime < 100 * np.finfo(float).eps:
         raise RuntimeError("The 'dTime' sent to currSpin must be greater " +
                            "than 100 times machine epsilon.")
@@ -275,9 +274,9 @@ def currSpin(prevRotationMtx, currRotationMtx, nextRotationMtx,
 def nextSpin(prevRotationMtx, currRotationMtx, nextRotationMtx,
              reindex, dTime):
     # verify the input
-    if not isinstance(reindex, pivot):
+    if not isinstance(reindex, Pivot):
         raise RuntimeError("The 'reindex' variable sent to nextSpin " +
-                           "must be of type pivot.")
+                           "must be of type Pivot.")
     if dTime < 100 * np.finfo(float).eps:
         raise RuntimeError("The 'dTime' sent to nextSpin must be greater " +
                            "than 100 times machine epsilon.")

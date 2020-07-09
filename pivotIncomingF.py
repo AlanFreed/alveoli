@@ -10,24 +10,24 @@ physically compatible with the Laplace stretch.
 
 Copyright (c) 2020 Alan D. Freed
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
+Copyright (c) 2020 Alan D. Freed
 """
 
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "04-17-2020"
-__update__ = "05-21-2020"
+__update__ = "07-06-2020"
 __author__ = "Alan D. Freed and Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -35,7 +35,7 @@ __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 A listing of changes made wrt version release can be found at the end of file.
 
 
-Class pivot in file pivotIncomingF.py pivots an incoming deformation gradient
+Class Pivot in file pivotIncomingF.py pivots an incoming deformation gradient
 so that in its re-indexed frame of reference the physics of Laplace stretch are
 adhered to, viz., the invariant properties that the 1st co-ordinate direction
 and the 12 co-ordinate plane remain invariant under transformations of the
@@ -64,11 +64,11 @@ variables
     P5  maps global co-ordinate frame (k, i, j) into local frame (e1, e2, e3)
     P6  maps global co-ordinate frame (k, j, i) into local frame (e1, e2, e3)
 
-class pivot
+class Pivot
 
 constructor
 
-    p = pivot(F0)
+    p = Pivot(F0)
         F0  is a deformation gradient in its global co-ordinate frame that
         pertains to a reference state or configuration
 
@@ -95,9 +95,10 @@ methods
         F   is the pivoted or re-indexed deformation gradient to be used for
             analysis as it applies to the configuration 'state'
 
-    P = p.pivotMtx(state)
+    P = p.pivotMatrix(state)
         P   is the orthogonal matrix used for re-indexing between the user's
             co-ordinate frame and the analysis frame of configuration 'state'
+            it is one of p.P1, p.P2, p.P3, p.P4, p.P5 or p.P6
 
     In the following set of four methods, local fields are quantified in the
     co-ordinate frame of the dodecahedron with basis (E1, E2, E3), while
@@ -149,7 +150,7 @@ Reference:
 """
 
 
-class pivot(object):
+class Pivot(object):
 
     def __init__(self, F0):
         # assess admissibility of input
@@ -334,7 +335,7 @@ class pivot(object):
                                "was sent in call a to pivot.pivotedF.")
         return F
 
-    def pivotMtx(self, state):
+    def pivotMatrix(self, state):
         P = np.zeros((3, 3), dtype=float)
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -355,25 +356,25 @@ class pivot(object):
 
     def globalToLocalVector(self, gVec, state):
         lVec = np.zeros(3, dtype=float)
-        P = self.pivotMtx(state)
+        P = self.pivotMatrix(state)
         lVec = np.matmul(np.transpose(P), gVec)
         return lVec
 
     def localToGlobalVector(self, lVec, state):
         gVec = np.zeros(3, dtype=float)
-        P = self.pivotMtx(state)
+        P = self.pivotMatrix(state)
         gVec = np.matmul(P, lVec)
         return gVec
 
     def globalToLocalTensor(self, gTen, state):
         lTen = np.zeros((3, 3), dtype=float)
-        P = self.pivotMtx(state)
+        P = self.pivotMatrix(state)
         lTen = np.matmul(np.transpose(P), np.matmul(gTen, P))
         return lTen
 
     def localToGlobalTensor(self, lTen, state):
         gTen = np.zeros((3, 3), dtype=float)
-        P = self.pivotMtx(state)
+        P = self.pivotMatrix(state)
         gTen = np.matmul(P, np.matmul(lTen, np.transpose(P)))
         return gTen
 

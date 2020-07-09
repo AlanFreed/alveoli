@@ -2,25 +2,24 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from pivotIncomingF import pivot
+from pivotIncomingF import Pivot
 
 """
 Module vertices.py provides an object to manage its geometric information.
 
-Copyright (c) 2020 Alan D. Freed
+Copyright (c) 2019-2020 Alan D. Freed
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
@@ -34,7 +33,7 @@ __author_email__ = "afreed@tamu.edu"
 A listing of changes made wrt version release can be found at the end of file.
 
 
-Class vertex in file vertices.py allows for the creation of objects that are
+Class Vertex in file vertices.py allows for the creation of objects that are
 to be used to locate a vertex in a polyhedron, in our case, an irregular
 dodecahedron.  Vertices can have co-ordinates reassigned, but not their number.
 
@@ -77,16 +76,16 @@ s = matrixToString(matrix)
     returns formatted string representation for the assigned matrix
 
 
-class vertex
+class Vertex
 
-A vertex object, say v, can be printed out to the command window using the
+A Vertex object, say v, can be printed out to the command window using the
 following command.  The object printed associates with the current state.
 
     print(v)
 
 constructor
 
-    v = vertex(number, coordinates, dTime)
+    v = Vertex(number, coordinates, dTime)
         number  immutable value unique to this vertex
         coordinates = (x0, y0, z0) is a tuple with values
             x0  initial x co-ordinate at zero pleural pressure
@@ -214,7 +213,7 @@ def matrixToString(matrix):
     return s
 
 
-class vertex(object):
+class Vertex(object):
 
     def __init__(self, number, coordinates, dTime):
         # verify the input
@@ -317,9 +316,9 @@ class vertex(object):
 
     def displacement(self, reindex, state):
         # verify the input
-        if not isinstance(reindex, pivot):
+        if not isinstance(reindex, Pivot):
             raise RuntimeError("The 'reindex' variable sent to " +
-                               "vertex.displacement must be of type pivot.")
+                               "vertex.displacement must be of type Pivot.")
         # calculate the displacement in the specified configuration
         u = np.zeros(3, dtype=float)
         x0 = np.zeros(3, dtype=float)
@@ -352,9 +351,9 @@ class vertex(object):
 
     def velocity(self, reindex, state):
         # verify the input
-        if not isinstance(reindex, pivot):
+        if not isinstance(reindex, Pivot):
             raise RuntimeError("The 'reindex' variable sent to " +
-                               "vertex.velocity must be of type pivot.")
+                               "vertex.velocity must be of type Pivot.")
         # calculate the velocity in the specified configuration
         h = 2.0 * self._h
         v = np.zeros(3, dtype=float)
@@ -407,9 +406,9 @@ class vertex(object):
 
     def acceleration(self, reindex, state):
         # verify the input
-        if not isinstance(reindex, pivot):
+        if not isinstance(reindex, Pivot):
             raise RuntimeError("The 'reindex' variable sent to " +
-                               "vertex.acceleration must be of type pivot.")
+                               "vertex.acceleration must be of type Pivot.")
         # calculate the acceleration in the specified configuration
         h2 = self._h**2
         a = np.zeros(3, dtype=float)

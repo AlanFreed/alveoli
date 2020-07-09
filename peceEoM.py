@@ -7,26 +7,25 @@ from numpy import linalg as LA
 """
 Module peceEoM.py provides a PECE solver for solving Equations of Motion.
 
-Copyright (c) 2020 Alan D. Freed
+Copyright (c) 2017-2020 Alan D. Freed
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-16-2017"
-__update__ = "05-18-2020"
+__update__ = "07-06-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "adfreed@tamu.edu"
 
@@ -81,7 +80,7 @@ with evaluations for acceleration occurring after each PC integration.
 
 object constructor
 
-    E.g.:  solver = pece(u0, v0, t0, dt, aFn, m=1)
+    E.g.:  solver = PECE(u0, v0, t0, dt, aFn, m=1)
         u0  is the array of initial displacements, 1 of 2 initial conditions
         v0  is the array of initial velocities,    2 of 2 initial conditions
         t0  is the initial time
@@ -112,7 +111,7 @@ getT()
     E.g.: t = getT()
     Returns a float for current time (the independent variable)
 
-getX()
+getU()
     E.g.: u = getU()
     Returns a vector for displacement (one of two response variables)
 
@@ -134,7 +133,7 @@ Reference:
 """
 
 
-class pece(object):
+class PECE(object):
 
     def __init__(self, u0, v0, t0, dt, aFn, m=1):
         # verify the inputs

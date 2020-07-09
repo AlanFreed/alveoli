@@ -3,30 +3,30 @@
 
 from math import cos, pi, sin
 import numpy as np
+from shapeFunctions import ShapeFunction as ShapeFn
 
 """
-File shapeFnPentagons.py provides shape functions for interpolating pentagons.
+File shapeFnPentagons.py implements base class ShapeFunction for pentagons.
 
-Copyright (c) 2019 Alan D. Freed
+Copyright (c) 2019-2020 Alan D. Freed
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
 # Module metadata
-__version__ = "1.4.0"
+__version__ = "1.0.0"
 __date__ = "04-30-2019"
-__update__ = "04-15-2020"
+__update__ = "07-07-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -49,7 +49,7 @@ values at the five vertices for this interpolated field are supplied.
 
 Also provided are the spatial derivatives for these shape functions, taken
 with respect to coordinates 'xi' and 'eta', from which one can construct
-approxiamtions for the Jacobian, and the displacement G and deformation F
+approxiamtions for the Jacobian, plus the displacement G and deformation F
 gradients, plus the B matrix, both linear and nonlinear.
 
 The five vertices and the five chords of this pentagon are numbered according
@@ -65,22 +65,37 @@ to the following graphic when looking outward in:
                      \              /
                       v3 -- c4 -- v4
 
+where
+    v1 = (xi_1, eta_1)
+    v2 = (xi_2, eta_2)
+    v3 = (xi_3, eta_3)
+    v4 = (xi_4, eta_4)
+    v5 = (xi_5, eta_5)
+with
+    xi_i  = cos(2*(i-1)*pi/5 + pi/2),     i = 1,2,..,5
+    eta_i = sin(2*(i-1)*pi/5 + pi/2),     i = 1,2,..,5
+
 By numbering the vertices and chords in a counterclockwise direction, the
 algorithm used to compute its area will be positive; otherwise, if they had
-been numbered clockwise, then the derived area would have been negative.
+been numbered clockwise, then the derived area would become negative.
 
 
 class
 
-    shapeFunction
+    ShapeFunction
+        Implements class ShapeFunction exported by module shapeFunctions.py.
 
 constructor
 
-    sf = shapeFunction(xi, eta)
-        xi    is the x co-ordinate in the natural co-ordinate system
-        eta   is the y co-ordiante in the natural co-ordiante system
+    sf = ShapeFunction(coordinates)
+        coordinates     A tuple of natural co-ordinate for interpolating at.
+                        For a pentagon, coordinates = (xi, eta) where xi is
+                        the 'x' natural co-ordinate and eta is the 'y' natural
+                        co-ordinate.
+    returns
+        sf              a new instance of class ShapeFunction for 2D pentagons
 
-methods
+inherited methods
 
     y = sf.interpolate(y1, y2, y3, y4, y5)
         y1   is a physical field of arbitrary type located at vertex 1
@@ -90,128 +105,128 @@ methods
         y5   is a physical field of arbitrary type located at vertex 5
     returns
         y    is its interpolated value for this field at location (xi, eta)
-    inputs must allow for: i) scalar multiplication and ii) the '+' operator
+    Inputs must allow for: i) scalar multiplication and ii) the '+' operator.
 
-    Jmtx = sf.jacobianMtx(x1, x2, x3, x4, x5)
-        x1   is a tuple of physical co-ordinates (x, y) located at vertex 1
-        x2   is a tuple of physical co-ordinates (x, y) located at vertex 2
-        x3   is a tuple of physical co-ordinates (x, y) located at vertex 3
-        x4   is a tuple of physical co-ordinates (x, y) located at vertex 4
-        x5   is a tuple of physical co-ordinates (x, y) located at vertex 5
+    Jmtx = sf.jacobianMatrix(x1, x2, x3, x4, x5)
+        x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical co-ordinates (x, y) locating vertex 5
     returns
         Jmtx is the Jacobian matrix (a 2x2 matrix) at location (xi, eta)
                     /  dx/dXi  dy/dXi  \
              Jmtx = |                  |
                     \ dx/dEta  dy/dEta /
-    inputs are co-ordinates evaluated in a global chordal co-ordinate system
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
-    Jdet = sf.jacobianDet(x1, x2, x3, x4, x5)
-        x1   is a tuple of physical co-ordinates (x, y) located at vertex 1
-        x2   is a tuple of physical co-ordinates (x, y) located at vertex 2
-        x3   is a tuple of physical co-ordinates (x, y) located at vertex 3
-        x4   is a tuple of physical co-ordinates (x, y) located at vertex 4
-        x5   is a tuple of physical co-ordinates (x, y) located at vertex 5
+    Jdet = sf.jacobianDeterminant(x1, x2, x3, x4, x5)
+        x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical co-ordinates (x, y) locating vertex 5
     returns
         Jdet is the determinant of the Jacobian matrix
-    inputs are co-ordinates evaluated in a global chordal co-ordinate system
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
     Gmtx = sf.G(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-        x1   is a tuple of physical  co-ordinates (x, y) located at vertex 1
-        x2   is a tuple of physical  co-ordinates (x, y) located at vertex 2
-        x3   is a tuple of physical  co-ordinates (x, y) located at vertex 3
-        x4   is a tuple of physical  co-ordinates (x, y) located at vertex 4
-        x5   is a tuple of physical  co-ordinates (x, y) located at vertex 5
-        x01  is a tuple of reference co-ordinates (x, y) located at vertex 1
-        x02  is a tuple of reference co-ordinates (x, y) located at vertex 2
-        x03  is a tuple of reference co-ordinates (x, y) located at vertex 3
-        x04  is a tuple of reference co-ordinates (x, y) located at vertex 4
-        x05  is a tuple of reference co-ordinates (x, y) located at vertex 5
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical  co-ordinates (x, y) locating vertex 5
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+        x05  is a tuple of reference co-ordinates (x, y) locating vertex 5
     returns
         Gmtx is the displacement gradient (a 2x2 matrix) at location (xi, eta)
                     / du/dx  du/dy \             u = x - X  or  x - x0
              Gmtx = |              |    where
                     \ dv/dx  dv/dy /             v = y - Y  or  y - y0
-    inputs are co-ordinates evaluated in a global chordal co-ordinate system
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
     Fmtx = sf.F(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-        x1   is a tuple of physical  co-ordinates (x, y) located at vertex 1
-        x2   is a tuple of physical  co-ordinates (x, y) located at vertex 2
-        x3   is a tuple of physical  co-ordinates (x, y) located at vertex 3
-        x4   is a tuple of physical  co-ordinates (x, y) located at vertex 4
-        x5   is a tuple of physical  co-ordinates (x, y) located at vertex 5
-        x01  is a tuple of reference co-ordinates (x, y) located at vertex 1
-        x02  is a tuple of reference co-ordinates (x, y) located at vertex 2
-        x03  is a tuple of reference co-ordinates (x, y) located at vertex 3
-        x04  is a tuple of reference co-ordinates (x, y) located at vertex 4
-        x05  is a tuple of reference co-ordinates (x, y) located at vertex 5
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical  co-ordinates (x, y) locating vertex 5
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+        x05  is a tuple of reference co-ordinates (x, y) locating vertex 5
     returns
         Fmtx is the deformation gradient (a 2x2 matrix) at location (xi, eta)
                     / dx/dX  dx/dY \
              Fmtx = |              |
                     \ dy/dX  dy/dY /
-    inputs are co-ordinates evaluated in a global chordal co-ordinate system
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
     BL = sf.BLinear(x1, x2, x3, x4, x5)
-        x1   is a tuple of physical co-ordinates (x, y) located at vertex 1
-        x2   is a tuple of physical co-ordinates (x, y) located at vertex 2
-        x3   is a tuple of physical co-ordinates (x, y) located at vertex 3
-        x4   is a tuple of physical co-ordinates (x, y) located at vertex 4
-        x5   is a tuple of physical co-ordinates (x, y) located at vertex 5
+        x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical co-ordinates (x, y) locating vertex 5
     returns
         BL   is the linear strain displacement matrix
-    inputs are co-ordinates evaluated in a global chordal co-ordinate system
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
     Hmtx = sf.HmatrixF(x1, x2, x3, x4, x5)
-        x1   is a tuple of physical co-ordinates (x, y) located at vertex 1
-        x2   is a tuple of physical co-ordinates (x, y) located at vertex 2
-        x3   is a tuple of physical co-ordinates (x, y) located at vertex 3
-        x4   is a tuple of physical co-ordinates (x, y) located at vertex 4
-        x5   is a tuple of physical co-ordinates (x, y) located at vertex 5
+        x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical co-ordinates (x, y) locating vertex 5
     returns
         Hmtx  is the first H matrix, which is a derivative of shape functions
               from theta = H * D in the first contribution to nonlinear strain
-    inputs are co-ordinates evaluated in a global chordal co-ordinate system
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
     Hmtx = sf.HmatrixS(x1, x2, x3, x4, x5)
-        x1   is a tuple of physical co-ordinates (x, y) located at vertex 1
-        x2   is a tuple of physical co-ordinates (x, y) located at vertex 2
-        x3   is a tuple of physical co-ordinates (x, y) located at vertex 3
-        x4   is a tuple of physical co-ordinates (x, y) located at vertex 4
-        x5   is a tuple of physical co-ordinates (x, y) located at vertex 5
+        x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical co-ordinates (x, y) locating vertex 5
     returns
         Hmtx is the second H matrix, which is a derivative of shape functions
              from theta = H * D in second contribution to nonlinear strain
-    inputs are co-ordinates evaluated in a global chordal co-ordinate system
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
     BN = sf.firstBNonLinear(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-        x1   is a tuple of physical  co-ordinates (x, y) located at vertex 1
-        x2   is a tuple of physical  co-ordinates (x, y) located at vertex 2
-        x3   is a tuple of physical  co-ordinates (x, y) located at vertex 3
-        x4   is a tuple of physical  co-ordinates (x, y) located at vertex 4
-        x5   is a tuple of physical  co-ordinates (x, y) located at vertex 5
-        x01  is a tuple of reference co-ordinates (x, y) located at vertex 1
-        x02  is a tuple of reference co-ordinates (x, y) located at vertex 2
-        x03  is a tuple of reference co-ordinates (x, y) located at vertex 3
-        x04  is a tuple of reference co-ordinates (x, y) located at vertex 4
-        x05  is a tuple of reference co-ordinates (x, y) located at vertex 5
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical  co-ordinates (x, y) locating vertex 5
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+        x05  is a tuple of reference co-ordinates (x, y) locating vertex 5
     returns
         BN is first nonlinear contribution to the strain displacement matrix
-    inputs are co-ordinates evaluated in a global chordal co-ordinate system
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
     BN = sf.secondBNonLinear(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-        x1   is a tuple of physical  co-ordinates (x, y) located at vertex 1
-        x2   is a tuple of physical  co-ordinates (x, y) located at vertex 2
-        x3   is a tuple of physical  co-ordinates (x, y) located at vertex 3
-        x4   is a tuple of physical  co-ordinates (x, y) located at vertex 4
-        x5   is a tuple of physical  co-ordinates (x, y) located at vertex 5
-        x01  is a tuple of reference co-ordinates (x, y) located at vertex 1
-        x02  is a tuple of reference co-ordinates (x, y) located at vertex 2
-        x03  is a tuple of reference co-ordinates (x, y) located at vertex 3
-        x04  is a tuple of reference co-ordinates (x, y) located at vertex 4
-        x05  is a tuple of reference co-ordinates (x, y) located at vertex 5
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical  co-ordinates (x, y) locating vertex 5
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+        x05  is a tuple of reference co-ordinates (x, y) locating vertex 5
     returns
         BN is second nonlinear contribution to the strain displacement matrix
-    inputs are co-ordinates evaluated in a global chordal co-ordinate system
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
 variables
 
@@ -243,14 +258,20 @@ variables
 
 Reference
     1) Dasgupta, G., "Interpolants within convex polygons: Wachspress shape
-       funtions", Journal of Aerospace Engineering, vol. 16, 2003, pp. 1-8.
+       functions", Journal of Aerospace Engineering, vol. 16, 2003, pp. 1-8.
 """
 
 
-class shapeFunction(object):
+class ShapeFunction(ShapeFn):
 
-    def __init__(self, xi, eta):
+    def __init__(self, coordinates):
         # construct the five, exported, shape functions for location (xi, eta)
+        super(ShapeFunction, self).__init__(coordinates)
+        if len(coordinates) == 2:
+            xi = coordinates[0]
+            eta = coordinates[1]
+        else:
+            raise RuntimeError("The co-ordinates for a pentagon are in 2D.")
 
         # create the x and y vertex vectors in their natural coordinate frame
         self.det = 0
@@ -284,10 +305,11 @@ class shapeFunction(object):
         kappa = np.zeros(6, dtype=float)
         kappa[1] = 1.0
         for i in range(2, 6):
-            kappa[i] = kappa[i-1] * ((aVec[i+1] * (xiVec[i-1] - xiVec[i]) +
-                                      bVec[i+1] * (etaVec[i-1] - etaVec[i])) /
-                                     (aVec[i-1] * (xiVec[i] - xiVec[i-1]) +
-                                      bVec[i-1] * (etaVec[i] - etaVec[i-1])))
+            kappa[i] = kappa[i-1] * ((aVec[i+1] * (xiVec[i-1] - xiVec[i])
+                                      + bVec[i+1] * (etaVec[i-1] - etaVec[i]))
+                                     / (aVec[i-1] * (xiVec[i] - xiVec[i-1])
+                                        + bVec[i-1] * (etaVec[i]
+                                                       - etaVec[i-1])))
 
         # create the alpha coefficients for the numerator's polynomial
         alpha = np.zeros((10, 6), dtype=float)
@@ -295,20 +317,20 @@ class shapeFunction(object):
             alpha[0, i] = 1.0
             alpha[1, i] = -(aVec[i+1] + aVec[i+2] + aVec[i+3])
             alpha[2, i] = -(bVec[i+1] + bVec[i+2] + bVec[i+3])
-            alpha[3, i] = (aVec[i+1] * aVec[i+2] + aVec[i+2] * aVec[i+3] +
-                           aVec[i+3] * aVec[i+1])
-            alpha[4, i] = (aVec[i+1] * (bVec[i+2] + bVec[i+3]) +
-                           aVec[i+2] * (bVec[i+1] + bVec[i+3]) +
-                           aVec[i+3] * (bVec[i+1] + bVec[i+2]))
-            alpha[5, i] = (bVec[i+1] * bVec[i+2] + bVec[i+2] * bVec[i+3] +
-                           bVec[i+3] * bVec[i+1])
+            alpha[3, i] = (aVec[i+1] * aVec[i+2] + aVec[i+2] * aVec[i+3]
+                           + aVec[i+3] * aVec[i+1])
+            alpha[4, i] = (aVec[i+1] * (bVec[i+2] + bVec[i+3])
+                           + aVec[i+2] * (bVec[i+1] + bVec[i+3])
+                           + aVec[i+3] * (bVec[i+1] + bVec[i+2]))
+            alpha[5, i] = (bVec[i+1] * bVec[i+2] + bVec[i+2] * bVec[i+3]
+                           + bVec[i+3] * bVec[i+1])
             alpha[6, i] = -aVec[i+1] * aVec[i+2] * aVec[i+3]
-            alpha[7, i] = -(aVec[i+1] * aVec[i+2] * bVec[i+3] +
-                            aVec[i+1] * bVec[i+2] * aVec[i+3] +
-                            bVec[i+1] * aVec[i+2] * aVec[i+3])
-            alpha[8, i] = -(aVec[i+1] * bVec[i+2] * bVec[i+3] +
-                            bVec[i+1] * aVec[i+2] * bVec[i+3] +
-                            bVec[i+1] * bVec[i+2] * aVec[i+3])
+            alpha[7, i] = -(aVec[i+1] * aVec[i+2] * bVec[i+3]
+                            + aVec[i+1] * bVec[i+2] * aVec[i+3]
+                            + bVec[i+1] * aVec[i+2] * aVec[i+3])
+            alpha[8, i] = -(aVec[i+1] * bVec[i+2] * bVec[i+3]
+                            + bVec[i+1] * aVec[i+2] * bVec[i+3]
+                            + bVec[i+1] * bVec[i+2] * aVec[i+3])
             alpha[9, i] = -bVec[i+1] * bVec[i+2] * bVec[i+3]
 
         # create the beta coefficients for the denominator's polynomial
@@ -320,15 +342,15 @@ class shapeFunction(object):
         # create the polynomials for the numerators of these shape functions
         aPoly = np.zeros(6, dtype=float)
         for i in range(1, 6):
-            aPoly[i] = (alpha[0, i] + alpha[1, i] * xi + alpha[2, i] * eta +
-                        alpha[3, i] * xi**2 + alpha[4, i] * xi * eta +
-                        alpha[5, i] * eta**2 + alpha[6, i] * xi**3 +
-                        alpha[7, i] * xi**2 * eta + alpha[8, i] * xi * eta**2 +
-                        alpha[9, i] * eta**3)
+            aPoly[i] = (alpha[0, i] + alpha[1, i] * xi + alpha[2, i] * eta
+                        + alpha[3, i] * xi**2 + alpha[4, i] * xi * eta
+                        + alpha[5, i] * eta**2 + alpha[6, i] * xi**3
+                        + alpha[7, i] * xi**2 * eta + alpha[8, i] * xi * eta**2
+                        + alpha[9, i] * eta**3)
 
         # create the polynomial for the denominator of these shape functions
-        bPoly = (beta[0] + beta[1] * xi * beta[2] * eta + beta[3] * xi**2 +
-                 beta[4] * xi * eta + beta[5] * eta**2)
+        bPoly = (beta[0] + beta[1] * xi * beta[2] * eta + beta[3] * xi**2
+                 + beta[4] * xi * eta + beta[5] * eta**2)
 
         # create the five exported shape functions
         self.N5 = kappa[1] * aPoly[1] / bPoly
@@ -347,12 +369,13 @@ class shapeFunction(object):
         dAdXi = np.zeros(6, dtype=float)
         dAdEta = np.zeros(6, dtype=float)
         for i in range(1, 6):
-            dAdXi[i] = (alpha[1, i] + 2 * alpha[3, i] * xi +
-                        alpha[4, i] * eta + 3 * alpha[6, i] * xi**2 +
-                        2 * alpha[7, i] * xi * eta + alpha[8, i] * eta**2)
-            dAdEta[i] = (alpha[2, i] + alpha[4, i] * xi +
-                         2 * alpha[5, i] * eta + alpha[7, i] * xi**2 +
-                         2 * alpha[8, i] * xi * eta + 3 * alpha[9, i] * eta**2)
+            dAdXi[i] = (alpha[1, i] + 2 * alpha[3, i] * xi
+                        + alpha[4, i] * eta + 3 * alpha[6, i] * xi**2
+                        + 2 * alpha[7, i] * xi * eta + alpha[8, i] * eta**2)
+            dAdEta[i] = (alpha[2, i] + alpha[4, i] * xi
+                         + 2 * alpha[5, i] * eta + alpha[7, i] * xi**2
+                         + 2 * alpha[8, i] * xi * eta
+                         + 3 * alpha[9, i] * eta**2)
 
         # determine the gradients of the denominator polynomial
         dBdXi = beta[1] + 2 * beta[3] * xi + beta[4] * eta
@@ -381,40 +404,54 @@ class shapeFunction(object):
         return  # the object
 
     def interpolate(self, y1, y2, y3, y4, y5):
-        y = (self.N1 * y1 + self.N2 * y2 + self.N3 * y3 + self.N4 * y4 +
-             self.N5 * y5)
+        if (type(y1) == type(y2) and type(y2) == type(y3)
+           and type(y3) == type(y4)) and type(y4) == type(y5):
+            y = (self.N1 * y1 + self.N2 * y2 + self.N3 * y3 + self.N4 * y4
+                 + self.N5 * y5)
+        else:
+            raise RuntimeError("interpolate arguments must be the same type.")
         return y
 
-    def jacobianMtx(self, x1, x2, x3, x4, x5):
-        Jmtx = np.zeros((2, 2), dtype=float)
-        if isinstance(x1, tuple):
-            Jmtx[0, 0] = (self.dN1dXi * x1[0] + self.dN2dXi * x2[0] +
-                          self.dN3dXi * x3[0] + self.dN4dXi * x4[0] +
-                          self.dN5dXi * x5[0])
-            Jmtx[0, 1] = (self.dN1dXi * x1[1] + self.dN2dXi * x2[1] +
-                          self.dN3dXi * x3[1] + self.dN4dXi * x4[1] +
-                          self.dN5dXi * x5[1])
-            Jmtx[1, 0] = (self.dN1dEta * x1[0] + self.dN2dEta * x2[0] +
-                          self.dN3dEta * x3[0] + self.dN4dEta * x4[0] +
-                          self.dN5dEta * x5[0])
-            Jmtx[1, 1] = (self.dN1dEta * x1[1] + self.dN2dEta * x2[1] +
-                          self.dN3dEta * x3[1] + self.dN4dEta * x4[1] +
-                          self.dN5dEta * x5[1])
+    def jacobianMatrix(self, x1, x2, x3, x4, x5):
+        if (isinstance(x1, tuple) and len(x1) == 2
+           and isinstance(x2, tuple) and len(x2) == 2
+           and isinstance(x3, tuple) and len(x3) == 2
+           and isinstance(x4, tuple) and len(x4) == 2
+           and isinstance(x5, tuple) and len(x5) == 2):
+            Jmtx = np.zeros((2, 2), dtype=float)
+            Jmtx[0, 0] = (self.dN1dXi * x1[0] + self.dN2dXi * x2[0]
+                          + self.dN3dXi * x3[0] + self.dN4dXi * x4[0]
+                          + self.dN5dXi * x5[0])
+            Jmtx[0, 1] = (self.dN1dXi * x1[1] + self.dN2dXi * x2[1]
+                          + self.dN3dXi * x3[1] + self.dN4dXi * x4[1]
+                          + self.dN5dXi * x5[1])
+            Jmtx[1, 0] = (self.dN1dEta * x1[0] + self.dN2dEta * x2[0]
+                          + self.dN3dEta * x3[0] + self.dN4dEta * x4[0]
+                          + self.dN5dEta * x5[0])
+            Jmtx[1, 1] = (self.dN1dEta * x1[1] + self.dN2dEta * x2[1]
+                          + self.dN3dEta * x3[1] + self.dN4dEta * x4[1]
+                          + self.dN5dEta * x5[1])
         else:
-            raise RuntimeError("Each argument of shapeFunction.jacobianMtx " +
-                               "must be a tuple of co-ordinates, " +
-                               "e.g., (x, y).")
+            raise RuntimeError("Each argument of shapeFunction.jacobianMatrix "
+                               + "must be a tuple of co-ordinates, "
+                               + "e.g., (x, y).")
         return Jmtx
 
-    def jacobianDet(self, x1, x2, x3, x4, x5):
-        Jmtx = self.jacobianMtx(x1, x2, x3, x4, x5)
+    def jacobianDeterminant(self, x1, x2, x3, x4, x5):
+        Jmtx = self.jacobianMatrix(x1, x2, x3, x4, x5)
         return np.linalg.det(Jmtx)
 
     def G(self, x1, x2, x3, x4, x5, x01, x02, x03, x04, x05):
-        disGrad = np.zeros((2, 2), dtype=float)
-        curGrad = np.zeros((2, 2), dtype=float)
-        Gmtx = np.zeros((2, 2), dtype=float)
-        if isinstance(x1, tuple):
+        if (isinstance(x1, tuple) and len(x1) == 2
+           and isinstance(x2, tuple) and len(x2) == 2
+           and isinstance(x3, tuple) and len(x3) == 2
+           and isinstance(x4, tuple) and len(x4) == 2
+           and isinstance(x5, tuple) and len(x5) == 2
+           and isinstance(x01, tuple) and len(x01) == 2
+           and isinstance(x02, tuple) and len(x02) == 2
+           and isinstance(x03, tuple) and len(x03) == 2
+           and isinstance(x04, tuple) and len(x04) == 2
+           and isinstance(x05, tuple) and len(x05) == 2):
             u1 = x1[0] - x01[0]
             u2 = x2[0] - x02[0]
             u3 = x3[0] - x03[0]
@@ -427,32 +464,39 @@ class shapeFunction(object):
             v5 = x5[1] - x05[1]
 
             # determine the displacement gradient
-            disGrad[0, 0] = (self.dN1dXi * u1 + self.dN2dXi * u2 +
-                             self.dN3dXi * u3 + self.dN4dXi * u4 +
-                             self.dN5dXi * u5)
-            disGrad[0, 1] = (self.dN1dEta * u1 + self.dN2dEta * u2 +
-                             self.dN3dEta * u3 + self.dN4dEta * u4 +
-                             self.dN5dEta * u5)
-            disGrad[1, 0] = (self.dN1dXi * v1 + self.dN2dXi * v2 +
-                             self.dN3dXi * v3 + self.dN4dXi * v4 +
-                             self.dN5dXi * v5)
-            disGrad[1, 1] = (self.dN1dEta * v1 + self.dN2dEta * v2 +
-                             self.dN3dEta * v3 + self.dN4dEta * v4 +
-                             self.dN5dEta * v5)
+            disGrad = np.zeros((2, 2), dtype=float)
+            disGrad[0, 0] = (self.dN1dXi * u1 + self.dN2dXi * u2
+                             + self.dN3dXi * u3 + self.dN4dXi * u4
+                             + self.dN5dXi * u5)
+            disGrad[0, 1] = (self.dN1dEta * u1 + self.dN2dEta * u2
+                             + self.dN3dEta * u3 + self.dN4dEta * u4
+                             + self.dN5dEta * u5)
+            disGrad[1, 0] = (self.dN1dXi * v1 + self.dN2dXi * v2
+                             + self.dN3dXi * v3 + self.dN4dXi * v4
+                             + self.dN5dXi * v5)
+            disGrad[1, 1] = (self.dN1dEta * v1 + self.dN2dEta * v2
+                             + self.dN3dEta * v3 + self.dN4dEta * v4
+                             + self.dN5dEta * v5)
 
             # determine the current gradient of position
             curGrad = np.transpose(self.jacobianMtx(x1, x2, x3, x4, x5))
         else:
-            raise RuntimeError("Each argument of shapeFunction.G must be a " +
-                               "tuple of co-ordinates, e.g., (x, y).")
+            raise RuntimeError("Each argument of shapeFunction.G must be a "
+                               + "tuple of co-ordinates, e.g., (x, y).")
         Gmtx = np.matmul(disGrad, np.linalg.inv(curGrad))
         return Gmtx
 
     def F(self, x1, x2, x3, x4, x5, x01, x02, x03, x04, x05):
-        disGrad = np.zeros((2, 2), dtype=float)
-        refGrad = np.zeros((2, 2), dtype=float)
-        Fmtx = np.zeros((2, 2), dtype=float)
-        if isinstance(x1, tuple):
+        if (isinstance(x1, tuple) and len(x1) == 2
+           and isinstance(x2, tuple) and len(x2) == 2
+           and isinstance(x3, tuple) and len(x3) == 2
+           and isinstance(x4, tuple) and len(x4) == 2
+           and isinstance(x5, tuple) and len(x5) == 2
+           and isinstance(x01, tuple) and len(x01) == 2
+           and isinstance(x02, tuple) and len(x02) == 2
+           and isinstance(x03, tuple) and len(x03) == 2
+           and isinstance(x04, tuple) and len(x04) == 2
+           and isinstance(x05, tuple) and len(x05) == 2):
             u1 = x1[0] - x01[0]
             u2 = x2[0] - x02[0]
             u3 = x3[0] - x03[0]
@@ -463,42 +507,45 @@ class shapeFunction(object):
             v3 = x3[1] - x03[1]
             v4 = x4[1] - x04[1]
             v5 = x5[1] - x05[1]
+
             # determine the displacement gradient
-            disGrad[0, 0] = (self.dN1dXi * u1 + self.dN2dXi * u2 +
-                             self.dN3dXi * u3 + self.dN4dXi * u4 +
-                             self.dN5dXi * u5)
-            disGrad[0, 1] = (self.dN1dEta * u1 + self.dN2dEta * u2 +
-                             self.dN3dEta * u3 + self.dN4dEta * u4 +
-                             self.dN5dEta * u5)
-            disGrad[1, 0] = (self.dN1dXi * v1 + self.dN2dXi * v2 +
-                             self.dN3dXi * v3 + self.dN4dXi * v4 +
-                             self.dN5dXi * v5)
-            disGrad[1, 1] = (self.dN1dEta * v1 + self.dN2dEta * v2 +
-                             self.dN3dEta * v3 + self.dN4dEta * v4 +
-                             self.dN5dEta * v5)
+            disGrad = np.zeros((2, 2), dtype=float)
+            disGrad[0, 0] = (self.dN1dXi * u1 + self.dN2dXi * u2
+                             + self.dN3dXi * u3 + self.dN4dXi * u4
+                             + self.dN5dXi * u5)
+            disGrad[0, 1] = (self.dN1dEta * u1 + self.dN2dEta * u2
+                             + self.dN3dEta * u3 + self.dN4dEta * u4
+                             + self.dN5dEta * u5)
+            disGrad[1, 0] = (self.dN1dXi * v1 + self.dN2dXi * v2
+                             + self.dN3dXi * v3 + self.dN4dXi * v4
+                             + self.dN5dXi * v5)
+            disGrad[1, 1] = (self.dN1dEta * v1 + self.dN2dEta * v2
+                             + self.dN3dEta * v3 + self.dN4dEta * v4
+                             + self.dN5dEta * v5)
 
             # determine the reference gradient of position
-            refGrad[0, 0] = (self.dN1dXi * x01[0] + self.dN2dXi * x02[0] +
-                             self.dN3dXi * x03[0] + self.dN4dXi * x04[0] +
-                             self.dN5dXi * x05[0])
-            refGrad[0, 1] = (self.dN1dEta * x01[0] + self.dN2dEta * x02[0] +
-                             self.dN3dEta * x03[0] + self.dN4dEta * x04[0] +
-                             self.dN5dEta * x05[0])
-            refGrad[1, 0] = (self.dN1dXi * x01[1] + self.dN2dXi * x02[1] +
-                             self.dN3dXi * x03[1] + self.dN4dXi * x04[1] +
-                             self.dN5dXi * x05[1])
-            refGrad[1, 1] = (self.dN1dEta * x01[1] + self.dN2dEta * x02[1] +
-                             self.dN3dEta * x03[1] + self.dN4dEta * x04[1] +
-                             self.dN5dEta * x05[1])
+            refGrad = np.zeros((2, 2), dtype=float)
+            refGrad[0, 0] = (self.dN1dXi * x01[0] + self.dN2dXi * x02[0]
+                             + self.dN3dXi * x03[0] + self.dN4dXi * x04[0]
+                             + self.dN5dXi * x05[0])
+            refGrad[0, 1] = (self.dN1dEta * x01[0] + self.dN2dEta * x02[0]
+                             + self.dN3dEta * x03[0] + self.dN4dEta * x04[0]
+                             + self.dN5dEta * x05[0])
+            refGrad[1, 0] = (self.dN1dXi * x01[1] + self.dN2dXi * x02[1]
+                             + self.dN3dXi * x03[1] + self.dN4dXi * x04[1]
+                             + self.dN5dXi * x05[1])
+            refGrad[1, 1] = (self.dN1dEta * x01[1] + self.dN2dEta * x02[1]
+                             + self.dN3dEta * x03[1] + self.dN4dEta * x04[1]
+                             + self.dN5dEta * x05[1])
         else:
-            raise RuntimeError("Each argument of shapeFunction.F must be a " +
-                               "tuple of co-ordinates, e.g., (x, y).")
-        Fmtx = (np.eye(2, dtype=float) +
-                np.matmul(disGrad, np.linalg.inv(refGrad)))
+            raise RuntimeError("Each argument of shapeFunction.F must be a "
+                               + "tuple of co-ordinates, e.g., (x, y).")
+        Fmtx = (np.eye(2, dtype=float)
+                + np.matmul(disGrad, np.linalg.inv(refGrad)))
         return Fmtx
 
     def BLinear(self, x1, x2, x3, x4, x5):
-        Jmtx = self.jacobianMtx(x1, x2, x3, x4, x5)
+        Jmtx = self.jacobianMatrix(x1, x2, x3, x4, x5)
         BL = np.zeros((3, 10), dtype=float)
 
         BL[0, 0] = (self.dN1dXi * Jmtx[1, 1] - self.dN1dEta * Jmtx[0, 1]) / 2
@@ -613,45 +660,7 @@ class shapeFunction(object):
 
 
 """
-Changes made in version "1.4.0":
+Changes made in version "1.0.0":
 
-
-variable sf.Nmat renamed to
-
-    sf.Nmtx
-
-method sf.jacobian renamed to
-
-    Jmtx = sf.jacobianMtx(x1, x2, x3, x4, x5)
-
-methods added
-
-    Jdet = sf.jacobianDet(x1, x2, x3, x4, x5)
-
-    BL = sf.BLinear(x1, x2, x3, x4, x5)
-
-    Hmtx = sf.HmatrixF(x1, x2, x3, x4, x5)
-
-    Hmtx = sf.HmatrixS(x1, x2, x3, x4, x5)
-
-    BN = sf.firstBNonLinear(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-
-    BN = sf.secondBNonLinear(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
-
-Changes made in version "1.3.0":
-
-method added
-
-    det = sf.jacobian(x1, x2, x3, x4, x5)
-        x1    is a tuple of current coordinates (x, y) located at vertex 1
-        x2    is a tuple of current coordinates (x, y) located at vertex 2
-        x3    is a tuple of current coordinates (x, y) located at vertex 3
-        x4    is a tuple of current coordinates (x, y) located at vertex 4
-        x5    is a tuple of current coordinates (x, y) located at vertex 5
-    returns
-        jacob   is the Jacobian matrix
-
-variables
-
-    sf.Nmatx  a 2x10 shape function matrix for the pentagon
+Original version
 """

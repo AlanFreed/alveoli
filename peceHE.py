@@ -26,7 +26,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-16-2017"
-__update__ = "06-24-2020"
+__update__ = "07-06-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -35,9 +35,9 @@ A listing of changes made wrt version release can be found at the end of file.
 
 
 This module provides three classes:
-    pece        implements a PECE solver for first-order differential equations
-    control     provides the user with an interface for the control  variables
-    response    provides the user with an interface for the response variables
+    PECE        implements a PECE solver for first-order differential equations
+    Control     provides the user with an interface for the control  variables
+    Response    provides the user with an interface for the response variables
 
 
 The PECE solver solves the following system of ODEs typical of hypo-elasticity
@@ -97,9 +97,9 @@ This is the Adams-Moulton method of Freed for integrating a first-order ODE.
 
 object constructor
 
-    E.g.:  solver = pece(ctrl, resp, m=1)
-        ctrl    an object extending class 'control'  (see below):
-        resp    an object extending class 'response' (see below):
+    E.g.:  solver = PECE(ctrl, resp, m=1)
+        ctrl    an object extending class 'Control'  (see below):
+        resp    an object extending class 'Response' (see below):
         m       the number of CE iterations, i.e., PE(CE)^m, m is in [1, 5]
     Creates an object that integrates hypo-elastic like constitutive equations
     using a PE(CE)^m method.
@@ -152,7 +152,7 @@ getEminusE0()
     variables relative to their reference state (strains)
 
 getXminusX0()
-    E.g.:  x = solver.getXminusX-()
+    E.g.:  x = solver.getXminusX0()
     Returns a vector containing a difference in the physical control variables
     relative to their reference state (stretches)
 
@@ -173,7 +173,7 @@ next node.  The interface for this class is:
 
 object constructor
 
-    E.g.: ctrl = control(eVec0, xVec0, dt)
+    E.g.: ctrl = Control(eVec0, xVec0, dt)
         eVec0       initial conditions for the thermodynamic control variables
         xVec0       initial conditions for the physical control variables
         dt          size of the time step to be used throughout for integration
@@ -208,7 +208,7 @@ update(xVec, restart=False)
 advance()
     E.g.:  ctrl.advance()
     Updates the object's data structure in preparation for the next integration
-    step.  This method is called internally by the pece object and must not be
+    step.  This method is called internally by the PECE object and must not be
     called by the user.
 
 dedx()
@@ -236,7 +236,7 @@ with the next node.  The interface for this class is:
 
 object constructor
 
-    E.g.:  resp = response(yVec0)
+    E.g.:  resp = Response(yVec0)
         yVec0       initial conditions for the response variables
 
 variables: treat these as read-only
@@ -249,8 +249,8 @@ A mixture of n constituents will have responses of n * controls.
 
 methods
 
-secMod(eVec, xVec, yVec)
-    E.g.:  Es = ce.secMod(eVec, xVec, yVec)
+secantModulus(eVec, xVec, yVec)
+    E.g.:  Es = ce.secantModulus(eVec, xVec, yVec)
         Es          a matrix of secant moduli, i.e., a constitutive equation
         eVec        a vector of thermodynamic control variables  (strains)
         xVec        a vector of physical control variables       (stretches)
@@ -258,8 +258,8 @@ secMod(eVec, xVec, yVec)
     The secant modulus is not used by the PECE, but is needed by the FE solver.
     This constitutive expression is hyper-elastic.  It returns Es in: y = Es*e.
 
-tanMod(eVec, xVec, yVec)
-    E.g.:  Et = resp.tanMod(eVec, xVec, yVec)
+tangentModulus(eVec, xVec, yVec)
+    E.g.:  Et = resp.tangentModulus(eVec, xVec, yVec)
         dyde        a matrix of tangent moduli, i.e., a constitutive equation
         eVec        a vector of thermodynamic control variables  (strains)
         xVec        a vector of physical control variables       (stretches)
@@ -274,9 +274,9 @@ tanMod(eVec, xVec, yVec)
 
 isRuptured()
     E.g.:  (ruptured) = resp.isRuptured()
-        (ruptured)  is tuple of boolean result specifying if ruptured occurred
+        (ruptured)  is tuple of boolean results specifying if rupture occurred
     There is a entry for each constituent in a material that is a mixture.
-    This method is called by the 'pece' object.
+    This method is called by the PECE object.
 
 rupturedResponse(eVec, xVec, yBeforeVec)
     E.g.:  yAfterVec = resp.rupturedResponse(eVec, xVec, yBeforeVec)
@@ -285,14 +285,14 @@ rupturedResponse(eVec, xVec, yBeforeVec)
         yBeforeVec  vector of response variables just before rupture occurs
     returns
         yAfterVec   vector of response variables just after a rupture event
-    Calling this method, which is done internally by the 'pece' integrator,
+    Calling this method, which is done internally by the PECE integrator,
     allows for a discontinuity in the field of thermodynamic responses.
 
 
 Templates for using the above control and response objects are provided below.
 
 
-class myCtrl(control):
+class MyCtrl(Control):
 
 variables: treat these as read-only
 
@@ -316,7 +316,7 @@ methods
         # exported variables.
         super().__init__(eVec0, xVec0, dt)
         # Create and initialize any additional fields introduced by the user.
-        return  # a new instance of type myCtrl
+        return  # a new instance of type MyCtrl
 
     def update(self, xVec, restart=False):
         # Call the base implementation of this method to insert this physical
@@ -354,7 +354,7 @@ methods
         return dxdtVec
 
 
-class myResp(response):
+class MyResp(Response):
 
 variables: treat these as read-only
 
@@ -371,12 +371,12 @@ methods
         # variables.
         super().__init__(yVec0)
         # Create and initialize any additional fields introduced by the user.
-        return  # a new instance of type myResp
+        return  # a new instance of type MyResp
 
     # secant modulus is not used by the PECE, but is needed by the FE solver
-    def secMod(self, eVec, xVec, yVec):
+    def secantModulus(self, eVec, xVec, yVec):
         # call the base type to verify the inputs and to create the matrix E
-        Es = super().secMod(eVec, xVec, yVec)
+        Es = super().secantModulus(eVec, xVec, yVec)
         # y = Es * e
         #    e   is a vector of thermodynamic control variables  (strains)
         #    x   is a vector of physical control variables       (stretches)
@@ -384,9 +384,9 @@ methods
         # populate the entries of E for the user's secant moduli below
         return Es
 
-    def tanMod(self, eVec, xVec, yVec):
+    def tangentModulus(self, eVec, xVec, yVec):
         # call the base type to verify the inputs and to create matrix dyde
-        Et = super().tanMod(eVec, xVec, yVec)
+        Et = super().tangentModulus(eVec, xVec, yVec)
         # dy = Et * de  where  Et = dy/de  and  de = de/dx dx/dt
         #    e   is a vector of thermodynamic control variables  (strains)
         #    x   is a vector of physical control variables       (stretches)
@@ -411,7 +411,7 @@ Reference:
 """
 
 
-class control(object):
+class Control(object):
 
     def __init__(self, eVec0, xVec0, dt):
         if isinstance(eVec0, np.ndarray):
@@ -511,7 +511,7 @@ class control(object):
         return dx
 
 
-class response(object):
+class Response(object):
 
     def __init__(self, yVec0):
         # verify input
@@ -526,7 +526,7 @@ class response(object):
         self.firstCall = True
         return  # a new instance of this base type
 
-    def secMod(self, eVec, xVec, yVec):
+    def secantModulus(self, eVec, xVec, yVec):
         # verify inputs
         if isinstance(eVec, np.ndarray):
             (controls,) = np.shape(eVec)
@@ -571,7 +571,7 @@ class response(object):
             self.firstCall = False
         return Es
 
-    def tanMod(self, eVec, xVec, yVec):
+    def tangentModulus(self, eVec, xVec, yVec):
         if isinstance(eVec, np.ndarray):
             (controls,) = np.shape(eVec)
             if self.firstCall:
@@ -653,25 +653,25 @@ class response(object):
         return yAfterVec
 
 
-class pece(object):
+class PECE(object):
 
     def __init__(self, ctrl, resp, m=1):
         # verify the inputs
         # assert that ctrl is an object that extends class control
-        if isinstance(ctrl, control):
+        if isinstance(ctrl, Control):
             self.ctrl = ctrl
         else:
             raise RuntimeError("Argument ctrl must be an object that " +
-                               "inherits class control.")
+                               "inherits class Control.")
         self.t = 0.0
         self.tR = 0.0
         self.dt = ctrl.dt
         # assert that resp is an object that extends class response
-        if isinstance(resp, response):
+        if isinstance(resp, Response):
             self.resp = resp
         else:
             raise RuntimeError("Argument resp must be an object that " +
-                               "inherits class response.")
+                               "inherits class Response.")
         # limit the range for m in the implementation of our PE(CE)^m
         if isinstance(m, int):
             if m < 1:
@@ -711,7 +711,8 @@ class pece(object):
         self.ctrl.update(xVec, restart)
         # obtain a tangent modulus for the reference state
         if self.step == 1:
-            dyde0 = self.resp.tanMod(self.ctrl.eR, self.ctrl.xR, self.resp.yR)
+            dyde0 = self.resp.tangentModulus(self.ctrl.eR, self.ctrl.xR,
+                                             self.resp.yR)
             dedx0 = self.ctrl.dedx()
             dxdt0 = self.ctrl.dxdt()
             dydt0 = np.matmul(dyde0, np.matmul(dedx0, dxdt0))
@@ -732,7 +733,7 @@ class pece(object):
             y1 = np.add(self.yC, np.multiply(self.dt, self.dydtC))
             yP = np.copy(y1)
             # evaluate
-            dyde1 = self.resp.tanMod(self.ctrl.eN, self.ctrl.xN, y1)
+            dyde1 = self.resp.tangentModulus(self.ctrl.eN, self.ctrl.xN, y1)
             dydt1 = np.matmul(dyde1, dedt1)
             # iterate over the CE pair m times
             for m in range(self.m):
@@ -740,7 +741,8 @@ class pece(object):
                 y1 = np.add(self.yC, np.multiply(self.dt / 2.0,
                                                  np.add(dydt1, self.dydtC)))
                 # re-evaluate
-                dyde1 = self.resp.tanMod(self.ctrl.eN, self.ctrl.xN, y1)
+                dyde1 = self.resp.tangentModulus(self.ctrl.eN,
+                                                 self.ctrl.xN, y1)
                 dydt1 = np.matmul(dyde1, dedt1)
             yC = np.copy(y1)
         else:
@@ -755,14 +757,15 @@ class pece(object):
             yN = np.add(yNm1, np.multiply(2.0 * self.dt / 3.0, dydt))
             yP = np.copy(yN)
             # evaluate
-            dydeN = self.resp.tanMod(self.ctrl.eN, self.ctrl.xN, yN)
+            dydeN = self.resp.tangentModulus(self.ctrl.eN, self.ctrl.xN, yN)
             dydtN = np.matmul(dydeN, dedtN)
             # iterate over the CE pair m times
             for m in range(self.m):
                 # correct: this is Gear's BDF2 formula
                 yN = np.add(yNm1, np.multiply(2.0 * self.dt / 3.0, dydtN))
                 # re-evaluate
-                dydeN = self.resp.tanMod(self.ctrl.eN, self.ctrl.xN, yN)
+                dydeN = self.resp.tangentModulus(self.ctrl.eN,
+                                                 self.ctrl.xN, yN)
                 dydtN = np.matmul(dydeN, dedtN)
             yC = np.copy(yN)
         # update the integrator's data base
@@ -786,14 +789,16 @@ class pece(object):
             if self.step == 1 or restart:
                 yRuptured = self.resp.rupturedResponse(self.ctrl.eN,
                                                        self.ctrl.xN, y1)
-                dydeRuptured = self.resp.tanMod(self.ctrl.eN, self.ctrl.xN,
-                                                yRuptured)
+                dydeRuptured = self.resp.tangentModulus(self.ctrl.eN,
+                                                        self.ctrl.xN,
+                                                        yRuptured)
                 dydtRuptured = np.matmul(dydeRuptured, dedt1)
             else:
                 yRuptured = self.resp.rupturedResponse(self.ctrl.eN,
                                                        self.ctrl.xN, yN)
-                dydeRuptured = self.resp.tanMod(self.ctrl.eN, self.ctrl.xN,
-                                                yRuptured)
+                dydeRuptured = self.resp.tangentModulus(self.ctrl.eN,
+                                                        self.ctrl.xN,
+                                                        yRuptured)
                 dydtRuptured = np.matmul(dydeRuptured, dedtN)
             self.yCR[:] = yRuptured[:]
             self.dydtCR[:] = dydtRuptured[:]
