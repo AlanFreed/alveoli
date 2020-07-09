@@ -42,7 +42,9 @@ which is uniform over the length of a chord, i.e., it is independent of $\xi$.
 
 Triangular elements are needed in a support capacity in order to construct our alevolar model; specifically, the four surfaces of a tetrahedron are triangles.  What is required of them is a capability to compute the traction acting across such a surface through integration.  This requires knowledge of their shape functions and quadrature rules, the latter topic being discussed in Part~\ref{partNumericalMethods}. 
 
-The shape functions for a triangle expressed in terms of its natural co-ordinates $( \xi , \eta )$, where $0 \leq \xi \leq 1$ and $0 \leq \eta \leq \xi$, are given by
+\subsection{Shape Functions for Interpolating a Triangle}
+
+The shape functions for a triangle expressed in terms of its natural co-ordinates $( \xi , \eta )$, where $0 \leq \xi \leq 1$ and $0 \leq \eta \leq 1-\xi$, are given by
 \begin{subequations}
     \label{triangleShapeFns}
     \begin{align}
