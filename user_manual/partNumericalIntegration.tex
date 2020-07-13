@@ -419,6 +419,7 @@ where co-ordinates $\xi_i$ and $\eta_i$ place the $i^{\text{th}}$ node of integr
 
 
 \subsection{Gauss Integration of a Pentagon}
+\label{sec:pentagonQuadrature}
 
 Gauss quadrature rules for a regular pentagon described in its natural co-ordinate system, i.e., oriented according to Fig.~\ref{figRegPentagon}, are presented in Table~\ref{tabQuadrature}, which describe integrations of the type
 \begin{multline}
@@ -473,7 +474,7 @@ The quadrature rules presented in Table~\ref{tabQuadrature} were supplied to the
     \label{figQuadrature}
 \end{figure}
 
-The Gaussian quadrature rules of Mousavi, Xiao \& Sukumar \cite{Mousavietal10} presented in Table~\ref{tabQuadrature} are compatible with the shape functions of Wachspress \cite{Wachspress75,Wachspress16} and Dasgupta \cite{Dasgupta03} presented in \S\ref{secShapeFns}.  Again, Table~\ref{tabQuadrature} cannot be found in the literature.
+The Gaussian quadrature rules of Mousavi, Xiao \& Sukumar \cite{Mousavietal10} presented in Table~\ref{tabQuadrature} are compatible with the shape functions of Wachspress \cite{Wachspress75,Wachspress16} and Dasgupta \cite{Dasgupta03} presented in \S\ref{secShapeFns}.  More recently, Chakrabort \textit{et~al}.\ \cite{Chakrabortyetal18} have provided alternative quadrature schemes for pentagons that are also compatible with the Wachspress shape functions.  Again, Table~\ref{tabQuadrature} cannot be found in the literature.
 
 \subsection{Gauss Integration of a Tetrahedron}
 
@@ -557,7 +558,7 @@ where co-ordinates $\xi_i$, $\eta_i$ and $\zeta_i$ place the $i^{\text{th}}$ nod
 
 In a general finite element setting, information comes into the nodes of an element that then gets interpolated down to its Gauss points for their use there.  In many applications, and in particular, in ours, one needs to also be able to take fields, in our case the stress and entropy that have been determined at the Gauss points of an element, and extrapolate this information out to the exterior nodes of the element.
 
-In our application, a suite of nodes is common betwixt three, separate, finite element models comprised of twenty common vertices that belong to a dodecahedron used as a geometric model for an alveolus.  The resultant force at each vertex arises from: a finite element model of thirty 1D rods representing the alveolar chords, a finite element model of twelve 2D pentagons representing the alveolar membranes, and a finite element model of sixty 3D tetrahedra representing the alveolar sac.  The micro\-scopic forces coming from these three models are summed at these twenty common vertices. These resultant forces are then collectively homogenized to yield an averaged macroscopic state of stress for the parenchyma.  Feasibility of this solution strategy hinges upon one's ability to \textit{i\/}) extrapolate stresses evaluated at the Gauss points out to their nodal positions, and \textit{ii\/}) conversion these nodal stresses into nodal forces.  We address the first of these two issues in this section, and the second of these two issues in the next section.
+Particular to our application, a suite of nodes is common betwixt three, separate, finite element models comprised of twenty common vertices that belong to a dodecahedron used as a geometric model for an alveolus.  The resultant force at each vertex arises from: a finite element model of thirty 1D rods representing the alveolar chords, a finite element model of twelve 2D pentagons representing the alveolar membranes, and a finite element model of sixty 3D tetrahedra representing the alveolar sac.  The micro\-scopic forces coming from these three models are summed at these twenty common vertices. These resultant forces are then collectively homogenized to yield an averaged macroscopic state of stress for the parenchyma.  Feasibility of this solution strategy hinges upon one's ability to \textit{i\/}) extrapolate stresses evaluated at the Gauss points out to their nodal positions, and \textit{ii\/}) the conversion of these nodal stresses into nodal forces.  We address the first of these two issues in this section, and the second of these two issues in the next section.
 
 Shape functions are introduced for interpolating within an element; specifically, consider an arbitrary field, say $f$, whose values are known at the nodes, then
 \begin{subequations}
@@ -596,7 +597,7 @@ Shape functions are introduced for interpolating within an element; specifically
 \end{subequations}
 which follow upon substituting Eqn.~(\ref{extrapolation}) into Eqn.~(\ref{interpolation}), or vice versa.  In this regard, such a pair of interpolation\slash extrapolation functions are self consistent.  
 
-Specifically, whenever $m=n$, the matrices that come about from the interpolation and extrapolation coefficients are reciprocal to one another, with the 0's and 1's of Eqns.~(\ref{extrapolationConstraint1} \& \ref{extrapolationConstraint3} or \ref{extrapolationConstraint2} \& \ref{extrapolationConstraint4}) associating with the individual components of an identity matrix.  Consequently, our need to extrapolate information as-well-as interpolate it strongly suggests that then number of Gauss points selected ought to equal the number of nodal points for any given element geometry.
+Specifically, whenever $m=n$, the matrices that come about from the interpolation and extrapolation coefficients are reciprocal to one another, with the 0's and 1's of Eqns.~(\ref{extrapolationConstraint1} \& \ref{extrapolationConstraint3} or \ref{extrapolationConstraint2} \& \ref{extrapolationConstraint4}) associating with the individual components of an identity matrix.  Consequently, our need to extrapolate information as-well-as interpolate it strongly suggests that the number of Gauss points selected ought to equal the number of nodal points for any given element geometry.
 
 For example, in the case of a tetrahedron one interpolates via
 \begin{subequations}
@@ -649,7 +650,7 @@ For example, in the case of a tetrahedron one interpolates via
 where vectors $\boldsymbol{x}_1$, $\boldsymbol{x}_2$, $\boldsymbol{x}_3$ and $\boldsymbol{x}_4$ hold the co-ordinates of the nodal points, and where vectors $\boldsymbol{\xi}_1$, $\boldsymbol{\xi}_2$, $\boldsymbol{\xi}_3$ and $\boldsymbol{\xi}_4$ hold the co-ordinates of their Gauss points, all evaluated in the natural co-ordinate system of the element.  The matrices in the above mappings are inverses of one another in this construction.
 \addtocounter{equation}{-1}
 
-Our three-model finite element analysis of an alveolus requires the use of rods with two nodes, triangles with three nodes, tetrahedra with four nodes, and pentagons with five nodes.  We now provide consistent interpolation\slash extrapolation procedures for these geometries.  This requires the selection of a two-point quadrature rule for rods, a three-point quadrature rule for triangles, a four point quadrature rule for tetrahedra, and a five-point quadrature rule for pentagons.  Our selections, and for them their assoicated interpolation\slash extrapolation pairs, are presented below.
+Our three-model finite element analysis of an alveolus requires the use of rods with two nodes, triangles with three nodes, tetrahedra with four nodes, and pentagons with five nodes.  We now provide consistent interpolation\slash extrapolation procedures for these geometries.  This requires the selection of a two-point quadrature rule for rods, a three-point quadrature rule for triangles, a four point quadrature rule for tetrahedra, and a five-point quadrature rule for pentagons.  Our selections, and their associated interpolation\slash extrapolation pairs, are presented below.
 
 \subsection{Self-Consistent Interpolation\slash Extrapolation Procedures for Rods}
 
@@ -727,7 +728,7 @@ Now, considering a triangle with three Gauss points, the interpolation of an arb
     \label{extrapolateTriangle}
     \end{align}
 \end{subequations}
-As a check, each row in both matrices sums to 1 and, as expected, these matrices are reciprocals to one another.
+As a check, each row in both matrices sums to 1 and, as expected, plus these matrices are reciprocals to one another.
 
 \begin{table}
     \begin{center}
@@ -802,24 +803,40 @@ where $a = 0.1381966011250105$ and $b = 0.5854101966249685$ from Table~\ref{tab:
 
 \subsection{Self-Consistent Interpolation\slash Extrapolation Procedures for Pentagons}
 
-In the prior cases, many coefficients present in the shape functions and Gauss co-ordinates had like values.  This greatly simplified their interpolation\slash extrapolation matrices.  This is not the case for the pentagon, whose nodal co-ordinates are (cf.\ \S\ref{sec:pentagonGeometry})
+We only know of two papers where quadrature formul\ae\ have been created for integrating over the area of pentagons. \cite{Mousavietal10,Chakrabortyetal18}  Neither presents tables for their nodes and weights of quadrature, cf.\ \S\ref{sec:pentagonQuadrature} for such a table.  Only mathematical methodologies from which one can numerically construct such tables are published.  Also, neither of their strategies exploits the symmetry properties of a pentagon.  
+
+Because we seek a quadrature rule for regular pentagons that employs five Gauss points, and pentagons posses five radial lines of symmetry, it is reasonable to consider that the five nodes of quadrature that we seek lie along these five radial lines.  Specifically, we seek a quadrature rule for a pentagon whose vertices are located at $\boldsymbol{x}_i$, $i=1,2,\ldots,5$, and whose nodes of quadrature are located at $\boldsymbol{\xi}_i$ such that
 \begin{subequations}
     \label{pentagonCoordinates}
     \begin{align}
-        \boldsymbol{x}_1 & = (\phantom{-}0.0000000000000000, \phantom{-}1.0000000000000000) \notag \\
-        \boldsymbol{x}_2 & = (-0.9510565162951536, \phantom{-}0.3090169943749473) \notag \\
-        \boldsymbol{x}_3 & = (-0.5877852522924729, -0.8090169943749475) \\
-        \boldsymbol{x}_4 & = (\phantom{-}0.5877852522924729, -0.8090169943749475) \notag \\
-        \boldsymbol{x}_5 & = (\phantom{-}0.9510565162951536, \phantom{-}0.3090169943749473) \notag
-        \intertext{when evaluated in its natural co-ordinate system where a regular pentagon inscribes the unit circle.  Mated with these are the Gauss points that belong to the quadrature rule found in Table~\ref{tab:5nodePentagon}, whose co-ordinates are}
-        \boldsymbol{\xi}_1 & = (-0.0904672856259437, \phantom{-}0.6261163672367185) \notag \\
-        \boldsymbol{\xi}_2 & = (-0.5988664907434159, -0.0372772228317812) \notag \\
-        \boldsymbol{\xi}_3 & = (\phantom{-}0.0151090564021255, -0.6475950318414561) \\
-        \boldsymbol{\xi}_4 & = (\phantom{-}0.5913912812273181,-0.0149548962936793) \notag \\
-        \boldsymbol{\xi}_5 & = (\phantom{-}0.3651143172435236, \phantom{-}0.5872395873378157) \notag
+    \boldsymbol{x}_1 & = \bigl( \cos ( \textfrac{\pi}{2} ) ,
+        \sin ( \textfrac{\pi}{2} ) \bigr) & \boldsymbol{\xi}_1 & = \ell \boldsymbol{x}_1 \\
+    \boldsymbol{x}_2 & = \bigl( \cos ( \textfrac{9\pi}{10}) ,
+    \sin ( \textfrac{9\pi}{10} ) \bigr) & \boldsymbol{\xi}_2 & = \ell \boldsymbol{x}_2 \\
+    \boldsymbol{x}_3 & = \bigl( \cos ( \textfrac{13\pi}{10}) ,
+    \sin ( \textfrac{13\pi}{10} ) \bigr) & \boldsymbol{\xi}_3 & = \ell \boldsymbol{x}_3 \\
+    \boldsymbol{x}_4 & = \bigl( \cos ( \textfrac{17\pi}{10}) ,
+    \sin ( \textfrac{17\pi}{10} ) \bigr) & \boldsymbol{\xi}_4 & = \ell \boldsymbol{x}_4 \\
+    \boldsymbol{x}_5 & = \bigl( \cos ( \textfrac{\pi}{10}) ,
+    \sin ( \textfrac{\pi}{10} ) \bigr) & \boldsymbol{\xi}_5 & = \ell \boldsymbol{x}_5
     \end{align}
 \end{subequations}
-that are also placed in the natural co-ordinate system of a pentagon.  Consequently, given the general form for an interpolation function as being
+where lines radiating from the origin out to vertices $\boldsymbol{x}_i$ each have unit length, while those that radiate out to the Gauss points $\boldsymbol{\xi}$ have a shorter length of $\ell$.
+
+Implementing the strategies that underlie Gauss quadrature, length $\ell$ represents a distance out to the centroid of an area.  In our case, this area (one of five equivalent areas) is a four-sided polygon whose apex has an inside angle of $108^{\circ}$, whose shoulders have right angles, and whose inside angle at the origin is $72^{\circ}$.  A little bit of geometry and algebra leads to the result that
+\begin{subequations}
+    \label{pentagonQuadrature}
+    \begin{align}
+    \ell & = \frac{1 + \sin ( \textfrac{3\pi}{10} )}
+    {3 \sin ( \textfrac{3\pi}{10} ) } \approx 0.7454 \\
+    \intertext{whose associated area becomes the weight of quadrature}
+    w & = \sin ( \textfrac{3\pi}{10} ) \cos ( \textfrac{3\pi}{10} ) 
+    \approx 0.4755 
+    \end{align}
+\end{subequations}
+which is one-fifth the area of a pentagon, cf.\ Eqn.~(\ref{regPentagonArea}).  To the best of our knowledge, the quadrature rule put forward in Eqns.~(\ref{pentagonCoordinates} \& \ref{pentagonQuadrature}) for regular pentagons is new to the literature. 
+
+Interpolation is described through shape functions.  Adopting the shape functions of Wachspress, which were constructed in \S\ref{secShapeFns} for a pentagon, while using the quadrature rule of Eqns.~(\ref{pentagonCoordinates} \& \ref{pentagonQuadrature}), results in a symmetric interpolation map of
 \begin{subequations}
     \label{extrapolationPentagon}
     \begin{align} 
@@ -830,21 +847,11 @@ that are also placed in the natural co-ordinate system of a pentagon.  Consequen
     f ( \boldsymbol{\xi}_4 ) \\ 
     f ( \boldsymbol{\xi}_5 )
     \end{matrix} \right\} & = \begin{bmatrix}
-    N_1 (\boldsymbol{\xi}_1) & N_2 (\boldsymbol{\xi}_1) & 
-    N_3 (\boldsymbol{\xi}_1) & N_4 (\boldsymbol{\xi}_1) & 
-    N_5 (\boldsymbol{\xi}_1) \\
-    N_1 (\boldsymbol{\xi}_2) & N_2 (\boldsymbol{\xi}_2) &
-    N_3 (\boldsymbol{\xi}_2) & N_4 (\boldsymbol{\xi}_2) & 
-    N_5 (\boldsymbol{\xi}_2) \\
-    N_1 (\boldsymbol{\xi}_3) & N_2 (\boldsymbol{\xi}_3) & 
-    N_3 (\boldsymbol{\xi}_3) & N_4 (\boldsymbol{\xi}_3) & 
-    N_5 (\boldsymbol{\xi}_3) \\
-    N_1 (\boldsymbol{\xi}_4) & N_2 (\boldsymbol{\xi}_4) & 
-    N_3 (\boldsymbol{\xi}_4) & N_4 (\boldsymbol{\xi}_4) & 
-    N_5 (\boldsymbol{\xi}_4) \\
-    N_1 (\boldsymbol{\xi}_5) & N_2 (\boldsymbol{\xi}_5) & 
-    N_3 (\boldsymbol{\xi}_5) & N_4 (\boldsymbol{\xi}_5) & 
-    N_5 (\boldsymbol{\xi}_5) 
+    a & b & c & c & b \\
+    b & a & b & c & c \\
+    c & b & a & b & c \\
+    c & c & b & a & b \\
+    b & c & c & b & a
     \end{bmatrix} 
     \left\{ \begin{matrix} 
     f ( \boldsymbol{x}_1 ) \\ 
@@ -853,117 +860,35 @@ that are also placed in the natural co-ordinate system of a pentagon.  Consequen
     f ( \boldsymbol{x}_4 ) \\
     f ( \boldsymbol{x}_5 )
     \end{matrix} \right\} \\
-    \intertext{and the general form for the extrapolation function as being}
+    \intertext{with elements sized as $a = 0.6901471673508344$, $b = 0.1367959452017669$ and $c = 0.0181304711228159$, and an ensueing extrapolation map that is described by}
     \left\{ \begin{matrix} 
     f ( \boldsymbol{x}_1 ) \\ 
     f ( \boldsymbol{x}_2 ) \\ 
     f ( \boldsymbol{x}_3 ) \\
     f ( \boldsymbol{x}_4 ) \\
     f ( \boldsymbol{x}_5 )
-    \end{matrix} \right\} & = \begin{bmatrix}
-    M_1 (\boldsymbol{x}_1) & M_2 (\boldsymbol{x}_1) & 
-    M_3 (\boldsymbol{x}_1) & M_4 (\boldsymbol{x}_1) & 
-    M_5 (\boldsymbol{x}_1) \\
-    M_1 (\boldsymbol{x}_2) & M_2 (\boldsymbol{x}_2) &
-    M_3 (\boldsymbol{x}_2) & M_4 (\boldsymbol{x}_2) & 
-    M_5 (\boldsymbol{x}_2) \\
-    M_1 (\boldsymbol{x}_3) & M_2 (\boldsymbol{x}_3) & 
-    M_3 (\boldsymbol{x}_3) & M_4 (\boldsymbol{x}_3) & 
-    M_5 (\boldsymbol{x}_3) \\
-    M_1 (\boldsymbol{x}_4) & M_2 (\boldsymbol{x}_4) & 
-    M_3 (\boldsymbol{x}_4) & M_4 (\boldsymbol{x}_4) & 
-    M_5 (\boldsymbol{x}_4) \\
-    M_1 (\boldsymbol{x}_5) & M_2 (\boldsymbol{x}_5) & 
-    M_3 (\boldsymbol{x}_5) & M_4 (\boldsymbol{x}_5) & 
-    M_5 (\boldsymbol{x}_5) 
+    \end{matrix} \right\} & = \frac{1}{\Delta} \begin{bmatrix}
+    x & y & z & z & y \\
+    y & x & y & z & z \\
+    z & y & x & y & z \\
+    z & z & y & x & y \\
+    y & z & z & y & x
     \end{bmatrix} \left\{ \begin{matrix}
     f ( \boldsymbol{\xi}_1 ) \\ 
     f ( \boldsymbol{\xi}_2 ) \\ 
     f ( \boldsymbol{\xi}_3 ) \\ 
     f ( \boldsymbol{\xi}_4 ) \\ 
     f ( \boldsymbol{\xi}_5 )
-    \end{matrix} \right\} 
+    \end{matrix} \right\}  \\
+    \intertext{wherein}
+    x & = a^2 + (a-b)(b+c) - c^2 \\
+    y & = (b+c)c - (a+b)b \\
+    z & = b^2 - (a-b)c - c^2 \\
+    \Delta & = a^2 - (a+b)b - (a-3b)c - c^2
     \end{align}
 \end{subequations}
-then the Wachspress shape functions from \S\ref{secShapeFns} establish that
-\begin{subequations}
-    \begin{align}
-    N_1 (\boldsymbol{\xi}_1) & = 0.5742933239608368 & 
-    N_2 (\boldsymbol{\xi}_1) & = 0.2228683023898542 \notag \\
-    N_3 (\boldsymbol{\xi}_1) & = 0.0387153628761994 & 
-    N_4 (\boldsymbol{\xi}_1) & = 0.0325951295071632 \notag \\ & &
-    N_5 (\boldsymbol{\xi}_1) & = 0.1315278812659464 \\
-    N_1 (\boldsymbol{\xi}_2) & = 0.0958674114289660 & 
-    N_2 (\boldsymbol{\xi}_2) & = 0.5009845185523082 \notag \\
-    N_3 (\boldsymbol{\xi}_2) & = 0.3162525009222483 & 
-    N_4 (\boldsymbol{\xi}_2) & = 0.0527317817100517 \notag \\ & &
-    N_5 (\boldsymbol{\xi}_2) & = 0.0341637873864255 \\
-    N_1 (\boldsymbol{\xi}_3) & = 0.0240660371851330 & 
-    N_2 (\boldsymbol{\xi}_3) & = 0.0511250975959584 \notag \\
-    N_3 (\boldsymbol{\xi}_3) & = 0.4249752193226607 & 
-    N_4 (\boldsymbol{\xi}_3) & = 0.4455182171177459 \notag \\ & &
-    N_5 (\boldsymbol{\xi}_3) & = 0.0543154287785020 \\
-    N_1 (\boldsymbol{\xi}_4) & = 0.1045237636787928 & 
-    N_2 (\boldsymbol{\xi}_4) & = 0.0362093675445261 \notag \\
-    N_3 (\boldsymbol{\xi}_4) & = 0.0532941435687119 & 
-    N_4 (\boldsymbol{\xi}_4) & = 0.3010743631505153 \notag \\ & &
-    N_5 (\boldsymbol{\xi}_4) & = 0.5048983620574539 \\
-    N_1 (\boldsymbol{\xi}_5) & = 0.4878307399140562 & 
-    N_2 (\boldsymbol{\xi}_5) & = 0.0435130461996390 \notag \\
-    N_3 (\boldsymbol{\xi}_5) & = 0.0170947110590359 & 
-    N_4 (\boldsymbol{\xi}_5) & = 0.0355514146683694 \notag \\ & &
-    N_5 (\boldsymbol{\xi}_5) & = 0.4160100881588996 
-    \intertext{whose extrapolation coefficients (Gauss points $\mapsto$ nodes) have values of}
-    M_1 (\boldsymbol{x}_1) & = \phantom{-}1.574345925568418 & 
-    M_2 (\boldsymbol{x}_1) & = -0.733485390850717 \notag \\
-    M_3 (\boldsymbol{x}_1) & = \phantom{-}0.485211827009017 &
-    M_4 (\boldsymbol{x}_1) & = -0.818070126920090 \notag \\ & &
-    M_5 (\boldsymbol{x}_1) & = \phantom{-}0.491997765193371 \\
-    M_1 (\boldsymbol{x}_2) & = \phantom{-}1.856547184799469 & 
-    M_2 (\boldsymbol{x}_2) & = \phantom{-}1.415175245347637 \notag \\
-    M_3 (\boldsymbol{x}_2) & = -1.344310105964370 &
-    M_4 (\boldsymbol{x}_2) & = \phantom{-}1.870822678657299 \notag \\ & &
-    M_5 (\boldsymbol{x}_2) & = -2.798235002840037 \\
-    M_1 (\boldsymbol{x}_3) & = -3.777224172987033 & 
-    M_2 (\boldsymbol{x}_3) & = \phantom{-}1.301302873204922 \notag \\
-    M_3 (\boldsymbol{x}_3) & = \phantom{-}1.945214872630705 &
-    M_4 (\boldsymbol{x}_3) & = -3.263553503750074 \notag \\ & &
-    M_5 (\boldsymbol{x}_3) & = \phantom{-}4.794259930901484 \\
-    M_1 (\boldsymbol{x}_4) & = \phantom{-}3.572005103854215  & 
-    M_2 (\boldsymbol{x}_4) & = -1.459577846152766 \notag \\
-    M_3 (\boldsymbol{x}_4) & = \phantom{-}0.585178418544269 &
-    M_4 (\boldsymbol{x}_4) & = \phantom{-}2.862957094184496 \notag \\ & &
-    M_5 (\boldsymbol{x}_4) & = -4.560562770430216 \\
-    M_1 (\boldsymbol{x}_5) & = -2.190373901771571 & 
-    M_2 (\boldsymbol{x}_5) & = \phantom{-}0.783353108520279 \notag \\
-    M_3 (\boldsymbol{x}_5) & = -0.558311036814771 &
-    M_4 (\boldsymbol{x}_5) & = \phantom{-}0.653065631679351 \notag \\ & &
-    M_5 (\boldsymbol{x}_5) & = \phantom{-}2.312266198386713 
-    \end{align}
-\end{subequations}
-where, as a check, $\sum_{i=1}^5 N_i (\boldsymbol{\xi}_j) = 1$ and $\sum_{i=1}^5 M_i (\boldsymbol{x}_j) = 1$ for $j=1,2,\ldots,5$, plus the coefficient matrices for interpolation and extrapolation are the inverses of one another.   Like the tetrahedron, these interpolation\slash extrapolation matrices are not symmetric. 
+where, as a check, $\sum_{i=1}^5 N_i (\boldsymbol{\xi}_j) = 1$ and $\sum_{i=1}^5 M_i (\boldsymbol{x}_j) = 1$ for $j=1,2,\ldots,5$, and therefore, $a + 2b + 2c = 1$ and $x + 2y + 2z = \Delta$.  Furthermore, these coefficient matrices for interpolation and extrapolation are inverses to one another.  
 
-\begin{table}
-    \begin{center}
-        \begin{tabular}{|c|ccc|}
-            \hline
-            node & $\xi$ co-ordinate & $\eta$ co-ordinate  & weight \\ \hline 
-            1 & -0.0904672856259437 &  \phantom{-}0.6261163672367185 &
-             0.4934869125017041 \\ 
-            2 & -0.5988664907434159 & -0.0372772228317812 & 
-             0.6190315158026863 \\ 
-            3 & \phantom{-}0.0151090564021255 & -0.6475950318414561 &
-             0.5321153805577828 \\ 
-            4 & \phantom{-}0.5913912812273181 & -0.0149548962936793 &
-             0.6173424062184376 \\
-            5 & \phantom{-}0.3651143172435236 &  \phantom{-}0.5872395873378157 &
-             0.1156650756572724 \\ 
-            \hline
-        \end{tabular}
-    \end{center}
-    \caption{A Gauss quadrature rule for integrating functions over the areas of pentagons.  It approximates $\iint_{\pentagon} f (\xi, \eta) \, \mathrm{d} \eta \, \mathrm{d} \xi$ using five Gauss points.  The weights sum to the areas of pentagons inscribing the unit circle because $A = \iint_{\pentagon} \mathrm{d} \eta \, \mathrm{d} \xi = 2.3776412907378837$. This quadrature rule was supplied to the authors by Prof.\ Sukumar through a private communication.  It integrates polynomials over a pentagonal region exactly up through third order.  This quadrature rule is not symmetric.}
-    \label{tab:5nodePentagon}
-\end{table}
 
 \section{Converting Nodal Stresses into Nodal Forces}
 

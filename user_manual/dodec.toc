@@ -91,34 +91,34 @@
 \contentsline {section}{\numberline {5.3}I\Letter@Gap n\Letter@Gap t\Letter@Gap e\Letter@Gap r\Letter@Gap p\Letter@Gap o\Letter@Gap l\Letter@Gap a\Letter@Gap t\Letter@Gap i\Letter@Gap o\Letter@Gap n\Letter@Gap :\relax \ \kern \Letter@Space N\Letter@Gap o\Letter@Gap d\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space P\Letter@Gap o\Letter@Gap i\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax \ \kern \Letter@Space $\Letter@Gap \DOTSB \mapstochar \rightarrow \Letter@Gap $\relax \ \kern \Letter@Space G\Letter@Gap a\Letter@Gap u\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space P\Letter@Gap o\Letter@Gap i\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax \ \kern \Letter@Space \\\relax \ \kern \Letter@Space \hskip 2em\relax \Letter@Gap E\Letter@Gap x\Letter@Gap t\Letter@Gap r\Letter@Gap a\Letter@Gap p\Letter@Gap o\Letter@Gap l\Letter@Gap a\Letter@Gap t\Letter@Gap i\Letter@Gap o\Letter@Gap n\Letter@Gap :\relax \ \kern \Letter@Space G\Letter@Gap a\Letter@Gap u\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space P\Letter@Gap o\Letter@Gap i\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax \ \kern \Letter@Space $\Letter@Gap \DOTSB \mapstochar \rightarrow \Letter@Gap $\relax \ \kern \Letter@Space N\Letter@Gap o\Letter@Gap d\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space P\Letter@Gap o\Letter@Gap i\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax \relax }{118}%
 \contentsline {subsection}{\numberline {5.3.1}Self-Consistent Interpolation\slash Extrapolation Procedures for Rods}{121}%
 \contentsline {subsection}{\numberline {5.3.2}Self-Consistent Interpolation\slash Extrapolation Procedures for Triangles}{122}%
-\contentsline {subsection}{\numberline {5.3.3}Self-Consistent Interpolation\slash Extrapolation Procedures for Tetrahedra}{122}%
+\contentsline {subsection}{\numberline {5.3.3}Self-Consistent Interpolation\slash Extrapolation Procedures for Tetrahedra}{123}%
 \contentsline {subsection}{\numberline {5.3.4}Self-Consistent Interpolation\slash Extrapolation Procedures for Pentagons}{124}%
-\contentsline {section}{\numberline {5.4}C\Letter@Gap o\Letter@Gap n\Letter@Gap v\Letter@Gap e\Letter@Gap r\Letter@Gap t\Letter@Gap i\Letter@Gap n\Letter@Gap g\relax \ \kern \Letter@Space N\Letter@Gap o\Letter@Gap d\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space S\Letter@Gap t\Letter@Gap r\Letter@Gap e\Letter@Gap s\Letter@Gap s\Letter@Gap e\Letter@Gap s\relax \ \kern \Letter@Space i\Letter@Gap n\Letter@Gap t\Letter@Gap o\relax \ \kern \Letter@Space N\Letter@Gap o\Letter@Gap d\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space F\Letter@Gap o\Letter@Gap r\Letter@Gap c\Letter@Gap e\Letter@Gap s\relax \relax }{127}%
-\contentsline {part}{6\hspace {1em}Variational Formulation}{128}%
-\contentsline {section}{\numberline {6.1}M\Letter@Gap a\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space M\Letter@Gap a\Letter@Gap t\Letter@Gap r\Letter@Gap i\Letter@Gap x\relax \relax }{130}%
-\contentsline {subsection}{\numberline {6.1.1}Mass Matrices for a Chord}{131}%
-\contentsline {subsubsection}{\numberline {6.1.1.1}Assemble Mass Matrices for the Septal Chords}{132}%
-\contentsline {subsection}{\numberline {6.1.2}Mass Matrices for a Pentagon}{133}%
-\contentsline {subsubsection}{\numberline {6.1.2.1}Assemble Mass Matrices for the Alveolar Septa}{134}%
-\contentsline {subsection}{\numberline {6.1.3}Mass Matrices for a Tetrahedron}{134}%
-\contentsline {subsubsection}{\numberline {6.1.3.1}Assemble Tetrahedral Mass Matrices to Get Mass Matrix for an Alveolar Sac}{136}%
-\contentsline {section}{\numberline {6.2}S\Letter@Gap t\Letter@Gap i\Letter@Gap f\Letter@Gap f\Letter@Gap n\Letter@Gap e\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space M\Letter@Gap a\Letter@Gap t\Letter@Gap r\Letter@Gap i\Letter@Gap x\relax \relax }{137}%
-\contentsline {subsection}{\numberline {6.2.1}Stiffness Matrix for Chord}{139}%
-\contentsline {subsection}{\numberline {6.2.2}Stiffness Matrix for Pentagon}{142}%
-\contentsline {subsection}{\numberline {6.2.3}Stiffness Matrix for a tetrahedron}{148}%
-\contentsline {section}{\numberline {6.3}F\Letter@Gap o\Letter@Gap r\Letter@Gap c\Letter@Gap e\relax \ \kern \Letter@Space V\Letter@Gap e\Letter@Gap c\Letter@Gap t\Letter@Gap o\Letter@Gap r\relax \relax }{158}%
-\contentsline {subsection}{\numberline {6.3.1}Force Vector for a Chord}{159}%
-\contentsline {subsection}{\numberline {6.3.2}Force Vector for a Pentagon}{159}%
-\contentsline {subsection}{\numberline {6.3.3}Force Vector for a Tetrahedron}{160}%
-\contentsline {section}{\numberline {7.1}References\relax \relax }{162}%
-\contentsline {section}{Appendix\nobreakspace {}A. Implicit Elasticity}{171}%
-\contentsline {paragraph}{\numberline {A.3.2.1}Uniform Response}{183}%
-\contentsline {paragraph}{\numberline {A.3.2.2}Non-Uniform Response}{184}%
-\contentsline {paragraph}{\numberline {A.3.3.1}Uniform Response}{185}%
-\contentsline {paragraph}{\numberline {A.3.3.2}Non-Uniform Response}{186}%
-\contentsline {paragraph}{\numberline {A.4.1.1}Uniform Response}{187}%
-\contentsline {paragraph}{\numberline {A.4.1.2}Uniform Biologic Membrane Model}{187}%
-\contentsline {paragraph}{\numberline {A.4.1.3}Non-Uniform Response}{188}%
-\contentsline {paragraph}{\numberline {A.4.1.4}Non-Uniform Biologic Membrane Model}{189}%
-\contentsline {paragraph}{\numberline {A.4.2.1}Uniform Response}{191}%
-\contentsline {paragraph}{\numberline {A.4.2.2}Non-Uniform Response}{191}%
+\contentsline {section}{\numberline {5.4}C\Letter@Gap o\Letter@Gap n\Letter@Gap v\Letter@Gap e\Letter@Gap r\Letter@Gap t\Letter@Gap i\Letter@Gap n\Letter@Gap g\relax \ \kern \Letter@Space N\Letter@Gap o\Letter@Gap d\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space S\Letter@Gap t\Letter@Gap r\Letter@Gap e\Letter@Gap s\Letter@Gap s\Letter@Gap e\Letter@Gap s\relax \ \kern \Letter@Space i\Letter@Gap n\Letter@Gap t\Letter@Gap o\relax \ \kern \Letter@Space N\Letter@Gap o\Letter@Gap d\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space F\Letter@Gap o\Letter@Gap r\Letter@Gap c\Letter@Gap e\Letter@Gap s\relax \relax }{126}%
+\contentsline {part}{6\hspace {1em}Variational Formulation}{127}%
+\contentsline {section}{\numberline {6.1}M\Letter@Gap a\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space M\Letter@Gap a\Letter@Gap t\Letter@Gap r\Letter@Gap i\Letter@Gap x\relax \relax }{129}%
+\contentsline {subsection}{\numberline {6.1.1}Mass Matrices for a Chord}{130}%
+\contentsline {subsubsection}{\numberline {6.1.1.1}Assemble Mass Matrices for the Septal Chords}{131}%
+\contentsline {subsection}{\numberline {6.1.2}Mass Matrices for a Pentagon}{132}%
+\contentsline {subsubsection}{\numberline {6.1.2.1}Assemble Mass Matrices for the Alveolar Septa}{133}%
+\contentsline {subsection}{\numberline {6.1.3}Mass Matrices for a Tetrahedron}{133}%
+\contentsline {subsubsection}{\numberline {6.1.3.1}Assemble Tetrahedral Mass Matrices to Get Mass Matrix for an Alveolar Sac}{135}%
+\contentsline {section}{\numberline {6.2}S\Letter@Gap t\Letter@Gap i\Letter@Gap f\Letter@Gap f\Letter@Gap n\Letter@Gap e\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space M\Letter@Gap a\Letter@Gap t\Letter@Gap r\Letter@Gap i\Letter@Gap x\relax \relax }{136}%
+\contentsline {subsection}{\numberline {6.2.1}Stiffness Matrix for Chord}{138}%
+\contentsline {subsection}{\numberline {6.2.2}Stiffness Matrix for Pentagon}{141}%
+\contentsline {subsection}{\numberline {6.2.3}Stiffness Matrix for a tetrahedron}{147}%
+\contentsline {section}{\numberline {6.3}F\Letter@Gap o\Letter@Gap r\Letter@Gap c\Letter@Gap e\relax \ \kern \Letter@Space V\Letter@Gap e\Letter@Gap c\Letter@Gap t\Letter@Gap o\Letter@Gap r\relax \relax }{157}%
+\contentsline {subsection}{\numberline {6.3.1}Force Vector for a Chord}{158}%
+\contentsline {subsection}{\numberline {6.3.2}Force Vector for a Pentagon}{158}%
+\contentsline {subsection}{\numberline {6.3.3}Force Vector for a Tetrahedron}{159}%
+\contentsline {section}{\numberline {7.1}References\relax \relax }{161}%
+\contentsline {section}{Appendix\nobreakspace {}A. Implicit Elasticity}{170}%
+\contentsline {paragraph}{\numberline {A.3.2.1}Uniform Response}{182}%
+\contentsline {paragraph}{\numberline {A.3.2.2}Non-Uniform Response}{183}%
+\contentsline {paragraph}{\numberline {A.3.3.1}Uniform Response}{184}%
+\contentsline {paragraph}{\numberline {A.3.3.2}Non-Uniform Response}{185}%
+\contentsline {paragraph}{\numberline {A.4.1.1}Uniform Response}{186}%
+\contentsline {paragraph}{\numberline {A.4.1.2}Uniform Biologic Membrane Model}{186}%
+\contentsline {paragraph}{\numberline {A.4.1.3}Non-Uniform Response}{187}%
+\contentsline {paragraph}{\numberline {A.4.1.4}Non-Uniform Biologic Membrane Model}{188}%
+\contentsline {paragraph}{\numberline {A.4.2.1}Uniform Response}{190}%
+\contentsline {paragraph}{\numberline {A.4.2.2}Non-Uniform Response}{190}%
