@@ -26,7 +26,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-16-2017"
-__update__ = "07-06-2020"
+__update__ = "07-10-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -422,15 +422,15 @@ class Control(object):
         if isinstance(xVec0, np.ndarray):
             (controls,) = np.shape(xVec0)
             if controls != self.controls:
-                raise RuntimeError("Vectors eVec0 and xVec0 must have the " +
-                                   "same dimension.")
+                raise RuntimeError("Vectors eVec0 and xVec0 must have the "
+                                   + "same dimension.")
         else:
             raise RuntimeError("Argument xVec0 must by a NumPy array.")
         if isinstance(dt, float) and dt > 100.0 * np.finfo(float).eps:
             self.dt = dt
         else:
-            raise RuntimeError("Argument dt must be greater than 100 times " +
-                               "machine epsilon, i.e., dt > 2.2E-14.")
+            raise RuntimeError("Argument dt must be greater than 100 times "
+                               + "machine epsilon, i.e., dt > 2.2E-14.")
         # create the object's remaining internal data structure
         # thermodynamic control variables
         self.eR = np.zeros((self.controls,), dtype=float)    # reference state
@@ -464,9 +464,9 @@ class Control(object):
         if isinstance(xVec, np.ndarray):
             (controls,) = np.shape(xVec)
             if self.controls != controls:
-                raise RuntimeError("Argument xVec must have a length of " +
-                                   "{}, but it had ".format(self.controls) +
-                                   "a length of {}.".format(controls))
+                raise RuntimeError("Argument xVec must have a length of "
+                                   + "{}, but it had ".format(self.controls)
+                                   + "a length of {}.".format(controls))
         else:
             raise RuntimeError("Argument xVec must by a NumPy array.")
         if restart:
@@ -478,12 +478,12 @@ class Control(object):
         self.dedtN[:] = dedt[:]
         if self.node < 2:
             # start or restart the integrator using the trapezoidal rule
-            self.eN[:] = self.eC[:] + ((self.dt / 2.0) *
-                                       (self.dedtN[:] + self.dedtC[:]))
+            self.eN[:] = self.eC[:] + ((self.dt / 2.0)
+                                       * (self.dedtN[:] + self.dedtC[:]))
         else:
             # continue integration with Gear's BDF2 formula
-            self.eN[:] = ((1.0 / 3.0) * (4.0 * self.eC[:] - self.eP[:]) +
-                          ((2.0 * self.dt) / 3.0) * self.dedtN[:])
+            self.eN[:] = ((1.0 / 3.0) * (4.0 * self.eC[:] - self.eP[:])
+                          + ((2.0 * self.dt) / 3.0) * self.dedtN[:])
         return  # nothing
 
     def advance(self):
@@ -506,8 +506,8 @@ class Control(object):
             dx[:] = (self.xN[:] - self.xC[:]) / self.dt
         else:
             # use the second-order backward difference formula
-            dx[:] = ((3.0 * self.xN[:] - 4.0 * self.xC[:] + self.xP[:]) /
-                     (2.0 * self.dt))
+            dx[:] = ((3.0 * self.xN[:] - 4.0 * self.xC[:] + self.xP[:])
+                     / (2.0 * self.dt))
         return dx
 
 
@@ -521,8 +521,8 @@ class Response(object):
             self.yR = np.zeros((self.responses,), dtype=float)
             self.yR[:] = yVec0[:]
         else:
-            raise RuntimeError("Initial condition yVec0 must by a NumPy " +
-                               "array.")
+            raise RuntimeError("Initial condition yVec0 must by a NumPy "
+                               + "array.")
         self.firstCall = True
         return  # a new instance of this base type
 
@@ -533,16 +533,17 @@ class Response(object):
             if self.firstCall:
                 self.controls = controls
                 if self.responses % self.controls != 0:
-                    raise RuntimeError("The number of response variables " +
-                                       "must be an integer mulitplier to " +
-                                       "the number of control variables.")
+                    raise RuntimeError("The number of response variables "
+                                       + "must be an integer mulitplier to "
+                                       + "the number of control variables.")
                 self.eR = np.zeros((self.controls,), dtype=float)
                 self.eR[:] = eVec[:]
             else:
                 if controls != self.controls:
-                    raise RuntimeError("The eVec sent had a length of " +
-                                       "{}, but it must ".format(controls) +
-                                       "have length {}.".format(self.controls))
+                    raise RuntimeError("The eVec sent had a length of "
+                                       + "{}, but it must ".format(controls)
+                                       + "have length "
+                                       + "{}.".format(self.controls))
         else:
             raise RuntimeError("Argument eVec must be a NumPy array.")
         if isinstance(xVec, np.ndarray):
@@ -551,17 +552,17 @@ class Response(object):
                 self.xR = np.zeros((self.controls,), dtype=float)
                 self.xR[:] = xVec[:]
             if controls != self.controls:
-                raise RuntimeError("The xVec sent had a length of " +
-                                   "{}, but it must have ".format(controls) +
-                                   "a length of {}.".format(self.controls))
+                raise RuntimeError("The xVec sent had a length of "
+                                   + "{}, but it must have ".format(controls)
+                                   + "a length of {}.".format(self.controls))
         else:
             raise RuntimeError("Argument xVec must be a NumPy array.")
         if isinstance(yVec, np.ndarray):
             (responses,) = np.shape(yVec)
             if responses != self.responses:
-                raise RuntimeError("The yVec sent had a length of " +
-                                   "{}, but it must have ".format(responses) +
-                                   "a length of {}.".format(self.responses))
+                raise RuntimeError("The yVec sent had a length of "
+                                   + "{}, but it must have ".format(responses)
+                                   + "a length of {}.".format(self.responses))
         else:
             raise RuntimeError("Argument yVec must be a NumPy array.")
         # create an empty matrix for inserting the secant moduli into
@@ -577,16 +578,17 @@ class Response(object):
             if self.firstCall:
                 self.controls = controls
                 if self.responses % self.controls != 0:
-                    raise RuntimeError("The number of response variables " +
-                                       "must be an integer mulitplier to " +
-                                       "the number of control variables.")
+                    raise RuntimeError("The number of response variables "
+                                       + "must be an integer mulitplier to "
+                                       + "the number of control variables.")
                 self.eR = np.zeros((self.controls,), dtype=float)
                 self.eR[:] = eVec[:]
             else:
                 if controls != self.controls:
-                    raise RuntimeError("The eVec sent had a length of " +
-                                       "{}, but it must ".format(controls) +
-                                       "have length {}.".format(self.controls))
+                    raise RuntimeError("The eVec sent had a length of "
+                                       + "{}, but it must ".format(controls)
+                                       + "have length "
+                                       + "{}.".format(self.controls))
         else:
             raise RuntimeError("Argument eVec must be a NumPy array.")
         if isinstance(xVec, np.ndarray):
@@ -595,17 +597,17 @@ class Response(object):
                 self.xR = np.zeros((self.controls,), dtype=float)
                 self.xR[:] = xVec[:]
             if controls != self.controls:
-                raise RuntimeError("The xVec sent had a length of " +
-                                   "{}, but it must have ".format(controls) +
-                                   "a length of {}.".format(self.controls))
+                raise RuntimeError("The xVec sent had a length of "
+                                   + "{}, but it must have ".format(controls)
+                                   + "a length of {}.".format(self.controls))
         else:
             raise RuntimeError("Argument xVec must be a NumPy array.")
         if isinstance(yVec, np.ndarray):
             (responses,) = np.shape(yVec)
             if responses != self.responses:
-                raise RuntimeError("The yVec sent had a length of " +
-                                   "{}, but it must have ".format(responses) +
-                                   "a length of {}.".format(self.responses))
+                raise RuntimeError("The yVec sent had a length of "
+                                   + "{}, but it must have ".format(responses)
+                                   + "a length of {}.".format(self.responses))
         else:
             raise RuntimeError("Argument yVec must be a NumPy array.")
         # create an empty matrix for inserting the tangent moduli into
@@ -627,25 +629,25 @@ class Response(object):
         if isinstance(eVec, np.ndarray):
             (controls,) = np.shape(eVec)
             if controls != self.controls:
-                raise RuntimeError("The eVec sent had a length of " +
-                                   "{}, but it must have ".format(controls) +
-                                   "a length of {}.".format(self.controls))
+                raise RuntimeError("The eVec sent had a length of "
+                                   + "{}, but it must have ".format(controls)
+                                   + "a length of {}.".format(self.controls))
         else:
             raise RuntimeError("Argument eVec must be a NumPy array.")
         if isinstance(xVec, np.ndarray):
             (controls,) = np.shape(xVec)
             if controls != self.controls:
-                raise RuntimeError("The xVec sent had a length of " +
-                                   "{}, but it must have ".format(controls) +
-                                   "a length of {}.".format(self.controls))
+                raise RuntimeError("The xVec sent had a length of "
+                                   + "{}, but it must have ".format(controls)
+                                   + "a length of {}.".format(self.controls))
         else:
             raise RuntimeError("Argument xVec must be a NumPy array.")
         if isinstance(yBeforeVec, np.ndarray):
             (responses,) = np.shape(yBeforeVec)
             if responses != self.responses:
-                raise RuntimeError("The yBeforeVec sent had a length of " +
-                                   "{}, but it must have ".format(responses) +
-                                   "a length of {}.".format(self.responses))
+                raise RuntimeError("The yBeforeVec sent had a length of "
+                                   + "{}, but it must have ".format(responses)
+                                   + "a length of {}.".format(self.responses))
         else:
             raise RuntimeError("Argument yBeforeVec must be a NumPy array.")
         # create an empty vector for inserting the ruptured response variables
@@ -655,14 +657,16 @@ class Response(object):
 
 class PECE(object):
 
+    MIN_ERROR = 1.0e-10
+
     def __init__(self, ctrl, resp, m=1):
         # verify the inputs
         # assert that ctrl is an object that extends class control
         if isinstance(ctrl, Control):
             self.ctrl = ctrl
         else:
-            raise RuntimeError("Argument ctrl must be an object that " +
-                               "inherits class Control.")
+            raise RuntimeError("Argument ctrl must be an object that "
+                               + "inherits class Control.")
         self.t = 0.0
         self.tR = 0.0
         self.dt = ctrl.dt
@@ -670,8 +674,8 @@ class PECE(object):
         if isinstance(resp, Response):
             self.resp = resp
         else:
-            raise RuntimeError("Argument resp must be an object that " +
-                               "inherits class Response.")
+            raise RuntimeError("Argument resp must be an object that "
+                               + "inherits class Response.")
         # limit the range for m in the implementation of our PE(CE)^m
         if isinstance(m, int):
             if m < 1:
@@ -704,7 +708,7 @@ class PECE(object):
         self.dydtPR = np.zeros((self.resp.responses,), dtype=float)
         self.dydtCR = np.zeros((self.resp.responses,), dtype=float)
         # set the local truncation error to its truncated minimal value
-        self.error = 1.0e-10
+        self.error = self.MIN_ERROR
         return  # a new integrator object
 
     def integrate(self, xVec, restart=False):
@@ -779,8 +783,8 @@ class PECE(object):
         magP = LA.norm(yP)
         magC = LA.norm(yC)
         self.error = abs(magC - magP) / max(1.0, magC)
-        if self.error < 1.0e-10:
-            self.error = 1.0e-10
+        if self.error < self.MIN_ERROR:
+            self.error = self.MIN_ERROR
         # test for and handle, if necessary, a rupture event
         self.isRuptured = self.resp.isRuptured()
         if self.isRuptured != self.wasRuptured:

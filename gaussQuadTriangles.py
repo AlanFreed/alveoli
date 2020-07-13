@@ -25,55 +25,76 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-07-2020"
-__update__ = "07-08-2020"
+__update__ = "07-10-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
 r"""
 A listing of changes made wrt version release can be found at the end of file.
 
+Triangles have 3 nodes and 3 Gauss points that in their natural co-ordinates
+
+            N3
+    (0, 1)  |\
+            |  \
+            | G3 \
+            |      \
+            |        \
+            | G1    G2 \
+    (0, 0)  -------------  (1, 0)
+            N1         N2
 
 Overview of module gaussQuadTriangles.py:
 
-Module gaussQuadTriangles.py exports class GaussQuadrature which allows for
-the extrapolation of fields from their Gauss points out to their nodal points,
-along with providing for the weights and nodes (co-ordinates) of a Gaussian
-quadrature rule suitable for integrating over the area of a triangle.
+Module gaussQuadTriangles.py exports class GaussQuadrature that allows for the
+interpolation and extrapolation of fields between nodal and Gauss points.  It
+also provides the weights and nodes (co-ordinates) belonging a Gauss quadrature
+rule that is suitable for integrating fields over the area of a triangle.
 
 constructor
 
     gq = GaussQuadrature()
-    returns
+    output
         gq  is a new instance of the class GaussQuadrature for a triangle
 
 methods
 
-    dY = gq.extrapolate(y1, y2, y3)
+    yG1, yG2, yG3 = gq.interpolate(yN1, yN2, yN3)
     inputs
-        y1  is a physical field of arbitrary type located at Gauss point 1
-        y2  is a physical field of arbitrary type located at Gauss point 2
-        y3  is a physical field of arbitrary type located at Gauss point 3
-    returns
-        dY  is a dictionary holding the extrapolated values for this field,
-            pushed out to the element nodes.  dY[1] holds the extrapolated
-            value at node 1, dY[2] holds the extrapolated value at node 2,
-            and dY[3] holds the extrapolated value at node 3.
+        yN1 is physical field y of arbitrary type located at nodal point 1
+        yN2 is physical field y of arbitrary type located at nodal point 2
+        yN3 is physical field y of arbitrary type located at nodal point 3
+    outputs
+        yG1 is physical field y of arbitrary type located at Gauss point 1
+        yG2 is physical field y of arbitrary type located at Gauss point 2
+        yG3 is physical field y of arbitrary type located at Gauss point 3
+    Inputs must allow for: i) scalar multiplication and ii) the '+' operator.
+
+    yN1, yN2, yN3 = gq.extrapolate(yG1, yG2, yG3)
+    inputs
+        yG1 is physical field y of arbitrary type located at Gauss point 1
+        yG2 is physical field y of arbitrary type located at Gauss point 2
+        yG3 is physical field y of arbitrary type located at Gauss point 3
+    outputs
+        yN1 is physical field y of arbitrary type located at nodal point 1
+        yN2 is physical field y of arbitrary type located at nodal point 2
+        yN3 is physical field y of arbitrary type located at nodal point 3
     Inputs must allow for: i) scalar multiplication and ii) the '+' operator.
 
     gPts = gq.gaussPoints()
-    returns
+    output
         gPts is the number of Gauss points (and nodes, in our implementation)
 
     coord = gq.coordinates(atGaussPt)
-    inputs
+    input
         atGaussPt   is the Gauss point at which the co-ordinates are sought
-    returns
-        chord       are the natural co-ordinates at the specified Gauss point
+    output
+        coord       are the natural co-ordinates at the specified Gauss point
 
     wgt = gq.weight(atGaussPt)
-    inputs
+    input
         atGaussPt   is the Gauss point at which the co-ordinates are sought
-    returns
+    output
         wgt         is the weight of quadrature at the specified Gauss point
 """
 
@@ -93,6 +114,16 @@ class GaussQuadrature(GaussQuad):
             2: 1.0 / 6.0,
             3: 1.0 / 6.0
             }
+        self._interpCoef = np.zeros((3, 3), dtype=float)
+        self._interpCoef[0, 0] = 2.0 / 3.0
+        self._interpCoef[0, 1] = 1.0 / 6.0
+        self._interpCoef[0, 2] = 1.0 / 6.0
+        self._interpCoef[1, 0] = 1.0 / 6.0
+        self._interpCoef[1, 1] = 2.0 / 3.0
+        self._interpCoef[1, 2] = 1.0 / 6.0
+        self._interpCoef[2, 0] = 1.0 / 6.0
+        self._interpCoef[2, 1] = 1.0 / 6.0
+        self._interpCoef[2, 2] = 2.0 / 3.0
         self._extrapCoef = np.zeros((3, 3), dtype=float)
         self._extrapCoef[0, 0] = 5.0 / 3.0
         self._extrapCoef[0, 1] = -1.0 / 3.0
@@ -105,26 +136,31 @@ class GaussQuadrature(GaussQuad):
         self._extrapCoef[2, 2] = 5.0 / 3.0
         return  # a new instance of a Gauss quadrature rule for triangles
 
-    def extrapolate(self, y1, y2, y3):
-        if type(y1) == type(y2) and type(y2) == type(y3):
-            yAtNode1 = (self._extrapCoef[0, 0] * y1
-                        + self._extrapCoef[0, 1] * y2
-                        + self._extrapCoef[0, 2] * y3)
-            yAtNode2 = (self._extrapCoef[1, 0] * y1
-                        + self._extrapCoef[1, 1] * y2
-                        + self._extrapCoef[1, 2] * y3)
-            yAtNode3 = (self._extrapCoef[2, 0] * y1
-                        + self._extrapCoef[2, 1] * y2
-                        + self._extrapCoef[2, 2] * y3)
+    def interpolate(self, yN1, yN2, yN3):
+        if type(yN1) == type(yN2) and type(yN2) == type(yN3):
+            yG1 = (self._interpCoef[0, 0] * yN1 + self._interpCoef[0, 1] * yN2
+                   + self._interpCoef[0, 2] * yN3)
+            yG2 = (self._interpCoef[1, 0] * yN1 + self._interpCoef[1, 1] * yN2
+                   + self._interpCoef[1, 2] * yN3)
+            yG3 = (self._interpCoef[2, 0] * yN1 + self._interpCoef[2, 1] * yN2
+                   + self._interpCoef[2, 2] * yN3)
+        else:
+            raise RuntimeError("Arguments for interpolation are not of the "
+                               + "same type.")
+        return yG1, yG2, yG3
+
+    def extrapolate(self, yG1, yG2, yG3):
+        if type(yG1) == type(yG2) and type(yG2) == type(yG3):
+            yN1 = (self._extrapCoef[0, 0] * yG1 + self._extrapCoef[0, 1] * yG2
+                   + self._extrapCoef[0, 2] * yG3)
+            yN2 = (self._extrapCoef[1, 0] * yG1 + self._extrapCoef[1, 1] * yG2
+                   + self._extrapCoef[1, 2] * yG3)
+            yN3 = (self._extrapCoef[2, 0] * yG1 + self._extrapCoef[2, 1] * yG2
+                   + self._extrapCoef[2, 2] * yG3)
         else:
             raise RuntimeError("Arguments for extrapolation are not of the "
                                + "same type.")
-        extrapolation = {
-            1: yAtNode1,
-            2: yAtNode2,
-            3: yAtNode3
-            }
-        return extrapolation
+        return yN1, yN2, yN3
 
     def gaussPoints(self):
         return self._gaussPts

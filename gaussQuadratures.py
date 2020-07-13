@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-07-2020"
-__update__ = "07-08-2020"
+__update__ = "07-10-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -47,14 +47,18 @@ constructor
 
 abstract methods
 
+    yG = gq.interpolate()
+    Implementations return a sequence (equal in number to the number of inputs)
+    for values of a field, say y, interpolated from the nodal points (the
+    inputs) in to the Gauss points (the outputs).
+
     dY = gq.extrapolate()
-    Implementations return a dictionary that holds values for a field located
-    at each nodal point in the element.  These derive from values for that
-    field that are known (supplied) at all Gauss points of the element.
-    Entries in this dictionary index from 1 to gq.gaussPoints.
+    Implementations return a sequence (equal in number to the number of inputs)
+    for values of a field, say y, extrapolated from the Gauss points (the
+    inputs) out to the nodal points (the outputs).
 
     gPts = gq.gaussPoints()
-    Implementations return the number of Gauss points (and nodes, in our
+    Implementations return the number of Gauss points (and nodal points, in our
     implementation) that pertain to this element.
 
     coord = gq.coordinates(atGaussPt)
@@ -62,7 +66,7 @@ abstract methods
     point, which must lie within the range of [1,..,gq.gaussPoints].
 
     wgt = gq.weight(atGaussPt)
-    Implementations return the weight of quadrature for the specified Gauss
+    Implementations return the weight of quadrature at the specified Gauss
     point, which must lie within the range of [1,..,gq.gaussPoints].
 """
 
@@ -74,10 +78,17 @@ class GaussQuadrature(ABC):
         return  # a new instance for a Gauss quadrature rule
 
     @abstractmethod
+    def interpolate(self):
+        # Implementations interpolate a field whose values are known at all
+        # nodal points of an element that are then interpolated in to all
+        # Gauss points of the element.
+        pass
+
+    @abstractmethod
     def extrapolate(self):
-        # Implementations extrpolate a field whose values are known at all
+        # Implementations extrapolate a field whose values are known at all
         # Gauss points of an element that are then extrapolated out to all
-        # of the nodal points of the element.
+        # nodal points of the element.
         pass
 
     @abstractmethod

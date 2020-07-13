@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 
 # Module metadata
 __version__ = "1.0.0"
-__date__ = "07-07-2020"
+__date__ = "07-10-2020"
 __update__ = "07-08-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
@@ -33,47 +33,62 @@ __author_email__ = "afreed@tamu.edu"
 r"""
 A listing of changes made wrt version release can be found at the end of file.
 
+Chords have 2 nodes and 2 Gauss points that in their natural co-ordinates
+
+    N1    G1              G2    N2
+    X-----X----------------X-----X
+   -1              0             1
 
 Overview of module gaussQuadChords.py:
 
-Module gaussQuadChords.py exports class GaussQuadrature which allows for the
-extrapolation of fields from their Gauss points out to their nodal points,
-along with providing for the weights and nodes (co-ordinates) of a Gaussian
-quadrature rule suitable for integrating over the length of a chord.
+Module gaussQuadChords.py exports class GaussQuadrature that allows for the
+interpolation and extrapolation of fields between nodal and Gauss points.  It
+also provides the weights and nodes (co-ordinates) belonging a Gauss quadrature
+rule that is suitable for integrating fields over the length of a chord.
 
 constructor
 
     gq = GaussQuadrature()
-    returns
+    output
         gq  is a new instance of the class GaussQuadrature for a chord
 
 methods
 
-    dY = gq.extrapolate(y1, y2)
+    yG1, yG2 = gq.interpolate(yN1, yN2)
     inputs
-        y1  is a physical field of arbitrary type located at Gauss point 1
-        y2  is a physical field of arbitrary type located at Gauss point 2
-    returns
-        dY  is a dictionary holding the extrapolated values for this field,
-            pushed out to the element nodes.  dY[1] holds the extrapolated
-            value at node 1, and dY[2] holds the extrapolated value at node 2.
+        yN1 is physical field y of arbitrary type located at nodal point 1
+        yN2 is physical field y of arbitrary type located at nodal point 2
+    outputs
+        yG1 is physical field y of arbitrary type located at Gauss point 1
+        yG2 is physical field y of arbitrary type located at Gauss point 2
+    Inputs must allow for: i) scalar multiplication and ii) the '+' operator.
+
+    yN1, yN2 = gq.extrapolate(yG1, yG2)
+    inputs
+        yG1 is physical field y of arbitrary type located at Gauss point 1
+        yG2 is physical field y of arbitrary type located at Gauss point 2
+    outputs
+        yN1 is physical field y of arbitrary type located at nodal point 1
+        yN2 is physical field y of arbitrary type located at nodal point 2
     Inputs must allow for: i) scalar multiplication and ii) the '+' operator.
 
     gPts = gq.gaussPoints()
-    returns
+    output
         gPts is the number of Gauss points (and nodes, in our implementation)
 
     coord = gq.coordinates(atGaussPt)
-    inputs
+    input
         atGaussPt   is the Gauss point at which the co-ordinates are sought
-    returns
-        chord       are the natural co-ordinates at the specified Gauss point
+    output
+        coord       are the natural co-ordinates at the specified Gauss point
+    Input atGaussPt must be either 1 or 2 for a chord.
 
     wgt = gq.weight(atGaussPt)
-    inputs
+    input
         atGaussPt   is the Gauss point at which the weight is sought
-    returns
+    output
         wgt         is the weight of quadrature at the specified Gauss point
+    Input atGaussPt must be either 1 or 2 for a chord.
 """
 
 
@@ -91,6 +106,11 @@ class GaussQuadrature(GaussQuad):
             1: 1.0,
             2: 1.0
             }
+        self._interpCoef = np.zeros((2, 2), dtype=float)
+        self._interpCoef[0, 0] = (3.0 + sqrt3) / 6.0
+        self._interpCoef[0, 1] = (3.0 - sqrt3) / 6.0
+        self._interpCoef[1, 0] = (3.0 + sqrt3) / 6.0
+        self._interpCoef[1, 1] = (3.0 - sqrt3) / 6.0
         self._extrapCoef = np.zeros((2, 2), dtype=float)
         self._extrapCoef[0, 0] = (sqrt3 + 3.0) / (2.0 * sqrt3)
         self._extrapCoef[0, 1] = (sqrt3 - 3.0) / (2.0 * sqrt3)
@@ -98,20 +118,23 @@ class GaussQuadrature(GaussQuad):
         self._extrapCoef[1, 1] = (sqrt3 + 3.0) / (2.0 * sqrt3)
         return  # a new instance of a Gauss quadrature rule for chords
 
-    def extrapolate(self, y1, y2):
-        if type(y1) == type(y2):
-            yAtNode1 = (self._extrapCoef[0, 0] * y1
-                        + self._extrapCoef[0, 1] * y2)
-            yAtNode2 = (self._extrapCoef[1, 0] * y1
-                        + self._extrapCoef[1, 1] * y2)
+    def interpolate(self, yN1, yN2):
+        if type(yN1) == type(yN2):
+            yG1 = self._interpCoef[0, 0] * yN1 + self._interpCoef[0, 1] * yN2
+            yG2 = self._interpCoef[1, 0] * yN1 + self._interpCoef[1, 1] * yN2
+        else:
+            raise RuntimeError("Arguments for interpolation are not of the "
+                               + "same type.")
+        return yG1, yG2
+
+    def extrapolate(self, yG1, yG2):
+        if type(yG1) == type(yG2):
+            yN1 = self._extrapCoef[0, 0] * yG1 + self._extrapCoef[0, 1] * yG2
+            yN2 = self._extrapCoef[1, 0] * yG1 + self._extrapCoef[1, 1] * yG2
         else:
             raise RuntimeError("Arguments for extrapolation are not of the "
                                + "same type.")
-        extrapolation = {
-            1: yAtNode1,
-            2: yAtNode2
-            }
-        return extrapolation
+        return yN1, yN2
 
     def gaussPoints(self):
         return self._gaussPts
