@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ceChords import bioFiber, controlFiber
+from ceChords import BioFiber, ControlFiber
 import math
-from peceHE import pece
+from peceHE import PECE
 # for creating graphics
 from matplotlib import pyplot as plt
 from matplotlib import ticker
@@ -13,9 +13,9 @@ from pylab import rcParams
 
 """
 Created on Wed May 27 2020
-Updated on Wed May 27 2020
+Updated on Fri Jul 10 2020
 
-A test file for the bioFiber constitutive response in file ceChords.py.
+A test file for the BioFiber constitutive response in file ceChords.py.
 
 author: Prof. Alan Freed
 """
@@ -66,7 +66,7 @@ def run():
         xVec0 = np.zeros((ctrlVars,), dtype=float)
         xVec0[0] = T0
         xVec0[1] = L0
-        ctrl = controlFiber(eVec0, xVec0, dt)
+        ctrl = ControlFiber(eVec0, xVec0, dt)
         # create the response vector and object
         rho = mp.rhoCollagen()
         Cp = mp.CpCollagen()
@@ -75,9 +75,9 @@ def run():
         yVec0 = np.zeros((respVars,), dtype=float)
         yVec0[0] = mp.etaCollagen()
         yVec0[1] = s_0
-        resp = bioFiber(yVec0, rho, Cp, alpha, E1, E2, e_t, e_f)
+        resp = BioFiber(yVec0, rho, Cp, alpha, E1, E2, e_t, e_f)
         # create the integrator
-        solver = pece(ctrl, resp, m)
+        solver = PECE(ctrl, resp, m)
         # establish the initial conditios
         e0 = solver.getE()
         y0 = solver.getY()

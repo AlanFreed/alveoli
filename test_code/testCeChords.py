@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ceChords import controlFiber, ceChord
+from ceChords import ControlFiber, SeptalChord
 import math
-from peceHE import pece
+from peceHE import PECE
 # for creating graphics
 from matplotlib import pyplot as plt
 # from matplotlib import ticker
@@ -13,7 +13,7 @@ from pylab import rcParams
 
 """
 Created on Thr Nov 07 2019
-Updated on Thr Jun 22 2020
+Updated on Fri Jul 10 2020
 
 A test file for the chordal constitutive response in file ceChords.py.
 
@@ -61,11 +61,11 @@ def run():
         xVec0[0] = T0
         xVec0[1] = L0
         # create the control object
-        ctrl = controlFiber(eVec0, xVec0, dt)
+        ctrl = ControlFiber(eVec0, xVec0, dt)
         # create the response object
-        resp = ceChord()
+        resp = SeptalChord()
         # create the integrator
-        solver = pece(ctrl, resp, m)
+        solver = PECE(ctrl, resp, m)
         # provide the initial conditions for their relative states, viz. zeros
         force[0, j] = resp.relativeForce()
         stress[0, j] = resp.relativeStress()
@@ -101,9 +101,9 @@ def run():
         else:
             pass
 
-    print("\nOut of {} septal chords,\n".format(curves) +
-          "   {} collagen fibers ruptured, and \n".format(rupturedCollagen) +
-          "   {} elastin fibers ruptured.\n".format(rupturedElastin))
+    print("\nOut of {} septal chords,\n".format(curves)
+          + "   {} collagen fibers ruptured, and \n".format(rupturedCollagen)
+          + "   {} elastin fibers ruptured.\n".format(rupturedElastin))
 
     # change fontsize of minor and major tick labels
     plt.tick_params(axis='both', which='major', labelsize=16)
