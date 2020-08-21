@@ -10,7 +10,7 @@ from shapeFnPentagons import ShapeFunction
 
 """
 Created on Wed Apr 15 2020
-Updated on Wed Jul 08 2020
+Updated on Wed Jul 10 2020
 
 A test file for exported objects in files: gaussQuadChords.py,
 gaussQuadTriangles.py, gaussQuadTetrahedra.py and gaussQuadPentagons.py.
