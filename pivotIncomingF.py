@@ -27,7 +27,7 @@ Copyright (c) 2020 Alan D. Freed
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "04-17-2020"
-__update__ = "07-06-2020"
+__update__ = "07-17-2020"
 __author__ = "Alan D. Freed and Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -145,8 +145,8 @@ methods
         toCase      is the p.pivotedCase in to  which it is to be rotated
 
 Reference:
-    Paul, S., Rajagopal, K. R., and Freed, A. D., "On coordinate indexing when
-    using Laplace stretch", in review.
+    Paul, S., and Freed, A. D., "On coordinate indexing when using Laplace
+    stretch", in review.
 """
 
 

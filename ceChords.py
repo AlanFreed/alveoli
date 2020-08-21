@@ -27,7 +27,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "09-24-2019"
-__update__ = "07-10-2020"
+__update__ = "07-21-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -62,6 +62,9 @@ where
     force           dynes       [g.cm/s^2]      1 Newton = 10^5 dyne
     pressure        barye       [dyne/cm^2]     1 Pascal = 10 barye
     energy          erg         [dyne.cm]       1 Joule  = 10^7 ergs
+
+All fields in this module are evaluated at the end of the current interval of
+integration, i.e., at the 'next' node of integration.
 
 
 class ControlFiber:  It implements and extends class 'Control'
@@ -99,7 +102,7 @@ variables: treat these as read-only
     xC              a vector of physical control variables at the current node
     xN              a vector of physical control variables at the next node
 
-methods
+inherited methods
 
 update(xVec, restart=False)
     E.g.:  ctrl.update(xVec, restart)
@@ -166,7 +169,7 @@ variables: treat these as read-only
     responses       an integer specifying the number of response variables
     yR              a vector containing the initial condition for response
 
-methods
+inherited methods
 
 secantModulus(eVec, xVec, yVec)
     E.g.:  E = ce.secantModulus(eVec, xVec, yVec)
@@ -302,8 +305,8 @@ massDensity()
         rho         the mass density of the septal chord
 
 length()
-    E.g.:  len = ce.length()
-        len         the current length of the septal chord
+    E.g.:  len_ = ce.length()
+        len_        length of the septal chord at the next node of integration
 
 areaCollagen()
     E.g.:  a_c = ce.areaCollagen()
@@ -373,7 +376,6 @@ relativeForce()
     E.g.:  f = ce.relativeForce()
         f           the relative total force carried by the septal chord
 
-
 Reference:
     Freed, A. D. and Rajagopal, K. R., “A Promising Approach for Modeling
     Biological Fibers,” ACTA Mechanica, 227 (2016), 1609-1619.
@@ -403,6 +405,8 @@ class ControlFiber(Control):
     #   xVec[0]     contains the fiber temperature (in centigrade)
     #   xVec[1]     contains the fiber length      (in cm)
 
+    # constructor
+
     def __init__(self, eVec0, xVec0, dt):
         # Call the constructor of the base type to create and initialize the
         # exported variables.
@@ -412,6 +416,8 @@ class ControlFiber(Control):
             raise RuntimeError("There are only 2 control variables for 1D "
                                + "fibers: temperature and length.")
         return  # a new instance of type controlFiber
+
+    # inherited methods
 
     def update(self, xVec, restart=False):
         # Call the base implementation of this method to insert this physical
@@ -465,6 +471,8 @@ class BioFiber(Response):
     #     yVec[0]  contains fiber entropy density      (in erg/g.K)
     #     yVec[1]  contains fiber stress               (in barye)
 
+    # constructor
+
     def __init__(self, yVec0, rho, Cp, alpha, E1, E2, e_t, e_f=float("inf")):
         # A call to the base constructor creates and initializes the exported
         # variables.
@@ -501,17 +509,19 @@ class BioFiber(Response):
             raise RuntimeError('Limiting fiber reconfiguration strain e_t '
                                + 'must be positive.')
         # one one-hundredth of the theoretical upper bound on fiber strength
-        bodyTemp = 310.0  # Kelvin
-        e_fmax = 0.01 * rho * Cp * bodyTemp / (alpha**2 * E2)
+        body_temp = 310.0  # Kelvin
+        e_f_max = 0.01 * rho * Cp * body_temp / (alpha**2 * E2)
         # establish the strain at fracture
-        if e_f > e_fmax:
-            self.e_f = e_fmax
+        if e_f > e_f_max:
+            self.e_f = e_f_max
         elif e_f > np.finfo(float).eps:
             self.e_f = e_f
         else:
             raise RuntimeError('Fiber failure strain e_f must be positive.')
         self.ruptured = False
         return  # a new instance of a fiber object
+
+    # local methods
 
     def _secCompliance(self, stress):
         if stress > self.e_f * self.E2:
@@ -532,28 +542,6 @@ class BioFiber(Response):
                     / m.sqrt(stress_t + 2.0 * (stress - stress0)))
                  + 1.0 / self.E2)
         return c
-
-    def secantModulus(self, eVec, xVec, yVec):
-        # call the base type to verify the inputs and to create the matrix E
-        Es = super().secantModulus(eVec, xVec, yVec)
-        # y - y0 = E * e
-        #    e   is a vector of thermodynamic control variables  (strains)
-        #    x   is a vector of physical control variables       (stretches)
-        #    y   is a vector of thermodynamic response variables (stresses)
-        # populate the entries of E for the user's secant moduli below
-        temperature = xVec[0]       # temperature                (in C)
-        stress0 = self.yR[1]        # initial or residual stress (in barye)
-        stress = yVec[1]            # stress                     (in barye)
-        E = 1.0 / self._secCompliance(stress)
-        rhoT = self.rho * (273.0 + temperature)
-        Cs = self.alpha * (stress - stress0) / rhoT
-        Ce = self.alpha**2 * E / rhoT
-        # compute the tangent modulus
-        Es[0, 0] = self.Cp - Cs - Ce
-        Es[0, 1] = Ce / self.alpha
-        Es[1, 0] = -self.alpha * E
-        Es[1, 1] = E
-        return Es
 
     def _tanCompliance(self, stress, mechanicalStrain, thermalStrain):
         if stress > self.e_f * self.E2:
@@ -577,6 +565,30 @@ class BioFiber(Response):
             else:
                 c = 1.0 / self.E2
         return c
+
+    # inherited methods
+
+    def secantModulus(self, eVec, xVec, yVec):
+        # call the base type to verify the inputs and to create the matrix E
+        Es = super().secantModulus(eVec, xVec, yVec)
+        # y - y0 = E * e
+        #    e   is a vector of thermodynamic control variables  (strains)
+        #    x   is a vector of physical control variables       (stretches)
+        #    y   is a vector of thermodynamic response variables (stresses)
+        # populate the entries of E for the user's secant moduli below
+        temperature = xVec[0]       # temperature                (in C)
+        stress0 = self.yR[1]        # initial or residual stress (in barye)
+        stress = yVec[1]            # stress                     (in barye)
+        E = 1.0 / self._secCompliance(stress)
+        rhoT = self.rho * (273.0 + temperature)
+        Cs = self.alpha * (stress - stress0) / rhoT
+        Ce = self.alpha**2 * E / rhoT
+        # compute the tangent modulus
+        Es[0, 0] = self.Cp - Cs - Ce
+        Es[0, 1] = Ce / self.alpha
+        Es[1, 0] = -self.alpha * E
+        Es[1, 1] = E
+        return Es
 
     def tangentModulus(self, eVec, xVec, yVec):
         # call the base type to verify the inputs and to create matrix dyde
@@ -645,6 +657,8 @@ class SeptalChord(Response):
     #     yVec[2]  contains elastin  fiber entropy density  (in erg/g.K)
     #     yVec[3]  contains elastin  fiber stress           (in barye)
 
+    # constructor
+
     def __init__(self, diaCollagen=None, diaElastin=None):
         fiberResponses = 2
         yFiber0 = np.zeros((fiberResponses,), dtype=float)
@@ -703,6 +717,8 @@ class SeptalChord(Response):
         self.eta_e = mp.etaElastin()
         self.stress_e = s0_e
         return  # a new instance of type ceChord
+
+    # inherited methods
 
     def secantModulus(self, eVec, xVec, yVec):
         # extract initial control variables for export: must be before super
@@ -767,7 +783,7 @@ class SeptalChord(Response):
     def isRuptured(self):
         ruptured_c = self.fiberC.isRuptured()
         ruptured_e = self.fiberE.isRuptured()
-        ruptured = ruptured_c + ruptured_e         # an addition of two tuples
+        ruptured = ruptured_c + ruptured_e        # concatination of two tuples
         return ruptured
 
     def rupturedResponse(self, eVec, xVec, yBeforeVec):
@@ -809,9 +825,16 @@ class SeptalChord(Response):
         self.stress_e = yAfterVec[3]
         return yAfterVec
 
+    # additional methods
+
+    # These methods associate with the end of the current integration interval
+    # in other words, at the 'next' knot/node of integration
+
+    # the response object for collagen
     def bioFiberCollagen(self):
         return self.fiberC
 
+    # the response object for elastin
     def bioFiberElastin(self):
         return self.fiberE
 
@@ -869,9 +892,9 @@ class SeptalChord(Response):
     # absolute measures
 
     def temperature(self):
-        bodyTemp = 37.0  # centigrade
+        body_temp = 37.0  # in degrees centigrade
         if self.firstCall:
-            theta = bodyTemp
+            theta = body_temp
         else:
             theta = self.temp
         return theta
@@ -887,7 +910,7 @@ class SeptalChord(Response):
 
     def strain(self):
         if self.firstCall:
-            e = 0
+            e = 0.0
         else:
             e = self.strn
         return e

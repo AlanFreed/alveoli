@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-07-2020"
-__update__ = "07-10-2020"
+__update__ = "07-17-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -57,7 +57,13 @@ constructor
     output
         gq  is a new instance of the class GaussQuadrature for a triangle
 
-methods
+property
+
+    gPts = gq.gaussPoints()
+    output
+        gPts is the number of Gauss points (and nodes, in our implementation)
+
+inherited methods
 
     yG1, yG2, yG3 = gq.interpolate(yN1, yN2, yN3)
     inputs
@@ -81,10 +87,6 @@ methods
         yN3 is physical field y of arbitrary type located at nodal point 3
     Inputs must allow for: i) scalar multiplication and ii) the '+' operator.
 
-    gPts = gq.gaussPoints()
-    output
-        gPts is the number of Gauss points (and nodes, in our implementation)
-
     coord = gq.coordinates(atGaussPt)
     input
         atGaussPt   is the Gauss point at which the co-ordinates are sought
@@ -101,9 +103,10 @@ methods
 
 class GaussQuadrature(GaussQuad):
 
+    # constructor
+
     def __init__(self):
         super(GaussQuadrature, self).__init__()
-        self._gaussPts = 3
         self._coordinates = {
             1: (1.0/6.0, 1.0/6.0),
             2: (2.0/3.0, 1.0/6.0),
@@ -136,6 +139,14 @@ class GaussQuadrature(GaussQuad):
         self._extrapCoef[2, 2] = 5.0 / 3.0
         return  # a new instance of a Gauss quadrature rule for triangles
 
+    # property
+
+    def gaussPoints(self):
+        gPts = 3
+        return gPts
+
+    # methods
+
     def interpolate(self, yN1, yN2, yN3):
         if type(yN1) == type(yN2) and type(yN2) == type(yN3):
             yG1 = (self._interpCoef[0, 0] * yN1 + self._interpCoef[0, 1] * yN2
@@ -161,9 +172,6 @@ class GaussQuadrature(GaussQuad):
             raise RuntimeError("Arguments for extrapolation are not of the "
                                + "same type.")
         return yN1, yN2, yN3
-
-    def gaussPoints(self):
-        return self._gaussPts
 
     def coordinates(self, atGaussPt):
         if atGaussPt > 0 and atGaussPt < 4:

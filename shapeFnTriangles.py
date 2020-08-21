@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "03-10-2020"
-__update__ = "07-06-2020"
+__update__ = "07-17-2020"
 __author__ = "Shahla Zamani and Alan D. Freed"
 __author_email__ = "Zamani.Shahla@tamu.edu, afreed@tamu.edu"
 
@@ -66,6 +66,28 @@ constructor
                         the 'y' natural co-ordinate in range [0, 1-xi].
     returns
         sf              a new instance of class ShapeFunction for 2D triangles
+
+variables
+
+    # the shape functions are
+
+    sf.N1        the 1st shape function
+    sf.N2        the 2nd shape function
+    sf.N3        the 3rd shape function
+
+    sf.Nmtx      a 2x6 matrix of shape functions for representing a triangle
+
+    # partial derivatives of the shape functions
+
+    # partial derivative: d N_i / dXi, i = 1..3
+    sf.dN1dXi    gradient of the 1st shape function wrt the xi co-ordinate
+    sf.dN2dXi    gradient of the 2nd shape function wrt the xi co-ordinate
+    sf.dN3dXi    gradient of the 3rd shape function wrt the xi co-ordinate
+
+    # partial derivative: d N_i / dEta, i = 1..3
+    sf.dN1dEta   gradient of the 1st shape function wrt the eta co-ordinate
+    sf.dN2dEta   gradient of the 2nd shape function wrt the eta co-ordinate
+    sf.dN3dEta   gradient of the 3rd shape function wrt the eta co-ordinate
 
 inherited methods
 
@@ -123,32 +145,12 @@ inherited methods
              Fmtx = |                |
                     \ dy/dx0  dy/dy0 /
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
-
-variables
-
-    # the shape functions are
-
-    sf.N1        the 1st shape function
-    sf.N2        the 2nd shape function
-    sf.N3        the 3rd shape function
-
-    sf.Nmtx      a 2x6 matrix of shape functions for representing a triangle
-
-    # partial derivatives of the shape functions
-
-    # partial derivative: d N_i / dXi, i = 1..3
-    sf.dN1dXi    gradient of the 1st shape function wrt the xi co-ordinate
-    sf.dN2dXi    gradient of the 2nd shape function wrt the xi co-ordinate
-    sf.dN3dXi    gradient of the 3rd shape function wrt the xi co-ordinate
-
-    # partial derivative: d N_i / dEta, i = 1..3
-    sf.dN1dEta   gradient of the 1st shape function wrt the eta co-ordinate
-    sf.dN2dEta   gradient of the 2nd shape function wrt the eta co-ordinate
-    sf.dN3dEta   gradient of the 3rd shape function wrt the eta co-ordinate
 """
 
 
 class ShapeFunction(ShapeFn):
+
+    # constructor
 
     def __init__(self, coordinates):
         super(ShapeFunction, self).__init__(coordinates)
@@ -180,8 +182,9 @@ class ShapeFunction(ShapeFn):
         self.dN1dEta = -1.0
         self.dN2dEta = 0.0
         self.dN3dEta = 1.0
-
         return  # the object
+
+    # methods
 
     def interpolate(self, y1, y2, y3):
         if type(y1) == type(y2) and type(y2) == type(y3):

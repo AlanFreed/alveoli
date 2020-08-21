@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-07-2020"
-__update__ = "07-10-2020"
+__update__ = "07-17-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -45,6 +45,11 @@ constructor
     gq = GaussQuadrature()
     This constructor must be called via the super command in inherited classes.
 
+abstract properties
+
+    gPts = gq.gaussPoints()
+    Implementations specify number of Gauss points for this quadrature rule.
+
 abstract methods
 
     yG = gq.interpolate()
@@ -56,10 +61,6 @@ abstract methods
     Implementations return a sequence (equal in number to the number of inputs)
     for values of a field, say y, extrapolated from the Gauss points (the
     inputs) out to the nodal points (the outputs).
-
-    gPts = gq.gaussPoints()
-    Implementations return the number of Gauss points (and nodal points, in our
-    implementation) that pertain to this element.
 
     coord = gq.coordinates(atGaussPt)
     Implementations return the natural co-ordinates at the specified Gauss
@@ -77,6 +78,12 @@ class GaussQuadrature(ABC):
         super(GaussQuadrature, self).__init__()
         return  # a new instance for a Gauss quadrature rule
 
+    @property
+    @abstractmethod
+    def gaussPoints(self):
+        # Implementations specify number of Gauss points--a read-only property.
+        pass
+
     @abstractmethod
     def interpolate(self):
         # Implementations interpolate a field whose values are known at all
@@ -89,11 +96,6 @@ class GaussQuadrature(ABC):
         # Implementations extrapolate a field whose values are known at all
         # Gauss points of an element that are then extrapolated out to all
         # nodal points of the element.
-        pass
-
-    @abstractmethod
-    def gaussPoints(self):
-        # Implementations return the number of Gauss points within the element.
         pass
 
     @abstractmethod

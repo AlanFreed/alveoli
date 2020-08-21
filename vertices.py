@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "04-27-2019"
-__update__ = "05-20-2020"
+__update__ = "07-17-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -129,15 +129,15 @@ methods
     of interest
 
     [ux, uy, uz] = v.displacement(reindex, state)
-        reindex     is an instance of pivot object from module pivotIncomingF
+        reindex     is an instance of Pivot object from module pivotIncomingF
         returns the displacement of this vertex for configuration 'state'
 
     [vx, vy, vz] = v.velocity(reindex, state)
-        reindex     is an instance of pivot object from module pivotIncomingF
+        reindex     is an instance of Pivot object from module pivotIncomingF
         returns the velocity of this vertex for configuration 'state'
 
     [ax, ay, az] = v.acceleration(reindex, state)
-        reindex     is an instance of pivot object from module pivotIncomingF
+        reindex     is an instance of Pivot object from module pivotIncomingF
         returns the acceleration of this vertex for configuration 'state'
 """
 

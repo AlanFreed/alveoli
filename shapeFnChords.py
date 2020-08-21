@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "09-23-2019"
-__update__ = "07-07-2020"
+__update__ = "07-17-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -62,6 +62,20 @@ constructor
                         co-ordinate location of interest residing in [-1, 1]
     returns
         sf              a new instance of class ShapeFunction for 1D chords
+
+variables
+
+    # the shape functions are
+
+    sf.N1        the 1st shape function
+    sf.N2        the 2nd shape function
+
+    sf.Nmtx      the 1x2 matrix of shape functions for representing a chord
+
+    # partial derivatives: d N_i / dXi, i = 1, 2
+
+    sf.dN1dXi    gradient of the 1st shape function wrt the xi co-ordinate
+    sf.dN2dXi    gradient of the 2nd shape function wrt the xi co-ordinate
 
 inherited methods
 
@@ -106,20 +120,6 @@ inherited methods
             Fmtx = dx/dX    where    X = x0
     Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
 
-variables
-
-    # the shape functions are
-
-    sf.N1        the 1st shape function
-    sf.N2        the 2nd shape function
-
-    sf.Nmtx      the 1x2 matrix of shape functions for representing a chord
-
-    # partial derivatives: d N_i / dXi, i = 1, 2
-
-    sf.dN1dXi    gradient of the 1st shape function wrt the xi co-ordinate
-    sf.dN2dXi    gradient of the 2nd shape function wrt the xi co-ordinate
-
 Reference
     1) Guido Dhondt, "The Finite Element Method for Three-dimensional
        Thermomechanical Applications", John Wiley & Sons Ltd, 2004.
@@ -127,6 +127,8 @@ Reference
 
 
 class ShapeFunction(ShapeFn):
+
+    # constructor
 
     def __init__(self, coordinates):
         super(ShapeFunction, self).__init(coordinates)
@@ -151,6 +153,8 @@ class ShapeFunction(ShapeFn):
         self.dN1dXi = -0.5
         self.dN2dXi = 0.5
         return  # the object
+
+    # methods
 
     def interpolate(self, y1, y2):
         if type(y1) == type(y2):

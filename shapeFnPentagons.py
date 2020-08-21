@@ -26,7 +26,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "04-30-2019"
-__update__ = "07-07-2020"
+__update__ = "07-17-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -94,6 +94,34 @@ constructor
                         co-ordinate.
     returns
         sf              a new instance of class ShapeFunction for 2D pentagons
+
+variables
+
+    # the shape functions
+
+    sf.N1        the 1st shape function, it associates with vertex 1
+    sf.N2        the 2nd shape function, it associates with vertex 2
+    sf.N3        the 3rd shape function, it associates with vertex 3
+    sf.N4        the 4th shape function, it associates with vertex 4
+    sf.N5        the 5th shape function, it associates with vertex 5
+
+    sf.Nmtx      a 2x10 matrix of shape functions for the pentagon
+
+    # partial derivatives of the shape functions
+
+    # first partial derivative: d N_i / dXi, i = 1..5
+    sf.dN1dXi    gradient of the 1st shape function wrt the xi co-ordinate
+    sf.dN2dXi    gradient of the 2nd shape function wrt the xi co-ordinate
+    sf.dN3dXi    gradient of the 3rd shape function wrt the xi co-ordinate
+    sf.dN4dXi    gradient of the 4th shape function wrt the xi co-ordinate
+    sf.dN5dXi    gradient of the 5th shape function wrt the xi co-ordinate
+
+    # first partial derivative: d N_i / dEta, i = 1..5
+    sf.dN1dEta   gradient of the 1st shape function wrt the eta co-ordinate
+    sf.dN2dEta   gradient of the 2nd shape function wrt the eta co-ordinate
+    sf.dN3dEta   gradient of the 3rd shape function wrt the eta co-ordinate
+    sf.dN4dEta   gradient of the 4th shape function wrt the eta co-ordinate
+    sf.dN5dEta   gradient of the 5th shape function wrt the eta co-ordinate
 
 inherited methods
 
@@ -228,34 +256,6 @@ inherited methods
         BN is second nonlinear contribution to the strain displacement matrix
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
-variables
-
-    # the shape functions
-
-    sf.N1        the 1st shape function, it associates with vertex 1
-    sf.N2        the 2nd shape function, it associates with vertex 2
-    sf.N3        the 3rd shape function, it associates with vertex 3
-    sf.N4        the 4th shape function, it associates with vertex 4
-    sf.N5        the 5th shape function, it associates with vertex 5
-
-    sf.Nmtx      a 2x10 matrix of shape functions for the pentagon
-
-    # partial derivatives of the shape functions
-
-    # first partial derivative: d N_i / dXi, i = 1..5
-    sf.dN1dXi    gradient of the 1st shape function wrt the xi co-ordinate
-    sf.dN2dXi    gradient of the 2nd shape function wrt the xi co-ordinate
-    sf.dN3dXi    gradient of the 3rd shape function wrt the xi co-ordinate
-    sf.dN4dXi    gradient of the 4th shape function wrt the xi co-ordinate
-    sf.dN5dXi    gradient of the 5th shape function wrt the xi co-ordinate
-
-    # first partial derivative: d N_i / dEta, i = 1..5
-    sf.dN1dEta   gradient of the 1st shape function wrt the eta co-ordinate
-    sf.dN2dEta   gradient of the 2nd shape function wrt the eta co-ordinate
-    sf.dN3dEta   gradient of the 3rd shape function wrt the eta co-ordinate
-    sf.dN4dEta   gradient of the 4th shape function wrt the eta co-ordinate
-    sf.dN5dEta   gradient of the 5th shape function wrt the eta co-ordinate
-
 Reference
     1) Dasgupta, G., "Interpolants within convex polygons: Wachspress shape
        functions", Journal of Aerospace Engineering, vol. 16, 2003, pp. 1-8.
@@ -263,6 +263,8 @@ Reference
 
 
 class ShapeFunction(ShapeFn):
+
+    # constructor
 
     def __init__(self, coordinates):
         # construct the five, exported, shape functions for location (xi, eta)
@@ -400,8 +402,9 @@ class ShapeFunction(ShapeFn):
         self.dN2dEta = kappa[3] * dNumdEta[3] / bPoly**2
         self.dN3dEta = kappa[4] * dNumdEta[4] / bPoly**2
         self.dN4dEta = kappa[5] * dNumdEta[5] / bPoly**2
-
         return  # the object
+
+    # methods
 
     def interpolate(self, y1, y2, y3, y4, y5):
         if (type(y1) == type(y2) and type(y2) == type(y3)

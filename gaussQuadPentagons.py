@@ -26,7 +26,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-07-2020"
-__update__ = "07-13-2020"
+__update__ = "07-17-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -69,7 +69,13 @@ constructor
     output
         gq  is a new instance of the class GaussQuadrature for a pentagon
 
-methods
+property
+
+    gPts = gq.gaussPoints()
+    output
+        gPts    the number of Gauss points (and nodes, in our implementation)
+
+inherited methods
 
     yG1, yG2, yG3, yG4, yG5 = gq.interpolate(yN1, yN2, yN3, yN4, yN5)
     inputs
@@ -101,10 +107,6 @@ methods
         yN5 is physical field y of arbitrary type located at nodal point 5
     Inputs must allow for: i) scalar multiplication and ii) the '+' operator.
 
-    gPts = gq.gaussPoints()
-    output
-        gPts    the number of Gauss points (and nodes, in our implementation)
-
     coord = gq.coordinates(atGaussPt)
     input
         atGaussPt   is the Gauss point at which the co-ordinates are sought
@@ -121,9 +123,10 @@ methods
 
 class GaussQuadrature(GaussQuad):
 
+    # constructor
+
     def __init__(self):
         super(GaussQuadrature, self).__init__()
-        self._gaussPts = 5
         # the sines and cosines that appear in the geometry of a pentagon
         sin1 = sin(pi/10.0)
         cos1 = cos(pi/10.0)
@@ -213,6 +216,14 @@ class GaussQuadrature(GaussQuad):
         self._extrapCoef[4, 4] = x
         return  # a new instance of a Gauss quadrature rule for pentagons
 
+    # property
+
+    def gaussPoints(self):
+        gPts = 5
+        return gPts
+
+    # methods
+
     def interpolate(self, yN1, yN2, yN3, yN4, yN5):
         if (type(yN1) == type(yN2) and type(yN2) == type(yN3)
            and type(yN3) == type(yN4) and type(yN4) == type(yN5)):
@@ -278,9 +289,6 @@ class GaussQuadrature(GaussQuad):
             raise RuntimeError("Arguments for extrapolation are not of the "
                                + "same type.")
         return yN1, yN2, yN3, yN4, yN5
-
-    def gaussPoints(self):
-        return self._gaussPts
 
     def coordinates(self, atGaussPt):
         if atGaussPt > 0 and atGaussPt < 6:

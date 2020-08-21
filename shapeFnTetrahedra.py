@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "09-18-2019"
-__update__ = "07-06-2020"
+__update__ = "07-17-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -68,7 +68,39 @@ constructor
     returns
         sf              a new instance of class ShapeFunction for 3D tetrahedra
 
-methods
+variables
+
+    # the shape functions
+
+    sf.N1        the 1st shape function
+    sf.N2        the 2nd shape function
+    sf.N3        the 3rd shape function
+    sf.N4        the 4th shape function
+
+    sf.Nmtx      a 3x12 matrix of shape functions for the tetrahedron located
+                 at (xi, eta, zeta)
+
+    # partial derivatives of the shape functions
+
+    # partial derivative: d N_i / dXi, i = 1..4
+    sf.dN1dXi    gradient of the 1st shape function wrt the xi co-ordinate
+    sf.dN2dXi    gradient of the 2nd shape function wrt the xi co-ordinate
+    sf.dN3dXi    gradient of the 3rd shape function wrt the xi co-ordinate
+    sf.dN4dXi    gradient of the 4th shape function wrt the xi co-ordinate
+
+    # partial derivative: d N_i / dEta, i = 1..4
+    sf.dN1dEta   gradient of the 1st shape function wrt the eta co-ordinate
+    sf.dN2dEta   gradient of the 2nd shape function wrt the eta co-ordinate
+    sf.dN3dEta   gradient of the 3rd shape function wrt the eta co-ordinate
+    sf.dN4dEta   gradient of the 4th shape function wrt the eta co-ordinate
+
+    # partial derivative: d N_i / dZeta, i = 1..4
+    sf.dN1dZeta  gradient of the 1st shape function wrt the zeta co-ordinate
+    sf.dN2dZeta  gradient of the 2nd shape function wrt the zeta co-ordinate
+    sf.dN3dZeta  gradient of the 3rd shape function wrt the zeta co-ordinate
+    sf.dN4dZeta  gradient of the 4th shape function wrt the zeta co-ordinate
+
+inherited methods
 
     y = sf.interpolate(y1, y2, y3, y4)
         y1   is a physical field of arbitrary type located at vertex 1
@@ -210,38 +242,6 @@ methods
         BN is third nonlinear contribution to the strain displacement matrix
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
-variables
-
-    # the shape functions
-
-    sf.N1        the 1st shape function
-    sf.N2        the 2nd shape function
-    sf.N3        the 3rd shape function
-    sf.N4        the 4th shape function
-
-    sf.Nmtx      a 3x12 matrix of shape functions for the tetrahedron located
-                 at (xi, eta, zeta)
-
-    # partial derivatives of the shape functions
-
-    # partial derivative: d N_i / dXi, i = 1..4
-    sf.dN1dXi    gradient of the 1st shape function wrt the xi co-ordinate
-    sf.dN2dXi    gradient of the 2nd shape function wrt the xi co-ordinate
-    sf.dN3dXi    gradient of the 3rd shape function wrt the xi co-ordinate
-    sf.dN4dXi    gradient of the 4th shape function wrt the xi co-ordinate
-
-    # partial derivative: d N_i / dEta, i = 1..4
-    sf.dN1dEta   gradient of the 1st shape function wrt the eta co-ordinate
-    sf.dN2dEta   gradient of the 2nd shape function wrt the eta co-ordinate
-    sf.dN3dEta   gradient of the 3rd shape function wrt the eta co-ordinate
-    sf.dN4dEta   gradient of the 4th shape function wrt the eta co-ordinate
-
-    # partial derivative: d N_i / dZeta, i = 1..4
-    sf.dN1dZeta  gradient of the 1st shape function wrt the zeta co-ordinate
-    sf.dN2dZeta  gradient of the 2nd shape function wrt the zeta co-ordinate
-    sf.dN3dZeta  gradient of the 3rd shape function wrt the zeta co-ordinate
-    sf.dN4dZeta  gradient of the 4th shape function wrt the zeta co-ordinate
-
 Reference
     1) Guido Dhondt, "The Finite Element Method for Three-dimensional
        Thermomechanical Applications", John Wiley & Sons Ltd, 2004.
@@ -249,6 +249,8 @@ Reference
 
 
 class ShapeFunction(ShapeFn):
+
+    # constructor
 
     def __init__(self, coordinates):
         super(ShapeFunction, self).__init__(coordinates)
@@ -297,8 +299,9 @@ class ShapeFunction(ShapeFn):
         self.dN2dZeta = 0
         self.dN3dZeta = 0
         self.dN4dZeta = 1
-
         return  # the object
+
+    # methods
 
     def interpolate(self, y1, y2, y3, y4):
         if (type(y1) == type(y2) and type(y2) == type(y3)

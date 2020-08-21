@@ -26,7 +26,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-10-2020"
-__update__ = "07-08-2020"
+__update__ = "07-17-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -52,7 +52,13 @@ constructor
     output
         gq  is a new instance of the class GaussQuadrature for a chord
 
-methods
+property
+
+    gPts = gq.gaussPoints()
+    output
+        gPts is the number of Gauss points (and nodes, in our implementation)
+
+inherited methods
 
     yG1, yG2 = gq.interpolate(yN1, yN2)
     inputs
@@ -72,10 +78,6 @@ methods
         yN2 is physical field y of arbitrary type located at nodal point 2
     Inputs must allow for: i) scalar multiplication and ii) the '+' operator.
 
-    gPts = gq.gaussPoints()
-    output
-        gPts is the number of Gauss points (and nodes, in our implementation)
-
     coord = gq.coordinates(atGaussPt)
     input
         atGaussPt   is the Gauss point at which the co-ordinates are sought
@@ -94,9 +96,10 @@ methods
 
 class GaussQuadrature(GaussQuad):
 
+    # constructor
+
     def __init__(self):
         super(GaussQuadrature, self).__init__()
-        self._gaussPts = 2
         sqrt3 = sqrt(3.0)
         self._coordinates = {
             1: (-1.0 / sqrt3,),
@@ -118,6 +121,14 @@ class GaussQuadrature(GaussQuad):
         self._extrapCoef[1, 1] = (sqrt3 + 3.0) / (2.0 * sqrt3)
         return  # a new instance of a Gauss quadrature rule for chords
 
+    # property
+
+    def gaussPoints(self):
+        gPts = 2
+        return gPts
+
+    # methods
+
     def interpolate(self, yN1, yN2):
         if type(yN1) == type(yN2):
             yG1 = self._interpCoef[0, 0] * yN1 + self._interpCoef[0, 1] * yN2
@@ -135,9 +146,6 @@ class GaussQuadrature(GaussQuad):
             raise RuntimeError("Arguments for extrapolation are not of the "
                                + "same type.")
         return yN1, yN2
-
-    def gaussPoints(self):
-        return self._gaussPts
 
     def coordinates(self, atGaussPt):
         if atGaussPt > 0 and atGaussPt < 3:
