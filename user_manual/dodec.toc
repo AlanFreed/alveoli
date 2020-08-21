@@ -1,6 +1,6 @@
-\contentsline {section}{L\Letter@Gap i\Letter@Gap s\Letter@Gap t\relax \ \kern \Letter@Space o\Letter@Gap f\relax \ \kern \Letter@Space F\Letter@Gap i\Letter@Gap g\Letter@Gap u\Letter@Gap r\Letter@Gap e\Letter@Gap s\relax }{viii}%
-\contentsline {section}{L\Letter@Gap i\Letter@Gap s\Letter@Gap t\relax \ \kern \Letter@Space o\Letter@Gap f\relax \ \kern \Letter@Space T\Letter@Gap a\Letter@Gap b\Letter@Gap l\Letter@Gap e\Letter@Gap s\relax }{xiii}%
-\contentsline {section}{A\Letter@Gap c\Letter@Gap k\Letter@Gap n\Letter@Gap o\Letter@Gap w\Letter@Gap l\Letter@Gap e\Letter@Gap d\Letter@Gap g\Letter@Gap m\Letter@Gap e\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax }{xv}%
+\contentsline {section}{L\Letter@Gap i\Letter@Gap s\Letter@Gap t\relax \ \kern \Letter@Space o\Letter@Gap f\relax \ \kern \Letter@Space F\Letter@Gap i\Letter@Gap g\Letter@Gap u\Letter@Gap r\Letter@Gap e\Letter@Gap s\relax }{ix}%
+\contentsline {section}{L\Letter@Gap i\Letter@Gap s\Letter@Gap t\relax \ \kern \Letter@Space o\Letter@Gap f\relax \ \kern \Letter@Space T\Letter@Gap a\Letter@Gap b\Letter@Gap l\Letter@Gap e\Letter@Gap s\relax }{xiv}%
+\contentsline {section}{A\Letter@Gap c\Letter@Gap k\Letter@Gap n\Letter@Gap o\Letter@Gap w\Letter@Gap l\Letter@Gap e\Letter@Gap d\Letter@Gap g\Letter@Gap m\Letter@Gap e\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax }{xvi}%
 \contentsline {part}{1\hspace {1em}Introduction}{1}%
 \contentsline {section}{\numberline {1.1}P\Letter@Gap r\Letter@Gap o\Letter@Gap b\Letter@Gap l\Letter@Gap e\Letter@Gap m\relax \ \kern \Letter@Space S\Letter@Gap t\Letter@Gap a\Letter@Gap t\Letter@Gap e\Letter@Gap m\Letter@Gap e\Letter@Gap n\Letter@Gap t\relax \relax }{2}%
 \contentsline {section}{\numberline {1.2}A\Letter@Gap p\Letter@Gap p\Letter@Gap r\Letter@Gap o\Letter@Gap a\Letter@Gap c\Letter@Gap h\relax \relax }{6}%
@@ -19,24 +19,24 @@
 \contentsline {subsection}{\numberline {3.1.2}Deformation Gradient for a Rod}{24}%
 \contentsline {section}{\numberline {3.2}2\Letter@Gap D\relax \ \kern \Letter@Space T\Letter@Gap r\Letter@Gap i\Letter@Gap a\Letter@Gap n\Letter@Gap g\Letter@Gap l\Letter@Gap e\Letter@Gap s\relax \relax }{24}%
 \contentsline {subsection}{\numberline {3.2.1}Shape Functions for Interpolating a Triangle}{24}%
-\contentsline {section}{\numberline {3.3}2\Letter@Gap D\relax \ \kern \Letter@Space I\Letter@Gap r\Letter@Gap r\Letter@Gap e\Letter@Gap g\Letter@Gap u\Letter@Gap l\Letter@Gap a\Letter@Gap r\relax \ \kern \Letter@Space P\Letter@Gap e\Letter@Gap n\Letter@Gap t\Letter@Gap a\Letter@Gap g\Letter@Gap o\Letter@Gap n\Letter@Gap s\relax \relax }{25}%
-\contentsline {subsection}{\numberline {3.3.1}Wachspress' Shape Functions for Interpolating an Irregular Pentagon}{25}%
-\contentsline {subsection}{\numberline {3.3.2}First Derivatives of the Shape Functions}{28}%
-\contentsline {subsection}{\numberline {3.3.3}Second Derivatives of the Shape Functions}{29}%
-\contentsline {subsection}{\numberline {3.3.4}Deformation Gradient for an Irregular Pentagon}{31}%
-\contentsline {subsection}{\numberline {3.3.5}Compatibility Conditions}{32}%
-\contentsline {subsection}{\numberline {3.3.6}Gram-Schmidt Decomposition of the Deformation Gradient}{34}%
-\contentsline {subsubsection}{\numberline {3.3.6.1}\textbf {QR} Factorization of\/ $\boldsymbol {\mathsf {F}}$}{35}%
-\contentsline {subsubsection}{\numberline {3.3.6.2}Dilemma}{36}%
-\contentsline {subsubsection}{\numberline {3.3.6.3}Remedy}{37}%
-\contentsline {subsection}{\numberline {3.3.7}Thermodynamic Strains and Strain Rates}{40}%
-\contentsline {subsubsection}{\numberline {3.3.7.1}Stretch Rates}{40}%
-\contentsline {section}{\numberline {3.4}3\Letter@Gap D\relax \ \kern \Letter@Space I\Letter@Gap r\Letter@Gap r\Letter@Gap e\Letter@Gap g\Letter@Gap u\Letter@Gap l\Letter@Gap a\Letter@Gap r\relax \ \kern \Letter@Space D\Letter@Gap o\Letter@Gap d\Letter@Gap e\Letter@Gap c\Letter@Gap a\Letter@Gap h\Letter@Gap e\Letter@Gap d\Letter@Gap r\Letter@Gap a\relax \relax }{41}%
-\contentsline {subsection}{\numberline {3.4.1}Shape Functions for Interpolating an Irregular Tetrahedron}{41}%
-\contentsline {subsubsection}{\numberline {3.4.1.1}Deformation Gradient for an Irregular Tetrahedron}{42}%
-\contentsline {subsection}{\numberline {3.4.2}\textbf {QR} Factorization of $\boldsymbol {\mathsf {F}}$}{43}%
-\contentsline {subsection}{\numberline {3.4.3}Thermodynamic Strains and Strain Rates}{44}%
-\contentsline {subsubsection}{\numberline {3.4.3.1}Stretch Rates}{45}%
+\contentsline {section}{\numberline {3.3}3\Letter@Gap D\relax \ \kern \Letter@Space I\Letter@Gap r\Letter@Gap r\Letter@Gap e\Letter@Gap g\Letter@Gap u\Letter@Gap l\Letter@Gap a\Letter@Gap r\relax \ \kern \Letter@Space D\Letter@Gap o\Letter@Gap d\Letter@Gap e\Letter@Gap c\Letter@Gap a\Letter@Gap h\Letter@Gap e\Letter@Gap d\Letter@Gap r\Letter@Gap a\relax \relax }{25}%
+\contentsline {subsection}{\numberline {3.3.1}Shape Functions for Interpolating an Irregular Tetrahedron}{25}%
+\contentsline {subsubsection}{\numberline {3.3.1.1}Deformation Gradient for an Irregular Tetrahedron}{26}%
+\contentsline {subsection}{\numberline {3.3.2}\textbf {QR} Factorization of $\boldsymbol {\mathsf {F}}$}{27}%
+\contentsline {subsection}{\numberline {3.3.3}Thermodynamic Strains and Strain Rates}{28}%
+\contentsline {subsubsection}{\numberline {3.3.3.1}Stretch Rates}{29}%
+\contentsline {section}{\numberline {3.4}2\Letter@Gap D\relax \ \kern \Letter@Space I\Letter@Gap r\Letter@Gap r\Letter@Gap e\Letter@Gap g\Letter@Gap u\Letter@Gap l\Letter@Gap a\Letter@Gap r\relax \ \kern \Letter@Space P\Letter@Gap e\Letter@Gap n\Letter@Gap t\Letter@Gap a\Letter@Gap g\Letter@Gap o\Letter@Gap n\Letter@Gap s\relax \relax }{30}%
+\contentsline {subsection}{\numberline {3.4.1}Wachspress' Shape Functions for Interpolating an Irregular Pentagon}{31}%
+\contentsline {subsection}{\numberline {3.4.2}First Derivatives of the Shape Functions}{34}%
+\contentsline {subsection}{\numberline {3.4.3}Second Derivatives of the Shape Functions}{35}%
+\contentsline {subsection}{\numberline {3.4.4}Deformation Gradient for an Irregular Pentagon}{36}%
+\contentsline {subsection}{\numberline {3.4.5}Compatibility Conditions}{37}%
+\contentsline {subsection}{\numberline {3.4.6}Gram-Schmidt Decomposition of the Deformation Gradient}{39}%
+\contentsline {subsubsection}{\numberline {3.4.6.1}\textbf {QR} Factorization of\/ $\boldsymbol {\mathsf {F}}$}{40}%
+\contentsline {subsubsection}{\numberline {3.4.6.2}Dilemma}{41}%
+\contentsline {subsubsection}{\numberline {3.4.6.3}Remedy}{43}%
+\contentsline {subsection}{\numberline {3.4.7}Thermodynamic Strains and Strain Rates}{45}%
+\contentsline {subsubsection}{\numberline {3.4.7.1}Stretch Rates}{45}%
 \contentsline {section}{\numberline {3.5}C\Letter@Gap o\Letter@Gap d\Letter@Gap e\relax \ \kern \Letter@Space V\Letter@Gap e\Letter@Gap r\Letter@Gap i\Letter@Gap f\Letter@Gap i\Letter@Gap c\Letter@Gap a\Letter@Gap t\Letter@Gap i\Letter@Gap o\Letter@Gap n\Letter@Gap :\relax \ \kern \Letter@Space K\Letter@Gap i\Letter@Gap n\Letter@Gap e\Letter@Gap m\Letter@Gap a\Letter@Gap t\Letter@Gap i\Letter@Gap c\Letter@Gap s\relax \relax }{46}%
 \contentsline {subsection}{\numberline {3.5.1}Isotropic Motions}{47}%
 \contentsline {subsubsection}{\numberline {3.5.1.1}Geometric vs.\ Thermodynamic Strains}{47}%
@@ -83,42 +83,59 @@
 \contentsline {subsubsection}{\numberline {5.1.3.2}Two-Step ODE Solver}{111}%
 \contentsline {subsection}{\numberline {5.1.4}A Relevant Example}{112}%
 \contentsline {section}{\numberline {5.2}Q\Letter@Gap u\Letter@Gap a\Letter@Gap d\Letter@Gap r\Letter@Gap a\Letter@Gap t\Letter@Gap u\Letter@Gap r\Letter@Gap e\relax \ \kern \Letter@Space R\Letter@Gap u\Letter@Gap l\Letter@Gap e\Letter@Gap s\relax \ \kern \Letter@Space f\Letter@Gap o\Letter@Gap r\relax \ \kern \Letter@Space S\Letter@Gap p\Letter@Gap a\Letter@Gap t\Letter@Gap i\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space I\Letter@Gap n\Letter@Gap t\Letter@Gap e\Letter@Gap g\Letter@Gap r\Letter@Gap a\Letter@Gap t\Letter@Gap i\Letter@Gap o\Letter@Gap n\relax \relax }{113}%
-\contentsline {subsection}{\numberline {5.2.1}Gauss Integration Along a Rod}{113}%
-\contentsline {subsection}{\numberline {5.2.2}Multi-Dimensional Integration}{114}%
-\contentsline {subsection}{\numberline {5.2.3}Gauss Integration of a Triangle}{115}%
-\contentsline {subsection}{\numberline {5.2.4}Gauss Integration of a Pentagon}{116}%
-\contentsline {subsection}{\numberline {5.2.5}Gauss Integration of a Tetrahedron}{117}%
-\contentsline {section}{\numberline {5.3}I\Letter@Gap n\Letter@Gap t\Letter@Gap e\Letter@Gap r\Letter@Gap p\Letter@Gap o\Letter@Gap l\Letter@Gap a\Letter@Gap t\Letter@Gap i\Letter@Gap o\Letter@Gap n\Letter@Gap :\relax \ \kern \Letter@Space N\Letter@Gap o\Letter@Gap d\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space P\Letter@Gap o\Letter@Gap i\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax \ \kern \Letter@Space $\Letter@Gap \DOTSB \mapstochar \rightarrow \Letter@Gap $\relax \ \kern \Letter@Space G\Letter@Gap a\Letter@Gap u\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space P\Letter@Gap o\Letter@Gap i\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax \ \kern \Letter@Space \\\relax \ \kern \Letter@Space \hskip 2em\relax \Letter@Gap E\Letter@Gap x\Letter@Gap t\Letter@Gap r\Letter@Gap a\Letter@Gap p\Letter@Gap o\Letter@Gap l\Letter@Gap a\Letter@Gap t\Letter@Gap i\Letter@Gap o\Letter@Gap n\Letter@Gap :\relax \ \kern \Letter@Space G\Letter@Gap a\Letter@Gap u\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space P\Letter@Gap o\Letter@Gap i\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax \ \kern \Letter@Space $\Letter@Gap \DOTSB \mapstochar \rightarrow \Letter@Gap $\relax \ \kern \Letter@Space N\Letter@Gap o\Letter@Gap d\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space P\Letter@Gap o\Letter@Gap i\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax \relax }{118}%
-\contentsline {subsection}{\numberline {5.3.1}Self-Consistent Interpolation\slash Extrapolation Procedures for Rods}{121}%
-\contentsline {subsection}{\numberline {5.3.2}Self-Consistent Interpolation\slash Extrapolation Procedures for Triangles}{122}%
-\contentsline {subsection}{\numberline {5.3.3}Self-Consistent Interpolation\slash Extrapolation Procedures for Tetrahedra}{123}%
-\contentsline {subsection}{\numberline {5.3.4}Self-Consistent Interpolation\slash Extrapolation Procedures for Pentagons}{124}%
-\contentsline {section}{\numberline {5.4}C\Letter@Gap o\Letter@Gap n\Letter@Gap v\Letter@Gap e\Letter@Gap r\Letter@Gap t\Letter@Gap i\Letter@Gap n\Letter@Gap g\relax \ \kern \Letter@Space N\Letter@Gap o\Letter@Gap d\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space S\Letter@Gap t\Letter@Gap r\Letter@Gap e\Letter@Gap s\Letter@Gap s\Letter@Gap e\Letter@Gap s\relax \ \kern \Letter@Space i\Letter@Gap n\Letter@Gap t\Letter@Gap o\relax \ \kern \Letter@Space N\Letter@Gap o\Letter@Gap d\Letter@Gap a\Letter@Gap l\relax \ \kern \Letter@Space F\Letter@Gap o\Letter@Gap r\Letter@Gap c\Letter@Gap e\Letter@Gap s\relax \relax }{126}%
-\contentsline {part}{6\hspace {1em}Variational Formulation}{127}%
-\contentsline {section}{\numberline {6.1}M\Letter@Gap a\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space M\Letter@Gap a\Letter@Gap t\Letter@Gap r\Letter@Gap i\Letter@Gap x\relax \relax }{129}%
-\contentsline {subsection}{\numberline {6.1.1}Mass Matrices for a Chord}{130}%
-\contentsline {subsubsection}{\numberline {6.1.1.1}Assemble Mass Matrices for the Septal Chords}{131}%
-\contentsline {subsection}{\numberline {6.1.2}Mass Matrices for a Pentagon}{132}%
-\contentsline {subsubsection}{\numberline {6.1.2.1}Assemble Mass Matrices for the Alveolar Septa}{133}%
-\contentsline {subsection}{\numberline {6.1.3}Mass Matrices for a Tetrahedron}{133}%
-\contentsline {subsubsection}{\numberline {6.1.3.1}Assemble Tetrahedral Mass Matrices to Get Mass Matrix for an Alveolar Sac}{135}%
-\contentsline {section}{\numberline {6.2}S\Letter@Gap t\Letter@Gap i\Letter@Gap f\Letter@Gap f\Letter@Gap n\Letter@Gap e\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space M\Letter@Gap a\Letter@Gap t\Letter@Gap r\Letter@Gap i\Letter@Gap x\relax \relax }{136}%
-\contentsline {subsection}{\numberline {6.2.1}Stiffness Matrix for Chord}{138}%
-\contentsline {subsection}{\numberline {6.2.2}Stiffness Matrix for Pentagon}{141}%
-\contentsline {subsection}{\numberline {6.2.3}Stiffness Matrix for a tetrahedron}{147}%
-\contentsline {section}{\numberline {6.3}F\Letter@Gap o\Letter@Gap r\Letter@Gap c\Letter@Gap e\relax \ \kern \Letter@Space V\Letter@Gap e\Letter@Gap c\Letter@Gap t\Letter@Gap o\Letter@Gap r\relax \relax }{157}%
-\contentsline {subsection}{\numberline {6.3.1}Force Vector for a Chord}{158}%
-\contentsline {subsection}{\numberline {6.3.2}Force Vector for a Pentagon}{158}%
-\contentsline {subsection}{\numberline {6.3.3}Force Vector for a Tetrahedron}{159}%
-\contentsline {section}{\numberline {7.1}References\relax \relax }{161}%
-\contentsline {section}{Appendix\nobreakspace {}A. Implicit Elasticity}{170}%
-\contentsline {paragraph}{\numberline {A.3.2.1}Uniform Response}{182}%
-\contentsline {paragraph}{\numberline {A.3.2.2}Non-Uniform Response}{183}%
-\contentsline {paragraph}{\numberline {A.3.3.1}Uniform Response}{184}%
-\contentsline {paragraph}{\numberline {A.3.3.2}Non-Uniform Response}{185}%
-\contentsline {paragraph}{\numberline {A.4.1.1}Uniform Response}{186}%
-\contentsline {paragraph}{\numberline {A.4.1.2}Uniform Biologic Membrane Model}{186}%
-\contentsline {paragraph}{\numberline {A.4.1.3}Non-Uniform Response}{187}%
-\contentsline {paragraph}{\numberline {A.4.1.4}Non-Uniform Biologic Membrane Model}{188}%
-\contentsline {paragraph}{\numberline {A.4.2.1}Uniform Response}{190}%
-\contentsline {paragraph}{\numberline {A.4.2.2}Non-Uniform Response}{190}%
+\contentsline {subsection}{\numberline {5.2.1}Interpolations:\tmspace +\thinmuskip {.1667em}\tmspace +\thinmuskip {.1667em} Nodal Points $\DOTSB \mapstochar \rightarrow $ Gauss Points \\ \hskip 2em\relax \hskip 1em\relax Extrapolations: Gauss Points $\DOTSB \mapstochar \rightarrow $ Nodal Points}{114}%
+\contentsline {subsubsection}{\numberline {5.2.1.1}Self-Consistent Interpolation\slash Extrapolation Procedures for Rods}{116}%
+\contentsline {subsubsection}{\numberline {5.2.1.2}Self-Consistent Interpolation\slash Extrapolation Procedures for Triangles}{117}%
+\contentsline {subsubsection}{\numberline {5.2.1.3}Self-Consistent Interpolation\slash Extrapolation Procedures for Tetrahedra}{117}%
+\contentsline {subsubsection}{\numberline {5.2.1.4}Self-Consistent Interpolation\slash Extrapolation Procedures for Pentagons}{119}%
+\contentsline {subsection}{\numberline {5.2.2}Converting Nodal Stresses into Nodal Forces}{120}%
+\contentsline {part}{6\hspace {1em}Variational Formulation}{121}%
+\contentsline {section}{\numberline {6.1}M\Letter@Gap a\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space M\Letter@Gap a\Letter@Gap t\Letter@Gap r\Letter@Gap i\Letter@Gap c\Letter@Gap e\Letter@Gap s\relax \relax }{125}%
+\contentsline {subsection}{\numberline {6.1.1}Mass Matrix for a Chord}{126}%
+\contentsline {subsubsection}{\numberline {6.1.1.1}Assembly of Chordal Mass Matrices}{129}%
+\contentsline {subsection}{\numberline {6.1.2}Mass Matrix for a Triangle}{130}%
+\contentsline {subsection}{\numberline {6.1.3}Mass Matrix for a Tetrahedron}{131}%
+\contentsline {subsubsection}{\numberline {6.1.3.1}Assembly of Tetrahedral Mass Matrices}{133}%
+\contentsline {subsection}{\numberline {6.1.4}Mass Matrix for a Pentagon}{135}%
+\contentsline {subsubsection}{\numberline {6.1.4.1}Assembly of Pentagonal Mass Matrices}{136}%
+\contentsline {section}{\numberline {6.2}C\Letter@Gap o\Letter@Gap n\Letter@Gap s\Letter@Gap t\Letter@Gap i\Letter@Gap t\Letter@Gap u\Letter@Gap t\Letter@Gap i\Letter@Gap v\Letter@Gap e\relax \ \kern \Letter@Space M\Letter@Gap o\Letter@Gap d\Letter@Gap e\Letter@Gap l\Letter@Gap s\relax \ \kern \Letter@Space f\Letter@Gap o\Letter@Gap r\relax \ \kern \Letter@Space F\Letter@Gap i\Letter@Gap n\Letter@Gap i\Letter@Gap t\Letter@Gap e\relax \ \kern \Letter@Space E\Letter@Gap l\Letter@Gap e\Letter@Gap m\Letter@Gap e\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax \relax }{138}%
+\contentsline {subsection}{\numberline {6.2.1}Moduli for a Chord}{140}%
+\contentsline {subsection}{\numberline {6.2.2}Moduli for a Pentagon}{141}%
+\contentsline {subsection}{\numberline {6.2.3}Moduli for a Tetrahedron}{141}%
+\contentsline {section}{\numberline {6.3}S\Letter@Gap t\Letter@Gap i\Letter@Gap f\Letter@Gap f\Letter@Gap n\Letter@Gap e\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space M\Letter@Gap a\Letter@Gap t\Letter@Gap r\Letter@Gap i\Letter@Gap c\Letter@Gap e\Letter@Gap s\relax \relax }{142}%
+\contentsline {subsection}{\numberline {6.3.1}Strain-Displacement Matrices}{142}%
+\contentsline {subsection}{\numberline {6.3.2}Secant Stiffness Matrix}{144}%
+\contentsline {subsection}{\numberline {6.3.3}Tangent Stiffness Matrix}{145}%
+\contentsline {subsection}{\numberline {6.3.4}Equations of Motion}{146}%
+\contentsline {section}{\numberline {6.4}K\Letter@Gap i\Letter@Gap n\Letter@Gap e\Letter@Gap m\Letter@Gap a\Letter@Gap t\Letter@Gap i\Letter@Gap c\relax \ \kern \Letter@Space M\Letter@Gap a\Letter@Gap t\Letter@Gap r\Letter@Gap i\Letter@Gap c\Letter@Gap e\Letter@Gap s\relax \ \kern \Letter@Space o\Letter@Gap f\relax \ \kern \Letter@Space F\Letter@Gap i\Letter@Gap n\Letter@Gap i\Letter@Gap t\Letter@Gap e\relax \ \kern \Letter@Space E\Letter@Gap l\Letter@Gap e\Letter@Gap m\Letter@Gap e\Letter@Gap n\Letter@Gap t\Letter@Gap s\relax \relax }{148}%
+\contentsline {subsection}{\numberline {6.4.1}Kinematic Matrices for a Chord}{148}%
+\contentsline {subsubsection}{\numberline {6.4.1.1}Stiffness Matrix $\mathbf {K}_0$}{150}%
+\contentsline {subsubsection}{\numberline {6.4.1.2}Stiffness Matrix $\mathbf {K}^s$}{150}%
+\contentsline {subsubsection}{\numberline {6.4.1.3}Stiffness Matrix $\mathbf {K}^t$}{151}%
+\contentsline {subsection}{\numberline {6.4.2}Kinematic Matrices for a Pentagon}{152}%
+\contentsline {subsubsection}{\numberline {6.4.2.1}Stiffness Matrix $\mathbf {K}_0$}{157}%
+\contentsline {subsection}{\numberline {6.4.3}Kinematic Matrices for a Tetrahedron}{159}%
+\contentsline {section}{\numberline {6.5}T\Letter@Gap a\Letter@Gap n\Letter@Gap g\Letter@Gap e\Letter@Gap n\Letter@Gap t\relax \ \kern \Letter@Space S\Letter@Gap t\Letter@Gap i\Letter@Gap f\Letter@Gap f\Letter@Gap n\Letter@Gap e\Letter@Gap s\Letter@Gap s\relax \ \kern \Letter@Space M\Letter@Gap a\Letter@Gap t\Letter@Gap r\Letter@Gap i\Letter@Gap c\Letter@Gap e\Letter@Gap s\relax \relax }{172}%
+\contentsline {subsection}{\numberline {6.5.1}Tangent Stiffness Matrix for a Chord}{172}%
+\contentsline {subsubsection}{\numberline {6.5.1.1}Stiffness Matrix $\mathbf {K}_0$}{174}%
+\contentsline {subsubsection}{\numberline {6.5.1.2}Stiffness Matrix $\mathbf {K}^s$}{174}%
+\contentsline {subsubsection}{\numberline {6.5.1.3}Stiffness Matrix $\mathbf {K}^t$}{175}%
+\contentsline {subsection}{\numberline {6.5.2}Tangent Stiffness Matrix for a Pentagon}{176}%
+\contentsline {subsubsection}{\numberline {6.5.2.1}Stiffness Matrix $\mathbf {K}_0$}{181}%
+\contentsline {subsection}{\numberline {6.5.3}Tangent Stiffness Matrix for a Tetrahedron}{183}%
+\contentsline {section}{\numberline {6.6}F\Letter@Gap o\Letter@Gap r\Letter@Gap c\Letter@Gap e\relax \ \kern \Letter@Space V\Letter@Gap e\Letter@Gap c\Letter@Gap t\Letter@Gap o\Letter@Gap r\relax \relax }{196}%
+\contentsline {subsection}{\numberline {6.6.1}Force Vector for a Chord}{196}%
+\contentsline {subsection}{\numberline {6.6.2}Force Vector for a Pentagon}{196}%
+\contentsline {subsection}{\numberline {6.6.3}Force Vector for a Tetrahedron}{197}%
+\contentsline {section}{\numberline {7.1}References\relax \relax }{200}%
+\contentsline {section}{Appendix\nobreakspace {}A. Implicit Elasticity}{209}%
+\contentsline {paragraph}{\numberline {A.3.2.1}Uniform Response}{221}%
+\contentsline {paragraph}{\numberline {A.3.2.2}Non-Uniform Response}{222}%
+\contentsline {paragraph}{\numberline {A.3.3.1}Uniform Response}{223}%
+\contentsline {paragraph}{\numberline {A.3.3.2}Non-Uniform Response}{224}%
+\contentsline {paragraph}{\numberline {A.4.1.1}Uniform Response}{225}%
+\contentsline {paragraph}{\numberline {A.4.1.2}Uniform Biologic Membrane Model}{225}%
+\contentsline {paragraph}{\numberline {A.4.1.3}Non-Uniform Response}{226}%
+\contentsline {paragraph}{\numberline {A.4.1.4}Non-Uniform Biologic Membrane Model}{227}%
+\contentsline {paragraph}{\numberline {A.4.2.1}Uniform Response}{229}%
+\contentsline {paragraph}{\numberline {A.4.2.2}Non-Uniform Response}{229}%

@@ -11,6 +11,7 @@ The stretch of a rod under extension is a ratio of its lengths.  Specifically, $
 
 A two-noded alveolar chord has shape functions $N_i$, $i=1,2$, that, when evaluated in its natural co-ordinate system where $-1 \leq \xi \leq 1$, describe a matrix with elements
 \begin{subequations}
+    \label{shapeFnsChord}
     \begin{align}
 \mathbf{N} & = \begin{bmatrix} N_1 & N_2 \end{bmatrix} =
 \begin{bmatrix}
@@ -59,6 +60,238 @@ The shape functions for a triangle expressed in terms of its natural co-ordinate
 so that the area of a triangle in its natural co-ordinates is \textfrac{1}{2}.  
 
 No further kinematics are required from triangular elements in our analysis.
+
+
+\section{3D Irregular Dodecahedra}
+
+The primary kinematic variables needed to describe the deformation of an irregular dodecahedron used as a model for an alveolar sac are its volume $V$ (see \S\ref{sec:geometries}) and the differential change in volume $\mathrm{d}V$, with the former following from Eq.~(\ref{tetrahedralVolume}) and the latter coming from a suitable finite difference formula.  Whenever the material filling an alveolar sac is air (its normal healthy condition), no further breakdown of these kinematics is required.  
+
+However, whenever an alveolar sac is filled with fluid (blood, interstitial fluids, pflem, etc.) this fluid can be expected to behave solid-like in the face of a passing shock wave.  In this situation, non-uniform measures for strain (i.e., shears) can be expected to arise.
+
+\subsection{Shape Functions for Interpolating an Irregular Tetrahedron}
+
+The shape functions associated with the four vertices of a tetrahedron $N_i$, $i = 1, 2, 3, 4,$ are defined as follows
+\begin{subequations}
+    \begin{align}
+    N_1 & = 1 - \xi - \eta - \zeta , \quad
+    N_2 = \xi , \quad
+    N_3 = \eta , \quad
+    N_4 = \zeta \\
+    \intertext{where $\xi$, $\eta$ and $\zeta$ represent natural co-ordinates with $0 \leq \xi \leq 1$, $0 \leq \eta \leq 1-\xi$ and $0 \leq \zeta \leq 1-\xi-\eta$.  Gradients of these shape functions are} 
+    N_{1,\xi} & = -1 , \quad N_{1,\eta} = -1 , \quad N_{1,\zeta} = -1 \notag \\
+    N_{2,\xi} & = 1 , \quad \phantom{-} N_{2,\eta} = 0 , \quad \phantom{-} N_{2,\zeta} = 0 \notag \\
+    N_{3,\xi} & = 0 , \quad \phantom{-} N_{3,\eta} = 1 , \quad \phantom{-} N_{3,\zeta} = 0 \notag \\
+    N_{4,\xi} & = 0 , \quad \phantom{-} N_{4,\eta} = 0 , \quad \phantom{-} N_{4,\zeta} = 1 
+    \end{align}
+\end{subequations}
+and consequently the deformation gradient will be constant throughout its volume, like the deformation gradients used for chords and triangles.
+
+\subsubsection{Deformation Gradient for an Irregular Tetrahedron}
+
+The deformation gradient for a volume element is constructed from
+\small
+\begin{equation}
+\mathbfsf{F} ( \xi , \eta , \zeta ) = \begin{bmatrix} 1 & 0 & 0 \\
+0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} + \begin{bmatrix}
+\partial u / \partial \xi & \partial u / \partial \eta & \partial u / \partial \zeta \\
+\partial v / \partial \xi & \partial v / \partial \eta & \partial v / \partial \zeta \\
+\partial w / \partial \xi & \partial w / \partial \eta & \partial w / \partial \zeta
+\end{bmatrix} \begin{bmatrix}
+\partial x_0 / \partial \xi & \partial x_0 / \partial \eta & \partial x_0 / \partial \zeta \\
+\partial y_0 / \partial \xi & \partial y_0 / \partial \eta & \partial y_0 / \partial \zeta \\
+\partial z_0 / \partial \xi & \partial z_0 / \partial \eta & \partial z_0 / \partial \zeta
+\end{bmatrix}^{-1}
+\end{equation}
+\normalsize
+such that, for the four-node tetrahedron considered here, one has
+\begin{subequations}
+    \begin{align}
+    \begin{bmatrix}
+    \partial u / \partial \xi & \partial u / \partial \eta & \partial u / \partial \zeta \\
+    \partial v / \partial \xi & \partial v / \partial \eta & \partial v / \partial \zeta \\
+    \partial w / \partial \xi & \partial w / \partial \eta & \partial w / \partial \zeta
+    \end{bmatrix} & = \begin{bmatrix}
+    \sum_{i=1}^4 N_{i,\xi} u_i & \sum_{i=1}^4 N_{i,\eta} u_i & \sum_{i=1}^4 N_{i,\zeta} u_i \\
+    \sum_{i=1}^4 N_{i,\xi} v_i & \sum_{i=1}^4 N_{i,\eta} v_i & \sum_{i=1}^4 N_{i,\zeta} v_i \\
+    \sum_{i=1}^4 N_{i,\xi} w_i & \sum_{i=1}^4 N_{i,\eta} w_i & \sum_{i=1}^4 N_{i,\zeta} w_i 
+    \end{bmatrix} \notag \\
+    & = \begin{bmatrix}
+    u_2 - u_1 & u_3 - u_1 & u_4 - u_1 \\
+    v_2 - v_1 & v_3 - v_1 & v_4 - v_1 \\
+    w_2 - w_1 & w_3 - w_1 & w_4 - w_1
+    \end{bmatrix} \\
+    \intertext{whose nodal displacements $\mathbfit{u}_i \defeq \mathbfit{x}_i - \mathbfit{x}_{0i}$, $i=1,2,3,4$, have components of $\mathbfit{u}_i = u_i \, \vec{\mathbfsf{E}}_1 + v_i \, \vec{\mathbfsf{E}}_2 + w_i \, \vec{\mathbfsf{E}}_3$, when evaluated in the reference co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ of our dodecahedron, with $u_i \defeq x_i - x_{0i}$, $v_i \defeq y_i - y_{0i}$ and $w_i \defeq z_i - z_{0i}$, and where}
+    \begin{bmatrix}
+    \partial x_0 / \partial \xi & \partial x_0 / \partial \eta & \partial x_0 / \partial \zeta \\
+    \partial y_0 / \partial \xi & \partial y_0 / \partial \eta & \partial y_0 / \partial \zeta \\
+    \partial z_0 / \partial \xi & \partial z_0 / \partial \eta & \partial z_0 / \partial \zeta
+    \end{bmatrix} & = \begin{bmatrix}
+    \sum_{i=1}^4 N_{i,\xi} x_{0i} & \sum_{i=1}^4 N_{i,\eta} x_{0i} & \sum_{i=1}^4 N_{i,\zeta} x_{0i} \\
+    \sum_{i=1}^4 N_{i,\xi} y_{0i} & \sum_{i=1}^4 N_{i,\eta} y_{0i} & \sum_{i=1}^4 N_{i,\zeta} y_{0i} \\
+    \sum_{i=1}^4 N_{i,\xi} z_{0i} & \sum_{i=1}^4 N_{i,\eta} z_{0i} & \sum_{i=1}^4 N_{i,\zeta} z_{0i}
+    \end{bmatrix} \notag \\
+    & = \begin{bmatrix}
+    x_{02} - x_{01} & x_{03} - x_{01} & x_{04} - x_{01} \\
+    y_{02} - y_{01} & y_{03} - y_{01} & y_{04} - y_{01} \\
+    z_{02} - z_{01} & z_{03} - z_{01} & z_{04} - z_{01}
+    \end{bmatrix} \\
+    \intertext{whose initial nodal positions are $\mathbfit{x}_{0i} = x_{0i} \, \vec{\mathbfsf{E}}_1 + y_{0i} \, \vec{\mathbfsf{E}}_2 + z_{0i} \, \vec{\mathbfsf{E}}_3$ at vertex $i$.  This matrix is invertible, becuase the four vertices of a tetrahedron are distinct.  The Jacobian matrix is given by}
+    \mathbf{J} \defeq \begin{bmatrix}
+    \partial x / \partial \xi & \partial y / \partial \xi & \partial z / \partial \xi \\
+    \partial x / \partial \eta & \partial y / \partial \eta & \partial z / \partial \eta \\
+    \partial x / \partial \zeta & \partial y / \partial \zeta & \partial z / \partial \zeta
+    \end{bmatrix} & = \begin{bmatrix}
+    \sum_{i=1}^4 N_{i,\xi} x_{i} & \sum_{i=1}^4 N_{i,\xi} y_{i} & \sum_{i=1}^4 N_{i,\xi} z_{i} \\
+    \sum_{i=1}^4 N_{i,\eta} x_{i} & \sum_{i=1}^4 N_{i,\eta} y_{i} & \sum_{i=1}^4 N_{i,\eta} z_{i} \\
+    \sum_{i=1}^4 N_{i,\zeta} x_{i} & \sum_{i=1}^4 N_{i,\zeta} y_{i} & \sum_{i=1}^4 N_{i,\zeta} z_{i}
+    \end{bmatrix} \notag \\
+    & = \begin{bmatrix}
+    x_{2} - x_{1} & y_{2} - y_{1} & z_{2} - z_{1} \\
+    x_{3} - x_{1} & y_{3} - y_{1} & z_{3} - z_{1} \\
+    x_{4} - x_{1} & y_{4} - y_{1} & z_{4} - z_{1}
+    \end{bmatrix}
+    \label{tetJacobian}
+    \end{align}
+\end{subequations}
+whose determinant is used in integrations.  The current nodal positions have components $\mathbfit{x}_{i} = x_i \, \vec{\mathbfsf{E}}_1 + y_i \, \vec{\mathbfsf{E}}_2 + z_i \, \vec{\mathbfsf{E}}_3$, $i=1,2,3,4$, in the dodecahedral frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$.  The Jacobian matrix is invertible, because the four vertices of a tetrahedron are distinct.
+
+\subsection{\textbf{QR} Factorization of $\mathbfsf{F}$}
+\label{secQR3D}
+
+The re-indexed deformation gradient presented in \S\ref{reindexing3D} has a Gram-Schmidt decomposition that we denote as $\mathbfsf{F} = \boldsymbol{\mathcal{RU}}$ whose components are an orthogonal rotation matrix $\boldsymbol{\mathcal{R}} = \bigl[ \vec{\mathbfsf{g}}_1 \bigm| \vec{\mathbfsf{g}}_2 \bigm| \vec{\mathbfsf{g}}_3 \bigr] = \delta_{ij} \, \vec{\mathbfsf{g}}_i \otimes \vec{\mathbfsf{E}}_j = \mathcal{R}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ and an upper-triangular matrix $\boldsymbol{\mathcal{U}} = \mathcal{U}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ called Laplace stretch, \cite{Freedetal19} both evaluated in the reference co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$, so that $\mathbfsf{F} = \mathcal{F}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j = \mathcal{R}_{ik\,} \mathcal{U}_{kj} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$, and therefore $\mathcal{F}_{ij} = \mathcal{R}_{ik\,} \mathcal{U}_{kj}$.
+
+The components of Laplace stretch $\mathcal{U}_{ij}$ are readily gotten through a Cholesky factorization of the right Cauchy-Green deformation tensor $\mathbfsf{C} = \mathcal{C}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ with tensor components $\mathcal{C}_{ij} = \mathcal{F}_{ki\,} \mathcal{F}_{kj}$ that relate to their physical attributes via \cite{Freed17}
+\begin{equation} 
+\boldsymbol{\mathcal{U}} = 
+\begin{bmatrix}
+a & a \gamma & a \beta \\ 0 & b & b \alpha \\ 0 & 0 & c
+\end{bmatrix} 
+\quad \text{with inverse} \quad
+\boldsymbol{\mathcal{U}}^{-1} = \begin{bmatrix}
+1/a & -\gamma / b & -( \beta - \alpha\gamma ) / c \\
+0 & 1/b & -\alpha / c \\
+0 & 0 & 1/c
+\end{bmatrix}
+\label{LaplaceStretch3D}
+\end{equation}
+with tensor components $\mathcal{U}_{ij}$ being evaluated according to formul\ae\ \cite{Srinivasa12}
+\begin{equation}
+\begin{aligned}
+\mathcal{U}_{11} & = \sqrt{\mathcal{C}_{11}} & 
+\mathcal{U}_{12} & = \mathcal{C}_{12} / \mathcal{U}_{11} &
+\mathcal{U}_{13} & = \mathcal{C}_{13} / \mathcal{U}_{11} \\
+\mathcal{U}_{21} & = 0 &
+\mathcal{U}_{22} & = \sqrt{\mathcal{C}_{22} - \mathcal{U}_{12}^{\,2}} &
+\mathcal{U}_{23} & = \bigl( \mathcal{C}_{23} - 
+\mathcal{U}_{12\,} \mathcal{U}_{13} \bigr) / \mathcal{U}_{22} \\
+\mathcal{U}_{31} & = 0 &
+\mathcal{U}_{32} & = 0 & 
+\mathcal{U}_{33} & = \sqrt{\mathcal{C}_{33} - \mathcal{U}_{13}^{\,2} - 
+    \mathcal{U}_{23}^{\,2}}
+\end{aligned}
+\label{LagrangianLaplaceStretch3D}
+\end{equation}
+implying that the physical attributes for Laplace stretch can be evaluated via
+\begin{equation}
+a \defeq \mathcal{U}_{11} , \quad
+b \defeq \mathcal{U}_{22} , \quad
+c \defeq \mathcal{U}_{33} , \quad
+\alpha \defeq \frac{\mathcal{U}_{23}}{\mathcal{U}_{22}} , \quad
+\beta \defeq \frac{\mathcal{U}_{13}}{\mathcal{U}_{11}} , \quad
+\gamma \defeq \frac{\mathcal{U}_{12}}{\mathcal{U}_{11}}
+\label{LagrangianPhysicalAttributes3D}
+\end{equation}
+where $a$, $b$ and $c$ are three, orthogonal, elongation ratios, and where $\alpha$, $\beta$ and $\gamma$ are three, orthogonal, simple shears, with $a_0$, $b_0$, $c_0$, $\alpha_0$, $\beta_0$ and $\gamma_0$ denoting their values in some reference state. The elongations must be positive, whereas the shears may be of either sign. Collectively, they constitute a complete set of physical attributes for describing stretch from which constitutive equations can then be constructed. 
+
+No eigen\-value\slash eigen\-vector analysis is required to acquire either the stretch components or their attributes when using this technique. \cite{Srinivasa12} The eigen\-values and eigen\-vectors of the triangular Laplace stretch equate with the eigen\-values and eigen\-vectors of the symmetric polar stretch \textit{only\/} in an absence of shear. \cite{Rosakis90}  Laplace stretch associates with the geometric description of a cube deforming into a parallelepiped; whereas, polar stretch associates with the geometric description of a sphere deforming into an ellipsoid.  They are distinct measures of stretch.
+
+\subsection{Thermodynamic Strains and Strain Rates}
+\label{strainsAndStrainRates3D}
+
+In terms of the above physical attributes for stretch, one can define an useful set of strain attributes derived from thermo\-dynamics, specifically \cite{Freed17}
+\begin{subequations}
+    \label{thermodynamicStrains3D}
+    \begin{align}
+    \Xi & \defeq \ln \left( \sqrt[3]{\frac{a}{a_0} \frac{b}{b_0} \frac{c}{c_0}} \right) & 
+    \mathrm{d} \Xi & = \frac{1}{2} \left( \frac{\mathrm{d}a}{a} + 
+    \frac{\mathrm{d}b}{b} + \frac{\mathrm{d}c}{c} \right) \\
+    \varepsilon_1 & \defeq \ln \left( \sqrt[3]{\frac{a}{a_0} \frac{b_0}{b}} \right) &
+    \mathrm{d} \varepsilon_1 & = \frac{1}{3} \left( \frac{\mathrm{d}a}{a} - 
+    \frac{\mathrm{d}b}{b} \right) \\
+    \varepsilon_2 & \defeq \ln \left( \sqrt[3]{\frac{b}{b_0} \frac{c_0}{c}} \right) &
+    \mathrm{d} \varepsilon_2 & = \frac{1}{3} \left( \frac{\mathrm{d}b}{b} - 
+    \frac{\mathrm{d}c}{c} \right) \\
+    \gamma_1 & \defeq \alpha - \alpha_0 & 
+    \mathrm{d} \gamma_1 & = \mathrm{d} \alpha \\
+    \gamma_2 & \defeq \beta - \beta_0 & 
+    \mathrm{d} \gamma_2 & = \mathrm{d} \beta \\
+    \gamma_3 & \defeq \gamma - \gamma_0 & 
+    \mathrm{d} \gamma_3 & = \mathrm{d} \gamma
+    \end{align}
+\end{subequations}
+whose rates are exact differentials, i.e., they are independent of path---a tacit requirement from thermo\-dynamics \cite{Caratheodory09}.  Here $\Xi$ represents dilatation, $\varepsilon_1$ is a squeeze in the 12~plane, and $\varepsilon_2$ is a squeeze in the 23-plane, while $\gamma_1$ is a shear in the 23~plane, $\gamma_2$ is a shear in the 13~plane, and $\gamma_3$ is a shear in the 12~plane, which are three, orthogonal, simple shearing motions.  There is a third squeeze, too, viz., $\varepsilon_3 = -\varepsilon_1 - \varepsilon_2$, but it is not an independent descriptor of strain.
+
+\subsubsection{Stretch Rates}
+
+The following approximations for stretch rates were derived by Freed \&\ Zamani \cite{FreedZamani18}.  From these, the various strain rates listed in Eqn.~(\ref{thermodynamicStrains3D}) can be established.  
+
+A forward difference formula is used to approximate rates in the reference configuration for the various stretch attributes, as obtained from $\mathrm{d} \boldsymbol{\mathcal{U}}_0 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / \mathrm{d}t + \mathcal{O}(\mathrm{d}t)$.  Neglecting higher-order terms, this produces
+\begin{equation}
+\begin{aligned}
+\mathrm{d} a_0 &
+= \frac {a_1 - a_0}{\mathrm{d}t} \quad &
+\mathrm{d} \alpha_0 & 
+= \frac{b_1}{b_0} \left(\frac{\alpha_1 - \alpha_0}{\mathrm{d}t} \right) \\
+\mathrm{d} b_0 & 
+= \frac {b_1 - b_0}{\mathrm{d}t} \quad & 
+\mathrm{d} \beta_0 & 
+= \frac{a_1}{a_0} \left( \frac{\beta_1 - \beta_0}{\mathrm{d}t} \right) \\
+\mathrm{d} c_0 & 
+= \frac {c_1 - c_0}{\mathrm{d}t} \quad & 
+\mathrm{d} \gamma_0 & = \frac{a_1}{a_0} \left( \frac{\gamma_1 - \gamma_0}{\mathrm{d}t}\right) .
+\end{aligned}
+\label{forwardDifference1stOrder3D}
+\end{equation}
+A backward difference formula $\mathrm{d} \boldsymbol{\mathcal{U}}_1 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / \mathrm{d}t + \mathcal{O}(\mathrm{d}t)$ is used to estimate rates for the various stretch attributes at the end of its first integration step, from which it follows that
+\begin{equation}
+\begin{aligned}
+\mathrm{d} a_1 & 
+= \frac {a_1 - a_0}{\mathrm{d}t} \;\; & 
+\mathrm{d} \alpha_1 & 
+= \frac {b_0}{b_1} \left( \frac{\alpha_1 - \alpha_0}{\mathrm{d}t} \right) \\
+\mathrm{d} b_1 & 
+= \frac {b_1 - b_0}{\mathrm{d}t} \;\; & 
+\mathrm{d} \beta_1 & 
+= \frac {a_0} {a_1} \left( \frac{\beta_1 - \beta_0}{\mathrm{d}t} \right) \\
+\mathrm{d} c_1 & 
+= \frac {c_1 - c_0}{\mathrm{d}t} \;\; & 
+\mathrm{d} \gamma_1 & 
+= \frac{a_0}{a_1} \left(\frac{\gamma_1 - \gamma_0}{\mathrm{d}t} \right) .
+\end{aligned}
+\label{backwardDifference1stOrder3D}
+\end{equation}
+Curiously, there is a distinction in how the shear rates are approximated at the two nodes belonging to this first interval of integration.
+
+Equations (\ref{forwardDifference1stOrder3D} \& \ref{backwardDifference1stOrder3D}) are first-order approximations for these derivatives.  Second-order approximations can be established whenever $n > 0$ provided the stepsize for step $[n, n+1]$ equals the stepsize for step $[n-1, n]$, where state $n=0$ associates with an initial condition.  The backward difference formula  $\mathrm{d} \boldsymbol{\mathcal{U}}_{n+1} = ( 3 \, \boldsymbol{\mathcal{U}}_{n+1} -  4 \, \boldsymbol{\mathcal{U}}_{n} + \boldsymbol{\mathcal{U}}_{n-1} ) / 2\mathrm{d}t + \mathcal{O} \bigl( ( \mathrm{d}t )^2 \bigr)$ produces differential stretch rates of
+\begin{equation}
+\begin{aligned}
+\mathrm{d} a_{n+1} & 
+= \frac {3a_{n+1} - 4a_{n} +  a_{n-1}}{2\mathrm{d}t} \\ 
+\mathrm{d} b_{n+1} & 
+= \frac {3b_{n+1} - 4b_{n} +  b_{n-1}}{2\mathrm{d}t} \\
+\mathrm{d} c_{n+1} & 
+= \frac {3c_{n+1} - 4c_{n} +  c_{n-1}}{2\mathrm{d}t} \\
+\mathrm{d} \alpha_{n+1} & 
+= 2 \frac{b_{n}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n}}{\mathrm{d}t} \right) - \frac{b_{n-1}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n-1}}{2\mathrm{d}t} \right) \\
+\mathrm{d} \beta_{n+1} & 
+= 2 \frac{a_{n}}{a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n} }{\mathrm{d}t} \right) - \frac{a_{n-1}} {a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n-1}}{2\mathrm{d}t} \right) \\ 
+\mathrm{d} \gamma_{n+1} & 
+= 2 \frac{a_{n}} {a_{n+1}} \left(\frac{\gamma_{n+1} - \gamma_{n}}{\mathrm{d}t} \right) - \frac{a_{n-1}}{a_{n+1}} \left( \frac{\gamma_{n+1} - \gamma_{n-1}}{2\mathrm{d}t} \right) 
+\end{aligned}
+\label{backwardDifference2ndOrder3D}
+\end{equation}
+which require data to be stored for the previous state associated with step $n-1$.
+
 
 \section{2D Irregular Pentagons}
 
@@ -748,235 +981,6 @@ Equations (\ref{forwardDifference1stOrder2D} \& \ref{backwardDifference1stOrder2
 \label{backwardDifference2ndOrder2D}
 \end{equation}
 which require stretch attributes $a_{n-1}$, $b_{n-1}$ and $g_{n-1}$ to be stored in a finite element setting.
-
-\section{3D Irregular Dodecahedra}
-
-The primary kinematic variables needed to describe the deformation of an irregular dodecahedron used as a model for an alveolar sac are its volume $V$ (see \S\ref{sec:geometries}) and the differential change in volume $\mathrm{d}V$, with the former following from Eq.~(\ref{tetrahedralVolume}) and the latter coming from a suitable finite difference formula.  Whenever the material filling an alveolar sac is air (its normal healthy condition), no further breakdown of these kinematics is required.  
-
-However, whenever an alveolar sac is filled with fluid (blood, interstitial fluids, pflem, etc.) this fluid can be expected to behave solid-like in the face of a passing shock wave.  In this situation, non-uniform measures for strain (i.e., shears) can be expected to arise.
-
-\subsection{Shape Functions for Interpolating an Irregular Tetrahedron}
-
-The shape functions associated with the four vertices of a tetrahedron $N_i$, $i = 1, 2, 3, 4,$ are defined as follows
-\begin{subequations}
-    \begin{align}
-    N_1 & = 1 - \xi - \eta - \zeta , \quad
-    N_2 = \xi , \quad
-    N_3 = \eta , \quad
-    N_4 = \zeta \\
-    \intertext{where $\xi$, $\eta$ and $\zeta$ represent natural co-ordinates with $0 \leq \xi \leq 1$, $0 \leq \eta \leq 1-\xi$ and $0 \leq \zeta \leq 1-\xi-\eta$.  Gradients of these shape functions are} 
-    N_{1,\xi} & = -1 , \quad N_{1,\eta} = -1 , \quad N_{1,\zeta} = -1 \notag \\
-    N_{2,\xi} & = 1 , \quad \phantom{-} N_{2,\eta} = 0 , \quad \phantom{-} N_{2,\zeta} = 0 \notag \\
-    N_{3,\xi} & = 0 , \quad \phantom{-} N_{3,\eta} = 1 , \quad \phantom{-} N_{3,\zeta} = 0 \notag \\
-    N_{4,\xi} & = 0 , \quad \phantom{-} N_{4,\eta} = 0 , \quad \phantom{-} N_{4,\zeta} = 1 
-    \end{align}
-\end{subequations}
-and consequently the deformation gradient will be constant throughout its volume, like the deformation gradients used for chords and triangles.
-
-\subsubsection{Deformation Gradient for an Irregular Tetrahedron}
-
-The deformation gradient for a volume element is constructed from
-\small
-\begin{equation}
-    \mathbfsf{F} ( \xi , \eta , \zeta ) = \begin{bmatrix} 1 & 0 & 0 \\
-    0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} + \begin{bmatrix}
-    \partial u / \partial \xi & \partial u / \partial \eta & \partial u / \partial \zeta \\
-    \partial v / \partial \xi & \partial v / \partial \eta & \partial v / \partial \zeta \\
-    \partial w / \partial \xi & \partial w / \partial \eta & \partial w / \partial \zeta
-    \end{bmatrix} \begin{bmatrix}
-    \partial x_0 / \partial \xi & \partial x_0 / \partial \eta & \partial x_0 / \partial \zeta \\
-    \partial y_0 / \partial \xi & \partial y_0 / \partial \eta & \partial y_0 / \partial \zeta \\
-    \partial z_0 / \partial \xi & \partial z_0 / \partial \eta & \partial z_0 / \partial \zeta
-    \end{bmatrix}^{-1}
-\end{equation}
-\normalsize
-such that, for the four-node tetrahedron considered here, one has
-\begin{subequations}
-    \begin{align}
-    \begin{bmatrix}
-    \partial u / \partial \xi & \partial u / \partial \eta & \partial u / \partial \zeta \\
-    \partial v / \partial \xi & \partial v / \partial \eta & \partial v / \partial \zeta \\
-    \partial w / \partial \xi & \partial w / \partial \eta & \partial w / \partial \zeta
-    \end{bmatrix} & = \begin{bmatrix}
-    \sum_{i=1}^4 N_{i,\xi} u_i & \sum_{i=1}^4 N_{i,\eta} u_i & \sum_{i=1}^4 N_{i,\zeta} u_i \\
-    \sum_{i=1}^4 N_{i,\xi} v_i & \sum_{i=1}^4 N_{i,\eta} v_i & \sum_{i=1}^4 N_{i,\zeta} v_i \\
-    \sum_{i=1}^4 N_{i,\xi} w_i & \sum_{i=1}^4 N_{i,\eta} w_i & \sum_{i=1}^4 N_{i,\zeta} w_i 
-    \end{bmatrix} \notag \\
-    & = \begin{bmatrix}
-    u_2 - u_1 & u_3 - u_1 & u_4 - u_1 \\
-    v_2 - v_1 & v_3 - v_1 & v_4 - v_1 \\
-    w_2 - w_1 & w_3 - w_1 & w_4 - w_1
-    \end{bmatrix} \\
-    \intertext{whose nodal displacements $\mathbfit{u}_i \defeq \mathbfit{x}_i - \mathbfit{x}_{0i}$, $i=1,2,3,4$, have components of $\mathbfit{u}_i = u_i \, \vec{\mathbfsf{E}}_1 + v_i \, \vec{\mathbfsf{E}}_2 + w_i \, \vec{\mathbfsf{E}}_3$, when evaluated in the reference co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ of our dodecahedron, with $u_i \defeq x_i - x_{0i}$, $v_i \defeq y_i - y_{0i}$ and $w_i \defeq z_i - z_{0i}$, and where}
-    \begin{bmatrix}
-    \partial x_0 / \partial \xi & \partial x_0 / \partial \eta & \partial x_0 / \partial \zeta \\
-    \partial y_0 / \partial \xi & \partial y_0 / \partial \eta & \partial y_0 / \partial \zeta \\
-    \partial z_0 / \partial \xi & \partial z_0 / \partial \eta & \partial z_0 / \partial \zeta
-    \end{bmatrix} & = \begin{bmatrix}
-    \sum_{i=1}^4 N_{i,\xi} x_{0i} & \sum_{i=1}^4 N_{i,\eta} x_{0i} & \sum_{i=1}^4 N_{i,\zeta} x_{0i} \\
-    \sum_{i=1}^4 N_{i,\xi} y_{0i} & \sum_{i=1}^4 N_{i,\eta} y_{0i} & \sum_{i=1}^4 N_{i,\zeta} y_{0i} \\
-    \sum_{i=1}^4 N_{i,\xi} z_{0i} & \sum_{i=1}^4 N_{i,\eta} z_{0i} & \sum_{i=1}^4 N_{i,\zeta} z_{0i}
-    \end{bmatrix} \notag \\
-    & = \begin{bmatrix}
-    x_{02} - x_{01} & x_{03} - x_{01} & x_{04} - x_{01} \\
-    y_{02} - y_{01} & y_{03} - y_{01} & y_{04} - y_{01} \\
-    z_{02} - z_{01} & z_{03} - z_{01} & z_{04} - z_{01}
-    \end{bmatrix} \\
-    \intertext{whose initial nodal positions are $\mathbfit{x}_{0i} = x_{0i} \, \vec{\mathbfsf{E}}_1 + y_{0i} \, \vec{\mathbfsf{E}}_2 + z_{0i} \, \vec{\mathbfsf{E}}_3$ at vertex $i$.  This matrix is invertible, becuase the four vertices of a tetrahedron are distinct.  The Jacobian matrix is given by}
-    \mathbf{J} \defeq \begin{bmatrix}
-    \partial x / \partial \xi & \partial y / \partial \xi & \partial z / \partial \xi \\
-    \partial x / \partial \eta & \partial y / \partial \eta & \partial z / \partial \eta \\
-    \partial x / \partial \zeta & \partial y / \partial \zeta & \partial z / \partial \zeta
-    \end{bmatrix} & = \begin{bmatrix}
-    \sum_{i=1}^4 N_{i,\xi} x_{i} & \sum_{i=1}^4 N_{i,\xi} y_{i} & \sum_{i=1}^4 N_{i,\xi} z_{i} \\
-    \sum_{i=1}^4 N_{i,\eta} x_{i} & \sum_{i=1}^4 N_{i,\eta} y_{i} & \sum_{i=1}^4 N_{i,\eta} z_{i} \\
-    \sum_{i=1}^4 N_{i,\zeta} x_{i} & \sum_{i=1}^4 N_{i,\zeta} y_{i} & \sum_{i=1}^4 N_{i,\zeta} z_{i}
-    \end{bmatrix} \notag \\
-    & = \begin{bmatrix}
-    x_{2} - x_{1} & y_{2} - y_{1} & z_{2} - z_{1} \\
-    x_{3} - x_{1} & y_{3} - y_{1} & z_{3} - z_{1} \\
-    x_{4} - x_{1} & y_{4} - y_{1} & z_{4} - z_{1}
-    \end{bmatrix}
-    \end{align}
-\end{subequations}
-whose determinant is used in integrations.  The current nodal positions have components $\mathbfit{x}_{i} = x_i \, \vec{\mathbfsf{E}}_1 + y_i \, \vec{\mathbfsf{E}}_2 + z_i \, \vec{\mathbfsf{E}}_3$, $i=1,2,3,4$, in the dodecahedral frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$.  The Jacobian matrix is invertible, because the four vertices of a tetrahedron are distinct.
-
-\subsection{\textbf{QR} Factorization of $\mathbfsf{F}$}
-\label{secQR3D}
-
-The re-indexed deformation gradient presented in \S\ref{reindexing3D} has a Gram-Schmidt decomposition that we denote as $\mathbfsf{F} = \boldsymbol{\mathcal{RU}}$ whose components are an orthogonal rotation matrix $\boldsymbol{\mathcal{R}} = \bigl[ \vec{\mathbfsf{g}}_1 \bigm| \vec{\mathbfsf{g}}_2 \bigm| \vec{\mathbfsf{g}}_3 \bigr] = \delta_{ij} \, \vec{\mathbfsf{g}}_i \otimes \vec{\mathbfsf{E}}_j = \mathcal{R}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ and an upper-triangular matrix $\boldsymbol{\mathcal{U}} = \mathcal{U}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ called Laplace stretch, \cite{Freedetal19} both evaluated in the reference co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$, so that $\mathbfsf{F} = \mathcal{F}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j = \mathcal{R}_{ik\,} \mathcal{U}_{kj} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$, and therefore $\mathcal{F}_{ij} = \mathcal{R}_{ik\,} \mathcal{U}_{kj}$.
-
-The components of Laplace stretch $\mathcal{U}_{ij}$ are readily gotten through a Cholesky factorization of the right Cauchy-Green deformation tensor $\mathbfsf{C} = \mathcal{C}_{ij} \, \vec{\mathbfsf{E}}_i \otimes \vec{\mathbfsf{E}}_j$ with tensor components $\mathcal{C}_{ij} = \mathcal{F}_{ki\,} \mathcal{F}_{kj}$ that relate to their physical attributes via \cite{Freed17}
-\begin{equation} 
-\boldsymbol{\mathcal{U}} = 
-\begin{bmatrix}
-a & a \gamma & a \beta \\ 0 & b & b \alpha \\ 0 & 0 & c
-\end{bmatrix} 
-\quad \text{with inverse} \quad
-\boldsymbol{\mathcal{U}}^{-1} = \begin{bmatrix}
-1/a & -\gamma / b & -( \beta - \alpha\gamma ) / c \\
-0 & 1/b & -\alpha / c \\
-0 & 0 & 1/c
-\end{bmatrix}
-\label{LaplaceStretch3D}
-\end{equation}
-with tensor components $\mathcal{U}_{ij}$ being evaluated according to formul\ae\ \cite{Srinivasa12}
-\begin{equation}
-\begin{aligned}
-\mathcal{U}_{11} & = \sqrt{\mathcal{C}_{11}} & 
-\mathcal{U}_{12} & = \mathcal{C}_{12} / \mathcal{U}_{11} &
-\mathcal{U}_{13} & = \mathcal{C}_{13} / \mathcal{U}_{11} \\
-\mathcal{U}_{21} & = 0 &
-\mathcal{U}_{22} & = \sqrt{\mathcal{C}_{22} - \mathcal{U}_{12}^{\,2}} &
-\mathcal{U}_{23} & = \bigl( \mathcal{C}_{23} - 
-\mathcal{U}_{12\,} \mathcal{U}_{13} \bigr) / \mathcal{U}_{22} \\
-\mathcal{U}_{31} & = 0 &
-\mathcal{U}_{32} & = 0 & 
-\mathcal{U}_{33} & = \sqrt{\mathcal{C}_{33} - \mathcal{U}_{13}^{\,2} - 
-    \mathcal{U}_{23}^{\,2}}
-\end{aligned}
-\label{LagrangianLaplaceStretch3D}
-\end{equation}
-implying that the physical attributes for Laplace stretch can be evaluated via
-\begin{equation}
-a \defeq \mathcal{U}_{11} , \quad
-b \defeq \mathcal{U}_{22} , \quad
-c \defeq \mathcal{U}_{33} , \quad
-\alpha \defeq \frac{\mathcal{U}_{23}}{\mathcal{U}_{22}} , \quad
-\beta \defeq \frac{\mathcal{U}_{13}}{\mathcal{U}_{11}} , \quad
-\gamma \defeq \frac{\mathcal{U}_{12}}{\mathcal{U}_{11}}
-\label{LagrangianPhysicalAttributes3D}
-\end{equation}
-where $a$, $b$ and $c$ are three, orthogonal, elongation ratios, and where $\alpha$, $\beta$ and $\gamma$ are three, orthogonal, simple shears, with $a_0$, $b_0$, $c_0$, $\alpha_0$, $\beta_0$ and $\gamma_0$ denoting their values in some reference state. The elongations must be positive, whereas the shears may be of either sign. Collectively, they constitute a complete set of physical attributes for describing stretch from which constitutive equations can then be constructed. 
-
-No eigen\-value\slash eigen\-vector analysis is required to acquire either the stretch components or their attributes when using this technique. \cite{Srinivasa12} The eigen\-values and eigen\-vectors of the triangular Laplace stretch equate with the eigen\-values and eigen\-vectors of the symmetric polar stretch \textit{only\/} in an absence of shear. \cite{Rosakis90}  Laplace stretch associates with the geometric description of a cube deforming into a parallelepiped; whereas, polar stretch associates with the geometric description of a sphere deforming into an ellipsoid.  They are distinct measures of stretch.
-
-\subsection{Thermodynamic Strains and Strain Rates}
-\label{strainsAndStrainRates3D}
-
-In terms of the above physical attributes for stretch, one can define an useful set of strain attributes derived from thermo\-dynamics, specifically \cite{Freed17}
-\begin{subequations}
-    \label{thermodynamicStrains3D}
-    \begin{align}
-    \Xi & \defeq \ln \left( \sqrt[3]{\frac{a}{a_0} \frac{b}{b_0} \frac{c}{c_0}} \right) & 
-    \mathrm{d} \Xi & = \frac{1}{2} \left( \frac{\mathrm{d}a}{a} + 
-    \frac{\mathrm{d}b}{b} + \frac{\mathrm{d}c}{c} \right) \\
-    \varepsilon_1 & \defeq \ln \left( \sqrt[3]{\frac{a}{a_0} \frac{b_0}{b}} \right) &
-    \mathrm{d} \varepsilon_1 & = \frac{1}{3} \left( \frac{\mathrm{d}a}{a} - 
-    \frac{\mathrm{d}b}{b} \right) \\
-    \varepsilon_2 & \defeq \ln \left( \sqrt[3]{\frac{b}{b_0} \frac{c_0}{c}} \right) &
-    \mathrm{d} \varepsilon_2 & = \frac{1}{3} \left( \frac{\mathrm{d}b}{b} - 
-    \frac{\mathrm{d}c}{c} \right) \\
-    \gamma_1 & \defeq \alpha - \alpha_0 & 
-    \mathrm{d} \gamma_1 & = \mathrm{d} \alpha \\
-    \gamma_2 & \defeq \beta - \beta_0 & 
-    \mathrm{d} \gamma_2 & = \mathrm{d} \beta \\
-    \gamma_3 & \defeq \gamma - \gamma_0 & 
-    \mathrm{d} \gamma_3 & = \mathrm{d} \gamma
-    \end{align}
-\end{subequations}
-whose rates are exact differentials, i.e., they are independent of path---a tacit requirement from thermo\-dynamics \cite{Caratheodory09}.  Here $\Xi$ represents dilatation, $\varepsilon_1$ is a squeeze in the 12~plane, and $\varepsilon_2$ is a squeeze in the 23-plane, while $\gamma_1$ is a shear in the 23~plane, $\gamma_2$ is a shear in the 13~plane, and $\gamma_3$ is a shear in the 12~plane, which are three, orthogonal, simple shearing motions.  There is a third squeeze, too, viz., $\varepsilon_3 = -\varepsilon_1 - \varepsilon_2$, but it is not an independent descriptor of strain.
-
-\subsubsection{Stretch Rates}
-
-The following approximations for stretch rates were derived by Freed \&\ Zamani \cite{FreedZamani18}.  From these, the various strain rates listed in Eqn.~(\ref{thermodynamicStrains3D}) can be established.  
-
-A forward difference formula is used to approximate rates in the reference configuration for the various stretch attributes, as obtained from $\mathrm{d} \boldsymbol{\mathcal{U}}_0 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / \mathrm{d}t + \mathcal{O}(\mathrm{d}t)$.  Neglecting higher-order terms, this produces
-\begin{equation}
-\begin{aligned}
-\mathrm{d} a_0 &
-= \frac {a_1 - a_0}{\mathrm{d}t} \quad &
-\mathrm{d} \alpha_0 & 
-= \frac{b_1}{b_0} \left(\frac{\alpha_1 - \alpha_0}{\mathrm{d}t} \right) \\
-\mathrm{d} b_0 & 
-= \frac {b_1 - b_0}{\mathrm{d}t} \quad & 
-\mathrm{d} \beta_0 & 
-= \frac{a_1}{a_0} \left( \frac{\beta_1 - \beta_0}{\mathrm{d}t} \right) \\
-\mathrm{d} c_0 & 
-= \frac {c_1 - c_0}{\mathrm{d}t} \quad & 
-\mathrm{d} \gamma_0 & = \frac{a_1}{a_0} \left( \frac{\gamma_1 - \gamma_0}{\mathrm{d}t}\right) .
-\end{aligned}
-\label{forwardDifference1stOrder3D}
-\end{equation}
-A backward difference formula $\mathrm{d} \boldsymbol{\mathcal{U}}_1 = ( \boldsymbol{\mathcal{U}}_1 -  \boldsymbol{\mathcal{U}}_0 ) / \mathrm{d}t + \mathcal{O}(\mathrm{d}t)$ is used to estimate rates for the various stretch attributes at the end of its first integration step, from which it follows that
-\begin{equation}
-\begin{aligned}
-\mathrm{d} a_1 & 
-= \frac {a_1 - a_0}{\mathrm{d}t} \;\; & 
-\mathrm{d} \alpha_1 & 
-= \frac {b_0}{b_1} \left( \frac{\alpha_1 - \alpha_0}{\mathrm{d}t} \right) \\
-\mathrm{d} b_1 & 
-= \frac {b_1 - b_0}{\mathrm{d}t} \;\; & 
-\mathrm{d} \beta_1 & 
-= \frac {a_0} {a_1} \left( \frac{\beta_1 - \beta_0}{\mathrm{d}t} \right) \\
-\mathrm{d} c_1 & 
-= \frac {c_1 - c_0}{\mathrm{d}t} \;\; & 
-\mathrm{d} \gamma_1 & 
-= \frac{a_0}{a_1} \left(\frac{\gamma_1 - \gamma_0}{\mathrm{d}t} \right) .
-\end{aligned}
-\label{backwardDifference1stOrder3D}
-\end{equation}
-Curiously, there is a distinction in how the shear rates are approximated at the two nodes belonging to this first interval of integration.
-
-Equations (\ref{forwardDifference1stOrder3D} \& \ref{backwardDifference1stOrder3D}) are first-order approximations for these derivatives.  Second-order approximations can be established whenever $n > 0$ provided the stepsize for step $[n, n+1]$ equals the stepsize for step $[n-1, n]$, where state $n=0$ associates with an initial condition.  The backward difference formula  $\mathrm{d} \boldsymbol{\mathcal{U}}_{n+1} = ( 3 \, \boldsymbol{\mathcal{U}}_{n+1} -  4 \, \boldsymbol{\mathcal{U}}_{n} + \boldsymbol{\mathcal{U}}_{n-1} ) / 2\mathrm{d}t + \mathcal{O} \bigl( ( \mathrm{d}t )^2 \bigr)$ produces differential stretch rates of
-\begin{equation}
-\begin{aligned}
-\mathrm{d} a_{n+1} & 
-= \frac {3a_{n+1} - 4a_{n} +  a_{n-1}}{2\mathrm{d}t} \\ 
-\mathrm{d} b_{n+1} & 
-= \frac {3b_{n+1} - 4b_{n} +  b_{n-1}}{2\mathrm{d}t} \\
-\mathrm{d} c_{n+1} & 
-= \frac {3c_{n+1} - 4c_{n} +  c_{n-1}}{2\mathrm{d}t} \\
-\mathrm{d} \alpha_{n+1} & 
-= 2 \frac{b_{n}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n}}{\mathrm{d}t} \right) - \frac{b_{n-1}} {b_{n+1}} \left( \frac{\alpha_{n+1} - \alpha_{n-1}}{2\mathrm{d}t} \right) \\
-\mathrm{d} \beta_{n+1} & 
-= 2 \frac{a_{n}}{a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n} }{\mathrm{d}t} \right) - \frac{a_{n-1}} {a_{n+1}} \left( \frac{\beta_{n+1} - \beta_{n-1}}{2\mathrm{d}t} \right) \\ 
-\mathrm{d} \gamma_{n+1} & 
-= 2 \frac{a_{n}} {a_{n+1}} \left(\frac{\gamma_{n+1} - \gamma_{n}}{\mathrm{d}t} \right) - \frac{a_{n-1}}{a_{n+1}} \left( \frac{\gamma_{n+1} - \gamma_{n-1}}{2\mathrm{d}t} \right) 
-\end{aligned}
-\label{backwardDifference2ndOrder3D}
-\end{equation}
-which require data to be stored for the previous state associated with step $n-1$.
 
 \section{Code Verification: Kinematics}
 \label{sec:verification}

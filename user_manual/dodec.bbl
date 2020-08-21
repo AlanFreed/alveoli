@@ -210,6 +210,29 @@ Freed~AD,\ le~{G}raverend~JB,\ Rajagopal~KR.\,~  A decomposition of {L}aplace
   stretch with applications in inelasticity.  \textrm{Acta Mechanica}.
   \textrm{2019};230:3423--3429.
 
+\bibitem{Freed17}
+Freed~AD.\,~  A note on stress/strain conjugate pairs: explicit and implicit
+  theories of thermoelasticity for anisotropic materials.
+  \textrm{International Journal of Engineering Science}.
+  \textrm{2017};120:155--171.
+
+\bibitem{Srinivasa12}
+R.~A~Srinivasa.\,~  On the use of the upper triangle (or \textbf{QR})
+  decomposition for developing constitutive equations for {G}reen-elastic
+  materials.  \textrm{International Journal of Engineering Science}.
+  \textrm{2012};60:1--12.
+
+\bibitem{Rosakis90}
+Rosakis~P.\,~  Ellipticity and deformations with discontinuous gradients in
+  finite elastostatics.  \textrm{Archives for Rational Mechanics and Analysis}.
+  \textrm{1990};109:1--37.
+
+\bibitem{Caratheodory09}
+Carath{\'e}odory~C.\,~  Untersuchungen {\"u}ber die {G}rundlagen der
+  {T}hermodynamik.  \textrm{Mathematische Annalen}. \textrm{1909};67:355--386;
+  Translated in: J. Kestin (ed.), \textit{The Second Law of Thermodynamics},
+  Dowden, Hutchinson and Ross, Stroudsberg, PA, 1976, pp. 229-256.
+
 \bibitem{Wachspress75}
 Wachspress~EL.\,\,  A rational finite element basis.~ New York: Academic Press;
    1975.
@@ -235,12 +258,6 @@ Dasgupta~G.\,~  Interpolants within convex polygons: {W}achspress’ shape
 Clayton~JD.\,\,  Differential geometry and kinematics of continua.~ New York:
   World Scientific;  2015.
 
-\bibitem{Srinivasa12}
-R.~A~Srinivasa.\,~  On the use of the upper triangle (or \textbf{QR})
-  decomposition for developing constitutive equations for {G}reen-elastic
-  materials.  \textrm{International Journal of Engineering Science}.
-  \textrm{2012};60:1--12.
-
 \bibitem{FreedSrinivasa15}
 Freed~AD,\ R.~A~Srinivasa.\,~  Logarithmic strain and its material derivative
   for a \textbf{QR} decomposition of the deformation gradient.  \textrm{ACTA
@@ -262,11 +279,6 @@ Mc{L}ellan~AG.\,~  Finite strain coordinate and the stability of solid phases.
   \textrm{Journal of Physics C: Solid State Physics}.
   \textrm{1976};9:4083--4094.
 
-\bibitem{Rosakis90}
-Rosakis~P.\,~  Ellipticity and deformations with discontinuous gradients in
-  finite elastostatics.  \textrm{Archives for Rational Mechanics and Analysis}.
-  \textrm{1990};109:1--37.
-
 \bibitem{Souchet93}
 Souchet~R.\,~  Concerning the polar decomposition of the deformation gradient.
   \textrm{International Journal of Engineering Science}.
@@ -276,18 +288,6 @@ Souchet~R.\,~  Concerning the polar decomposition of the deformation gradient.
 Leon~SJ,\ Bj{\"o}rck~{\AA},\ Gander~W.\,~  Gram-{S}chmidt orthogonalization:
   100 years and more.  \textrm{Numerical Linear Algebra with Applications}.
   \textrm{2013};20:492--532.
-
-\bibitem{Freed17}
-Freed~AD.\,~  A note on stress/strain conjugate pairs: explicit and implicit
-  theories of thermoelasticity for anisotropic materials.
-  \textrm{International Journal of Engineering Science}.
-  \textrm{2017};120:155--171.
-
-\bibitem{Caratheodory09}
-Carath{\'e}odory~C.\,~  Untersuchungen {\"u}ber die {G}rundlagen der
-  {T}hermodynamik.  \textrm{Mathematische Annalen}. \textrm{1909};67:355--386;
-  Translated in: J. Kestin (ed.), \textit{The Second Law of Thermodynamics},
-  Dowden, Hutchinson and Ross, Stroudsberg, PA, 1976, pp. 229-256.
 
 \bibitem{PerlmanBhattacharya07}
 Perlman~CE,\ Bhattacharya~J.\,~  Alveolar expansion imaged by optical
@@ -306,13 +306,6 @@ Suki~B,\ Ito~S,\ Stamenovi{\'c}~D,\ Lutchen~KR,\ Ingenito~EP.\,~  Biomechanics
 \bibitem{Sukietal11}
 Suki~B,\ Stamenovi{\'c}~D,\ Hubmayr~R.\,~  Lung parenchymal mechanics.
   \textrm{Comprehensive Physiology}. \textrm{2011};1:1317--1351.
-
-\bibitem{Birzleetal19}
-Birzle~AM,\ Hobrack~SMK,\ Martin~C,\ Uhlig~S,\ Wall~WA.\,~
-  Constituent‐specific material behavior of soft biological tissue:
-  experimental quantification and numerical identification for lung parenchyma.
-   \textrm{Biomechanics and Modeling in Mechanobiology}.
-  \textrm{2019};18:1383--1400.
 
 \bibitem{Weinhold75c}
 Weinhold~F.\,~  Metric geometry of equilibrium thermodynamics. {III}.
@@ -448,6 +441,13 @@ Davison~L.\,\,  Fundamentals of shock wave propagation in solids.~ Berlin:
 Zener~C.\,\,  Elasticity and {A}nelasticity of {M}etals.~ Chicago: University
   of Chicago Press;  1948.
 
+\bibitem{Birzleetal19}
+Birzle~AM,\ Hobrack~SMK,\ Martin~C,\ Uhlig~S,\ Wall~WA.\,~
+  Constituent‐specific material behavior of soft biological tissue:
+  experimental quantification and numerical identification for lung parenchyma.
+   \textrm{Biomechanics and Modeling in Mechanobiology}.
+  \textrm{2019};18:1383--1400.
+
 \bibitem{Freed17a}
 Freed~AD.\, \textrm{A technical note: {T}wo-step {PECE} methods for
   approximating solutions to first- and second-order {ODE}s}.  Texas
@@ -462,10 +462,22 @@ Newmark~NM.\,~  A method of computation for structural dynamics.
   \textrm{Journal of the Engineering Mechanics Division, Proceedings of the
   American Society of Civil Engineers}. \textrm{1959};EM 3:67--94.
 
+\bibitem{Onate09}
+O{\~n}ate~E.\,\,  Structural analysis with the finite element method. linear
+  statics.~ Barcelona: Springer;  2009. (Lecture Notes on Numerical Methods in
+  Engineering and Sciences;  vol. 1. Basis and Solids).
+
 \bibitem{Mousavietal10}
 Mousavi~SE,\ Xiao~H,\ Sukumar~N.\,~  Generalized {G}aussian quadrature rules on
   arbitrary polygons.  \textrm{International Journal for Numerical Methods in
   Engineering}. \textrm{2010};82:99--113.
+
+\bibitem{Chakrabortyetal18}
+Chakraborty~S,\ Natarajan~S,\ Singh~S,\ Mahapatra~DR,\ Bordas~SPA.\,~  Optimal
+  numerical integration schemes for a family of polygonal finite elements with
+  {S}chwarz-{C}hristoffel conformal mapping.  \textrm{International Journal for
+  Computational Methods in Engineering Science and Mechanics}.
+  \textrm{2018};19:283--304.
 
 \bibitem{Archer65}
 Archer~JS.\,~  Consistent matrix formulations for structural analysis using
@@ -475,6 +487,10 @@ Archer~JS.\,~  Consistent matrix formulations for structural analysis using
 \bibitem{Reddy93}
 Reddy~JN.\,\,  An introduction to the finite element method. 2nd ed.~
   McGraw-Hill, Inc.: McGraw.Hill series in mechanical engineering;  1993.
+
+\bibitem{ClaytonChung18}
+Clayton~JD,\ Chung~PW.\,\,  Applied finite element methods: Lecture notes on
+  principles and procedures.~ CreateSpace;  2018.
 
 \bibitem{Yangetal10}
 Y.~Xiu-ying~GJ~Z. Jin-ch.\,~  Stiffness matrix derivation of space beam element
