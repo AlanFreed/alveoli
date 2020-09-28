@@ -5,7 +5,7 @@ This analysis tool, which models alveolar geometry as a dodecahedron, requires n
 
 \section{ODE Solvers}
 
-The constitutive equations used to describe our alveolar model present themselves as ordinary differential equations that need to be integrated, cf.\ \S\ref{secFE_CE}.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} suitable for solving stiff systems of first- and second-order differential equations.  These methods are based upon Gear's well-known, second-order, backward, difference formula (BDF2) that appears in Eqns.~(\ref{1stOrderCorrector} \& \ref{velocityCorrector}) below.
+The constitutive equations used to describe our alveolar model present themselves as ordinary differential equations that need to be integrated, cf.\ \S\ref{secAlveolus}.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} suitable for solving stiff systems of first- and second-order differential equations.  These methods are based upon Gear's well-known, second-order, backward, difference formula (BDF2) that appears in Eqns.~(\ref{1stOrderCorrector} \& \ref{velocityCorrector}) below.
 
 Time $t$ is considered to be the independent variable, discretized over an interval in time $[t_0, t_I]$ for which $I$ solutions are to be extracted at nodes $i=1, 2, \ldots, I$ spaced at uniform intervals in time with a common step size of $\mathrm{d}t = (t_I - t_0)/I$ separating them, where time $t_0$ associates with the initial condition.
 
@@ -41,7 +41,7 @@ Multi-step methods are not self starting.  As such, Heun's method (a forward-Eul
     \label{startUp1stReEvaluate}
     \end{align}
 \end{subequations}
-wherein $\dot{\mathbf{y}}_0 = \mathbf{f}(\mathbf{x}_0, \mathbf{y}_0) \, \dot{\mathbf{x}}_0$.  Its predictor is the forward Euler method, while its corrector is the trapezoidal rule.  The order of accuracy for a method (the exponent on $\mathrm{d}t$ in $\mathcal{O}$), as they appear in the above big $\mathcal{O}$ operators, pertains to a single step of integration.  The overall order of the integrator, when integrated over a sequence of steps, is one less than the exponent inside the $\mathcal{O}$ operator.  Therefore, Euler's method is first-order accurate, and the trapezoidal method is second-order accurate.
+wherein $\dot{\mathbf{y}}_0 = \mathbf{f}(\mathbf{x}_0, \mathbf{y}_0) \, \dot{\mathbf{x}}_0$.  Its predictor is the forward Euler method, while its corrector is the trapezoidal rule.  The order of accuracy for a method (the exponent on $\mathrm{d}t$ in $\mathcal{O}$), as they appear in the above big~oh operators, $\mathcal{O}$, pertains to a single step of integration.  The overall order of the integrator, when integrated over a sequence of steps, is one less than the exponent inside the $\mathcal{O}$ operator.  Therefore, Euler's method is first-order accurate, and the trapezoidal method is second-order accurate.
 
 \subsubsection{Two-Step ODE Solver}
 
@@ -74,7 +74,7 @@ whose corrector is the well-known BDF2 formula made popular by Gear, for which F
 
 Both the predictor and corrector of this PECE scheme have a solution $\mathbf{y}$ with a weight of 1, and a rate $\dot{\mathbf{y}}$ with a weight of $\tfrac{2}{3} \mathrm{d}t$; hence, this predictor\slash corrector pair is internally consistent, i.e., the predictor and corrector will produce the same result whenever they integrate over a constant $\dot{\mathbf{y}}$ field. 
 
-The correct\slash re-evaluate (CE) steps of a PECE method are often iterated over until a convergence criterion is satisfied.  Such methods are typically denoted as $\text{PE}(\text{CE})^m$, where $m$ specifies the number of iterations imposed.
+The evaluate\slash correct (EC) steps of a PECE method are often iterated over until a convergence criterion is satisfied.  Such methods are typically denoted as $\text{P}(\text{EC})^m \text{E}$, where $m$ specifies the number of iterations imposed.
 
 
 \subsection{A Relevant Example}
@@ -97,7 +97,7 @@ where $\eta$ is entropy and the rest of its constituents are stress attributes. 
 \boldsymbol{\epsilon}_{2D} = \{ \theta , \xi , \varepsilon , \gamma \}^{\mathsf{T}} , \quad
 \boldsymbol{\epsilon}_{3D} = \{ \theta , \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 \}^{\mathsf{T}}
 \end{displaymath}
-where $\theta$ is temperature and the rest of its constituents are strain attributes.  In the 2- and 3-D cases, these stress\slash strain attributes arise from Gram-Schmidt decompositions of their respective deformation gradients (cf.\ Sections~\ref{secQR2D}, \ref{secConjugatePairs} and \ref{secFE_CE}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\epsilon} , \boldsymbol{\sigma} )$ is the topic of Part~\ref{partConstitutive}.  Both strain $\boldsymbol{\epsilon}$ and stress $\boldsymbol{\sigma}$ appear as arguments in our tangent moduli.
+where $\theta$ is temperature and the rest of its constituents are strain attributes.  In the 2- and 3-D cases, these stress\slash strain attributes arise from Gram-Schmidt decompositions of their respective deformation gradients (cf.\ Sections~\ref{secQR2D} \& \ref{secConjugatePairs}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\epsilon} , \boldsymbol{\sigma} )$ is the topic of Part~\ref{partConstitutive}.  Both strain $\boldsymbol{\epsilon}$ and stress $\boldsymbol{\sigma}$ appear as arguments in our tangent moduli.
 
 Equation (\ref{startUp1stOrderODEs}) is used to take the first step of integration; specifcally, 
 \begin{subequations}
@@ -135,7 +135,7 @@ where $\dot{\boldsymbol{\sigma}}_0 = \mathbf{M} ( \boldsymbol{\epsilon}_0 , \bol
     \boldsymbol{\sigma}_{i+1} ) \, \dot{\boldsymbol{\epsilon}}_{i+1}
     \end{align}
 \end{subequations} 
-whose strain rates $\dot{\boldsymbol{\epsilon}}$ are computed according to \S\ref{secFE_CE}.
+whose strain rates $\dot{\boldsymbol{\epsilon}}$ are computed according to \S\ref{strainsAndStrainRates3D}.
 
 
 \subsection{PECE Solver for Second-Order ODEs}
@@ -322,7 +322,7 @@ We observe that the mass matrix must not be ill conditioned in order for this al
 \section{Quadrature Rules for Spatial Integration}
 \label{sec:Gauss}
 
-In a general finite element setting, information comes into an element via its nodes.  Once there, it gets interpolated to its interior Gauss points where constitutive equations are solved and spatial integrations occur.  In some applications, and in particular, ours, one also needs to be able to take fields, in our case the stress and entropy whose constitutive equations have been integrated at the Gauss points of an element, and extrapolate this information back out to the exterior nodes of the element.
+In a general finite element setting, information comes into an element via its nodes.  Once there, it gets interpolated into its interior Gauss points, where the constitutive equations are solved and spatial integrations occur.  In some applications, and in particular, in ours, one also needs to be able to take fields (in our case stress) whose constitutive equations have been integrated at the Gauss points of an element, and extrapolate this information back out to the exterior nodes of the element.
 
 Particular to our application, a suite of nodes is common betwixt three, separate, finite-element models that share twenty common vertices.  These vertices establish the geometry of a dodecahedron used as the model for a micro\-scopic alveolus.  The resultant micro\-scopic force at each vertex arises from: \textit{i\/}) a finite element model of thirty 1D rods representing the alveolar chords, \textit{ii\/}) a finite element model of twelve 2D pentagons representing the alveolar membranes, and \textit{iii\/}) a finite element model of sixty 3D tetrahedra representing the alveolar sac.  The micro\-scopic forces coming from these three geometric models are summed at their twenty common vertices. These resultant micro\-scopic forces are then collectively homo\-genized to yield an averaged macro\-scopic state of stress at a chosen location in the parenchyma.  
 
@@ -367,9 +367,9 @@ Shape functions are introduced for interpolating within an element; specifically
     \label{extrapolationConstraint4}
     \end{align}
 \end{subequations}
-which follow upon substituting Eqn.~(\ref{extrapolation}) into Eqn.~(\ref{interpolation}), or vice versa.  In this regard, such a pair of interpolation\slash extrapolation functions are said to be self consistent.  In other words, if a field whose values are known at the nodal points is interpolated down to the Gauss points, and then extrapolated back out to the nodal points, then the outgoing values to the nodes will equal the incoming values from the nodes.  The overall process is therefore self consistent.  As straight\-forward as this procedure is, we found no satisfactory explanation of it in a finite element text.
+which follow from substituting Eqn.~(\ref{extrapolation}) into Eqn.~(\ref{interpolation}), or vice versa.  In this regard, such a pair of interpolation\slash extrapolation functions are said to be self consistent.  In other words, if a field whose values are known at the nodal points is interpolated down to the Gauss points, and then extrapolated back out to the nodal points, then the outgoing values located at the nodes will equal their incoming values at these nodes.  The overall process is therefore self consistent.  As straight\-forward as this procedure is, we found no satisfactory explanation of it in a finite element text.
 
-Whenever $m=n$, the matrices that come about from the interpolation and extrapolation coefficients are reciprocal to one another, with the 0's and 1's of Eqns.~(\ref{extrapolationConstraint1} \& \ref{extrapolationConstraint3} or \ref{extrapolationConstraint2} \& \ref{extrapolationConstraint4}) associating with the individual components of an identity matrix.  Consequently, our need to extrapolate information as-well-as interpolate it strongly suggests that the number of Gauss points selected ought to equal the number of nodal points required for a given element geometry, albeit this is not a strict requirement for self consistency.
+Whenever $m=n$, the matrices that come about from the interpolation and extrapolation coefficients are reciprocal to one another, with the 0's and 1's of Eqns.~(\ref{extrapolationConstraint1} \& \ref{extrapolationConstraint3} or \ref{extrapolationConstraint2} \& \ref{extrapolationConstraint4}) associating with the individual components of an identity matrix.  Consequently, our need to extrapolate information as-well-as interpolate it strongly suggests that the number of Gauss points selected ought to equal the number of nodal points associated with a given element geometry, albeit this is not a strict requirement for self consistency.
 
 As an example, a self-consistent strategy for a tetrahedron interpolates via
 \begin{subequations}
@@ -463,7 +463,7 @@ This extrapolation matrix can be found in O{\~n}ate \cite[pg.~332]{Onate09}.  As
             \hline
         \end{tabular}
     \end{center}
-    \caption{A quadrature rule for integrating functions over the length of a line.  This quadrature rule approximates $\int_{-1}^1 f(\xi) \, \mathrm{d}\xi$ using two Gauss points, i.e., $\int_{-1}^1 f(\xi) \, \mathrm{d}\xi \approx \sum_{i=1}^2 w_i f(\xi_i)$.  The weights of quadrature $w_i$ sum to its length, because $L = \int_{-1}^1 \mathrm{d} \xi = 2$.  This quadrature rule is due to Christoffel.  It integrates polynomials along a line exactly up through second order.}
+    \caption{A quadrature rule for integrating functions over a length of line.  This quadrature rule approximates $\int_{-1}^1 f(\xi) \, \mathrm{d}\xi$ using two Gauss points, i.e., $\int_{-1}^1 f(\xi) \, \mathrm{d}\xi \approx \sum_{i=1}^2 w_i f(\xi_i)$.  The weights of quadrature $w_i$ sum to its length, because $L = \int_{-1}^1 \mathrm{d} \xi = 2$.  This quadrature rule is due to Christoffel.  It integrates polynomials along a line exactly up through second order.}
     \label{tab:2nodeRod}
 \end{table}
 
@@ -516,6 +516,95 @@ As a check, each row in both matrices sums to 1 and, as expected, these matrices
     \caption{A simple quadrature rule for integrating functions over the area of a triangle.  This quadrature rule approximates $\int_0^1 \int_0^{1-\xi} f(\xi , \eta) \, \mathrm{d} \eta \, \mathrm{d} \xi$  using three Gauss points, i.e., $\int_0^1 \int_0^{1-\xi} f(\xi , \eta) \, \mathrm{d} \eta \, \mathrm{d} \xi \approx \sum_{i=1}^3 w_i f(\xi_i , \eta_i )$.  The weights of quadrature $w_i$ sum to its area, because $A = \int_0^1 \int_0^{1-\xi} \mathrm{d}\eta \, \mathrm{d} \xi = \textfrac{1}{2}$.  This quadrature rule is due to Strang.  It integrates polynomials over a triangular region exactly up through second order. As a point of reference, its centroid has co-ordinates (\textfrac{1}{3}, \textfrac{1}{3}).}
     \label{tab:3nodeTriangle}
 \end{table}
+    
+\subsubsection{Self-Consistent Interpolation\slash Extrapolation Procedures for Pentagons}
+    \label{secPentagonGaussPts}
+    
+    We only know of two papers where quadrature formul\ae\ have been derived for integrating over the area of a pentagon. \cite{Mousavietal10,Chakrabortyetal18}  Neither presents tables for their nodes and weights of quadrature.  Only mathematical methodologies are provided, from which one can numerically construct such tables.  More importantly, for our application, neither of their strategies exploits the symmetry properties of a pentagon.  Their formul\ae, which can be highly accurate, unfortunately do not meet our needs. 
+    
+    Because we seek a quadrature rule for regular pentagons that employs five Gauss points, and pentagons posses five radial lines of symmetry, it is reasonable to consider that the five nodes of quadrature that we seek lie along these five radial lines.  Specifically, we seek a quadrature rule for a pentagon whose nodes are located at $\boldsymbol{x}_i$, $i=1,2,\ldots,5$, and whose Gauss points are located at $\boldsymbol{\xi}_i$, $i=1,2,\ldots,5$, with
+    \begin{subequations}
+        \label{pentagonCoordinates}
+        \begin{align}
+        \boldsymbol{x}_1 & = \bigl( \cos ( \textfrac{\pi}{2} ) ,
+        \sin ( \textfrac{\pi}{2} ) \bigr) & \boldsymbol{\xi}_1 & = \ell \boldsymbol{x}_1 \\
+        \boldsymbol{x}_2 & = \bigl( \cos ( \textfrac{9\pi}{10}) ,
+        \sin ( \textfrac{9\pi}{10} ) \bigr) & \boldsymbol{\xi}_2 & = \ell \boldsymbol{x}_2 \\
+        \boldsymbol{x}_3 & = \bigl( \cos ( \textfrac{13\pi}{10}) ,
+        \sin ( \textfrac{13\pi}{10} ) \bigr) & \boldsymbol{\xi}_3 & = \ell \boldsymbol{x}_3 \\
+        \boldsymbol{x}_4 & = \bigl( \cos ( \textfrac{17\pi}{10}) ,
+        \sin ( \textfrac{17\pi}{10} ) \bigr) & \boldsymbol{\xi}_4 & = \ell \boldsymbol{x}_4 \\
+        \boldsymbol{x}_5 & = \bigl( \cos ( \textfrac{\pi}{10}) ,
+        \sin ( \textfrac{\pi}{10} ) \bigr) & \boldsymbol{\xi}_5 & = \ell \boldsymbol{x}_5
+        \end{align}
+    \end{subequations}
+    where lines radiating from the origin out to each vertex $\boldsymbol{x}_i$ have unit length, while the lines that radiate out to the Gauss points $\boldsymbol{\xi}_i$ each have a shorter length of $\ell$.
+    
+    Implementing the strategies that underlie Gauss quadrature, length $\ell$ represents a distance from the pentagon's centroid out to the centroid of a quadrilateral.  In our case, this area (one of five equivalent areas) is a four-sided polygon whose apex has an inside angle of $108^{\circ}$, whose two shoulders have right angles, while the inside angle is $72^{\circ}$ at the origin.  A little bit of algebra and geometry leads to the result
+    \begin{subequations}
+        \label{pentagonQuadrature}
+        \begin{align}
+        \ell & = \frac{1 + \sin ( \textfrac{3\pi}{10} )}
+        {3 \sin ( \textfrac{3\pi}{10} ) } \approx 0.7454 \\
+        \intertext{whose area becomes the associated weight of quadrature, it being}
+        w & = \sin ( \textfrac{3\pi}{10} ) \cos ( \textfrac{3\pi}{10} ) 
+        \approx 0.4755 
+        \end{align}
+    \end{subequations}
+    which is one-fifth the area of a regular pentagon, cf.\ Eqn.~(\ref{regPentagonArea}).  To the best of our knowledge, the quadrature rule put forward in Eqns.~(\ref{pentagonCoordinates} \& \ref{pentagonQuadrature}) for pentagons is new to the literature. 
+    
+    Interpolation is described through shape functions.  Adopting the shape functions of Wachspress, which are constructed in \S\ref{secShapeFns} for a pentagon, while using the quadrature rule of Eqns.~(\ref{pentagonCoordinates} \& \ref{pentagonQuadrature}), results in a symmetric interpolation map of
+    \begin{subequations}
+        \label{extrapolationPentagon}
+        \begin{align} 
+        \left\{ \begin{matrix}
+        f ( \boldsymbol{\xi}_1 ) \\ 
+        f ( \boldsymbol{\xi}_2 ) \\ 
+        f ( \boldsymbol{\xi}_3 ) \\ 
+        f ( \boldsymbol{\xi}_4 ) \\ 
+        f ( \boldsymbol{\xi}_5 )
+        \end{matrix} \right\} & = \begin{bmatrix}
+        a & b & c & c & b \\
+        b & a & b & c & c \\
+        c & b & a & b & c \\
+        c & c & b & a & b \\
+        b & c & c & b & a
+        \end{bmatrix} 
+        \left\{ \begin{matrix} 
+        f ( \boldsymbol{x}_1 ) \\ 
+        f ( \boldsymbol{x}_2 ) \\ 
+        f ( \boldsymbol{x}_3 ) \\
+        f ( \boldsymbol{x}_4 ) \\
+        f ( \boldsymbol{x}_5 )
+        \end{matrix} \right\} \\
+        \intertext{whose matrix elements are $a = 0.6901471673508344$, $b = 0.1367959452017669$ and $c = 0.0181304711228159$, and whose paired extrapolation map is}
+        \left\{ \begin{matrix} 
+        f ( \boldsymbol{x}_1 ) \\ 
+        f ( \boldsymbol{x}_2 ) \\ 
+        f ( \boldsymbol{x}_3 ) \\
+        f ( \boldsymbol{x}_4 ) \\
+        f ( \boldsymbol{x}_5 )
+        \end{matrix} \right\} & = \frac{1}{\Delta} \begin{bmatrix}
+        x & y & z & z & y \\
+        y & x & y & z & z \\
+        z & y & x & y & z \\
+        z & z & y & x & y \\
+        y & z & z & y & x
+        \end{bmatrix} \left\{ \begin{matrix}
+        f ( \boldsymbol{\xi}_1 ) \\ 
+        f ( \boldsymbol{\xi}_2 ) \\ 
+        f ( \boldsymbol{\xi}_3 ) \\ 
+        f ( \boldsymbol{\xi}_4 ) \\ 
+        f ( \boldsymbol{\xi}_5 )
+        \end{matrix} \right\}  \\
+        \intertext{wherein}
+        x & = a^2 + (a-b)(b+c) - c^2 \\
+        y & = (b+c)c - (a+b)b \\
+        z & = b^2 - (a-b)c - c^2 \\
+        \Delta & = a^2 - (a+b)b - (a-3b)c - c^2
+        \end{align}
+    \end{subequations}
+    where, as a check, $\sum_{i=1}^5 N_i (\boldsymbol{\xi}_j) = 1$ and $\sum_{i=1}^5 M_i (\boldsymbol{x}_j) = 1$ for $j=1,2,\ldots,5$, and therefore, $a + 2(b + c) = 1$ and $x + 2(y + z) = \Delta$.  Furthermore, these coefficient matrices for interpolation and extrapolation are inverses to one another.  
     
 \subsubsection{Self-Consistent Interpolation\slash Extrapolation Procedures for Tetrahedra}
     
@@ -573,94 +662,6 @@ where $a = 0.1381966011250105$ and $b = 0.5854101966249685$ from Table~\ref{tab:
     \caption{A simple quadrature rule for integrating functions over the volume of a tetrahedron.  This quadrature rule approximates $\int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} f(\xi, \eta, \zeta) \, \mathrm{d}\zeta \, \mathrm{d}\eta \, \mathrm{d}\xi$ using four Gauss points, i.e., $\int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} f(\xi, \eta, \zeta) \, \mathrm{d}\zeta \, \mathrm{d}\eta \, \mathrm{d}\xi \approx \sum_{i=1}^4 w_i f( \xi_i , \eta_i , \zeta_i )$.  The weights of quadrature $w_i$ sum to its volume, because $V = \int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} \mathrm{d}\zeta \, \mathrm{d}\eta \, \mathrm{d}\xi = \textfrac{1}{6}$.  This quadrature rule is due to Keast.  It integrates polynomials over a tetrahedral region exactly up through second order.  As a point of reference, its centroid has co-ordinates (\textfrac{1}{4}, \textfrac{1}{4}, \textfrac{1}{4}).}
     \label{tab:4nodedTet}
 \end{table}
-
-\subsubsection{Self-Consistent Interpolation\slash Extrapolation Procedures for Pentagons}
-
-We only know of two papers where quadrature formul\ae\ have been derived for integrating over the area of a pentagon. \cite{Mousavietal10,Chakrabortyetal18}  Neither presents tables for their nodes and weights of quadrature.  Only mathematical methodologies are provided, from which one can numerically construct such tables.  More importantly, for our application, neither of their strategies exploits the symmetry properties of a pentagon.  Their formul\ae, which can be highly accurate, unfortunately do not meet our needs. 
-
-Because we seek a quadrature rule for regular pentagons that employs five Gauss points, and pentagons posses five radial lines of symmetry, it is reasonable to consider that the five nodes of quadrature that we seek lie along these five radial lines.  Specifically, we seek a quadrature rule for a pentagon whose nodes are located at $\boldsymbol{x}_i$, $i=1,2,\ldots,5$, and whose Gauss points are located at $\boldsymbol{\xi}_i$, $i=1,2,\ldots,5$, with
-\begin{subequations}
-    \label{pentagonCoordinates}
-    \begin{align}
-    \boldsymbol{x}_1 & = \bigl( \cos ( \textfrac{\pi}{2} ) ,
-        \sin ( \textfrac{\pi}{2} ) \bigr) & \boldsymbol{\xi}_1 & = \ell \boldsymbol{x}_1 \\
-    \boldsymbol{x}_2 & = \bigl( \cos ( \textfrac{9\pi}{10}) ,
-    \sin ( \textfrac{9\pi}{10} ) \bigr) & \boldsymbol{\xi}_2 & = \ell \boldsymbol{x}_2 \\
-    \boldsymbol{x}_3 & = \bigl( \cos ( \textfrac{13\pi}{10}) ,
-    \sin ( \textfrac{13\pi}{10} ) \bigr) & \boldsymbol{\xi}_3 & = \ell \boldsymbol{x}_3 \\
-    \boldsymbol{x}_4 & = \bigl( \cos ( \textfrac{17\pi}{10}) ,
-    \sin ( \textfrac{17\pi}{10} ) \bigr) & \boldsymbol{\xi}_4 & = \ell \boldsymbol{x}_4 \\
-    \boldsymbol{x}_5 & = \bigl( \cos ( \textfrac{\pi}{10}) ,
-    \sin ( \textfrac{\pi}{10} ) \bigr) & \boldsymbol{\xi}_5 & = \ell \boldsymbol{x}_5
-    \end{align}
-\end{subequations}
-where lines radiating from the origin out to each vertex $\boldsymbol{x}_i$ have unit length, while the lines that radiate out to the Gauss points $\boldsymbol{\xi}_i$ each have a shorter length of $\ell$.
-
-Implementing the strategies that underlie Gauss quadrature, length $\ell$ represents a distance from the pentagon's centroid out to the centroid of a quadrilateral.  In our case, this area (one of five equivalent areas) is a four-sided polygon whose apex has an inside angle of $108^{\circ}$, whose two shoulders have right angles, and whose inside angle at the origin is $72^{\circ}$.  A little bit of algebra and geometry leads to the result
-\begin{subequations}
-    \label{pentagonQuadrature}
-    \begin{align}
-    \ell & = \frac{1 + \sin ( \textfrac{3\pi}{10} )}
-    {3 \sin ( \textfrac{3\pi}{10} ) } \approx 0.7454 \\
-    \intertext{whose area becomes the associated weight of quadrature}
-    w & = \sin ( \textfrac{3\pi}{10} ) \cos ( \textfrac{3\pi}{10} ) 
-    \approx 0.4755 
-    \end{align}
-\end{subequations}
-which is one-fifth the area of a regular pentagon, cf.\ Eqn.~(\ref{regPentagonArea}).  To the best of our knowledge, the quadrature rule put forward in Eqns.~(\ref{pentagonCoordinates} \& \ref{pentagonQuadrature}) for pentagons is new to the literature. 
-
-Interpolation is described through shape functions.  Adopting the shape functions of Wachspress, which are constructed in \S\ref{secShapeFns} for a pentagon, while using the quadrature rule of Eqns.~(\ref{pentagonCoordinates} \& \ref{pentagonQuadrature}), results in a symmetric interpolation map of
-\begin{subequations}
-    \label{extrapolationPentagon}
-    \begin{align} 
-    \left\{ \begin{matrix}
-    f ( \boldsymbol{\xi}_1 ) \\ 
-    f ( \boldsymbol{\xi}_2 ) \\ 
-    f ( \boldsymbol{\xi}_3 ) \\ 
-    f ( \boldsymbol{\xi}_4 ) \\ 
-    f ( \boldsymbol{\xi}_5 )
-    \end{matrix} \right\} & = \begin{bmatrix}
-    a & b & c & c & b \\
-    b & a & b & c & c \\
-    c & b & a & b & c \\
-    c & c & b & a & b \\
-    b & c & c & b & a
-    \end{bmatrix} 
-    \left\{ \begin{matrix} 
-    f ( \boldsymbol{x}_1 ) \\ 
-    f ( \boldsymbol{x}_2 ) \\ 
-    f ( \boldsymbol{x}_3 ) \\
-    f ( \boldsymbol{x}_4 ) \\
-    f ( \boldsymbol{x}_5 )
-    \end{matrix} \right\} \\
-    \intertext{whose matrix elements are $a = 0.6901471673508344$, $b = 0.1367959452017669$ and $c = 0.0181304711228159$, and whose paired extrapolation map is}
-    \left\{ \begin{matrix} 
-    f ( \boldsymbol{x}_1 ) \\ 
-    f ( \boldsymbol{x}_2 ) \\ 
-    f ( \boldsymbol{x}_3 ) \\
-    f ( \boldsymbol{x}_4 ) \\
-    f ( \boldsymbol{x}_5 )
-    \end{matrix} \right\} & = \frac{1}{\Delta} \begin{bmatrix}
-    x & y & z & z & y \\
-    y & x & y & z & z \\
-    z & y & x & y & z \\
-    z & z & y & x & y \\
-    y & z & z & y & x
-    \end{bmatrix} \left\{ \begin{matrix}
-    f ( \boldsymbol{\xi}_1 ) \\ 
-    f ( \boldsymbol{\xi}_2 ) \\ 
-    f ( \boldsymbol{\xi}_3 ) \\ 
-    f ( \boldsymbol{\xi}_4 ) \\ 
-    f ( \boldsymbol{\xi}_5 )
-    \end{matrix} \right\}  \\
-    \intertext{wherein}
-    x & = a^2 + (a-b)(b+c) - c^2 \\
-    y & = (b+c)c - (a+b)b \\
-    z & = b^2 - (a-b)c - c^2 \\
-    \Delta & = a^2 - (a+b)b - (a-3b)c - c^2
-    \end{align}
-\end{subequations}
-where, as a check, $\sum_{i=1}^5 N_i (\boldsymbol{\xi}_j) = 1$ and $\sum_{i=1}^5 M_i (\boldsymbol{x}_j) = 1$ for $j=1,2,\ldots,5$, and therefore, $a + 2(b + c) = 1$ and $x + 2(y + z) = \Delta$.  Furthermore, these coefficient matrices for interpolation and extrapolation are inverses to one another.  
 
 
 \subsection{Converting Nodal Stresses into Nodal Forces}
