@@ -17,6 +17,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import rc
 from pylab import rcParams
+from pivotIncomingF import Pivot
 
 
 def run():
@@ -27,16 +28,41 @@ def run():
     # basic properties for creating the figures
 
     steps = 150
-    gaussPts = 1
     maxSqueeze = 3.5
 
+    # impose a far-field deformation history
+    F0 = np.eye(3, dtype=float)
+    F1 = np.copy(F0)
+    F1[0, 0] += 0.01
+    F1[1, 1] -= 0.01
+    F1[1, 0] -= 0.01
+    F1[2, 0] += 0.01
+    F2 = np.copy(F1)
+    F2[0, 0] += 0.01
+    F2[1, 1] -= 0.01
+    F2[0, 1] += 0.02
+    F2[2, 0] += 0.01
+    F3 = np.copy(F2)
+    F3[0, 0] += 0.02
+    F3[1, 1] -= 0.02
+    F3[0, 2] -= 0.01
+    F3[2, 1] += 0.02
+
+    # re-index the co-ordinate systems according to pivot in pivotIncomingF.py
+    pi = Pivot(F0)
+    pi.update(F1)
+    pi.advance()
+    pi.update(F2)
+    pi.advance()
+    pi.update(F3)
+    # get this histories re-indexed deformation gradients
+    piF0 = pi.pivotedF('ref')    
     # squeeze: 1-2
 
     strain = np.zeros((steps, 30), dtype=float)
     dilation = np.zeros((steps, 12), dtype=float)
     squeeze = np.zeros(steps, dtype=float)
-    F = np.eye(3, dtype=float)
-    d = dodecahedron(gaussPts, gaussPts, gaussPts, F)
+    d = dodecahedron(piF0)
     for i in range(steps):
         for j in range(1, 31):
             c = d.getChord(j)
@@ -44,11 +70,11 @@ def run():
         for j in range(1, 13):
             p = d.getPentagon(j)
             dilation[i, j-1] = p.arealStrain('curr')
-        F[0, 0] += maxSqueeze / steps
-        F[1, 1] = 1.0 / F[0, 0]
-        squeeze[i] = m.log((F[0, 0] / F[1, 1])**(1.0/3.0))
-        d.update(F)
-        d.advance()
+        piF0[0, 0] += maxSqueeze / steps
+        piF0[1, 1] = 1.0 / piF0[0, 0]
+        squeeze[i] = m.log((piF0[0, 0] / piF0[1, 1])**(1.0/3.0))
+        d.update(piF0)
+        d.advance(pi)
     strain1 = np.zeros(steps, dtype=float)
     strain1[:] = strain[:, 0]
     strain2 = np.zeros(steps, dtype=float)
@@ -113,11 +139,38 @@ def run():
 
     # squeeze: 1-3
 
+    # impose a far-field deformation history
+    F0 = np.eye(3, dtype=float)
+    F1 = np.copy(F0)
+    F1[0, 0] += 0.01
+    F1[1, 1] -= 0.01
+    F1[1, 0] -= 0.01
+    F1[2, 0] += 0.01
+    F2 = np.copy(F1)
+    F2[0, 0] += 0.01
+    F2[1, 1] -= 0.01
+    F2[0, 1] += 0.02
+    F2[2, 0] += 0.01
+    F3 = np.copy(F2)
+    F3[0, 0] += 0.02
+    F3[1, 1] -= 0.02
+    F3[0, 2] -= 0.01
+    F3[2, 1] += 0.02
+
+    # re-index the co-ordinate systems according to pivot in pivotIncomingF.py
+    pi = Pivot(F0)
+    pi.update(F1)
+    pi.advance()
+    pi.update(F2)
+    pi.advance()
+    pi.update(F3)
+    # get this histories re-indexed deformation gradients
+    piF0 = pi.pivotedF('ref') 
+    
     strain = np.zeros((steps, 30), dtype=float)
     dilation = np.zeros((steps, 12), dtype=float)
     squeeze = np.zeros(steps, dtype=float)
-    F = np.eye(3, dtype=float)
-    d = dodecahedron(gaussPts, gaussPts, gaussPts, F)
+    d = dodecahedron(piF0)
     for i in range(steps):
         for j in range(1, 31):
             c = d.getChord(j)
@@ -125,11 +178,11 @@ def run():
         for j in range(1, 13):
             p = d.getPentagon(j)
             dilation[i, j-1] = p.arealStrain('curr')
-        F[2, 2] += maxSqueeze / steps
-        F[0, 0] = 1.0 / F[2, 2]
-        squeeze[i] = m.log((F[2, 2] / F[0, 0])**(1.0/3.0))
-        d.update(F)
-        d.advance()
+        piF0[2, 2] += maxSqueeze / steps
+        piF0[0, 0] = 1.0 / piF0[2, 2]
+        squeeze[i] = m.log((piF0[2, 2] / piF0[0, 0])**(1.0/3.0))
+        d.update(piF0)
+        d.advance(pi)
     strain1 = np.zeros(steps, dtype=float)
     strain1[:] = strain[:, 0]
     strain2 = np.zeros(steps, dtype=float)
@@ -194,11 +247,39 @@ def run():
 
     # squeeze: 2-3
 
+    # impose a far-field deformation history
+    F0 = np.eye(3, dtype=float)
+    F1 = np.copy(F0)
+    F1[0, 0] += 0.01
+    F1[1, 1] -= 0.01
+    F1[1, 0] -= 0.01
+    F1[2, 0] += 0.01
+    F2 = np.copy(F1)
+    F2[0, 0] += 0.01
+    F2[1, 1] -= 0.01
+    F2[0, 1] += 0.02
+    F2[2, 0] += 0.01
+    F3 = np.copy(F2)
+    F3[0, 0] += 0.02
+    F3[1, 1] -= 0.02
+    F3[0, 2] -= 0.01
+    F3[2, 1] += 0.02
+
+    # re-index the co-ordinate systems according to pivot in pivotIncomingF.py
+    pi = Pivot(F0)
+    pi.update(F1)
+    pi.advance()
+    pi.update(F2)
+    pi.advance()
+    pi.update(F3)
+    # get this histories re-indexed deformation gradients
+    piF0 = pi.pivotedF('ref') 
+    
     strain = np.zeros((steps, 30), dtype=float)
     dilation = np.zeros((steps, 12), dtype=float)
     squeeze = np.zeros(steps, dtype=float)
-    F = np.eye(3, dtype=float)
-    d = dodecahedron(gaussPts, gaussPts, gaussPts, F)
+    piF0 = np.eye(3, dtype=float)
+    d = dodecahedron(piF0)
     for i in range(steps):
         for j in range(1, 31):
             c = d.getChord(j)
@@ -206,11 +287,11 @@ def run():
         for j in range(1, 13):
             p = d.getPentagon(j)
             dilation[i, j-1] = p.arealStrain('curr')
-        F[1, 1] += maxSqueeze / steps
-        F[2, 2] = 1.0 / F[1, 1]
-        squeeze[i] = m.log((F[1, 1] / F[2, 2])**(1.0/3.0))
-        d.update(F)
-        d.advance()
+        piF0[1, 1] += maxSqueeze / steps
+        piF0[2, 2] = 1.0 / piF0[1, 1]
+        squeeze[i] = m.log((piF0[1, 1] / piF0[2, 2])**(1.0/3.0))
+        d.update(piF0)
+        d.advance(pi)
     strain1 = np.zeros(steps, dtype=float)
     strain1[:] = strain[:, 0]
     strain2 = np.zeros(steps, dtype=float)

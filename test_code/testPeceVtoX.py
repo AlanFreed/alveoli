@@ -4,7 +4,7 @@
 """
     author:  Prof. Alan Freed, Texas A&M University
     date:    June 17, 2017
-    update:  April 20, 2020
+    update:  Oct 20, 2020
 
     This problem is known as the Brusselator:
 

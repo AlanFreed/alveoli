@@ -3,6 +3,7 @@
 
 import numpy as np
 from membranes import membrane
+from pivotIncomingF import Pivot
 
 """
 Created on Sat Apr 30 2019
@@ -20,6 +21,7 @@ def run():
 
     # consider uniform dilation
     print('The case of uniform dilation.\n')
+    # F0 = np.eye(3, dtype=float)
     m = membrane(h)
     F1 = np.array([[1.1, 0.0],
                    [0.0, 1.1]])
@@ -46,8 +48,6 @@ def run():
     print(m.dU('current'))
     print('\nThe inverse Laplace stretch rate is:')
     print(m.dUInv('current'))
-    print('\nThe spin is:')
-    print(m.spin('current'))
 
     print('\nThe extensive thermodynamic variables are:')
     print('   dilation = {:8.6F}'.format(m.dilation('current')))
@@ -87,8 +87,6 @@ def run():
     print(m.dU('current'))
     print('\nThe inverse Laplace stretch rate is:')
     print(m.dUInv('current'))
-    print('\nThe spin is:')
-    print(m.spin('current'))
 
     print('\nThe extensive thermodynamic variables are:')
     print('   dilation = {:8.6F}'.format(m.dilation('current')))
@@ -128,8 +126,6 @@ def run():
     print(m.dU('current'))
     print('\nThe inverse Laplace stretch rate is:')
     print(m.dUInv('current'))
-    print('\nThe spin is:')
-    print(m.spin('current'))
 
     print('\nThe extensive thermodynamic variables are:')
     print('   dilation = {:8.6F}'.format(m.dilation('current')))
@@ -169,8 +165,6 @@ def run():
     print(m.dU('current'))
     print('\nThe inverse Laplace stretch rate is:')
     print(m.dUInv('current'))
-    print('\nThe spin is:')
-    print(m.spin('current'))
 
     print('\nThe extensive thermodynamic variables are:')
     print('   dilation = {:8.6F}'.format(m.dilation('current')))

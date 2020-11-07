@@ -7,10 +7,11 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import rc
 from pylab import rcParams
+from pivotIncomingF import Pivot
 
 """
 Created on Mon Feb 04 2019
-Updated on Fri Oct 11 2019
+Updated on Fri Oct 28 2020
 
 Creates figures that examine the geometric pentagonal response vs. the thermo-
 dynamic pentagonal response during a dilatation of a regular dodecahedron into
@@ -28,9 +29,37 @@ def run():
     # basic properties for creating the figures
 
     steps = 150
-    gaussPts = 1
+    gaussPts = 5
     maxDilatation = 1.75
 
+    # impose a far-field deformation history
+    F0 = np.eye(3, dtype=float)
+    F1 = np.copy(F0)
+    F1[0, 0] += 0.01
+    F1[1, 1] -= 0.01
+    F1[1, 0] -= 0.01
+    F1[2, 0] += 0.01
+    F2 = np.copy(F1)
+    F2[0, 0] += 0.01
+    F2[1, 1] -= 0.01
+    F2[0, 1] += 0.02
+    F2[2, 0] += 0.01
+    F3 = np.copy(F2)
+    F3[0, 0] += 0.02
+    F3[1, 1] -= 0.02
+    F3[0, 2] -= 0.01
+    F3[2, 1] += 0.02
+
+    # re-index the co-ordinate systems according to pivot in pivotIncomingF.py
+    pi = Pivot(F0)
+    pi.update(F1)
+    pi.advance()
+    pi.update(F2)
+    pi.advance()
+    pi.update(F3)
+    # get this histories re-indexed deformation gradients
+    piF0 = pi.pivotedF('ref')
+    
     # far-field deformation is a dilatation
 
     dilatation = np.zeros(steps, dtype=float)
@@ -38,8 +67,7 @@ def run():
     delta = np.zeros((steps, 12), dtype=float)
     epsilon = np.zeros((steps, 12), dtype=float)
     gamma = np.zeros((steps, 12), dtype=float)
-    F = np.eye(3, dtype=float)
-    d = dodecahedron(gaussPts, gaussPts, gaussPts, F)
+    d = dodecahedron(piF0)
     for i in range(steps):
         for j in range(1, 13):
             p = d.getPentagon(j)
@@ -51,10 +79,10 @@ def run():
             gamma[i, j-1] = p.shear(gaussPts, 'curr')
         # the far-field imposed deformation
         for j in range(3):
-            F[j, j] += maxDilatation / steps
+            piF0[j, j] += maxDilatation / steps
         dilatation[i] = d.volumetricStrain('curr')
-        d.update(F)
-        d.advance()
+        d.update(piF0)
+        d.advance(pi)
     # create the arrays for plotting
     dilation1 = np.zeros(steps, dtype=float)
     dilation1[:] = dilation[:, 0]

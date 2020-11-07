@@ -3,10 +3,10 @@
 
 from ceMembranes import controlMembrane, ceMembrane
 import math
-from peceHE import pece
+from peceHE import PECE
 # for creating graphics
 from matplotlib import pyplot as plt
-# from matplotlib import ticker
+from matplotlib import ticker
 # import materialProperties as mp
 import numpy as np
 from pylab import rcParams
@@ -78,7 +78,7 @@ def run():
         # create the response object with random thickness assignment
         resp = ceMembrane()
         # create the integrator
-        solver = pece(ctrl, resp, m)
+        solver = PECE(ctrl, resp, m)
         # assign initial conditions for the plotting arrays
         e0 = solver.getE()
         y0 = solver.getYminusY0()
@@ -132,8 +132,8 @@ def run():
         respT = ceMembrane()                        # tension
         respC = ceMembrane()                        # compression
         # create the integrators
-        solverT = pece(ctrlT, respT, m)             # tension
-        solverC = pece(ctrlC, respC, m)             # compression
+        solverT = PECE(ctrlT, respT, m)             # tension
+        solverC = PECE(ctrlC, respC, m)             # compression
         # assign initial conditions for the plotting arrays
         # tension: a > b
         e0 = solverT.getE()
@@ -220,8 +220,8 @@ def run():
         respT = ceMembrane()                        # tension
         respC = ceMembrane()                        # compression
         # create the integrators
-        solverT = pece(ctrlT, respT, m)             # tension
-        solverC = pece(ctrlC, respC, m)             # compression
+        solverT = PECE(ctrlT, respT, m)             # tension
+        solverC = PECE(ctrlC, respC, m)             # compression
         # assign initial conditions for the plotting arrays
         # tension: gamma > 0
         e0 = solverT.getE()
@@ -296,7 +296,7 @@ def run():
     # the dilation experiment
 
     ax1 = plt.subplot(3, 3, 1)
-    # ax1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
+    ax1.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
     line1, = ax1.plot(xi[:, 0, 0], pi[:, 0, 0], 'k-', linewidth=2)
     line2, = ax1.plot(xi[:, 0, 1], pi[:, 0, 1], 'k-', linewidth=2)
     line3, = ax1.plot(xi[:, 0, 2], pi[:, 0, 2], 'k-', linewidth=2)
@@ -334,7 +334,7 @@ def run():
 
     # add the curves
     ax2 = plt.subplot(3, 3, 2)
-    # ax2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
+    ax2.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
     line1, = ax2.plot(epsilon[:, 0, 0], sigma[:, 0, 0], 'k-', linewidth=2)
     line2, = ax2.plot(epsilon[:, 0, 1], sigma[:, 0, 1], 'k-', linewidth=2)
     line3, = ax2.plot(epsilon[:, 0, 2], sigma[:, 0, 2], 'k-', linewidth=2)
@@ -372,7 +372,7 @@ def run():
 
     # add the curves
     ax3 = plt.subplot(3, 3, 3)
-    # ax3.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
+    ax3.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
     line1, = ax3.plot(gamma[:, 0, 0], tau[:, 0, 0], 'k-', linewidth=2)
     line2, = ax3.plot(gamma[:, 0, 1], tau[:, 0, 1], 'k-', linewidth=2)
     line3, = ax3.plot(gamma[:, 0, 2], tau[:, 0, 2], 'k-', linewidth=2)
@@ -410,7 +410,7 @@ def run():
     # the pure shear experiment
 
     ax4 = plt.subplot(3, 3, 4)
-    # ax4.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
+    ax4.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
     line1, = ax4.plot(xi[:, 1, 0], pi[:, 1, 0], 'k-', linewidth=2)
     line2, = ax4.plot(xi[:, 1, 1], pi[:, 1, 1], 'k-', linewidth=2)
     line3, = ax4.plot(xi[:, 1, 2], pi[:, 1, 2], 'k-', linewidth=2)
@@ -478,7 +478,7 @@ def run():
 
     # add the curves
     ax5 = plt.subplot(3, 3, 5)
-    # ax5.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
+    ax5.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
     line1, = ax5.plot(epsilon[:, 1, 0], sigma[:, 1, 0], 'k-', linewidth=2)
     line2, = ax5.plot(epsilon[:, 1, 1], sigma[:, 1, 1], 'k-', linewidth=2)
     line3, = ax5.plot(epsilon[:, 1, 2], sigma[:, 1, 2], 'k-', linewidth=2)
@@ -546,7 +546,7 @@ def run():
 
     # add the curves
     ax6 = plt.subplot(3, 3, 6)
-    # ax6.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
+    ax6.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
     line1, = ax6.plot(gamma[:, 1, 0], tau[:, 1, 0], 'k-', linewidth=2)
     line2, = ax6.plot(gamma[:, 1, 1], tau[:, 1, 1], 'k-', linewidth=2)
     line3, = ax6.plot(gamma[:, 1, 2], tau[:, 1, 2], 'k-', linewidth=2)
@@ -614,7 +614,7 @@ def run():
     # the simple shear experiment
 
     ax7 = plt.subplot(3, 3, 7)
-    # ax7.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
+    ax7.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
     line1, = ax7.plot(xi[:, 3, 0], pi[:, 3, 0], 'k-', linewidth=2)
     line2, = ax7.plot(xi[:, 3, 1], pi[:, 3, 1], 'k-', linewidth=2)
     line3, = ax7.plot(xi[:, 3, 2], pi[:, 3, 2], 'k-', linewidth=2)
@@ -682,7 +682,7 @@ def run():
 
     # add the curves
     ax8 = plt.subplot(3, 3, 8)
-    # ax8.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
+    ax8.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
     line1, = ax8.plot(epsilon[:, 3, 0], sigma[:, 3, 0], 'k-', linewidth=2)
     line2, = ax8.plot(epsilon[:, 3, 1], sigma[:, 3, 1], 'k-', linewidth=2)
     line3, = ax8.plot(epsilon[:, 3, 2], sigma[:, 3, 2], 'k-', linewidth=2)
@@ -750,7 +750,7 @@ def run():
 
     # add the curves
     ax9 = plt.subplot(3, 3, 9)
-    # ax9.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
+    ax9.yaxis.set_major_formatter(ticker.FormatStrFormatter('%1.1e'))
     line1, = ax9.plot(gamma[:, 3, 0], tau[:, 3, 0], 'k-', linewidth=2)
     line2, = ax9.plot(gamma[:, 3, 1], tau[:, 3, 1], 'k-', linewidth=2)
     line3, = ax9.plot(gamma[:, 3, 2], tau[:, 3, 2], 'k-', linewidth=2)

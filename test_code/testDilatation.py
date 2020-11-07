@@ -7,10 +7,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import rc
 from pylab import rcParams
+from pivotIncomingF import Pivot
+
 
 """
 Created on Mon Feb 04 2019
-Updated on Thr Apr 07 2020
+Updated on Thr Oct 28 2020
 
 Creates figures that examine the chordal and pentagonal responses during a
 dilatation of a regular dodecahedron into a deformed regular dodecahedron.
@@ -24,10 +26,37 @@ def run():
     rc('font', **{'family': 'serif', 'serif': ['Times']})
     rc('text', usetex=True)
 
+    # impose a far-field deformation history
+    F0 = np.eye(3, dtype=float)
+    F1 = np.copy(F0)
+    F1[0, 0] += 0.01
+    F1[1, 1] -= 0.01
+    F1[1, 0] -= 0.01
+    F1[2, 0] += 0.01
+    F2 = np.copy(F1)
+    F2[0, 0] += 0.01
+    F2[1, 1] -= 0.01
+    F2[0, 1] += 0.02
+    F2[2, 0] += 0.01
+    F3 = np.copy(F2)
+    F3[0, 0] += 0.02
+    F3[1, 1] -= 0.02
+    F3[0, 2] -= 0.01
+    F3[2, 1] += 0.02
+
+    # re-index the co-ordinate systems according to pivot in pivotIncomingF.py
+    pi = Pivot(F0)
+    pi.update(F1)
+    pi.advance()
+    pi.update(F2)
+    pi.advance()
+    pi.update(F3)
+
+    piF0 = pi.pivotedF('ref')
+    
     # basic properties for creating the figures
 
     steps = 150
-    gaussPts = 1
     maxDilatation = 1.75
 
     # dilatation
@@ -35,10 +64,9 @@ def run():
     strain = np.zeros((steps, 30), dtype=float)
     dilation = np.zeros((steps, 12), dtype=float)
     dilatation = np.zeros(steps, dtype=float)
-    F = np.eye(3, dtype=float)
-    d = dodecahedron(gaussPts, gaussPts, gaussPts, F)
+    d = dodecahedron(piF0)
     for i in range(steps):
-        d.advance()
+        d.advance(pi)
         for j in range(1, 31):
             c = d.getChord(j)
             strain[i, j-1] = c.strain('curr')
@@ -46,9 +74,9 @@ def run():
             p = d.getPentagon(j)
             dilation[i, j-1] = p.arealStrain('curr')
         for j in range(3):
-            F[j, j] += maxDilatation / steps
+            piF0[j, j] += maxDilatation / steps
         dilatation[i] = d.volumetricStrain('curr')
-        d.update(F)
+        d.update(piF0)
     strain1 = np.zeros(steps, dtype=float)
     strain1[:] = strain[:, 0]
     dilation1 = np.zeros(steps, dtype=float)

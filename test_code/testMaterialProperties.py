@@ -26,7 +26,7 @@ def runAlveolar():
 
     aDia = []
     for i in range(dataPts):
-        aDia.append(mp.alveolarDia())
+        aDia.append(mp.alveolarDiameter())
 
     n, bins, patches = plt.hist(x=aDia, bins='auto', color='#0504aa',
                                 density=False, alpha=0.7, rwidth=0.85)
@@ -49,7 +49,7 @@ def runCollagen():
 
     cDia = []
     for i in range(dataPts):
-        dia = mp.chordDiaCollagen()
+        dia = mp.fiberDiameterCollagen()
         dia = 10000.0 * dia
         cDia.append(dia)
 
@@ -74,7 +74,7 @@ def runElastin():
 
     eDia = []
     for i in range(dataPts):
-        dia = mp.chordDiaElastin()
+        dia = mp.fiberDiameterElastin()
         dia = 10000.0 * dia
         eDia.append(dia)
 

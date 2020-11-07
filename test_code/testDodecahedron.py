@@ -21,8 +21,7 @@ def pause():
 
 def run():
     F = np.identity(3, dtype=float)
-    gaussPts = 1
-    d = dodecahedron(gaussPts, gaussPts, gaussPts, F)
+    d = dodecahedron(F)
     # verify the dodecahedron nodal/chordal assignment by printing them out
     print('\nA normalized dodecahedron has vertices:\n')
     print(d.verticesToString('ref'))
@@ -41,9 +40,9 @@ def run():
     for i in range(1, 31):
         c = d.getChord(i)
         if i < 10:
-            print('Length of chord 0{} is {:8.6F}'.format(i, c.length('ref')))
+            print('Length of chord 0{} is {:8.6F}'.format(i, c.length()))
         else:
-            print('Length of chord {} is {:8.6F}'.format(i, c.length('ref')))
+            print('Length of chord {} is {:8.6F}'.format(i, c.length()))
     # verify the pentagonal areas
     print('')
     for i in range(1, 13):

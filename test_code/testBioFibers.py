@@ -13,7 +13,7 @@ from pylab import rcParams
 
 """
 Created on Wed May 27 2020
-Updated on Fri Jul 10 2020
+Updated on Fri Nov 01 2020
 
 A test file for the BioFiber constitutive response in file ceChords.py.
 
@@ -75,7 +75,12 @@ def run():
         yVec0 = np.zeros((respVars,), dtype=float)
         yVec0[0] = mp.etaCollagen()
         yVec0[1] = s_0
-        resp = BioFiber(yVec0, rho, Cp, alpha, E1, E2, e_t, e_f)
+        
+        # create and initialize the two control vectors
+        eVec0 = np.zeros((ctrlVars,), dtype=float)
+        xVec0 = np.zeros((ctrlVars,), dtype=float)
+        
+        resp = BioFiber(eVec0, xVec0, yVec0, rho, Cp, alpha, E1, E2, e_t, e_f)
         # create the integrator
         solver = PECE(ctrl, resp, m)
         # establish the initial conditios

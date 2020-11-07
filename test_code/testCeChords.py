@@ -60,10 +60,11 @@ def run():
         xVec0 = np.zeros((ctrlVars,), dtype=float)
         xVec0[0] = T0
         xVec0[1] = L0
+        yVec0 = np.zeros((respVars,), dtype=float)
         # create the control object
         ctrl = ControlFiber(eVec0, xVec0, dt)
         # create the response object
-        resp = SeptalChord()
+        resp = SeptalChord(eVec0, xVec0, yVec0)
         # create the integrator
         solver = PECE(ctrl, resp, m)
         # provide the initial conditions for their relative states, viz. zeros
