@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "09-18-2019"
-__update__ = "07-17-2020"
+__update__ = "10-19-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -277,12 +277,12 @@ class ShapeFunction(ShapeFn):
         self.N4 = zeta
 
         # construct the 3x12 matrix of shape functions for a tetrahedron
-        self.Nmatx = np.array([[self.N1, 0.0, 0.0, self.N2, 0.0, 0.0,
-                                self.N3, 0.0, 0.0, self.N4, 0.0, 0.0],
-                               [0.0, self.N1, 0.0, 0.0, self.N2, 0.0,
-                                0.0, self.N3, 0.0, 0.0, self.N4, 0.0],
-                               [0.0, 0.0, self.N1, 0.0, 0.0, self.N2,
-                                0.0, 0.0, self.N3, 0.0, 0.0, self.N4]])
+        self.Nmtx = np.array([[self.N1, 0.0, 0.0, self.N2, 0.0, 0.0,
+                               self.N3, 0.0, 0.0, self.N4, 0.0, 0.0],
+                              [0.0, self.N1, 0.0, 0.0, self.N2, 0.0,
+                               0.0, self.N3, 0.0, 0.0, self.N4, 0.0],
+                              [0.0, 0.0, self.N1, 0.0, 0.0, self.N2,
+                               0.0, 0.0, self.N3, 0.0, 0.0, self.N4]])
 
         # create the twelve, eported, derivatives of these shape functions
         self.dN1dXi = -1
@@ -389,7 +389,7 @@ class ShapeFunction(ShapeFn):
                              + self.dN3dZeta * w3 + self.dN4dZeta * w4)
 
             # determine the current gradient of position
-            curGrad = np.transpose(self.jacobianMtx(x1, x2, x3, x4))
+            curGrad = np.transpose(self.jacobianMatrix(x1, x2, x3, x4))
         else:
             raise RuntimeError("Each argument of shapeFunction.G must be "
                                + "a tuple of co-ordinates, e.g., (x, y, z).")
@@ -466,305 +466,643 @@ class ShapeFunction(ShapeFn):
                 + np.matmul(disGrad, np.linalg.inv(refGrad)))
         return Fmtx
 
-    def BLinear(self, x1, x2, x3, x4):
+    def BL(self, x1, x2, x3, x4):
         Jmtx = self.jacobianMatrix(x1, x2, x3, x4)
-        IJmtx = np.zeros((3, 3), dtype=float)
-        IJmtx = np.linalg.inv(Jmtx)
 
         BL = np.zeros((7, 12), dtype=float)
 
-        BL[0, 0] = ((self.dN1dXi * IJmtx[0, 0] + self.dN1dEta * IJmtx[0, 1] +
-                     self.dN1dZeta * IJmtx[0, 2]) / 3)
-        BL[0, 1] = ((self.dN1dXi * IJmtx[1, 0] + self.dN1dEta * IJmtx[1, 1] +
-                     self.dN1dZeta * IJmtx[1, 2]) / 3)
-        BL[0, 2] = ((self.dN1dXi * IJmtx[2, 0] + self.dN1dEta * IJmtx[2, 1] +
-                     self.dN1dZeta * IJmtx[2, 2]) / 3)
-        BL[0, 3] = ((self.dN2dXi * IJmtx[0, 0] + self.dN2dEta * IJmtx[0, 1] +
-                     self.dN2dZeta * IJmtx[0, 2]) / 3)
-        BL[0, 4] = ((self.dN2dXi * IJmtx[1, 0] + self.dN2dEta * IJmtx[1, 1] +
-                     self.dN2dZeta * IJmtx[1, 2]) / 3)
-        BL[0, 5] = ((self.dN2dXi * IJmtx[2, 0] + self.dN2dEta * IJmtx[2, 1] +
-                     self.dN2dZeta * IJmtx[2, 2]) / 3)
-        BL[0, 6] = ((self.dN3dXi * IJmtx[0, 0] + self.dN3dEta * IJmtx[0, 1] +
-                     self.dN3dZeta * IJmtx[0, 2]) / 3)
-        BL[0, 7] = ((self.dN3dXi * IJmtx[1, 0] + self.dN3dEta * IJmtx[1, 1] +
-                     self.dN3dZeta * IJmtx[1, 2]) / 3)
-        BL[0, 8] = ((self.dN3dXi * IJmtx[2, 0] + self.dN3dEta * IJmtx[2, 1] +
-                     self.dN3dZeta * IJmtx[2, 2]) / 3)
-        BL[0, 9] = ((self.dN4dXi * IJmtx[0, 0] + self.dN4dEta * IJmtx[0, 1] +
-                     self.dN4dZeta * IJmtx[0, 2]) / 3)
-        BL[0, 10] = ((self.dN4dXi * IJmtx[1, 0] + self.dN4dEta * IJmtx[1, 1] +
-                     self.dN4dZeta * IJmtx[1, 2]) / 3)
-        BL[0, 11] = ((self.dN4dXi * IJmtx[2, 0] + self.dN4dEta * IJmtx[2, 1] +
-                     self.dN4dZeta * IJmtx[2, 2]) / 3)
+        BL[0, 0] = ((self.dN1dXi * Jmtx[0, 0] + self.dN1dEta * Jmtx[0, 1] +
+                     self.dN1dZeta * Jmtx[0, 2]) / 3)
+        BL[0, 1] = ((self.dN1dXi * Jmtx[1, 0] + self.dN1dEta * Jmtx[1, 1] +
+                     self.dN1dZeta * Jmtx[1, 2]) / 3)
+        BL[0, 2] = ((self.dN1dXi * Jmtx[2, 0] + self.dN1dEta * Jmtx[2, 1] +
+                     self.dN1dZeta * Jmtx[2, 2]) / 3)
+        BL[0, 3] = ((self.dN2dXi * Jmtx[0, 0] + self.dN2dEta * Jmtx[0, 1] +
+                     self.dN2dZeta * Jmtx[0, 2]) / 3)
+        BL[0, 4] = ((self.dN2dXi * Jmtx[1, 0] + self.dN2dEta * Jmtx[1, 1] +
+                     self.dN2dZeta * Jmtx[1, 2]) / 3)
+        BL[0, 5] = ((self.dN2dXi * Jmtx[2, 0] + self.dN2dEta * Jmtx[2, 1] +
+                     self.dN2dZeta * Jmtx[2, 2]) / 3)
+        BL[0, 6] = ((self.dN3dXi * Jmtx[0, 0] + self.dN3dEta * Jmtx[0, 1] +
+                     self.dN3dZeta * Jmtx[0, 2]) / 3)
+        BL[0, 7] = ((self.dN3dXi * Jmtx[1, 0] + self.dN3dEta * Jmtx[1, 1] +
+                     self.dN3dZeta * Jmtx[1, 2]) / 3)
+        BL[0, 8] = ((self.dN3dXi * Jmtx[2, 0] + self.dN3dEta * Jmtx[2, 1] +
+                     self.dN3dZeta * Jmtx[2, 2]) / 3)
+        BL[0, 9] = ((self.dN4dXi * Jmtx[0, 0] + self.dN4dEta * Jmtx[0, 1] +
+                     self.dN4dZeta * Jmtx[0, 2]) / 3)
+        BL[0, 10] = ((self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
+                     self.dN4dZeta * Jmtx[1, 2]) / 3)
+        BL[0, 11] = ((self.dN4dXi * Jmtx[2, 0] + self.dN4dEta * Jmtx[2, 1] +
+                     self.dN4dZeta * Jmtx[2, 2]) / 3)
 
-        BL[1, 0] = ((self.dN1dXi * IJmtx[0, 0] + self.dN1dEta * IJmtx[0, 1] +
-                     self.dN1dZeta * IJmtx[0, 2]) / 3)
-        BL[1, 1] = (-(self.dN1dXi * IJmtx[1, 0] + self.dN1dEta * IJmtx[1, 1] +
-                    self.dN1dZeta * IJmtx[1, 2]) / 3)
-        BL[1, 3] = ((self.dN2dXi * IJmtx[0, 0] + self.dN2dEta * IJmtx[0, 1] +
-                     self.dN2dZeta * IJmtx[0, 2]) / 3)
-        BL[1, 4] = (-(self.dN2dXi * IJmtx[1, 0] + self.dN2dEta * IJmtx[1, 1] +
-                    self.dN2dZeta * IJmtx[1, 2]) / 3)
-        BL[1, 6] = ((self.dN3dXi * IJmtx[0, 0] + self.dN3dEta * IJmtx[0, 1] +
-                     self.dN3dZeta * IJmtx[0, 2]) / 3)
-        BL[1, 7] = (-(self.dN3dXi * IJmtx[1, 0] + self.dN3dEta * IJmtx[1, 1] +
-                    self.dN3dZeta * IJmtx[1, 2]) / 3)
-        BL[1, 9] = ((self.dN4dXi * IJmtx[0, 0] + self.dN4dEta * IJmtx[0, 1] +
-                     self.dN4dZeta * IJmtx[0, 2]) / 3)
-        BL[1, 10] = (-(self.dN4dXi * IJmtx[1, 0] + self.dN4dEta * IJmtx[1, 1] +
-                     self.dN4dZeta * IJmtx[1, 2]) / 3)
+        BL[1, 0] = ((self.dN1dXi * Jmtx[0, 0] + self.dN1dEta * Jmtx[0, 1] +
+                     self.dN1dZeta * Jmtx[0, 2]) / 3)
+        BL[1, 1] = (-(self.dN1dXi * Jmtx[1, 0] + self.dN1dEta * Jmtx[1, 1] +
+                    self.dN1dZeta * Jmtx[1, 2]) / 3)
+        BL[1, 3] = ((self.dN2dXi * Jmtx[0, 0] + self.dN2dEta * Jmtx[0, 1] +
+                     self.dN2dZeta * Jmtx[0, 2]) / 3)
+        BL[1, 4] = (-(self.dN2dXi * Jmtx[1, 0] + self.dN2dEta * Jmtx[1, 1] +
+                    self.dN2dZeta * Jmtx[1, 2]) / 3)
+        BL[1, 6] = ((self.dN3dXi * Jmtx[0, 0] + self.dN3dEta * Jmtx[0, 1] +
+                     self.dN3dZeta * Jmtx[0, 2]) / 3)
+        BL[1, 7] = (-(self.dN3dXi * Jmtx[1, 0] + self.dN3dEta * Jmtx[1, 1] +
+                    self.dN3dZeta * Jmtx[1, 2]) / 3)
+        BL[1, 9] = ((self.dN4dXi * Jmtx[0, 0] + self.dN4dEta * Jmtx[0, 1] +
+                     self.dN4dZeta * Jmtx[0, 2]) / 3)
+        BL[1, 10] = (-(self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
+                     self.dN4dZeta * Jmtx[1, 2]) / 3)
 
-        BL[2, 1] = ((self.dN1dXi * IJmtx[1, 0] + self.dN1dEta * IJmtx[1, 1] +
-                     self.dN1dZeta * IJmtx[1, 2]) / 3)
-        BL[2, 2] = (-(self.dN1dXi * IJmtx[2, 0] + self.dN1dEta * IJmtx[2, 1] +
-                      self.dN1dZeta * IJmtx[2, 2]) / 3)
-        BL[2, 4] = ((self.dN2dXi * IJmtx[1, 0] + self.dN2dEta * IJmtx[1, 1] +
-                     self.dN2dZeta * IJmtx[1, 2]) / 3)
-        BL[2, 5] = (-(self.dN2dXi * IJmtx[2, 0] + self.dN2dEta * IJmtx[2, 1] +
-                      self.dN2dZeta * IJmtx[2, 2]) / 3)
-        BL[2, 7] = ((self.dN3dXi * IJmtx[1, 0] + self.dN3dEta * IJmtx[1, 1] +
-                     self.dN3dZeta * IJmtx[1, 2]) / 3)
-        BL[2, 8] = (-(self.dN3dXi * IJmtx[2, 0] + self.dN3dEta * IJmtx[2, 1] +
-                      self.dN3dZeta * IJmtx[2, 2]) / 3)
-        BL[2, 10] = ((self.dN4dXi * IJmtx[1, 0] + self.dN4dEta * IJmtx[1, 1] +
-                     self.dN4dZeta * IJmtx[1, 2]) / 3)
-        BL[2, 11] = (-(self.dN4dXi * IJmtx[2, 0] + self.dN4dEta * IJmtx[2, 1] +
-                       self.dN4dZeta * IJmtx[2, 2]) / 3)
+        BL[2, 1] = ((self.dN1dXi * Jmtx[1, 0] + self.dN1dEta * Jmtx[1, 1] +
+                     self.dN1dZeta * Jmtx[1, 2]) / 3)
+        BL[2, 2] = (-(self.dN1dXi * Jmtx[2, 0] + self.dN1dEta * Jmtx[2, 1] +
+                      self.dN1dZeta * Jmtx[2, 2]) / 3)
+        BL[2, 4] = ((self.dN2dXi * Jmtx[1, 0] + self.dN2dEta * Jmtx[1, 1] +
+                     self.dN2dZeta * Jmtx[1, 2]) / 3)
+        BL[2, 5] = (-(self.dN2dXi * Jmtx[2, 0] + self.dN2dEta * Jmtx[2, 1] +
+                      self.dN2dZeta * Jmtx[2, 2]) / 3)
+        BL[2, 7] = ((self.dN3dXi * Jmtx[1, 0] + self.dN3dEta * Jmtx[1, 1] +
+                     self.dN3dZeta * Jmtx[1, 2]) / 3)
+        BL[2, 8] = (-(self.dN3dXi * Jmtx[2, 0] + self.dN3dEta * Jmtx[2, 1] +
+                      self.dN3dZeta * Jmtx[2, 2]) / 3)
+        BL[2, 10] = ((self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
+                     self.dN4dZeta * Jmtx[1, 2]) / 3)
+        BL[2, 11] = (-(self.dN4dXi * Jmtx[2, 0] + self.dN4dEta * Jmtx[2, 1] +
+                       self.dN4dZeta * Jmtx[2, 2]) / 3)
 
-        BL[3, 0] = (-(self.dN1dXi * IJmtx[0, 0] + self.dN1dEta * IJmtx[0, 1] +
-                      self.dN1dZeta * IJmtx[0, 2]) / 3)
-        BL[3, 2] = ((self.dN1dXi * IJmtx[2, 0] + self.dN1dEta * IJmtx[2, 1] +
-                     self.dN1dZeta * IJmtx[2, 2]) / 3)
-        BL[3, 3] = (-(self.dN2dXi * IJmtx[0, 0] + self.dN2dEta * IJmtx[0, 1] +
-                      self.dN2dZeta * IJmtx[0, 2]) / 3)
-        BL[3, 5] = ((self.dN2dXi * IJmtx[2, 0] + self.dN2dEta * IJmtx[2, 1] +
-                     self.dN2dZeta * IJmtx[2, 2]) / 3)
-        BL[3, 6] = (-(self.dN3dXi * IJmtx[0, 0] + self.dN3dEta * IJmtx[0, 1] +
-                      self.dN3dZeta * IJmtx[0, 2]) / 3)
-        BL[3, 8] = ((self.dN3dXi * IJmtx[2, 0] + self.dN3dEta * IJmtx[2, 1] +
-                     self.dN3dZeta * IJmtx[2, 2]) / 3)
-        BL[3, 9] = (-(self.dN4dXi * IJmtx[0, 0] + self.dN4dEta * IJmtx[0, 1] +
-                      self.dN4dZeta * IJmtx[0, 2]) / 3)
-        BL[3, 11] = ((self.dN4dXi * IJmtx[2, 0] + self.dN4dEta * IJmtx[2, 1] +
-                     self.dN4dZeta * IJmtx[2, 2]) / 3)
+        BL[3, 0] = (-(self.dN1dXi * Jmtx[0, 0] + self.dN1dEta * Jmtx[0, 1] +
+                      self.dN1dZeta * Jmtx[0, 2]) / 3)
+        BL[3, 2] = ((self.dN1dXi * Jmtx[2, 0] + self.dN1dEta * Jmtx[2, 1] +
+                     self.dN1dZeta * Jmtx[2, 2]) / 3)
+        BL[3, 3] = (-(self.dN2dXi * Jmtx[0, 0] + self.dN2dEta * Jmtx[0, 1] +
+                      self.dN2dZeta * Jmtx[0, 2]) / 3)
+        BL[3, 5] = ((self.dN2dXi * Jmtx[2, 0] + self.dN2dEta * Jmtx[2, 1] +
+                     self.dN2dZeta * Jmtx[2, 2]) / 3)
+        BL[3, 6] = (-(self.dN3dXi * Jmtx[0, 0] + self.dN3dEta * Jmtx[0, 1] +
+                      self.dN3dZeta * Jmtx[0, 2]) / 3)
+        BL[3, 8] = ((self.dN3dXi * Jmtx[2, 0] + self.dN3dEta * Jmtx[2, 1] +
+                     self.dN3dZeta * Jmtx[2, 2]) / 3)
+        BL[3, 9] = (-(self.dN4dXi * Jmtx[0, 0] + self.dN4dEta * Jmtx[0, 1] +
+                      self.dN4dZeta * Jmtx[0, 2]) / 3)
+        BL[3, 11] = ((self.dN4dXi * Jmtx[2, 0] + self.dN4dEta * Jmtx[2, 1] +
+                     self.dN4dZeta * Jmtx[2, 2]) / 3)
 
-        BL[4, 1] = (self.dN1dXi * IJmtx[2, 0] + self.dN1dEta * IJmtx[2, 1] +
-                    self.dN1dZeta * IJmtx[2, 2])
-        BL[4, 2] = (self.dN1dXi * IJmtx[1, 0] + self.dN1dEta * IJmtx[1, 1] +
-                    self.dN1dZeta * IJmtx[1, 2])
-        BL[4, 4] = (self.dN2dXi * IJmtx[2, 0] + self.dN2dEta * IJmtx[2, 1] +
-                    self.dN2dZeta * IJmtx[2, 2])
-        BL[4, 5] = (self.dN2dXi * IJmtx[1, 0] + self.dN2dEta * IJmtx[1, 1] +
-                    self.dN2dZeta * IJmtx[1, 2])
-        BL[4, 7] = (self.dN3dXi * IJmtx[2, 0] + self.dN3dEta * IJmtx[2, 1] +
-                    self.dN3dZeta * IJmtx[2, 2])
-        BL[4, 8] = (self.dN3dXi * IJmtx[1, 0] + self.dN3dEta * IJmtx[1, 1] +
-                    self.dN3dZeta * IJmtx[1, 2])
-        BL[4, 10] = (self.dN4dXi * IJmtx[2, 0] + self.dN4dEta * IJmtx[2, 1] +
-                     self.dN4dZeta * IJmtx[2, 2])
-        BL[4, 11] = (self.dN4dXi * IJmtx[1, 0] + self.dN4dEta * IJmtx[1, 1] +
-                     self.dN4dZeta * IJmtx[1, 2])
+        BL[4, 1] = (self.dN1dXi * Jmtx[2, 0] + self.dN1dEta * Jmtx[2, 1] +
+                    self.dN1dZeta * Jmtx[2, 2])
+        BL[4, 2] = (self.dN1dXi * Jmtx[1, 0] + self.dN1dEta * Jmtx[1, 1] +
+                    self.dN1dZeta * Jmtx[1, 2])
+        BL[4, 4] = (self.dN2dXi * Jmtx[2, 0] + self.dN2dEta * Jmtx[2, 1] +
+                    self.dN2dZeta * Jmtx[2, 2])
+        BL[4, 5] = (self.dN2dXi * Jmtx[1, 0] + self.dN2dEta * Jmtx[1, 1] +
+                    self.dN2dZeta * Jmtx[1, 2])
+        BL[4, 7] = (self.dN3dXi * Jmtx[2, 0] + self.dN3dEta * Jmtx[2, 1] +
+                    self.dN3dZeta * Jmtx[2, 2])
+        BL[4, 8] = (self.dN3dXi * Jmtx[1, 0] + self.dN3dEta * Jmtx[1, 1] +
+                    self.dN3dZeta * Jmtx[1, 2])
+        BL[4, 10] = (self.dN4dXi * Jmtx[2, 0] + self.dN4dEta * Jmtx[2, 1] +
+                     self.dN4dZeta * Jmtx[2, 2])
+        BL[4, 11] = (self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
+                     self.dN4dZeta * Jmtx[1, 2])
 
-        BL[5, 1] = (self.dN1dXi * IJmtx[2, 0] + self.dN1dEta * IJmtx[2, 1] +
-                    self.dN1dZeta * IJmtx[2, 2])
-        BL[5, 2] = (self.dN1dXi * IJmtx[1, 0] + self.dN1dEta * IJmtx[1, 1] +
-                    self.dN1dZeta * IJmtx[1, 2])
-        BL[5, 4] = (self.dN2dXi * IJmtx[2, 0] + self.dN2dEta * IJmtx[2, 1] +
-                    self.dN2dZeta * IJmtx[2, 2])
-        BL[5, 5] = (self.dN2dXi * IJmtx[1, 0] + self.dN2dEta * IJmtx[1, 1] +
-                    self.dN2dZeta * IJmtx[1, 2])
-        BL[5, 7] = (self.dN3dXi * IJmtx[2, 0] + self.dN3dEta * IJmtx[2, 1] +
-                    self.dN3dZeta * IJmtx[2, 2])
-        BL[5, 8] = (self.dN3dXi * IJmtx[1, 0] + self.dN3dEta * IJmtx[1, 1] +
-                    self.dN3dZeta * IJmtx[1, 2])
-        BL[5, 10] = (self.dN4dXi * IJmtx[2, 0] + self.dN4dEta * IJmtx[2, 1] +
-                     self.dN4dZeta * IJmtx[2, 2])
-        BL[5, 11] = (self.dN4dXi * IJmtx[1, 0] + self.dN4dEta * IJmtx[1, 1] +
-                     self.dN4dZeta * IJmtx[1, 2])
+        BL[5, 1] = (self.dN1dXi * Jmtx[2, 0] + self.dN1dEta * Jmtx[2, 1] +
+                    self.dN1dZeta * Jmtx[2, 2])
+        BL[5, 2] = (self.dN1dXi * Jmtx[1, 0] + self.dN1dEta * Jmtx[1, 1] +
+                    self.dN1dZeta * Jmtx[1, 2])
+        BL[5, 4] = (self.dN2dXi * Jmtx[2, 0] + self.dN2dEta * Jmtx[2, 1] +
+                    self.dN2dZeta * Jmtx[2, 2])
+        BL[5, 5] = (self.dN2dXi * Jmtx[1, 0] + self.dN2dEta * Jmtx[1, 1] +
+                    self.dN2dZeta * Jmtx[1, 2])
+        BL[5, 7] = (self.dN3dXi * Jmtx[2, 0] + self.dN3dEta * Jmtx[2, 1] +
+                    self.dN3dZeta * Jmtx[2, 2])
+        BL[5, 8] = (self.dN3dXi * Jmtx[1, 0] + self.dN3dEta * Jmtx[1, 1] +
+                    self.dN3dZeta * Jmtx[1, 2])
+        BL[5, 10] = (self.dN4dXi * Jmtx[2, 0] + self.dN4dEta * Jmtx[2, 1] +
+                     self.dN4dZeta * Jmtx[2, 2])
+        BL[5, 11] = (self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
+                     self.dN4dZeta * Jmtx[1, 2])
 
-        BL[6, 0] = (self.dN1dXi * IJmtx[1, 0] + self.dN1dEta * IJmtx[1, 1] +
-                    self.dN1dZeta * IJmtx[1, 2])
-        BL[6, 1] = (self.dN1dXi * IJmtx[0, 0] + self.dN1dEta * IJmtx[0, 1] +
-                    self.dN1dZeta * IJmtx[0, 2])
-        BL[6, 3] = (self.dN2dXi * IJmtx[1, 0] + self.dN2dEta * IJmtx[1, 1] +
-                    self.dN2dZeta * IJmtx[1, 2])
-        BL[6, 4] = (self.dN2dXi * IJmtx[0, 0] + self.dN2dEta * IJmtx[0, 1] +
-                    self.dN2dZeta * IJmtx[0, 2])
-        BL[6, 6] = (self.dN3dXi * IJmtx[1, 0] + self.dN3dEta * IJmtx[1, 1] +
-                    self.dN3dZeta * IJmtx[1, 2])
-        BL[6, 7] = (self.dN3dXi * IJmtx[0, 0] + self.dN3dEta * IJmtx[0, 1] +
-                    self.dN3dZeta * IJmtx[0, 2])
-        BL[6, 9] = (self.dN4dXi * IJmtx[1, 0] + self.dN4dEta * IJmtx[1, 1] +
-                    self.dN4dZeta * IJmtx[1, 2])
-        BL[6, 10] = (self.dN4dXi * IJmtx[0, 0] + self.dN4dEta * IJmtx[0, 1] +
-                     self.dN4dZeta * IJmtx[0, 2])
+        BL[6, 0] = (self.dN1dXi * Jmtx[1, 0] + self.dN1dEta * Jmtx[1, 1] +
+                    self.dN1dZeta * Jmtx[1, 2])
+        BL[6, 1] = (self.dN1dXi * Jmtx[0, 0] + self.dN1dEta * Jmtx[0, 1] +
+                    self.dN1dZeta * Jmtx[0, 2])
+        BL[6, 3] = (self.dN2dXi * Jmtx[1, 0] + self.dN2dEta * Jmtx[1, 1] +
+                    self.dN2dZeta * Jmtx[1, 2])
+        BL[6, 4] = (self.dN2dXi * Jmtx[0, 0] + self.dN2dEta * Jmtx[0, 1] +
+                    self.dN2dZeta * Jmtx[0, 2])
+        BL[6, 6] = (self.dN3dXi * Jmtx[1, 0] + self.dN3dEta * Jmtx[1, 1] +
+                    self.dN3dZeta * Jmtx[1, 2])
+        BL[6, 7] = (self.dN3dXi * Jmtx[0, 0] + self.dN3dEta * Jmtx[0, 1] +
+                    self.dN3dZeta * Jmtx[0, 2])
+        BL[6, 9] = (self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
+                    self.dN4dZeta * Jmtx[1, 2])
+        BL[6, 10] = (self.dN4dXi * Jmtx[0, 0] + self.dN4dEta * Jmtx[0, 1] +
+                     self.dN4dZeta * Jmtx[0, 2])
 
-        return BL
+        detJ = np.linalg.det(Jmtx)
+        BLmtx = BL / detJ
+        
+        return BLmtx
 
-    def HMatrixF(self, x1, x2, x3, x4):
-        HF = np.zeros((3, 12), dtype=float)
-        BL = self.BLinear(x1, x2, x3, x4)
+    def H1(self, x1, x2, x3, x4):
+        H1mtx = np.zeros((3, 12), dtype=float)
+        BLmtx = self.BL(x1, x2, x3, x4)
 
         # create the H1 matrix by differentiation of shape functions.
-        HF[0, 0] = 3 * BL[0, 0]
-        HF[0, 3] = 3 * BL[0, 3]
-        HF[0, 6] = 3 * BL[0, 6]
-        HF[0, 9] = 3 * BL[0, 9]
+        H1mtx[0, 0] = 3 * BLmtx[0, 0]
+        H1mtx[0, 3] = 3 * BLmtx[0, 3]
+        H1mtx[0, 6] = 3 * BLmtx[0, 6]
+        H1mtx[0, 9] = 3 * BLmtx[0, 9]
 
-        HF[1, 1] = 3 * BL[0, 0]
-        HF[1, 4] = 3 * BL[0, 3]
-        HF[1, 7] = 3 * BL[0, 6]
-        HF[1, 10] = 3 * BL[0, 9]
+        H1mtx[1, 1] = 3 * BLmtx[0, 1]
+        H1mtx[1, 4] = 3 * BLmtx[0, 4]
+        H1mtx[1, 7] = 3 * BLmtx[0, 7]
+        H1mtx[1, 10] = 3 * BLmtx[0, 10]
 
-        HF[2, 2] = 3 * BL[0, 0]
-        HF[2, 5] = 3 * BL[0, 3]
-        HF[2, 8] = 3 * BL[0, 6]
-        HF[2, 11] = 3 * BL[0, 9]
+        H1mtx[2, 2] = 3 * BLmtx[0, 2]
+        H1mtx[2, 5] = 3 * BLmtx[0, 5]
+        H1mtx[2, 8] = 3 * BLmtx[0, 8]
+        H1mtx[2, 11] = 3 * BLmtx[0, 11]
 
-        return HF
+        return H1mtx
 
-    def HmatrixS(self, x1, x2, x3, x4):
-        HS = np.zeros((3, 12), dtype=float)
-        BL = self.BLinear(x1, x2, x3, x4)
+    def H2(self, x1, x2, x3, x4):
+        H2mtx = np.zeros((3, 12), dtype=float)
+        BLmtx = self.BL(x1, x2, x3, x4)
 
         # create the H2 matrix by differentiation of shape functions.
-        HS[0, 0] = 3 * BL[0, 1]
-        HS[0, 3] = 3 * BL[0, 4]
-        HS[0, 6] = 3 * BL[0, 7]
-        HS[0, 9] = 3 * BL[0, 10]
+        H2mtx[0, 0] = 3 * BLmtx[0, 2]
+        H2mtx[0, 3] = 3 * BLmtx[0, 5]
+        H2mtx[0, 6] = 3 * BLmtx[0, 8]
+        H2mtx[0, 9] = 3 * BLmtx[0, 11]
 
-        HS[1, 1] = 3 * BL[0, 1]
-        HS[1, 4] = 3 * BL[0, 4]
-        HS[1, 7] = 3 * BL[0, 7]
-        HS[1, 10] = 3 * BL[0, 10]
+        H2mtx[1, 1] = 3 * BLmtx[0, 2]
+        H2mtx[1, 4] = 3 * BLmtx[0, 5]
+        H2mtx[1, 7] = 3 * BLmtx[0, 8]
+        H2mtx[1, 10] = 3 * BLmtx[0, 11]
 
-        HS[2, 2] = 3 * BL[0, 1]
-        HS[2, 5] = 3 * BL[0, 4]
-        HS[2, 8] = 3 * BL[0, 7]
-        HS[2, 11] = 3 * BL[0, 10]
+        H2mtx[2, 2] = 3 * BLmtx[0, 1]
+        H2mtx[2, 5] = 3 * BLmtx[0, 4]
+        H2mtx[2, 8] = 3 * BLmtx[0, 7]
+        H2mtx[2, 11] = 3 * BLmtx[0, 10]
 
-        return HS
+        return H2mtx
 
-    def HmatrixT(self, x1, x2, x3, x4):
-        HT = np.zeros((3, 12), dtype=float)
-        BL = self.BLinear(x1, x2, x3, x4)
+    def H3(self, x1, x2, x3, x4):
+        H3mtx = np.zeros((3, 12), dtype=float)
+        BLmtx = self.BL(x1, x2, x3, x4)
 
         # create the H3 matrix by differentiation of shape functions.
-        HT[0, 0] = 3 * BL[0, 2]
-        HT[0, 3] = 3 * BL[0, 5]
-        HT[0, 6] = 3 * BL[0, 8]
-        HT[0, 9] = 3 * BL[0, 11]
+        H3mtx[0, 0] = 3 * BLmtx[0, 1]
+        H3mtx[0, 3] = 3 * BLmtx[0, 4]
+        H3mtx[0, 6] = 3 * BLmtx[0, 7]
+        H3mtx[0, 9] = 3 * BLmtx[0, 10]
 
-        HT[1, 1] = 3 * BL[0, 2]
-        HT[1, 4] = 3 * BL[0, 5]
-        HT[1, 7] = 3 * BL[0, 8]
-        HT[1, 10] = 3 * BL[0, 11]
+        H3mtx[1, 1] = 3 * BLmtx[0, 2]
+        H3mtx[1, 4] = 3 * BLmtx[0, 5]
+        H3mtx[1, 7] = 3 * BLmtx[0, 8]
+        H3mtx[1, 10] = 3 * BLmtx[0, 11]
 
-        HT[2, 2] = 3 * BL[0, 2]
-        HT[2, 5] = 3 * BL[0, 5]
-        HT[2, 8] = 3 * BL[0, 8]
-        HT[2, 11] = 3 * BL[0, 11]
+        H3mtx[2, 2] = 3 * BLmtx[0, 0]
+        H3mtx[2, 5] = 3 * BLmtx[0, 3]
+        H3mtx[2, 8] = 3 * BLmtx[0, 6]
+        H3mtx[2, 11] = 3 * BLmtx[0, 9]
 
-        return HT
+        return H3mtx
 
-    def firstBNonLinear(self, x1, x2, x3, x4, x01, x02, x03, x04):
-        AF = np.zeros((7, 3), dtype=float)
-        G = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
-        HF = self.HmatrixF(x1, x2, x3, x4)
+    def H4(self, x1, x2, x3, x4):
+        H4mtx = np.zeros((3, 12), dtype=float)
+        BLmtx = self.BL(x1, x2, x3, x4)
+
+        # create the H3 matrix by differentiation of shape functions.
+        H4mtx[0, 0] = 3 * BLmtx[0, 0]
+        H4mtx[0, 3] = 3 * BLmtx[0, 3]
+        H4mtx[0, 6] = 3 * BLmtx[0, 6]
+        H4mtx[0, 9] = 3 * BLmtx[0, 9]
+
+        H4mtx[1, 1] = 3 * BLmtx[0, 0]
+        H4mtx[1, 4] = 3 * BLmtx[0, 3]
+        H4mtx[1, 7] = 3 * BLmtx[0, 6]
+        H4mtx[1, 10] = 3 * BLmtx[0, 9]
+
+        H4mtx[2, 2] = 3 * BLmtx[0, 1]
+        H4mtx[2, 5] = 3 * BLmtx[0, 4]
+        H4mtx[2, 8] = 3 * BLmtx[0, 7]
+        H4mtx[2, 11] = 3 * BLmtx[0, 10]
+
+        return H4mtx
+
+    def H5(self, x1, x2, x3, x4):
+        H5mtx = np.zeros((3, 12), dtype=float)
+        BLmtx = self.BL(x1, x2, x3, x4)
+
+        # create the H3 matrix by differentiation of shape functions.
+        H5mtx[0, 0] = 3 * BLmtx[0, 2]
+        H5mtx[0, 3] = 3 * BLmtx[0, 5]
+        H5mtx[0, 6] = 3 * BLmtx[0, 8]
+        H5mtx[0, 9] = 3 * BLmtx[0, 11]
+
+        H5mtx[1, 1] = 3 * BLmtx[0, 1]
+        H5mtx[1, 4] = 3 * BLmtx[0, 4]
+        H5mtx[1, 7] = 3 * BLmtx[0, 7]
+        H5mtx[1, 10] = 3 * BLmtx[0, 10]
+
+        H5mtx[2, 2] = 3 * BLmtx[0, 0]
+        H5mtx[2, 5] = 3 * BLmtx[0, 3]
+        H5mtx[2, 8] = 3 * BLmtx[0, 6]
+        H5mtx[2, 11] = 3 * BLmtx[0, 9]
+        
+        return H5mtx
+
+
+    def A1(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        A1mtx = np.zeros((7, 3), dtype=float)
+        Gmtx = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
 
         # create the A1 matrix from nonlinear part of strain
-        AF[0, 0] = - G[0, 0] / 3
-        AF[0, 1] = - 2 * G[0, 1] / 3
-        AF[0, 2] = G[2, 0] / 3
+        A1mtx[0, 0] = - Gmtx[0, 0] / 3
+        A1mtx[0, 1] = - Gmtx[1, 1] / 3
+        A1mtx[0, 2] = - Gmtx[2, 2] / 3
+        A1mtx[1, 0] = - Gmtx[0, 0] / 3
+        A1mtx[1, 1] = Gmtx[1, 1] / 3
+        A1mtx[2, 1] = - Gmtx[1, 1] / 3
+        A1mtx[2, 2] = Gmtx[2, 2] / 3
+        A1mtx[3, 0] = Gmtx[0, 0] / 3
+        A1mtx[3, 2] = - Gmtx[2, 2] / 3
+        A1mtx[4, 1] = - 2 * Gmtx[1, 2] 
+        A1mtx[4, 2] = 2 * Gmtx[2, 1]
+        A1mtx[5, 1] = 2 * Gmtx[1, 2] 
+        A1mtx[5, 2] = 2 * Gmtx[2, 1]
+        A1mtx[6, 0] = - 2 * Gmtx[0, 1]
+        A1mtx[6, 1] = 2 * Gmtx[1, 0]
+        
+        return A1mtx
 
-        AF[1, 0] = - G[0, 0] / 3
-        AF[1, 1] = 2 * G[1, 0] / 3
-        AF[1, 2] = G[2, 0] / 3
-
-        AF[2, 1] = - G[1, 0] / 3
-
-        AF[3, 0] = G[0, 0] / 3
-        AF[3, 1] = - G[1, 0] / 3
-        AF[3, 2] = - G[2, 0] / 3
-
-        AF[4, 0] = 4 * G[1, 2]
-        AF[4, 1] = - 2 * G[0, 2]
-        AF[4, 2] = - 2 * G[1, 0]
-
-        AF[5, 0] = - 4 * G[1, 2]
-
-        AF[6, 0] = - 2 * G[0, 1]
-        AF[6, 1] = - 4 * G[0, 0]
-
-        BNF = np.zeros((7, 12), dtype=float)
-        BNF = np.matmul(AF, HF)
-
-        return BNF
-
-    def secondBNonLinear(self, x1, x2, x3, x4, x01, x02, x03, x04):
-        AS = np.zeros((7, 3), dtype=float)
-        G = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
-        HS = self.HmatrixS(x1, x2, x3, x4)
+    def A2(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        A2mtx = np.zeros((7, 3), dtype=float)
+        Gmtx = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
 
         # create the A2 matrix from nonlinear part of strain
-        AS[0, 1] = - G[1, 1] / 3
-        AS[0, 2] = G[2, 1] / 3
+        A2mtx[0, 0] = Gmtx[0, 2] / 3
+        A2mtx[0, 1] = - Gmtx[1, 2] / 3
+        A2mtx[0, 2] = - Gmtx[2, 1] / 3
+        A2mtx[1, 2] = - Gmtx[2, 1] / 3
+        A2mtx[2, 0] = - Gmtx[0, 2] / 3
+        A2mtx[2, 1] = Gmtx[1, 2] / 3
+        A2mtx[2, 2] = Gmtx[2, 1] 
+        A2mtx[3, 0] = Gmtx[0, 2] / 3
+        A2mtx[3, 1] = - Gmtx[1, 2] / 3
+        A2mtx[3, 2] = - 2 * Gmtx[2, 1] / 3
+        A2mtx[5, 0] = 2 * Gmtx[0, 1] 
+        A2mtx[6, 2] = 2 * Gmtx[2, 0]
+        
+        return A2mtx
 
-        AS[1, 0] = 2 * G[1, 0] / 3
-        AS[1, 1] = 2 * G[1, 1] / 3
-        AS[1, 2] = - G[2, 1] / 3
-
-        AS[2, 0] = - 2 * G[1, 0] / 3
-        AS[2, 1] = - G[1, 1] / 3
-        AS[2, 2] = G[2, 1]
-
-        AS[3, 2] = - 2 * G[2, 1] / 3
-
-        AS[4, 0] = - 2 * G[2, 0]
-        AS[4, 1] = - 4 * G[2, 1]
-        AS[4, 2] = 2 * G[2, 2]
-
-        AS[5, 0] = 2 * G[0, 2]
-        AS[5, 2] = - 4 * G[0, 0]
-
-        AS[6, 1] = 2 * G[1, 0]
-        AS[6, 2] = 2 * G[2, 0]
-
-        BNS = np.zeros((7, 12), dtype=float)
-        BNS = np.matmul(AS, HS)
-
-        return BNS
-
-    def thirdBNonLinear(self, x1, x2, x3, x4, x01, x02, x03, x04):
-        AT = np.zeros((7, 3), dtype=float)
-        G = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
-        HT = self.HmatrixS(x1, x2, x3, x4)
+    def A3(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        A3mtx = np.zeros((7, 3), dtype=float)
+        Gmtx = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
 
         # create the A3 matrix from nonlinear part of strain
-        AT[0, 0] = G[0, 2] / 3
-        AT[0, 1] = (- G[1, 2] - 4 * G[2, 1]) / 3
-        AT[0, 2] = - G[2, 2] / 3
+        A3mtx[0, 0] = - 2 * Gmtx[1, 0] / 3
+        A3mtx[0, 1] = - 4 * Gmtx[2, 1] / 3
+        A3mtx[0, 2] = Gmtx[2, 0] / 3
+        A3mtx[1, 0] = 2 * Gmtx[1, 0] / 3
+        A3mtx[1, 2] = Gmtx[2, 0] / 3
+        A3mtx[2, 0] = - 2 * Gmtx[1, 0] / 3
+        A3mtx[2, 1] = 4 * Gmtx[2, 1] / 3
+        A3mtx[3, 1] = - 4 * Gmtx[2, 1] / 3
+        A3mtx[3, 2] = - Gmtx[2, 0] / 3
+        
+        return A3mtx
 
-        AT[2, 0] = - G[0, 2] / 3
-        AT[2, 1] = (G[1, 2] + 4 * G[2, 1]) / 3
-        AT[2, 2] = G[2, 2] / 3
+    def A4(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        A4mtx = np.zeros((7, 3), dtype=float)
+        Gmtx = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
 
-        AT[3, 0] = G[0, 2] / 3
-        AT[3, 1] = (- G[1, 2] - 4 * G[2, 1]) / 3
-        AT[3, 2] = - G[2, 2] / 3
+        # create the A4 matrix from nonlinear part of strain
+        A4mtx[1, 1] = 2 * Gmtx[1, 0] / 3
+        A4mtx[2, 1] = - Gmtx[1, 0] / 3
+        A4mtx[3, 1] = - Gmtx[1, 0] / 3
+        A4mtx[4, 0] = 4 * Gmtx[1, 2] 
+        A4mtx[4, 2] = 4 * Gmtx[0, 0] 
+        A4mtx[5, 0] = - 4 * Gmtx[1, 2] 
+        A4mtx[5, 2] = - 4 * Gmtx[0, 0] 
+        A4mtx[6, 0] = - 4 * Gmtx[1, 0] 
+        
+        return A4mtx
 
-        AT[4, 1] = - 2 * G[1, 1]
+    def A5(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        A5mtx = np.zeros((7, 3), dtype=float)
+        Gmtx = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
 
-        AT[5, 1] = 2 * G[1, 1]
-        AT[5, 2] = 2 * G[2, 1]
+        # create the A5 matrix from nonlinear part of strain
+        A5mtx[4, 0] = - 2 * Gmtx[1, 0] 
+        A5mtx[4, 1] = - 4 * Gmtx[2, 1] 
+        A5mtx[4, 2] = - 2 * Gmtx[1, 0] 
+        
+        return A5mtx
 
-        BNT = np.zeros((7, 12), dtype=float)
-        BNT = np.matmul(AT, HT)
+    # derivative of shape functions in contribution to the first nonlinear 
+    # strain
+    def L1(self, x1, x2, x3, x4):
+        B = self.BL(x1, x2, x3, x4)
+        L1 = np.zeros((7, 12), dtype=float)
 
-        return BNT
+        L1[0, 0] = - B[0, 0]
+        L1[0, 1] = - B[0, 1]
+        L1[0, 2] = - B[0, 2]
+        L1[0, 3] = - B[0, 3]
+        L1[0, 4] = - B[0, 4]
+        L1[0, 5] = - B[0, 5]
+        L1[0, 6] = - B[0, 6]
+        L1[0, 7] = - B[0, 7]
+        L1[0, 8] = - B[0, 8]
+        L1[0, 9] = - B[0, 9]
+        L1[0, 10] = - B[0, 10]
+        L1[0, 11] = - B[0, 11]
+        
+        L1[1, 0] = - B[1, 0]
+        L1[1, 1] = - B[1, 1]
+        L1[1, 3] = - B[1, 3]
+        L1[1, 4] = - B[1, 4]
+        L1[1, 6] = - B[1, 6]
+        L1[1, 7] = - B[1, 7]
+        L1[1, 9] = - B[1, 9]
+        L1[1, 10] = - B[1, 10]
 
+        L1[2, 1] = - B[2, 1]
+        L1[2, 2] = - B[2, 2]
+        L1[2, 4] = - B[2, 4]
+        L1[2, 5] = - B[2, 5]
+        L1[2, 7] = - B[2, 7]
+        L1[2, 8] = - B[2, 8]
+        L1[2, 10] = - B[2, 10]
+        L1[2, 11] = - B[2, 11]
 
+        L1[3, 0] = - B[3, 0]
+        L1[3, 2] = - B[3, 2]
+        L1[3, 3] = - B[3, 3]
+        L1[3, 5] = - B[3, 5]
+        L1[3, 6] = - B[3, 6]
+        L1[3, 8] = - B[3, 8]
+        L1[3, 9] = - B[3, 9]
+        L1[3, 11] = - B[3, 11]
+        
+        L1[4, 1] = - 2 * B[4, 1]
+        L1[4, 2] = 2 * B[4, 2]
+        L1[4, 4] = - 2 * B[4, 4]
+        L1[4, 5] = 2 * B[4, 5]
+        L1[4, 7] = - 2 * B[4, 7]
+        L1[4, 8] = 2 * B[4, 8]
+        L1[4, 10] = - 2 * B[4, 10]
+        L1[4, 11] = 2 * B[4, 11]
+
+        L1[5, 1] = 2 * B[5, 1]
+        L1[5, 2] = 2 * B[5, 2]
+        L1[5, 4] = 2 * B[5, 4]
+        L1[5, 5] = 2 * B[5, 5]
+        L1[5, 7] = 2 * B[5, 7]
+        L1[5, 8] = 2 * B[5, 8]
+        L1[5, 10] = 2 * B[5, 10]
+        L1[5, 11] = 2 * B[5, 11]
+
+        L1[6, 0] = - 2 * B[6, 0]
+        L1[6, 1] = 2 * B[6, 1]
+        L1[6, 3] = - 2 * B[6, 3]
+        L1[6, 4] = 2 * B[6, 4]
+        L1[6, 6] = - 2 * B[6, 6]
+        L1[6, 7] = 2 * B[6, 7]
+        L1[6, 9] = - 2 * B[6, 9]
+        L1[6, 10] = 2 * B[6, 10]
+        
+        return L1
+
+    # derivative of shape functions in contribution to the second nonlinear 
+    # strain
+    def L2(self, x1, x2, x3, x4):
+        B = self.BL(x1, x2, x3, x4)
+        L2 = np.zeros((7, 12), dtype=float)
+
+        L2[0, 0] = B[0, 2]
+        L2[0, 1] = - B[0, 2]
+        L2[0, 2] = - B[0, 1]
+        L2[0, 3] = B[0, 5]
+        L2[0, 4] = - B[0, 5]
+        L2[0, 5] = - B[0, 4]
+        L2[0, 6] = B[0, 8]
+        L2[0, 7] = - B[0, 8]
+        L2[0, 8] = - B[0, 7]
+        L2[0, 9] = B[0, 11]
+        L2[0, 10] = - B[0, 11]
+        L2[0, 11] = - B[0, 10]
+        
+        L2[1, 2] = B[1, 1]
+        L2[1, 5] = B[1, 4]
+        L2[1, 8] = B[1, 7]
+        L2[1, 11] = B[1, 10]
+
+        L2[2, 0] = B[2, 2]
+        L2[2, 1] = - B[2, 2]
+        L2[2, 2] = 3 * B[2, 1]
+        L2[2, 3] = B[2, 5]
+        L2[2, 4] = - B[2, 5]
+        L2[2, 5] = 3 * B[2, 4]
+        L2[2, 6] = B[2, 8]
+        L2[2, 7] = - B[2, 8]
+        L2[2, 8] = 3 * B[2, 7]
+        L2[2, 9] = B[2, 11]
+        L2[2, 10] = - B[2, 11]
+        L2[2, 11] = 3 * B[2, 10]
+
+        L2[3, 0] = B[3, 2]
+        L2[3, 1] = - B[3, 2]
+        L2[3, 2] = - 2 * B[2, 2] / 3
+        L2[3, 3] = B[3, 5]
+        L2[3, 4] = - B[3, 5]
+        L2[3, 5] = - 2 * B[2, 5] / 3
+        L2[3, 6] = B[3, 8]
+        L2[3, 7] = - B[3, 8]
+        L2[3, 8] = - 2 * B[2, 8] / 3
+        L2[3, 9] = B[3, 11]
+        L2[3, 10] = - B[3, 11]
+        L2[3, 11] = - 2 * B[2, 11] 
+
+        L2[5, 0] = 2 * B[5, 2]
+        L2[5, 3] = 2 * B[5, 5]
+        L2[5, 6] = 2 * B[5, 8]
+        L2[5, 9] = 2 * B[5, 11]
+
+        L2[6, 2] = 2 * B[6, 1]
+        L2[6, 5] = 2 * B[6, 4]
+        L2[6, 8] = 2 * B[6, 7]
+        L2[6, 11] = 2 * B[6, 10]
+       
+        return L2
+   
+    # derivative of shape functions in contribution to the third nonlinear 
+    # strain
+    def L3(self, x1, x2, x3, x4):
+        B = self.BL(x1, x2, x3, x4)
+        L3 = np.zeros((7, 12), dtype=float)
+
+        L3[0, 0] = -2 * B[0, 0]
+        L3[0, 1] = - 4 * B[0,1]
+        L3[0, 2] = B[0, 0]
+        L3[0, 3] = -2 * B[0, 3]
+        L3[0, 4] = - 4 * B[0, 4]
+        L3[0, 5] = B[0, 3]
+        L3[0, 6] = -2 * B[0, 6]
+        L3[0, 7] = - 4 * B[0, 7]
+        L3[0, 8] = B[0, 6]
+        L3[0, 9] = -2 * B[0, 9]
+        L3[0, 10] = - 4 * B[0, 10]
+        L3[0, 11] = B[0, 9]
+        
+        L3[1, 0] = 2 * B[1, 0]
+        L3[1, 2] = B[1, 0]
+        L3[1, 3] = 2 * B[1, 3]
+        L3[1, 5] = B[1, 3]
+        L3[1, 6] = 2 * B[1, 6]
+        L3[1, 8] = B[1, 6]
+        L3[1, 9] = 2 * B[1, 9]
+        L3[1, 11] = B[1, 9]
+
+        L3[2, 0] = - B[1, 0]
+        L3[2, 1] = 4 * B[2, 1]
+        L3[2, 3] = - B[1, 3]
+        L3[2, 4] = 4 * B[2, 4]
+        L3[2, 6] = - B[1, 6]
+        L3[2, 7] = 4 * B[2, 7]
+        L3[2, 9] = - B[1, 9]
+        L3[2, 10] = 4 * B[2, 10]
+
+        L3[3, 1] = - B[2, 1]
+        L3[3, 2] = B[3, 0]
+        L3[3, 4] = - B[2, 4]
+        L3[3, 5] = B[3, 3]
+        L3[3, 7] = - B[2, 7]
+        L3[3, 8] = B[3, 6]
+        L3[3, 10] = - B[2, 10]
+        L3[3, 11] = B[3, 9] 
+       
+        return L3
+ 
+    # derivative of shape functions in contribution to the forth nonlinear 
+    # strain
+    def L4(self, x1, x2, x3, x4):
+        B = self.BL(x1, x2, x3, x4)
+        L4 = np.zeros((7, 12), dtype=float)
+        
+        L4[1, 1] = 2 * B[1, 0]
+        L4[1, 4] = 2 * B[1, 3]
+        L4[1, 7] = 2 * B[1, 6]
+        L4[1, 10] = 2 * B[1, 9]
+
+        L4[2, 1] = - B[1, 0]
+        L4[2, 4] = - B[1, 3]
+        L4[2, 7] = - B[1, 6]
+        L4[2, 10] = - B[1, 9]
+
+        L4[3, 1] = B[3, 0]
+        L4[3, 4] = B[3, 3]
+        L4[3, 7] = B[3, 6]
+        L4[3, 10] = B[3, 9]
+
+        L4[4, 0] = 4 * B[4, 1]
+        L4[4, 2] = 4 * B[6, 1]
+        L4[4, 3] = 4 * B[4, 4]
+        L4[4, 5] = 4 * B[6, 4]
+        L4[4, 6] = 4 * B[4, 7]
+        L4[4, 8] = 4 * B[4, 7]
+        L4[4, 9] = 4 * B[4, 10]
+        L4[4, 11] = 4 * B[4, 10]
+
+        L4[5, 0] = - 4 * B[5, 1]
+        L4[5, 2] = - 4 * B[6, 1]
+        L4[5, 3] = - 4 * B[5, 4]
+        L4[5, 5] = - 4 * B[6, 4]
+        L4[5, 6] = - 4 * B[5, 7]
+        L4[5, 8] = - 4 * B[5, 7]
+        L4[5, 9] = - 4 * B[5, 10]
+        L4[5, 11] = - 4 * B[5, 10]
+        
+        L4[6, 0] = - 4 * B[6, 1]
+        L4[6, 3] = - 4 * B[6, 4]
+        L4[6, 6] = - 4 * B[6, 7]
+        L4[6, 9] = - 4 * B[6, 10]
+       
+        return L4
+
+    # derivative of shape functions in contribution to the fifth nonlinear 
+    # strain
+    def L5(self, x1, x2, x3, x4):
+        B = self.BL(x1, x2, x3, x4)
+        L5 = np.zeros((7, 12), dtype=float)
+
+        L5[4, 0] = - 2 * B[6, 1]
+        L5[4, 1] = - 4 * B[4, 2]
+        L5[4, 2] = - 2 * B[6, 1]
+        L5[4, 3] = - 2 * B[6, 4]
+        L5[4, 4] = - 4 * B[4, 5]
+        L5[4, 5] = - 2 * B[6, 4]
+        L5[4, 6] = - 2 * B[6, 7]
+        L5[4, 7] = - 4 * B[4, 8]
+        L5[4, 8] = - 2 * B[4, 7]
+        L5[4, 9] = - 2 * B[4, 10]
+        L5[4, 10] = - 4 * B[4, 11]
+        L5[4, 11] = - 2 * B[4, 10]
+       
+        return L5
+    
+    # first nonlinear contribution to strain displacement matrix    
+    def BN1(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        A1mtx = self.A1(x1, x2, x3, x4, x01, x02, x03, x04)
+        H1mtx = self.H1(x1, x2, x3, x4)
+
+        B1Nmtx = np.zeros((7, 12), dtype=float)
+        B1Nmtx = np.matmul(A1mtx, H1mtx)
+
+        return B1Nmtx
+
+    # second nonlinear contribution to strain displacement matrix    
+    def BN2(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        A2mtx = self.A2(x1, x2, x3, x4, x01, x02, x03, x04)
+        H2mtx = self.H2(x1, x2, x3, x4)
+
+        B2Nmtx = np.zeros((7, 12), dtype=float)
+        B2Nmtx = np.matmul(A2mtx, H2mtx)
+
+        return B2Nmtx
+
+    # third nonlinear contribution to strain displacement matrix    
+    def BN3(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        A3mtx = self.A3(x1, x2, x3, x4, x01, x02, x03, x04)
+        H3mtx = self.H3(x1, x2, x3, x4)
+
+        B3Nmtx = np.zeros((7, 12), dtype=float)
+        B3Nmtx = np.matmul(A3mtx, H3mtx)
+
+        return B3Nmtx
+
+    # forth nonlinear contribution to strain displacement matrix    
+    def BN4(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        A4mtx = self.A4(x1, x2, x3, x4, x01, x02, x03, x04)
+        H4mtx = self.H4(x1, x2, x3, x4)
+
+        B4Nmtx = np.zeros((7, 12), dtype=float)
+        B4Nmtx = np.matmul(A4mtx, H4mtx)
+
+        return B4Nmtx
+    
+    # fifth nonlinear contribution to strain displacement matrix    
+    def BN5(self, x1, x2, x3, x4, x01, x02, x03, x04):
+        A5mtx = self.A5(x1, x2, x3, x4, x01, x02, x03, x04)
+        H5mtx = self.H5(x1, x2, x3, x4)
+
+        B5Nmtx = np.zeros((7, 12), dtype=float)
+        B5Nmtx = np.matmul(A5mtx, H5mtx)
+
+        return B5Nmtx    
+    
 """
 Changes made in version "1.0.0":
 

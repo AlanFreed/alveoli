@@ -7,9 +7,14 @@ import math
 import numpy as np
 from peceHE import PECE
 from ridder import findRoot
-from shapeFnChords import ShapeFunction
+from shapeFnChords import ShapeFunction  
 import spin as spinMtx
 from vertices import Vertex
+import math as m
+from decimal import *
+import materialProperties as mp
+
+
 
 
 """
@@ -34,7 +39,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "08-08-2019"
-__update__ = "07-17-2020"
+__update__ = "11-06-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -137,7 +142,9 @@ methods
         before freezing the co-ordinate values with a call to c.advance.  This
         method calls its PECE integrator to update the constitutive state.
 
-    c.advance()
+    c.advance(reindex)
+       input
+            reindex     is an instance of Pivot object from module pivotIncomingF      
         assigns the current fields to the previous fields, and then assigns
         the next fields to the current fields, thereby freezing the present
         next-fields in preparation for an advancment of a solution along its
@@ -179,20 +186,25 @@ methods
         returns the current coordinates for the chordal mid-point
 
     [ux, uy, uz] = c.displacement(reindex)
-        input
-            reindex is an instance of class Pivot from pivotIncomingF.py
-        output
+    output
             current displacement of the centroid
 
+    Dmtx = sf.dDisplacement(reindex)
+       input
+            reindex is an instance of Pivot object from module pivotIncomingF      
+       output
+            Dmtx is change in displacement ( dA = L * D ) in the contribution 
+            to nonlinear strain
+    
     [vx, vy, vz] = c.velocity(reindex)
-        input
-            reindex is an instance of class Pivot from pivotIncomingF.py
+       input
+            reindex is an instance of Pivot object from module pivotIncomingF      
         output
             current velocity of the centroid
 
     [ax, ay, az] = c.acceleration(reindex)
-        input
-            reindex is an instance of class Pivot from pivotIncomingF.py
+       input
+            reindex is an instance of Pivot object from module pivotIncomingF      
         output
             current acceleration of the centroid
 
@@ -205,9 +217,7 @@ methods
         e_2 direction passes through the origin of the dodecahedral reference
         co-ordinate system (E_1, E_2, E_3).
 
-    omegaMtx = c.spin(reindex)
-        input
-            reindex is an instance of class Pivot from pivotIncomingF.py
+    omegaMtx = c.spin()
         output
             a 3x3 skew symmetric matrix that describes the time rate of change
             in rotation, i.e., the spin of the local chordal co-ordinate system
@@ -265,7 +275,8 @@ methods
         uniform over the length of the chord. This mass matrix is constant and
         therefore independent of state.
 
-    kMtx = c.stiffnessMatrix()
+    kMtx = c.stiffnessMatrix(reindex)
+        reindex is an instance of Pivot object from module pivotIncomingF
         returns a tangent stiffness matrix for the chosen number of Gauss
         points belonging to the current state.  An updated Lagrangian
         formulation is implemented.
@@ -320,40 +331,22 @@ class Chord(object):
         # assign the Gauss quadrature rule to be used
         self._gq = GaussQuadrature()
 
-        # create the four rotation matrices: rotate dodecahedral into chordal
-        self._Pr3D = np.identity(3, dtype=float)
-        self._Pp3D = np.identity(3, dtype=float)
-        self._Pc3D = np.identity(3, dtype=float)
-        self._Pn3D = np.identity(3, dtype=float)
-
         # initialize the chordal lengths for all configurations
         x1 = self._vertex[1].coordinates('ref')
         x2 = self._vertex[2].coordinates('ref')
-        L0 = m.sqrt((x2[0] - x1[0])**2 + (x2[1] - x1[1])**2
-                    + (x2[2] - x1[2])**2)
+
+        L0 = math.sqrt((x2[0] - x1[0])**2 
+                       + (x2[1] - x1[1])**2
+                       + (x2[2] - x1[2])**2)
         self._L0 = L0
         self._Lc = L0
         self._Ln = L0
-
-        # initialize the centroids for all configurations
-        self._centroidX0 = (x1[0] + x2[0]) / 2.0
-        self._centroidY0 = (x1[1] + x2[1]) / 2.0
-        self._centroidZ0 = (x1[2] + x2[2]) / 2.0
-        self._centroidXp = self._centroidX0
-        self._centroidYp = self._centroidY0
-        self._centroidZp = self._centroidZ0
-        self._centroidXc = self._centroidX0
-        self._centroidYc = self._centroidY0
-        self._centroidZc = self._centroidZ0
-        self._centroidXn = self._centroidX0
-        self._centroidYn = self._centroidY0
-        self._centroidZn = self._centroidZ0
-
+        
         # base vector 1: aligns with the axis of the chord
         x = x2[0] - x1[0]
         y = x2[1] - x1[1]
         z = x2[2] - x1[2]
-        mag = m.sqrt(x * x + y * y + z * z)
+        mag = math.sqrt(x * x + y * y + z * z)
         n1x = x / mag
         n1y = y / mag
         n1z = z / mag
@@ -363,7 +356,7 @@ class Chord(object):
         x = (x1[0] + x2[0]) / 2.0
         y = (x1[1] + x2[1]) / 2.0
         z = (x1[2] + x2[2]) / 2.0
-        mag = m.sqrt(x * x + y * y + z * z)
+        mag = math.sqrt(x * x + y * y + z * z)
         ex = x / mag
         ey = y / mag
         ez = z / mag
@@ -387,7 +380,7 @@ class Chord(object):
         x = ex + delta * n1x
         y = ey + delta * n1y
         z = ez + delta * n1z
-        mag = m.sqrt(x * x + y * y + z * z)
+        mag = math.sqrt(x * x + y * y + z * z)
         n2x = x / mag
         n2y = y / mag
         n2z = z / mag
@@ -397,6 +390,9 @@ class Chord(object):
         n3y = n1z * n2x - n1x * n2z
         n3z = n1x * n2y - n1y * n2x
 
+        # create the rotation matrices: rotate dodecahedral into chordal
+        self._Pr3D = np.identity(3, dtype=float)
+        
         # create the rotation matrix from dodecahedral to chordal co-ordinates
         self._Pr3D[0, 0] = n1x
         self._Pr3D[0, 1] = n2x
@@ -407,10 +403,55 @@ class Chord(object):
         self._Pr3D[2, 0] = n1z
         self._Pr3D[2, 1] = n2z
         self._Pr3D[2, 2] = n3z
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v1x0 = n1x * x1[0] + n1y * x1[1] + n1z * x1[2]
+        self._v1y0 = n2x * x1[0] + n2y * x1[1] + n2z * x1[2]
+        self._v2x0 = n1x * x2[0] + n1y * x2[1] + n1z * x2[2]
+        self._v2y0 = n2x * x2[0] + n2y * x2[1] + n2z * x2[2]
+
+        # initialize current vertice coordinates in chordal frame of reference
+        self._v1x = self._v1x0
+        self._v1y = self._v1y0
+        self._v2x = self._v2x0
+        self._v2y = self._v2y0
+        
+        # z offsets
+        self._v1z = n3x * x1[0] + n3y * x1[1] + n3z * x1[2]
+        self._v2z = n3x * x2[0] + n3y * x2[1] + n3z * x2[2]
+
+        self._vz0 = ((self._v1z + self._v2z) / 2.0)        
+        
+        # determine the centroid of this tetrahedron       
+        self._cx0 = (self._v1x0 + self._v2x0) / 2.0
+        self._cy0 = (self._v1y0 + self._v2y0) / 2.0
+        self._cz0 = self._vz0 
+
+        # rotate this centroid back into the reference coordinate system
+        self._centroidX0 = n1x * self._cx0 + n2x * self._cy0 + n3x * self._cz0
+        self._centroidY0 = n1y * self._cx0 + n2y * self._cy0 + n3y * self._cz0
+        self._centroidZ0 = n1z * self._cx0 + n2z * self._cy0 + n3z * self._cz0
+
+        # initialize the centroids for all configurations              
+        self._centroidXp = self._centroidX0
+        self._centroidYp = self._centroidY0
+        self._centroidZp = self._centroidZ0
+        self._centroidXc = self._centroidX0
+        self._centroidYc = self._centroidY0
+        self._centroidZc = self._centroidZ0
+        self._centroidXn = self._centroidX0
+        self._centroidYn = self._centroidY0
+        self._centroidZn = self._centroidZ0
+
+        # rotation matrices: from dodecahedral frame into pentagonal frame
+        self._Pp3D = np.zeros((3, 3), dtype=float)
+        self._Pc3D = np.zeros((3, 3), dtype=float)
+        self._Pn3D = np.zeros((3, 3), dtype=float)
         self._Pp3D[:, :] = self._Pr3D[:, :]
         self._Pc3D[:, :] = self._Pr3D[:, :]
         self._Pn3D[:, :] = self._Pr3D[:, :]
 
+        
         # establish the shape functions located at the various Gauss points
         atGaussPt = 1
         sf1 = ShapeFunction(self._gq.coordinates(atGaussPt))
@@ -426,7 +467,19 @@ class Chord(object):
         # 'p' implies previous, 'c' implies current, and 'n' implies next.
 
         # displacement gradients located at the Gauss points of a chord
-        self._G = {
+        self._G0 = {
+            1: np.zeros((1, 1), dtype=float),
+            2: np.zeros((1, 1), dtype=float)
+        }
+        self._Gp = {
+            1: np.zeros((1, 1), dtype=float),
+            2: np.zeros((1, 1), dtype=float)
+        }
+        self._Gc = {
+            1: np.zeros((1, 1), dtype=float),
+            2: np.zeros((1, 1), dtype=float)
+        }
+        self._Gn = {
             1: np.zeros((1, 1), dtype=float),
             2: np.zeros((1, 1), dtype=float)
         }
@@ -447,14 +500,23 @@ class Chord(object):
             1: np.ones((1, 1), dtype=float),
             2: np.ones((1, 1), dtype=float)
         }
+        
+        E1_c, E2_c, et_c, ef_c, s0_c = mp.collagenFiber()
+        E1_e, E2_e, et_e, s0_e = mp.elastinFiber()
 
         # create constitutive solvers for each Gauss point of a chord
         nbrVars = 2   # for a chord they are: temperature and length
+        respVars = 4
         T0 = 37.0     # body temperature in centigrade
         # thermodynamic strains (thermal and mechanical) are 0 at reference
         eVec0 = np.zeros((nbrVars,), dtype=float)
         # physical variables have reference values of
         xVec0 = np.zeros((nbrVars,), dtype=float)
+        # vector of thermodynamic response variables
+        yVec0 = np.zeros((respVars,), dtype=float)
+        yVec0[1] = s0_c
+        yVec0[3] = s0_e
+        
         xVec0[0] = T0  # temperature in centigrade
         xVec0[1] = L0  # length in centimeters
         self._control = {
@@ -462,19 +524,56 @@ class Chord(object):
             2: ControlFiber(eVec0, xVec0, dt)
         }
         self._response = {
-            1: SeptalChord(diaCollagen, diaElastin),
-            2: SeptalChord(diaCollagen, diaElastin)
+            1: SeptalChord(eVec0, xVec0, yVec0),
+            2: SeptalChord(eVec0, xVec0, yVec0)
         }
         self._solver = {
             1: PECE(self._control[1], self._response[1], m),
             2: PECE(self._control[2], self._response[2], m)
         }
+
+        self._Ms = {
+            1: self._response[1].mixedSecantModulus(eVec0, xVec0, yVec0),
+            2: self._response[2].mixedSecantModulus(eVec0, xVec0, yVec0)
+        }
+        
+        self._Mt = {
+            1: self._response[1].mixedtangentModulus(eVec0, xVec0, yVec0),
+            2: self._response[2].mixedtangentModulus(eVec0, xVec0, yVec0)
+        }        
+
+        self._trac = {
+            1: self._response[1].traction(),
+            2: self._response[2].traction()
+        }  
+
+        
         return  # a new chord object
 
     # local methods
 
     def __str__(self):
         return self.toString()
+    
+   # uniform or averaged geometric properties of the chord
+
+    def area(self):
+        a = ((self._response[1].A0_c + self._response[2].A0_c
+              + self._response[1].A0_e + self._response[2].A0_e)
+             * self._L0 / (2.0 * self._Lc))
+        return a
+
+    def length(self):
+        return self._Lc
+
+    def massDensity(self):
+        v1 = self._response[1].volume()
+        v2 = self._response[2].volume()
+        m1 = self._response[1].massDensity() * v1
+        m2 = self._response[2].massDensity() * v2
+        rho = (m1 + m2) / (v1 + v2)
+        return rho
+    
 
     # These FE arrays are evaluated at the beginning of the current step of
     # integration, i.e., they associate with an updated Lagrangian formulation.
@@ -497,7 +596,7 @@ class Chord(object):
         row, col = np.diag_indices_from(massC)
         massL[row, col] = massC.sum(axis=1)
 
-        # construct the averaged mass matrix in natural co-ordinates
+        # constrcuct the averaged mass matrix in natural co-ordinates
         massA = np.zeros((2, 2), dtype=float)
         massA = 0.5 * (massC + massL)
 
@@ -506,303 +605,142 @@ class Chord(object):
         # print(0.5 * massA)  # the half is the Jacobian for span [-1, 1]
 
         # convert average mass matrix from natural to physical co-ordinates
-        length = self.length("ref")
-        area = self.area('ref')
-        xn1 = (-length / 2,)
-        xn2 = (length / 2,)
-        Jdet = sf.jacobianDet(xn1, xn2)
+        
+        area = self.area()
+
+        # assign coordinates at the vertices in the reference configuration
+        x01 = (self._v1x0, self._v1y0)
+        x02 = (self._v2x0, self._v2y0)
+        
+        Jdet = sfn.jacobianDeterminant(x01, x02)
         rho = self.massDensity()
-        mMtx = (rho * area * Jdet) * massA
+        mMtx = (rho * area * Jdet) * massA     
 
         return mMtx
 
-    def _stiffnessMatrix(self):
+    def _stiffnessMatrix(self, reindex):
         kMtx = np.zeros((2, 2), dtype=float)
+
+        # current vertex coordinates in pentagonal frame of reference
+        xn1 = (self._v1x, self._v1y)
+        xn2 = (self._v2x, self._v2y)
+
+        # assign coordinates at the vertices in the reference configuration
+        x01 = (self._v1x0, self._v1y0)
+        x02 = (self._v2x0, self._v2y0)
+        
+        # cross-sectional area of the chord (both collagen and elastin fibers)
+        area = self.area()
+        
+        cs1 = np.zeros((2, 2), dtype=float)
+        ct1 = np.zeros((2, 2), dtype=float)
+        ks1 = np.zeros((2, 2), dtype=float)
+        kt1 = np.zeros((2, 2), dtype=float)
+            
+        for i in range(1, self._gq.gaussPoints()+1):
+            sfn = self._shapeFns[i]
+            wgt = self._gq.weight(i)
+            Ms = self._Ms[i]
+            Mt = self._Mt[i]
+            Ss = self._trac[i]
+
+            Hmtx = sfn.H(xn1, xn2)
+            Lmtx = sfn.L(xn1, xn2)
+            BLmtx = sfn.BL(xn1, xn2)
+            BNmtx = sfn.BN(xn1, xn2, x01, x02)
+            A = sfn.A(xn1, xn2, x01, x02)  
+            Dmtx = self.dDisplacement(reindex)
+                    
+            dA = np.dot(Lmtx, np.transpose(Dmtx))            
+            dSt = A.T.dot(Mt[1, 1]).dot(dA)
+            
+            cs1 += wgt * Hmtx.T.dot(Ss).dot(Hmtx)
+            
+            ct1 += wgt * (BLmtx.T.dot(Mt[1, 1]).dot(BLmtx) 
+                        + BLmtx.T.dot(Mt[1, 1]).dot(BNmtx)
+                        + BNmtx.T.dot(Mt[1, 1]).dot(BLmtx) 
+                        + BNmtx.T.dot(Mt[1, 1]).dot(BNmtx) )
+            
+            ks1 += wgt * (BLmtx.T.dot(Ms[1, 1]).dot(BLmtx) 
+                        + BLmtx.T.dot(Ms[1, 1]).dot(BNmtx) 
+                        + BNmtx.T.dot(Ms[1, 1]).dot(BLmtx) 
+                        + BNmtx.T.dot(Ms[1, 1]).dot(BNmtx) )
+            
+            kt1 += wgt * Hmtx.T.dot(dSt).dot(Hmtx)
+            
+        # determinant of jacobian matrix
+        Jdet = sfn.jacobianDeterminant(x01, x02)
+        
+        Cs = np.zeros((2, 2), dtype=float)
+        Ct = np.zeros((2, 2), dtype=float)
+        Ks = np.zeros((2, 2), dtype=float)
+        Kt = np.zeros((2, 2), dtype=float)
+    
+        # the tangent stiffness matrix Cs
+        Cs = area * Jdet * cs1
+
+        # the tangent stiffness matrix Ct
+        Ct = area * Jdet * ct1
+
+        # the secant stiffness matrix Ks
+        Ks = area * Jdet * ks1
+
+        # the stress stiffness matrix for 1 Gauss point
+        Kt = area * Jdet * kt1
+
+        # determine the total tangent stiffness matrix
+        kMtx = Cs + Ct + Ks + Kt
+
         return kMtx
 
     def _forcingFunction(self):
-        fVec = np.zeros((2,), dtype=float)
+        fVec = np.zeros((2,1), dtype=float)
+        
+        # current vertex coordinates in pentagonal frame of reference
+        xn1 = (self._v1x, self._v1y)
+        xn2 = (self._v2x, self._v2y)
+
+        # assign coordinates at the vertices in the reference configuration
+        x01 = (self._v1x0, self._v1y0)
+        x02 = (self._v2x0, self._v2y0)
+        
+        area = self.area()
+        N1 = np.zeros((2, 1), dtype=float)
+        BL1 = np.zeros((2, 1), dtype=float)
+        BN1 = np.zeros((2, 1), dtype=float)
+        
+        for i in range(1, self._gq.gaussPoints()+1):
+            sfn = self._shapeFns[i]
+            wgt = self._gq.weight(i)
+            t = self._trac[i]
+            N1 += wgt * np.transpose(sfn.Nmtx) * t 
+            BL1 += wgt * np.transpose(sfn.BL(xn1, xn2))   
+            BN1 += wgt * np.transpose(sfn.BN(xn1, xn2, x01, x02))
+            B = np.add(BL1, BN1) * t
+        
+        # determinant of jacobian matrix
+        Jdet = sfn.jacobianDeterminant(x01, x02)
+        
+        FBc = np.zeros((2, 1), dtype=float)
+        F0 = np.zeros((2, 1), dtype=float)
+        
+        FBc = Jdet * N1
+                    
+        F0 = Jdet * area * B
+        
+        fVec = FBc - F0
+            
         return fVec
 
-
-
-
-
-    def massMatrix(self):
-        # use the following rule for Gauss quadrature
-        gq = self.gaussQuadrature()
-
-        # construct the consistent mass matrix in natural co-ordinates
-        massC = np.zeros((2, 2), dtype=float)
-        NtN = np.zeros((2, 2), dtype=float)
-        for i in range(self.gaussPoints()):
-            sf = self.shapeFunction(i+1)
-            NtN += gq.weight(i+1) * np.matmul(np.transpose(sf.Nmtx), sf.Nmtx)
-        massC[:, :] = NtN[:, :]
-
-        # construct the lumped mass matrix in natural co-ordinates
-        massL = np.zeros((2, 2), dtype=float)
-        row, col = np.diag_indices_from(massC)
-        massL[row, col] = massC.sum(axis=1)
-
-        # construct the averaged mass matrix in natural co-ordinates
-        massA = np.zeros((2, 2), dtype=float)
-        massA = 0.5 * (massC + massL)
-
-        # the following print statements were used to verify the code
-        # print("\nThe averaged mass matrix in natural co-ordinates is")
-        # print(0.5 * massA)  # the half is the Jacobian for span [-1, 1]
-
-        # convert average mass matrix from natural to physical co-ordinates
-        length = self.length("ref")
-        area = self.area('ref')
-        xn1 = (-length / 2,)
-        xn2 = (length / 2,)
-        mass = np.zeros((2, 2), dtype=float)
-        Jdet = sf.jacobianDet(xn1, xn2)
-        rho = self.massDensity()
-        mass = (rho * area * Jdet) * massA
-        return mass
-
-    def stiffnessMatrix(self, M, se, sc):
-        # cross-sectional area of the chord (both collagen and elastin fibers)
-        area = self._areaC + self._areaE
-
-        # initial natural coordinates for a chord
-        x01 = -self._L0 / 2.0
-        x02 = self._L0 / 2.0
-        xn1 = -self._Ln / 2.0
-        xn2 = self._Ln / 2.0
-
-        # creat the stress matrix
-        T = se + sc
-
-        # determine the stiffness matrix
-        if self._gaussPts == 1:
-            # 'natural' weight of the element
-            wgt = 2.0
-            w = np.array([wgt])
-
-            # Jacobian matrix for
-            J = self._shapeFns[1].jacobian(xn1, xn2)
-
-            # create the linear Bmatrix
-            BL = self._shapeFns[1].dNdximat() / J
-            # the linear stiffness matrix for 1 Gauss point
-            KL = area * (J * w[0] * BL.T.dot(M).dot(BL))
-
-            # create the matrix of derivative of shape functions (H matrix)
-            H = self._shapeFns[1].dNdximat() / J
-            # create the matrix of derivative of displacements (A matrix)
-            A = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J
-            # create the nonlinear Bmatrix
-            BN = np.dot(A, H)
-            # the nonlinear stiffness matrix for 1 Gauss point
-            KN = (area * J * w[0] * (BL.T.dot(M).dot(BN) +
-                  BN.T.dot(M).dot(BL) + BN.T.dot(M).dot(BN) ))
-
-            # the stress stiffness matrix for 1 Gauss point
-            KS = area * (J * w[0] * H.T.dot(T).dot(H))
-
-            # determine the total tangent stiffness matrix
-            stiffT = KL + KN + KS
-
-        elif self._gaussPts == 2:
-            # 'natural' weights of the element
-            wgt = 1.0
-            w = np.array([wgt, wgt])
-
-            # at Gauss point 1
-            J1 = self._shapeFns[1].jacobian(xn1, xn2)
-            # create the linear Bmatrix
-            BL1 = self._shapeFns[1].dNdximat() / J1
-
-            # at Gauss point 2
-            J2 = self._shapeFns[2].jacobian(xn1, xn2)
-            # create the linear  Bmatrix
-            BL2 = self._shapeFns[2].dNdximat() / J2
-
-            # the linear stiffness matrix for 2 Gauss points
-            KL = (area * (J1 * w[0] * BL1.T.dot(M).dot(BL1) +
-                          J2 * w[1] * BL2.T.dot(M).dot(BL2)))
-
-            # create the matrix of derivative of shape functions (H matrix)
-            H1 = self._shapeFns[1].dNdximat() / J
-            H2 = self._shapeFns[2].dNdximat() / J
-            # create the matrix of derivative of displacements (A matrix)
-            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J1
-            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) / J2
-            # create the nonlinear Bmatrix
-            BN1 = np.dot(A1, H1)
-            BN2 = np.dot(A2, H2)
-
-            # the nonlinear stiffness matrix for 2 Gauss point
-            KN = (area * (J1 * w[0] * (BL1.T.dot(M).dot(BN1) +
-                         BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) +
-                         J2 * w[1] * (BL2.T.dot(M).dot(BN2) +
-                         BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2))))
-
-            # the stress stiffness matrix for 1 Gauss point
-            KS = (area * (J1 * w[0] * H1.T.dot(T).dot(H1) +
-                          J2 * w[1] * H2.T.dot(T).dot(H2)))
-
-            # determine the total tangent stiffness matrix
-            stiffT = KL + KN + KS
-
-        else:  # gaussPts = 3
-            # 'natural' weights of the element
-            wgt1 = 5.0 / 9.0
-            wgt2 = 8.0 / 9.0
-            w = np.array([wgt1, wgt2, wgt1])
-
-            # at Gauss point 1
-            J1 = self._shapeFns[1].jacobian(xn1, xn2)
-            # create the linear Bmatrix
-            BL1 = self._shapeFns[1].dNdximat() / J1
-
-            # at Gauss point 2
-            J2 = self._shapeFns[2].jacobian(xn1, xn2)
-            # create the linear Bmatrix
-            BL2 = self._shapeFns[2].dNdximat() / J2
-
-            # at Gauss point 3
-            J3 = self._shapeFns[3].jacobian(xn1, xn2)
-            # create the linear Bmatrix
-            BL3 = self._shapeFns[3].dNdximat() / J3
-
-            # the linear stiffness matrix for 3 Gauss points
-            KL = (area * (J1 * w[0] * BL1.T.dot(M).dot(BL1) +
-                          J2 * w[1] * BL2.T.dot(M).dot(BL2) +
-                          J3 * w[2] * BL3.T.dot(M).dot(BL3)))
-
-            # create the matrix of derivative of shape functions (H matrix)
-            H1 = self._shapeFns[1].dNdximat() / J1
-            H2 = self._shapeFns[2].dNdximat() / J2
-            H3 = self._shapeFns[3].dNdximat() / J3
-            # create the matrix of derivative of displacements (A matrix)
-            A1 = - self._shapeFns[1].G(xn1, xn2, x01, x02) / J1
-            A2 = - self._shapeFns[2].G(xn1, xn2, x01, x02) / J2
-            A3 = - self._shapeFns[3].G(xn1, xn2, x01, x02) / J3
-            # create the nonlinear Bmatrix
-            BN1 = np.dot(A1, H1)
-            BN2 = np.dot(A2, H2)
-            BN3 = np.dot(A3, H3)
-
-            # the nonlinear stiffness matrix for 3 Gauss point
-            KN = (area * (J1 * w[0] * (BL1.T.dot(M).dot(BN1) +
-                          BN1.T.dot(M).dot(BL1) + BN1.T.dot(M).dot(BN1)) +
-                          J2 * w[1] * (BL2.T.dot(M).dot(BN2) +
-                          BN2.T.dot(M).dot(BL2) + BN2.T.dot(M).dot(BN2) ) +
-                          J3 * w[2] * (BL3.T.dot(M).dot(BN3) +
-                          BN3.T.dot(M).dot(BL3) + BN3.T.dot(M).dot(BN3))))
-
-            # the stress stiffness matrix for 1 Gauss point
-            KS = (area * (J1 * w[0] * H1.T.dot(T).dot(H1) +
-                          J2 * w[1] * H2.T.dot(T).dot(H2) +
-                          J3 * w[2] * H3.T.dot(T).dot(H3)))
-
-            # determine the total tangent stiffness matrix
-            stiffT = KL + KN + KS
-
-        return stiffT
-
-    def forcingFunction(self, se, sc):
-
-        # create the traction
-        T = sc + se
-        t = T
-
-        # initial natural coordinates for a chord
-        xn1 = -self._Ln / 2.0
-        xn2 = self._Ln / 2.0
-
-        # determine the force vector
-        if self._gaussPts == 1:
-            # 'natural' weight of the element
-            wgt = 2.0
-            we = np.array([wgt])
-
-            N1 = self._shapeFns[1].N1
-            N2 = self._shapeFns[1].N2
-            n = np.array([[N1, N2]])
-            nMat1 = np.transpose(n)
-
-            J = self._shapeFns[1].jacobian(xn1, xn2)
-
-            # the force vector for 1 Gauss point
-            FVec = J * we[0] * nMat1 * t
-
-        elif self._gaussPts == 2:
-            # 'natural' weights of the element
-            wgt = 1.0
-            we = np.array([wgt, wgt])
-
-            # at Gauss point 1
-            N1 = self._shapeFns[1].N1
-            N2 = self._shapeFns[1].N2
-            n1 = np.array([[N1, N2]])
-            nMat1 = np.transpose(n1)
-
-            # at Gauss point 2
-            N1 = self._shapeFns[2].N1
-            N2 = self._shapeFns[2].N2
-            n2 = np.array([[N1, N2]])
-            nMat2 = np.transpose(n2)
-
-            J1 = self._shapeFns[1].jacobian(xn1, xn2)
-            J2 = self._shapeFns[2].jacobian(xn1, xn2)
-
-            # the force vector for 2 Gauss points
-            FVec = J1 * we[0] * nMat1 * t + J2 * we[1] * nMat2 * t
-
-        else:  # gaussPts = 3
-            # 'natural' weights of the element
-            wgt1 = 5.0 / 9.0
-            wgt2 = 8.0 / 9.0
-            we = np.array([wgt1, wgt2, wgt1])
-
-            # at Gauss point 1
-            N1 = self._shapeFns[1].N1
-            N2 = self._shapeFns[1].N2
-            n1 = np.array([[N1, N2]])
-            nMat1 = np.transpose(n1)
-
-            # at Gauss point 2
-            N1 = self._shapeFns[2].N1
-            N2 = self._shapeFns[2].N2
-            n2 = np.array([[N1, N2]])
-            nMat2 = np.transpose(n2)
-
-            # at Gauss point 3
-            N1 = self._shapeFns[3].N1
-            N2 = self._shapeFns[3].N2
-            n3 = np.array([[N1, N2]])
-            nMat3 = np.transpose(n3)
-
-            J1 = self._shapeFns[1].jacobian(xn1, xn2)
-            J2 = self._shapeFns[2].jacobian(xn1, xn2)
-            J3 = self._shapeFns[3].jacobian(xn1, xn2)
-
-            # the force vector for 3 Gauss points
-            FVec = (J1 * we[0] * nMat1 * t + J2 * we[1] * nMat2 * t +
-                    J3 * we[2] * nMat3 * t)
-
-        return FVec
-
-
-
-
-    # methods
-
-    def toString(self):
+    def toString(self, state):
         if self._number < 10:
             s = 'chord[0'
         else:
             s = 'chord['
         s = s + str(self._number)
         s = s + '] has vertices: \n'
-        s = s + '   ' + self._vertex[1].toString('curr') + '\n'
-        s = s + '   ' + self._vertex[2].toString('curr')
+        s = s + '   ' + self._vertex[1].toString(state) + '\n'
+        s = s + '   ' + self._vertex[2].toString(state)
         return s
 
     def number(self):
@@ -840,13 +778,6 @@ class Chord(object):
         # determine length of the chord in the next configuration
         x1 = self._vertex[1].coordinates('next')
         x2 = self._vertex[2].coordinates('next')
-        self._Ln = math.sqrt((x2[0] - x1[0])**2 + (x2[1] - x1[1])**2
-                             + (x2[2] - x1[2])**2)
-
-        # determine the centroid of this chord
-        self._centroidXn = (x1[0] + x2[0]) / 2.0
-        self._centroidYn = (x1[1] + x2[1]) / 2.0
-        self._centroidZn = (x1[2] + x2[2]) / 2.0
 
         # base vector 1: aligns with the axis of the chord
         x = x2[0] - x1[0]
@@ -907,19 +838,52 @@ class Chord(object):
         self._Pn3D[2, 1] = n2z
         self._Pn3D[2, 2] = n3z
 
-        # chordal co-ordinates for the chords, must be tuples
-        x10 = (-self._L0 / 2.0,)
-        x20 = (self._L0 / 2.0,)
-        x1n = (-self._Ln / 2.0,)
-        x2n = (self._Ln / 2.0,)
+        # determine vertice coordinates 
+        self._v1x0 = n1x * x1[0] + n1y * x1[1] + n1z * x1[2]
+        self._v1y0 = n2x * x1[0] + n2y * x1[1] + n2z * x1[2]
+        self._v2x0 = n1x * x2[0] + n1y * x2[1] + n1z * x2[2]
+        self._v2y0 = n2x * x2[0] + n2y * x2[1] + n2z * x2[2]
+
+        # initialize current vertice coordinates 
+        self._v1x = self._v1x0
+        self._v1y = self._v1y0
+        self._v2x = self._v2x0
+        self._v2y = self._v2y0
+
+        # z offsets 
+        self._v1z = n3x * x1[0] + n3y * x1[1] + n3z * x1[2]
+        self._v2z = n3x * x2[0] + n3y * x2[1] + n3z * x2[2]
+
+        self._Ln  = math.sqrt((self._v2x - self._v1x)**2 
+                              + (self._v2y - self._v1y)**2
+                              + (self._v2z - self._v1z)**2)
+        
+        # determine the centroid of this tetrahedron       
+        self._cx = (self._v1x + self._v2x) / 2.0
+        self._cy = (self._v1y + self._v2y) / 2.0
+        self._cz = (self._v1z + self._v2z) / 2.0  
+
+        # rotate this centroid back into the reference coordinate system
+        self._centroidXn = n1x * self._cx + n2x * self._cy + n3x * self._cz
+        self._centroidYn = n1y * self._cx + n2y * self._cy + n3y * self._cz
+        self._centroidZn = n1z * self._cx + n2z * self._cy + n3z * self._cz
+        
+        # current vertex coordinates 
+        x1 = (self._v1x, self._v1y)
+        x2 = (self._v2x, self._v2y)
+
+        # reference vertex coordinates 
+        x10 = (self._v1x0, self._v1y0)
+        x20 = (self._v2x0, self._v2y0)
+        
 
         # quantify the displacement and deformation gradients of the chord
         # displacement gradients located at the Gauss points of a chord
-        self._Gn[1] = self._shapeFns[1].G(x1n, x2n, x10, x20)
-        self._Gn[2] = self._shapeFns[2].G(x1n, x2n, x10, x20)
+        self._Gn[1] = self._shapeFns[1].G(x1, x2, x10, x20)
+        self._Gn[2] = self._shapeFns[2].G(x1, x2, x10, x20)
         # deformation gradients located at the Gauss points of a chord
-        self._Fn[1] = self._shapeFns[1].F(x1n, x2n, x10, x20)
-        self._Fn[2] = self._shapeFns[2].F(x1n, x2n, x10, x20)
+        self._Fn[1] = self._shapeFns[1].F(x1, x2, x10, x20)
+        self._Fn[2] = self._shapeFns[2].F(x1, x2, x10, x20)
 
         # integrate the constitutive equations
         xVec = np.zeros((2,), dtype=float)
@@ -929,7 +893,7 @@ class Chord(object):
         self._solver[2].integrate(xVec, restart)
         return  # nothing, the data structure has been updated
 
-    def advance(self):
+    def advance(self, reindex):
         # assign current to previous values, and then next to current values
         self._centroidXp = self._centroidXc
         self._centroidYp = self._centroidYc
@@ -937,12 +901,13 @@ class Chord(object):
         self._centroidXc = self._centroidXn
         self._centroidYc = self._centroidYn
         self._centroidZc = self._centroidZn
+        self._L0 = self._Lc
         self._Lc = self._Ln
         self._Pp3D[:, :] = self._Pc3D[:, :]
         self._Pc3D[:, :] = self._Pn3D[:, :]
 
         # advance the matrix fields associated with each Gauss point
-        for i in range(1, self.gaussPoints()+1):
+        for i in range(1, self._gq.gaussPoints()+1):
             self._Fp[i] = self._Fc[i]
             self._Fc[i] = self._Fn[i]
 
@@ -952,19 +917,11 @@ class Chord(object):
 
         # compute the FE arrays needed for the next interval of integration
         self.mMtx = self._massMatrix()
-        self.kMtx = self._stiffnessMatrix()
+        self.kMtx = self._stiffnessMatrix(reindex)
         self.fVec = self._forcingFunction()
         return  # nothing, the data structure has been advanced
 
     # material properties of the chord
-
-    def massDensity(self):
-        v1 = self._response[1].volume()
-        v2 = self._response[2].volume()
-        m1 = self._response[1].massDensity() * v1
-        m2 = self._response[2].massDensity() * v2
-        rho = (m1 + m2) / (v1 + v2)
-        return rho
 
     def collagenIsRuptured(self):
         (ruptured,) = self._response[1].bioFiberCollagen.isRuptured()
@@ -987,17 +944,6 @@ class Chord(object):
         else:
             return False
 
-    # uniform or averaged geometric properties of the chord
-
-    def area(self):
-        a = ((self._response[1].A0_c + self._response[2].A0_c
-              + self._response[1].A0_e + self._response[2].A0_e)
-             * self._L0 / (2.0 * self._Lc))
-        return a
-
-    def length(self):
-        return self._Lc
-
     def stretch(self):
         lambda_ = self._Lc / self._L0
         return lambda_
@@ -1011,21 +957,97 @@ class Chord(object):
         return np.array([cx, cy, cz])
 
     def displacement(self, reindex):
+        
         u1 = self._vertex[1].displacement(reindex, 'curr')
         u2 = self._vertex[2].displacement(reindex, 'curr')
-        u = 0.5 * (u1 + u2)
+        
+        R = self.rotation()
+        u1x = R[0,0] * u1[0] + R[1,0] * u1[1] + R[2,0] * u1[2]
+        u1y = R[0,1] * u1[0] + R[1,1] * u1[1] + R[2,1] * u1[2]
+        u1z = R[0,2] * u1[0] + R[1,2] * u1[1] + R[2,2] * u1[2]
+        u2x = R[0,0] * u2[0] + R[1,0] * u2[1] + R[2,0] * u2[2]
+        u2y = R[0,1] * u2[0] + R[1,1] * u2[1] + R[2,1] * u2[2]
+        u2z = R[0,2] * u2[0] + R[1,2] * u2[1] + R[2,2] * u2[2]
+        
+        u1r = np.zeros((1, 3), dtype=float)
+        u2r = np.zeros((1, 3), dtype=float)
+        
+        u1r[0,0] = u1x
+        u1r[0,1] = u1y
+        u1r[0,2] = u1z
+        
+        u2r[0,0] = u2x
+        u2r[0,1] = u2y
+        u2r[0,2] = u2z
+        
+        u = 0.5 * (u1r + u2r)        
         return u
-
+    
+    # determine the change in displacement ( dA = L * D )
+    def dDisplacement(self, reindex):
+        v1 = self._vertex[1].velocity(reindex, 'curr')
+        v2 = self._vertex[2].velocity(reindex, 'curr')
+        
+        Dmtx = np.zeros((1, 2), dtype=float)
+        
+        R = self.rotation()
+        Dmtx[0, 0] = R[0,0] * v1[0] + R[1,0] * v1[1] + R[2,0] * v1[2]
+        Dmtx[0, 1] = R[0,0] * v2[0] + R[1,0] * v2[1] + R[2,0] * v2[2]
+        
+        return Dmtx
+    
     def velocity(self, reindex):
         v1 = self._vertex[1].velocity(reindex, 'curr')
         v2 = self._vertex[2].velocity(reindex, 'curr')
-        v = 0.5 * (v1 + v2)
+        
+        R = self.rotation()
+        v1x = R[0,0] * v1[0] + R[1,0] * v1[1] + R[2,0] * v1[2]
+        v1y = R[0,1] * v1[0] + R[1,1] * v1[1] + R[2,1] * v1[2]
+        v1z = R[0,2] * v1[0] + R[1,2] * v1[1] + R[2,2] * v1[2]
+        v2x = R[0,0] * v2[0] + R[1,0] * v2[1] + R[2,0] * v2[2]
+        v2y = R[0,1] * v2[0] + R[1,1] * v2[1] + R[2,1] * v2[2]
+        v2z = R[0,2] * v2[0] + R[1,2] * v2[1] + R[2,2] * v2[2]
+        
+        v1r = np.zeros((1, 3), dtype=float)
+        v2r = np.zeros((1, 3), dtype=float)
+        
+        v1r[0,0] = v1x
+        v1r[0,1] = v1y
+        v1r[0,2] = v1z
+        
+        v2r[0,0] = v2x
+        v2r[0,1] = v2y
+        v2r[0,2] = v2z
+        
+        v = 0.5 * (v1r + v2r)         
+        
         return v
 
     def acceleration(self, reindex):
         a1 = self._vertex[1].acceleration(reindex, 'curr')
         a2 = self._vertex[2].acceleration(reindex, 'curr')
-        a = 0.5 * (a1 + a2)
+        
+        R = self.rotation()
+        a1x = R[0,0] * a1[0] + R[1,0] * a1[1] + R[2,0] * a1[2]
+        a1y = R[0,1] * a1[0] + R[1,1] * a1[1] + R[2,1] * a1[2]
+        a1z = R[0,2] * a1[0] + R[1,2] * a1[1] + R[2,2] * a1[2]
+        a2x = R[0,0] * a2[0] + R[1,0] * a2[1] + R[2,0] * a2[2]
+        a2y = R[0,1] * a2[0] + R[1,1] * a2[1] + R[2,1] * a2[2]
+        a2z = R[0,2] * a2[0] + R[1,2] * a2[1] + R[2,2] * a2[2]
+        
+        a1r = np.zeros((1, 3), dtype=float)
+        a2r = np.zeros((1, 3), dtype=float)
+        
+        a1r[0,0] = a1x
+        a1r[0,1] = a1y
+        a1r[0,2] = a1z
+        
+        a2r[0,0] = a2x
+        a2r[0,1] = a2y
+        a2r[0,2] = a2z
+        
+        a = 0.5 * (a1r + a2r)         
+        
         return a
 
     # rotation and spin of chord wrt dodecahedral coordinate system
@@ -1033,31 +1055,21 @@ class Chord(object):
     def rotation(self):
         return np.copy(self._Pc3D)
 
-    def spin(self, reindex):
-        return spinMtx.currSpin(self._Pp3D, self._Pc3D, self._Pn3D, reindex,
-                                self._h)
+    def spin(self):
+        return spinMtx.currSpin(self._Pp3D, self._Pc3D, self._Pn3D, self._h)
 
     # thermodynamic fields associated with a chord that are uniform in space
-
-
-
-
-
-
-
-
-
 
     def strain(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
-                return self._ec
+                return m.log(self._Lc / self._L0)
             elif state == 'n' or state == 'next':
-                return self._en
+                return m.log(self._Ln / self._L0) 
             elif state == 'p' or state == 'prev' or state == 'previous':
-                return self._ep
+                return m.log(self._Ln / self._L0) 
             elif state == 'r' or state == 'ref' or state == 'reference':
-                return self._e0
+                return 0.0
             else:
                 raise RuntimeError("An unknown state of {} ".format(state)
                                    + "was sent in a call to Chord.strain.")
@@ -1101,25 +1113,6 @@ class Chord(object):
 
     # non-uniform fields that are extrapolated out to the nodal points
 
-    def stress(self, state):
-        sN1, sN2 = self._gq.extrapolate(sG1, sG2)
-        if isinstance(state, str):
-            if state == 'c' or state == 'curr' or state == 'current':
-                return self._Sc
-            elif state == 'n' or state == 'next':
-                return self._Sn
-            elif state == 'p' or state == 'prev' or state == 'previous':
-                return self._Sp
-            elif state == 'r' or state == 'ref' or state == 'reference':
-                return self._S0
-            else:
-                raise RuntimeError("An unknown state of {} ".format(state) +
-                                   "was sent in a call to chord.stress.")
-        else:
-            raise RuntimeError("An unknown state of {} ".format(str(state)) +
-                               "was sent in a call to chord.stress.")
-        return sN1, sN2
-
     def entropy(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -1141,15 +1134,10 @@ class Chord(object):
 
     # displacement gradient at a Gauss point
     def G(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self.gaussPoints()):
-            if self.gaussPoints() == 1:
-                raise RuntimeError("gaussPt can only be 1 in a call to " +
+        if gaussPt != self._gq.gaussPoints():
+            raise RuntimeError("gaussPt can only be {} in a " +
+                               "call to " .format(self._gq.gaussPoints()) +
                                    "chord.G and you sent " +
-                                   "{}.".format(gaussPt))
-            else:
-                raise RuntimeError("gaussPt must be in the range of " +
-                                   "[1, {}] ".format(self.gaussPoints()) +
-                                   "in a call to chord.G and you sent " +
                                    "{}.".format(gaussPt))
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -1169,15 +1157,10 @@ class Chord(object):
 
     # deformation gradient at a Gauss point
     def F(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self.gaussPoints()):
-            if self.gaussPoints() == 1:
-                raise RuntimeError("gaussPt can only be 1 in a call to " +
-                                   "chord.F and you sent " +
-                                   "{}.".format(gaussPt))
-            else:
-                raise RuntimeError("gaussPt must be in the range of " +
-                                   "[1, {}] ".format(self.gaussPoints()) +
-                                   "in a call to chord.F and you sent " +
+        if gaussPt != self._gq.gaussPoints():
+            raise RuntimeError("gaussPt can only be {} in a " +
+                               "call to " .format(self._gq.gaussPoints()) +
+                                   "chord.G and you sent " +
                                    "{}.".format(gaussPt))
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -1197,15 +1180,10 @@ class Chord(object):
 
     # velocity gradient at a Gauss point in a specified state
     def L(self, gaussPt, state):
-        if (gaussPt < 1) or (gaussPt > self.gaussPoints()):
-            if self._gaussPts == 1:
-                raise RuntimeError("gaussPt can only be 1 in a call to " +
-                                   "chord.L and you sent " +
-                                   "{}.".format(gaussPt))
-            else:
-                raise RuntimeError("gaussPt must be in the range of " +
-                                   "[1, {}] ".format(self.gaussPoints()) +
-                                   "in a call to chord.L and you sent " +
+        if gaussPt != self._gq.gaussPoints():
+            raise RuntimeError("gaussPt can only be {} in a " +
+                               "call to " .format(self._gq.gaussPoints()) +
+                                   "chord.G and you sent " +
                                    "{}.".format(gaussPt))
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -1235,16 +1213,11 @@ class Chord(object):
     # fields needed to construct a finite element solution strategy
 
     def shapeFunction(self, gaussPt):
-        if (gaussPt < 1) or (gaussPt > self.gaussPoints()):
-            if self.gaussPoints() == 1:
-                raise RuntimeError("gaussPt can only be 1 in a call to " +
-                                   "chord.shapeFunction and you sent " +
+        if gaussPt != self._gq.gaussPoints():
+            raise RuntimeError("gaussPt can only be {} in a " +
+                               " call to " .format(self._gq.gaussPoints()) +
+                                   "chord.G and you sent " +
                                    "{}.".format(gaussPt))
-            else:
-                raise RuntimeError("gaussPt must be in the range of " +
-                                   "[1, {}] ".format(self.gaussPoints()) +
-                                   "in a call to chord.shapeFunction " +
-                                   "and you sent {}.".format(gaussPt))
         sf = self._shapeFns[gaussPt]
         return sf
 
@@ -1252,15 +1225,15 @@ class Chord(object):
         return self._gq
 
     def massMatrix(self):
-        mMtx = np.copy(self.mMtx)
+        mMtx = np.copy(self._massMatrix())
         return mMtx
 
-    def stiffnessMatrix(self):
-        kMtx = np.copy(self.kMtx)
+    def stiffnessMatrix(self, reindex):
+        kMtx = np.copy(self._stiffnessMatrix(reindex))
         return kMtx
 
     def forcingFunction(self):
-        fVec = np.copy(self.fVec)
+        fVec = np.copy(self._forcingFunction())
         return fVec
 
 

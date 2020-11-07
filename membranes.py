@@ -3,7 +3,6 @@
 
 import math as m
 import numpy as np
-import spin as spinMtx
 
 """
 Module membranes.py provides kinematic properties/attributes for a membrane.
@@ -89,10 +88,6 @@ methods
     rMtx = m.R(state)
         returns 2x2 rotation matrix 'Q' derived from a QR decomposition of the
         reindexed deformation gradient in configuration 'state'
-
-    omega = m.spin(state)
-        returns 2x2 spin matrix caused by planar deformation, i.e., dR R^t,
-        in the reindexed coordinate system for configuration 'state'
 
     uMtx = m.U(state)
         returns 2x2 Laplace stretch 'R' derived from a QR decomposition of the
@@ -354,44 +349,6 @@ class membrane(object):
         else:
             raise RuntimeError("An unknown state {} ".format(str(state)) +
                                "in a call to membrane.R.")
-
-    def spin(self, state):
-        if isinstance(state, str):
-            if ((self._pivotedNext == self._pivotedCurr) and
-               (self._pivotedCurr == self._pivotedPrev)):
-                Rp = np.zeros((3, 3), dtype=float)
-                Rc = np.zeros((3, 3), dtype=float)
-                Rn = np.zeros((3, 3), dtype=float)
-                for i in range(2):
-                    for j in range(2):
-                        Rp[i, j] = self._Rp[i, j]
-                        Rc[i, j] = self._Rc[i, j]
-                        Rn[i, j] = self._Rc[i, j]
-                Rp[2, 2] = 1.0
-                Rc[2, 2] = 1.0
-                Rn[2, 2] = 1.0
-                if state == 'c' or state == 'curr' or state == 'current':
-                    omega3D = spinMtx.currSpin(Rp, Rc, Rn, self._h)
-                elif state == 'n' or state == 'next':
-                    omega3D = spinMtx.nextSpin(Rp, Rc, Rn, self._h)
-                elif state == 'p' or state == 'prev' or state == 'previous':
-                    omega3D = spinMtx.prevSpin(Rp, Rc, Rn, self._h)
-                elif state == 'r' or state == 'ref' or state == 'reference':
-                    omega3D = np.zeros((3, 3), dtype=float)
-                else:
-                    raise RuntimeError("An unknown state {} ".format(state) +
-                                       "in a call to membrane.spin.")
-            else:
-                # rotations are likely to be disontinuous because of a
-                # coordinate re-indexing that took place
-                omega3D = np.zeros((3, 3), dtype=float)
-        else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "in a call to membrane.spin.")
-        omega2D = np.zeros((2, 2), dtype=float)
-        omega2D[0, 1] = omega3D[0, 1]
-        omega2D[1, 0] = omega3D[1, 0]
-        return omega2D
 
     def U(self, state):
         if isinstance(state, str):

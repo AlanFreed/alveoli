@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from chords import chord
+from chords import Chord
 import math as m
 import numpy as np
 from pentagons import pentagon
 from tetrahedra import tetrahedron
-from vertices import vertex
+from vertices import Vertex
 
 """
 Module dodecahedra.py provides geometric info about a deforming dodecahedron.
@@ -74,11 +74,7 @@ class dodecahedron
 
 constructor
 
-    d = dodecahedron(gaussPtsChord, gaussPtsPentegon, gaussPtsTetrahedron,
-                     F0, h=1.0, alveolarDiameter=1.9524008028984345)
-        gaussPtsChord        number of Gauss points in a chord: 1, 2 or 3
-        gaussPtsPentagon     number of Gauss points in a pentagon: 1, 4 or 7
-        gaussPtsTetrahedron  number of Gauss points in a tetrahedron: 1, 4 or 5
+    d = dodecahedron(F0, h=1.0, alveolarDiameter=1.9524008028984345)
         F0                   far-field deformation gradient for reference shape
         h                    time seperating two successive calls to 'advance'
         alveolarDiameter     mean diameter of an alveolar sac (in cm)
@@ -173,23 +169,8 @@ Reference
 
 class dodecahedron(object):
 
-    def __init__(self, gaussPtsChord, gaussPtsPentagon, gaussPtsTetrahedron,
-                 F0, h=1.0, alveolarDiameter=1.9524008028984345):
+    def __init__(self, F0, h=1.0, alveolarDiameter=1.9524008028984345):
         # verify the inputs
-        if gaussPtsChord != 1 and gaussPtsChord != 2 and gaussPtsChord != 3:
-            raise RuntimeError('Gauss points for the chords were specified ' +
-                               'at {}; '.format(gaussPtsChord) +
-                               'it must be 1, 2 or 3.')
-        if (gaussPtsPentagon != 1 and gaussPtsPentagon != 4
-           and gaussPtsPentagon != 7):
-            raise RuntimeError('Gauss points for the pentagons were ' +
-                               'specified at {}; '.format(gaussPtsPentagon) +
-                               'it must be 1, 4 or 7.')
-        if (gaussPtsTetrahedron != 1 and gaussPtsTetrahedron != 4
-           and gaussPtsTetrahedron != 5):
-            raise RuntimeError('Gauss points for the tetrahedra were specified'
-                               + ' at {}; '.format(gaussPtsTetrahedron) +
-                               'it must be 1, 4 or 5.')
         if (not isinstance(F0, np.ndarray)) or (F0.shape != (3, 3)):
             raise RuntimeError("Error: F0 sent to the dodecahedron " +
                                "constructor must be a 3x3 numpy array.")
@@ -282,26 +263,26 @@ class dodecahedron(object):
         v20z = sf * (0 * F0[2, 0] - phi * F0[2, 1] - F0[2, 2] / phi) / sqrt3
         # add the vertices that associate with the pentagonal centroids later
         self._vertex = {
-            1: vertex(1, v1x, v1y, v1z, h),
-            2: vertex(2, v2x, v2y, v2z, h),
-            3: vertex(3, v3x, v3y, v3z, h),
-            4: vertex(4, v4x, v4y, v4z, h),
-            5: vertex(5, v5x, v5y, v5z, h),
-            6: vertex(6, v6x, v6y, v6z, h),
-            7: vertex(7, v7x, v7y, v7z, h),
-            8: vertex(8, v8x, v8y, v8z, h),
-            9: vertex(9, v9x, v9y, v9z, h),
-            10: vertex(10, v10x, v10y, v10z, h),
-            11: vertex(11, v11x, v11y, v11z, h),
-            12: vertex(12, v12x, v12y, v12z, h),
-            13: vertex(13, v13x, v13y, v13z, h),
-            14: vertex(14, v14x, v14y, v14z, h),
-            15: vertex(15, v15x, v15y, v15z, h),
-            16: vertex(16, v16x, v16y, v16z, h),
-            17: vertex(17, v17x, v17y, v17z, h),
-            18: vertex(18, v18x, v18y, v18z, h),
-            19: vertex(19, v19x, v19y, v19z, h),
-            20: vertex(20, v20x, v20y, v20z, h),
+            1: Vertex(1, (v1x, v1y, v1z), h),
+            2: Vertex(2, (v2x, v2y, v2z), h),
+            3: Vertex(3, (v3x, v3y, v3z), h),
+            4: Vertex(4, (v4x, v4y, v4z), h),
+            5: Vertex(5, (v5x, v5y, v5z), h),
+            6: Vertex(6, (v6x, v6y, v6z), h),
+            7: Vertex(7, (v7x, v7y, v7z), h),
+            8: Vertex(8, (v8x, v8y, v8z), h),
+            9: Vertex(9, (v9x, v9y, v9z), h),
+            10: Vertex(10, (v10x, v10y, v10z), h),
+            11: Vertex(11, (v11x, v11y, v11z), h),
+            12: Vertex(12, (v12x, v12y, v12z), h),
+            13: Vertex(13, (v13x, v13y, v13z), h),
+            14: Vertex(14, (v14x, v14y, v14z), h),
+            15: Vertex(15, (v15x, v15y, v15z), h),
+            16: Vertex(16, (v16x, v16y, v16z), h),
+            17: Vertex(17, (v17x, v17y, v17z), h),
+            18: Vertex(18, (v18x, v18y, v18z), h),
+            19: Vertex(19, (v19x, v19y, v19z), h),
+            20: Vertex(20, (v20x, v20y, v20z), h),
             # set aside 13 more vertices to be created later
             21: None,
             22: None,
@@ -320,283 +301,217 @@ class dodecahedron(object):
 
         # create the chords of a dodecahedron as a dictionary
         self._chord = {
-            1: chord(1, self._vertex[9], self._vertex[10], h, gaussPtsChord),
-            2: chord(2, self._vertex[1], self._vertex[9], h, gaussPtsChord),
-            3: chord(3, self._vertex[2], self._vertex[10], h, gaussPtsChord),
-            4: chord(4, self._vertex[3], self._vertex[10], h, gaussPtsChord),
-            5: chord(5, self._vertex[4], self._vertex[9], h, gaussPtsChord),
-            6: chord(6, self._vertex[1], self._vertex[11], h, gaussPtsChord),
-            7: chord(7, self._vertex[2], self._vertex[11], h, gaussPtsChord),
-            8: chord(8, self._vertex[3], self._vertex[13], h, gaussPtsChord),
-            9: chord(9, self._vertex[4], self._vertex[13], h, gaussPtsChord),
-            10: chord(10, self._vertex[2], self._vertex[17], h, gaussPtsChord),
-            11: chord(11, self._vertex[17], self._vertex[18], h,
-                      gaussPtsChord),
-            12: chord(12, self._vertex[3], self._vertex[18], h, gaussPtsChord),
-            13: chord(13, self._vertex[4], self._vertex[16], h, gaussPtsChord),
-            14: chord(14, self._vertex[15], self._vertex[16], h,
-                      gaussPtsChord),
-            15: chord(15, self._vertex[1], self._vertex[15], h, gaussPtsChord),
-            16: chord(16, self._vertex[5], self._vertex[15], h, gaussPtsChord),
-            17: chord(17, self._vertex[5], self._vertex[12], h, gaussPtsChord),
-            18: chord(18, self._vertex[11], self._vertex[12], h,
-                      gaussPtsChord),
-            19: chord(19, self._vertex[6], self._vertex[12], h, gaussPtsChord),
-            20: chord(20, self._vertex[6], self._vertex[17], h, gaussPtsChord),
-            21: chord(21, self._vertex[7], self._vertex[18], h, gaussPtsChord),
-            22: chord(22, self._vertex[7], self._vertex[14], h, gaussPtsChord),
-            23: chord(23, self._vertex[13], self._vertex[14], h,
-                      gaussPtsChord),
-            24: chord(24, self._vertex[8], self._vertex[14], h, gaussPtsChord),
-            25: chord(25, self._vertex[8], self._vertex[16], h, gaussPtsChord),
-            26: chord(26, self._vertex[5], self._vertex[19], h, gaussPtsChord),
-            27: chord(27, self._vertex[6], self._vertex[20], h, gaussPtsChord),
-            28: chord(28, self._vertex[7], self._vertex[20], h, gaussPtsChord),
-            29: chord(29, self._vertex[8], self._vertex[19], h, gaussPtsChord),
-            30: chord(30, self._vertex[19], self._vertex[20], h, gaussPtsChord)
+            1: Chord(1, self._vertex[9], self._vertex[10], h),
+            2: Chord(2, self._vertex[1], self._vertex[9], h),
+            3: Chord(3, self._vertex[2], self._vertex[10], h),
+            4: Chord(4, self._vertex[3], self._vertex[10], h),
+            5: Chord(5, self._vertex[4], self._vertex[9], h),
+            6: Chord(6, self._vertex[1], self._vertex[11], h),
+            7: Chord(7, self._vertex[2], self._vertex[11], h),
+            8: Chord(8, self._vertex[3], self._vertex[13], h),
+            9: Chord(9, self._vertex[4], self._vertex[13], h),
+            10: Chord(10, self._vertex[2], self._vertex[17], h),
+            11: Chord(11, self._vertex[17], self._vertex[18], h),
+            12: Chord(12, self._vertex[3], self._vertex[18], h),
+            13: Chord(13, self._vertex[4], self._vertex[16], h),
+            14: Chord(14, self._vertex[15], self._vertex[16], h),
+            15: Chord(15, self._vertex[1], self._vertex[15], h),
+            16: Chord(16, self._vertex[5], self._vertex[15], h),
+            17: Chord(17, self._vertex[5], self._vertex[12], h),
+            18: Chord(18, self._vertex[11], self._vertex[12], h),
+            19: Chord(19, self._vertex[6], self._vertex[12], h),
+            20: Chord(20, self._vertex[6], self._vertex[17], h),
+            21: Chord(21, self._vertex[7], self._vertex[18], h),
+            22: Chord(22, self._vertex[7], self._vertex[14], h),
+            23: Chord(23, self._vertex[13], self._vertex[14], h),
+            24: Chord(24, self._vertex[8], self._vertex[14], h),
+            25: Chord(25, self._vertex[8], self._vertex[16], h),
+            26: Chord(26, self._vertex[5], self._vertex[19], h),
+            27: Chord(27, self._vertex[6], self._vertex[20], h),
+            28: Chord(28, self._vertex[7], self._vertex[20], h),
+            29: Chord(29, self._vertex[8], self._vertex[19], h),
+            30: Chord(30, self._vertex[19], self._vertex[20], h)
         }
 
         # create the pentagons of a dodecahedron as a dictionary
         self._pentagon = {
             1: pentagon(1, self._chord[6], self._chord[7], self._chord[3],
-                        self._chord[1], self._chord[2], h, gaussPtsPentagon),
+                        self._chord[1], self._chord[2], h),
             2: pentagon(2, self._chord[4], self._chord[3], self._chord[10],
-                        self._chord[11], self._chord[12], h, gaussPtsPentagon),
+                        self._chord[11], self._chord[12], h),
             3: pentagon(3, self._chord[8], self._chord[9], self._chord[5],
-                        self._chord[1], self._chord[4], h, gaussPtsPentagon),
+                        self._chord[1], self._chord[4], h),
             4: pentagon(4, self._chord[2], self._chord[5], self._chord[13],
-                        self._chord[14], self._chord[15], h, gaussPtsPentagon),
+                        self._chord[14], self._chord[15], h),
             5: pentagon(5, self._chord[15], self._chord[16], self._chord[17],
-                        self._chord[18], self._chord[6], h, gaussPtsPentagon),
+                        self._chord[18], self._chord[6], h),
             6: pentagon(6, self._chord[20], self._chord[10], self._chord[7],
-                        self._chord[18], self._chord[19], h, gaussPtsPentagon),
+                        self._chord[18], self._chord[19], h),
             7: pentagon(7, self._chord[12], self._chord[21], self._chord[22],
-                        self._chord[23], self._chord[8], h, gaussPtsPentagon),
+                        self._chord[23], self._chord[8], h),
             8: pentagon(8, self._chord[25], self._chord[13], self._chord[9],
-                        self._chord[23], self._chord[24], h, gaussPtsPentagon),
+                        self._chord[23], self._chord[24], h),
             9: pentagon(9, self._chord[19], self._chord[17], self._chord[26],
-                        self._chord[30], self._chord[27], h, gaussPtsPentagon),
+                        self._chord[30], self._chord[27], h),
             10: pentagon(10, self._chord[24], self._chord[22], self._chord[28],
-                         self._chord[30], self._chord[29], h,
-                         gaussPtsPentagon),
+                         self._chord[30], self._chord[29], h),
             11: pentagon(11, self._chord[27], self._chord[28], self._chord[21],
-                         self._chord[11], self._chord[20], h,
-                         gaussPtsPentagon),
+                         self._chord[11], self._chord[20], h),
             12: pentagon(12, self._chord[29], self._chord[26], self._chord[16],
-                         self._chord[14], self._chord[25], h, gaussPtsPentagon)
+                         self._chord[14], self._chord[25], h)
         }
 
         # asign the remaining vertices; they are the pentagonal centroids
         # and the centroid of the dodecahedron
         c = np.array(3, dtype=float)
         c = self._pentagon[1].centroid('ref')
-        self._vertex[21] = vertex(21, c[0], c[1], c[2], h)
+        self._vertex[21] = Vertex(21, (c[0], c[1], c[2]), h)
         c = self._pentagon[2].centroid('ref')
-        self._vertex[22] = vertex(22, c[0], c[1], c[2], h)
+        self._vertex[22] = Vertex(22, (c[0], c[1], c[2]), h)
         c = self._pentagon[3].centroid('ref')
-        self._vertex[23] = vertex(23, c[0], c[1], c[2], h)
+        self._vertex[23] = Vertex(23, (c[0], c[1], c[2]), h)
         c = self._pentagon[4].centroid('ref')
-        self._vertex[24] = vertex(24, c[0], c[1], c[2], h)
+        self._vertex[24] = Vertex(24, (c[0], c[1], c[2]), h)
         c = self._pentagon[5].centroid('ref')
-        self._vertex[25] = vertex(25, c[0], c[1], c[2], h)
+        self._vertex[25] = Vertex(25, (c[0], c[1], c[2]), h)
         c = self._pentagon[6].centroid('ref')
-        self._vertex[26] = vertex(26, c[0], c[1], c[2], h)
+        self._vertex[26] = Vertex(26, (c[0], c[1], c[2]), h)
         c = self._pentagon[7].centroid('ref')
-        self._vertex[27] = vertex(27, c[0], c[1], c[2], h)
+        self._vertex[27] = Vertex(27, (c[0], c[1], c[2]), h)
         c = self._pentagon[8].centroid('ref')
-        self._vertex[28] = vertex(28, c[0], c[1], c[2], h)
+        self._vertex[28] = Vertex(28, (c[0], c[1], c[2]), h)
         c = self._pentagon[9].centroid('ref')
-        self._vertex[29] = vertex(29, c[0], c[1], c[2], h)
+        self._vertex[29] = Vertex(29, (c[0], c[1], c[2]), h)
         c = self._pentagon[10].centroid('ref')
-        self._vertex[30] = vertex(30, c[0], c[1], c[2], h)
+        self._vertex[30] = Vertex(30, (c[0], c[1], c[2]), h)
         c = self._pentagon[11].centroid('ref')
-        self._vertex[31] = vertex(31, c[0], c[1], c[2], h)
+        self._vertex[31] = Vertex(31, (c[0], c[1], c[2]), h)
         c = self._pentagon[12].centroid('ref')
-        self._vertex[32] = vertex(32, c[0], c[1], c[2], h)
-        self._vertex[33] = vertex(33, 0.0, 0.0, 0.0, h)
+        self._vertex[32] = Vertex(32, (c[0], c[1], c[2]), h)
+        self._vertex[33] = Vertex(33, (0.0, 0.0, 0.0), h)
 
         # create the tetrahedra that fill the volume as a dictionary
         self._tetrahedron = {
-            1: tetrahedron(1, self._vertex[21], self._vertex[11],
-                           self._vertex[2], self._vertex[33], h,
-                           gaussPtsTetrahedron),
-            2: tetrahedron(2, self._vertex[21], self._vertex[2],
-                           self._vertex[10], self._vertex[33], h,
-                           gaussPtsTetrahedron),
-            3: tetrahedron(3, self._vertex[21], self._vertex[10],
-                           self._vertex[9], self._vertex[33], h,
-                           gaussPtsTetrahedron),
-            4: tetrahedron(4, self._vertex[21], self._vertex[9],
-                           self._vertex[1], self._vertex[33], h,
-                           gaussPtsTetrahedron),
-            5: tetrahedron(5, self._vertex[21], self._vertex[1],
-                           self._vertex[11], self._vertex[33], h,
-                           gaussPtsTetrahedron),
-            6: tetrahedron(6, self._vertex[22], self._vertex[10],
-                           self._vertex[2], self._vertex[33], h,
-                           gaussPtsTetrahedron),
-            7: tetrahedron(7, self._vertex[22], self._vertex[2],
-                           self._vertex[17], self._vertex[33], h,
-                           gaussPtsTetrahedron),
-            8: tetrahedron(8, self._vertex[22], self._vertex[17],
-                           self._vertex[18], self._vertex[33], h,
-                           gaussPtsTetrahedron),
-            9: tetrahedron(9, self._vertex[22], self._vertex[18],
-                           self._vertex[3], self._vertex[33], h,
-                           gaussPtsTetrahedron),
-            10: tetrahedron(10, self._vertex[22], self._vertex[3],
-                            self._vertex[10], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            11: tetrahedron(11, self._vertex[23], self._vertex[13],
-                            self._vertex[4], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            12: tetrahedron(12, self._vertex[23], self._vertex[4],
-                            self._vertex[9], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            13: tetrahedron(13, self._vertex[23], self._vertex[9],
-                            self._vertex[10], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            14: tetrahedron(14, self._vertex[23], self._vertex[10],
-                            self._vertex[3], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            15: tetrahedron(15, self._vertex[23], self._vertex[3],
-                            self._vertex[13], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            16: tetrahedron(16, self._vertex[24], self._vertex[9],
-                            self._vertex[4], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            17: tetrahedron(17, self._vertex[24], self._vertex[4],
-                            self._vertex[16], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            18: tetrahedron(18, self._vertex[24], self._vertex[16],
-                            self._vertex[15], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            19: tetrahedron(19, self._vertex[24], self._vertex[15],
-                            self._vertex[1], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            20: tetrahedron(20, self._vertex[24], self._vertex[1],
-                            self._vertex[9], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            21: tetrahedron(21, self._vertex[25], self._vertex[15],
-                            self._vertex[5], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            22: tetrahedron(22, self._vertex[25], self._vertex[5],
-                            self._vertex[12], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            23: tetrahedron(23, self._vertex[25], self._vertex[12],
-                            self._vertex[11], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            24: tetrahedron(24, self._vertex[25], self._vertex[11],
-                            self._vertex[1], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            25: tetrahedron(25, self._vertex[25], self._vertex[1],
-                            self._vertex[15], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            26: tetrahedron(26, self._vertex[26], self._vertex[17],
-                            self._vertex[2], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            27: tetrahedron(27, self._vertex[26], self._vertex[2],
-                            self._vertex[11], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            28: tetrahedron(28, self._vertex[26], self._vertex[11],
-                            self._vertex[12], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            29: tetrahedron(29, self._vertex[26], self._vertex[12],
-                            self._vertex[6], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            30: tetrahedron(30, self._vertex[26], self._vertex[6],
-                            self._vertex[17], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            31: tetrahedron(31, self._vertex[27], self._vertex[18],
-                            self._vertex[7], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            32: tetrahedron(32, self._vertex[27], self._vertex[7],
-                            self._vertex[14], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            33: tetrahedron(33, self._vertex[27], self._vertex[14],
-                            self._vertex[13], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            34: tetrahedron(34, self._vertex[27], self._vertex[13],
-                            self._vertex[3], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            35: tetrahedron(35, self._vertex[27], self._vertex[3],
-                            self._vertex[18], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            36: tetrahedron(36, self._vertex[28], self._vertex[16],
-                            self._vertex[4], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            37: tetrahedron(37, self._vertex[28], self._vertex[4],
-                            self._vertex[13], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            38: tetrahedron(38, self._vertex[28], self._vertex[13],
-                            self._vertex[14], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            39: tetrahedron(39, self._vertex[28], self._vertex[14],
-                            self._vertex[8], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            40: tetrahedron(40, self._vertex[28], self._vertex[8],
-                            self._vertex[16], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            41: tetrahedron(41, self._vertex[29], self._vertex[12],
-                            self._vertex[5], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            42: tetrahedron(42, self._vertex[29], self._vertex[5],
-                            self._vertex[19], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            43: tetrahedron(43, self._vertex[29], self._vertex[19],
-                            self._vertex[20], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            44: tetrahedron(44, self._vertex[29], self._vertex[20],
-                            self._vertex[6], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            45: tetrahedron(45, self._vertex[29], self._vertex[6],
-                            self._vertex[12], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            46: tetrahedron(46, self._vertex[30], self._vertex[14],
-                            self._vertex[7], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            47: tetrahedron(47, self._vertex[30], self._vertex[7],
-                            self._vertex[20], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            48: tetrahedron(48, self._vertex[30], self._vertex[20],
-                            self._vertex[19], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            49: tetrahedron(49, self._vertex[30], self._vertex[19],
-                            self._vertex[8], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            50: tetrahedron(50, self._vertex[30], self._vertex[8],
-                            self._vertex[14], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            51: tetrahedron(51, self._vertex[31], self._vertex[20],
-                            self._vertex[7], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            52: tetrahedron(52, self._vertex[31], self._vertex[7],
-                            self._vertex[18], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            53: tetrahedron(53, self._vertex[31], self._vertex[18],
-                            self._vertex[17], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            54: tetrahedron(54, self._vertex[31], self._vertex[17],
-                            self._vertex[6], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            55: tetrahedron(55, self._vertex[31], self._vertex[6],
-                            self._vertex[20], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            56: tetrahedron(56, self._vertex[32], self._vertex[19],
-                            self._vertex[5], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            57: tetrahedron(57, self._vertex[32], self._vertex[5],
-                            self._vertex[15], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            58: tetrahedron(58, self._vertex[32], self._vertex[15],
-                            self._vertex[16], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            59: tetrahedron(59, self._vertex[32], self._vertex[16],
-                            self._vertex[8], self._vertex[33], h,
-                            gaussPtsTetrahedron),
-            60: tetrahedron(60, self._vertex[32], self._vertex[8],
-                            self._vertex[19], self._vertex[33], h,
-                            gaussPtsTetrahedron)
+            1: tetrahedron(1, self._vertex[21], self._vertex[2],
+                           self._vertex[11], self._vertex[33], h),
+            2: tetrahedron(2, self._vertex[21], self._vertex[10],
+                           self._vertex[2], self._vertex[33], h),
+            3: tetrahedron(3, self._vertex[21], self._vertex[9],
+                           self._vertex[10], self._vertex[33], h),
+            4: tetrahedron(4, self._vertex[21], self._vertex[1],
+                           self._vertex[9], self._vertex[33], h),
+            5: tetrahedron(5, self._vertex[21], self._vertex[11],
+                           self._vertex[1], self._vertex[33], h),
+            6: tetrahedron(6, self._vertex[22], self._vertex[2],
+                           self._vertex[10], self._vertex[33], h),
+            7: tetrahedron(7, self._vertex[22], self._vertex[17],
+                           self._vertex[2], self._vertex[33], h),
+            8: tetrahedron(8, self._vertex[22], self._vertex[18],
+                           self._vertex[17], self._vertex[33], h),
+            9: tetrahedron(9, self._vertex[22], self._vertex[3],
+                           self._vertex[18], self._vertex[33], h),
+            10: tetrahedron(10, self._vertex[22], self._vertex[10],
+                            self._vertex[3], self._vertex[33], h),
+            11: tetrahedron(11, self._vertex[23], self._vertex[4],
+                            self._vertex[13], self._vertex[33], h),
+            12: tetrahedron(12, self._vertex[23], self._vertex[9],
+                            self._vertex[4], self._vertex[33], h),
+            13: tetrahedron(13, self._vertex[23], self._vertex[10],
+                            self._vertex[9], self._vertex[33], h),
+            14: tetrahedron(14, self._vertex[23], self._vertex[3],
+                            self._vertex[10], self._vertex[33], h),
+            15: tetrahedron(15, self._vertex[23], self._vertex[13],
+                            self._vertex[3], self._vertex[33], h),
+            16: tetrahedron(16, self._vertex[24], self._vertex[4],
+                            self._vertex[9], self._vertex[33], h),
+            17: tetrahedron(17, self._vertex[24], self._vertex[16],
+                            self._vertex[4], self._vertex[33], h),
+            18: tetrahedron(18, self._vertex[24], self._vertex[15],
+                            self._vertex[16], self._vertex[33], h),
+            19: tetrahedron(19, self._vertex[24], self._vertex[1],
+                            self._vertex[15], self._vertex[33], h),
+            20: tetrahedron(20, self._vertex[24], self._vertex[9],
+                            self._vertex[1], self._vertex[33], h),
+            21: tetrahedron(21, self._vertex[25], self._vertex[5],
+                            self._vertex[15], self._vertex[33], h),
+            22: tetrahedron(22, self._vertex[25], self._vertex[12],
+                            self._vertex[5], self._vertex[33], h),
+            23: tetrahedron(23, self._vertex[25], self._vertex[11],
+                            self._vertex[12], self._vertex[33], h),
+            24: tetrahedron(24, self._vertex[25], self._vertex[1],
+                            self._vertex[11], self._vertex[33], h),
+            25: tetrahedron(25, self._vertex[25], self._vertex[15],
+                            self._vertex[1], self._vertex[33], h),
+            26: tetrahedron(26, self._vertex[26], self._vertex[2],
+                            self._vertex[17], self._vertex[33], h),
+            27: tetrahedron(27, self._vertex[26], self._vertex[11],
+                            self._vertex[2], self._vertex[33], h),
+            28: tetrahedron(28, self._vertex[26], self._vertex[12],
+                            self._vertex[11], self._vertex[33], h),
+            29: tetrahedron(29, self._vertex[26], self._vertex[6],
+                            self._vertex[12], self._vertex[33], h),
+            30: tetrahedron(30, self._vertex[26], self._vertex[17],
+                            self._vertex[6], self._vertex[33], h),
+            31: tetrahedron(31, self._vertex[27], self._vertex[7],
+                            self._vertex[18], self._vertex[33], h),
+            32: tetrahedron(32, self._vertex[27], self._vertex[14],
+                            self._vertex[7], self._vertex[33], h),
+            33: tetrahedron(33, self._vertex[27], self._vertex[13],
+                            self._vertex[14], self._vertex[33], h),
+            34: tetrahedron(34, self._vertex[27], self._vertex[3],
+                            self._vertex[13], self._vertex[33], h),
+            35: tetrahedron(35, self._vertex[27], self._vertex[18],
+                            self._vertex[3], self._vertex[33], h),
+            36: tetrahedron(36, self._vertex[28], self._vertex[4],
+                            self._vertex[16], self._vertex[33], h),
+            37: tetrahedron(37, self._vertex[28], self._vertex[13],
+                            self._vertex[4], self._vertex[33], h),
+            38: tetrahedron(38, self._vertex[28], self._vertex[14],
+                            self._vertex[13], self._vertex[33], h),
+            39: tetrahedron(39, self._vertex[28], self._vertex[8],
+                            self._vertex[14], self._vertex[33], h),
+            40: tetrahedron(40, self._vertex[28], self._vertex[16],
+                            self._vertex[8], self._vertex[33], h),
+            41: tetrahedron(41, self._vertex[29], self._vertex[5],
+                            self._vertex[12], self._vertex[33], h),
+            42: tetrahedron(42, self._vertex[29], self._vertex[19],
+                            self._vertex[5], self._vertex[33], h),
+            43: tetrahedron(43, self._vertex[29], self._vertex[20],
+                            self._vertex[19], self._vertex[33], h),
+            44: tetrahedron(44, self._vertex[29], self._vertex[6],
+                            self._vertex[20], self._vertex[33], h),
+            45: tetrahedron(45, self._vertex[29], self._vertex[12],
+                            self._vertex[6], self._vertex[33], h),
+            46: tetrahedron(46, self._vertex[30], self._vertex[7],
+                            self._vertex[14], self._vertex[33], h),
+            47: tetrahedron(47, self._vertex[30], self._vertex[20],
+                            self._vertex[7], self._vertex[33], h),
+            48: tetrahedron(48, self._vertex[30], self._vertex[19],
+                            self._vertex[20], self._vertex[33], h),
+            49: tetrahedron(49, self._vertex[30], self._vertex[8],
+                            self._vertex[19], self._vertex[33], h),
+            50: tetrahedron(50, self._vertex[30], self._vertex[14],
+                            self._vertex[8], self._vertex[33], h),
+            51: tetrahedron(51, self._vertex[31], self._vertex[7],
+                            self._vertex[20], self._vertex[33], h),
+            52: tetrahedron(52, self._vertex[31], self._vertex[18],
+                            self._vertex[7], self._vertex[33], h),
+            53: tetrahedron(53, self._vertex[31], self._vertex[17],
+                            self._vertex[18], self._vertex[33], h),
+            54: tetrahedron(54, self._vertex[31], self._vertex[6],
+                            self._vertex[17], self._vertex[33], h),
+            55: tetrahedron(55, self._vertex[31], self._vertex[20],
+                            self._vertex[6], self._vertex[33], h),
+            56: tetrahedron(56, self._vertex[32], self._vertex[5],
+                            self._vertex[19], self._vertex[33], h),
+            57: tetrahedron(57, self._vertex[32], self._vertex[15],
+                            self._vertex[5], self._vertex[33], h),
+            58: tetrahedron(58, self._vertex[32], self._vertex[16],
+                            self._vertex[15], self._vertex[33], h),
+            59: tetrahedron(59, self._vertex[32], self._vertex[8],
+                            self._vertex[16], self._vertex[33], h),
+            60: tetrahedron(60, self._vertex[32], self._vertex[19],
+                            self._vertex[8], self._vertex[33], h)
         }
 
         # add up the volumes associated with the sixty tetrahedra
@@ -679,7 +594,7 @@ class dodecahedron(object):
             x = nextF[0, 0] * x0 + nextF[0, 1] * y0 + nextF[0, 2] * z0
             y = nextF[1, 0] * x0 + nextF[1, 1] * y0 + nextF[1, 2] * z0
             z = nextF[2, 0] * x0 + nextF[2, 1] * y0 + nextF[2, 2] * z0
-            self._vertex[i].update(x, y, z)
+            self._vertex[i].update((x, y, z))
         # vertices 21-33 are updated after the pentagons are updated
 
         # update the chords of the dodecahedron
@@ -694,7 +609,7 @@ class dodecahedron(object):
         c = np.array(3, dtype=float)
         for i in range(21, 33):
             c = self._pentagon[i-20].centroid('next')
-            self._vertex[i].update(c[0], c[1], c[2])
+            self._vertex[i].update((c[0], c[1], c[2]))
         # the 33rd vertex is at the centroid of the dodecahedron; it is fixed
 
         # update the tetrahedra of the dodecahedron
@@ -707,22 +622,22 @@ class dodecahedron(object):
             vol += self._tetrahedron[i].volume('next')
         self._nextVol = vol
 
-    def advance(self):
+    def advance(self, reindex):
         # advance kinematic fields of the vertices
         for i in range(1, 34):
             self._vertex[i].advance()
 
         # advance kinematic fields of the chords
         for i in range(1, 31):
-            self._chord[i].advance()
+            self._chord[i].advance(reindex)
 
         # advance kinematic fields of the pentagons
         for i in range(1, 13):
-            self._pentagon[i].advance()
+            self._pentagon[i].advance(reindex)
 
         # advance kinematic fields of the tetrahedra
         for i in range(1, 61):
-            self._tetrahedron[i].advance()
+            self._tetrahedron[i].advance(reindex)
 
         # advance kinematic fields of the dodecahedron
         self._prevVol = self._currVol

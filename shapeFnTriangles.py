@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "03-10-2020"
-__update__ = "07-17-2020"
+__update__ = "10-19-2020"
 __author__ = "Shahla Zamani and Alan D. Freed"
 __author_email__ = "Zamani.Shahla@tamu.edu, afreed@tamu.edu"
 
@@ -171,8 +171,12 @@ class ShapeFunction(ShapeFn):
         self.N3 = eta
 
         # construct the 2x6 matrix of shape functions for a triangle
-        self.Nmtx = np.array([[self.N1, 0.0, self.N2, 0.0, self.N3, 0.0],
-                              [0.0, self.N1, 0.0, self.N2, 0.0, self.N3]])
+        self.Nmtx = np.array([[self.N1, 0.0, self.N2, 0.0, self.N3, 0.0, 0.0, 
+                               0.0, 0.0, 0.0, 0.0, 0.0],
+                              [0.0, self.N1, 0.0, self.N2, 0.0, self.N3, 0.0, 
+                               0.0, 0.0, 0.0, 0.0, 0.0],
+                              [0.0, 0.0, self.N1, 0.0, self.N2, 0.0, self.N3, 
+                               0.0, 0.0, 0.0, 0.0, 0.0]])
 
         # create the six, exported, derivatives of these shape functions
         self.dN1dXi = -1.0
@@ -194,9 +198,9 @@ class ShapeFunction(ShapeFn):
         return y
 
     def jacobianMatrix(self, x1, x2, x3):
-        if (isinstance(x1, tuple) and len(x1) == 2
-           and isinstance(x2, tuple) and len(x2) == 2
-           and isinstance(x3, tuple) and len(x3) == 2):
+        if (isinstance(x1, tuple) and len(x1) == 3
+           and isinstance(x2, tuple) and len(x2) == 3
+           and isinstance(x3, tuple) and len(x3) == 3):
             Jmtx = np.zeros((2, 2), dtype=float)
             Jmtx[0, 0] = (self.dN1dXi * x1[0] + self.dN2dXi * x2[0]
                           + self.dN3dXi * x3[0])
@@ -208,8 +212,7 @@ class ShapeFunction(ShapeFn):
                           + self.dN3dEta * x3[1])
         else:
             raise RuntimeError("Each argument of shapeFunction.jacobianMatrix "
-                               + "must be a tuple of co-ordinates, "
-                               + "e.g., (x, y).")
+                               + "must be a tuple of co-ordinates. ")
         return Jmtx
 
     def jacobianDeterminant(self, x1, x2, x3):
@@ -217,12 +220,12 @@ class ShapeFunction(ShapeFn):
         return np.linalg.det(Jmtx)
 
     def G(self, x1, x2, x3, x01, x02, x03):
-        if (isinstance(x1, tuple) and len(x1) == 2
-           and isinstance(x2, tuple) and len(x2) == 2
-           and isinstance(x3, tuple) and len(x3) == 2
-           and isinstance(x01, tuple) and len(x01) == 2
-           and isinstance(x02, tuple) and len(x02) == 2
-           and isinstance(x03, tuple) and len(x03) == 2):
+        if (isinstance(x1, tuple) and len(x1) == 3
+           and isinstance(x2, tuple) and len(x2) == 3
+           and isinstance(x3, tuple) and len(x3) == 3
+           and isinstance(x01, tuple) and len(x01) == 3
+           and isinstance(x02, tuple) and len(x02) == 3
+           and isinstance(x03, tuple) and len(x03) == 3):
             u1 = x1[0] - x01[0]
             u2 = x2[0] - x02[0]
             u3 = x3[0] - x03[0]
@@ -250,12 +253,12 @@ class ShapeFunction(ShapeFn):
         return Gmtx
 
     def F(self, x1, x2, x3, x01, x02, x03):
-        if (isinstance(x1, tuple) and len(x1) == 2
-           and isinstance(x2, tuple) and len(x2) == 2
-           and isinstance(x3, tuple) and len(x3) == 2
-           and isinstance(x01, tuple) and len(x01) == 2
-           and isinstance(x02, tuple) and len(x02) == 2
-           and isinstance(x03, tuple) and len(x03) == 2):
+        if (isinstance(x1, tuple) and len(x1) == 3
+           and isinstance(x2, tuple) and len(x2) == 3
+           and isinstance(x3, tuple) and len(x3) == 3
+           and isinstance(x01, tuple) and len(x01) == 3
+           and isinstance(x02, tuple) and len(x02) == 3
+           and isinstance(x03, tuple) and len(x03) == 3):
             u1 = x1[0] - x01[0]
             u2 = x2[0] - x02[0]
             u3 = x3[0] - x03[0]

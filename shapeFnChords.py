@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "09-23-2019"
-__update__ = "07-17-2020"
+__update__ = "10-13-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -120,6 +120,49 @@ inherited methods
             Fmtx = dx/dX    where    X = x0
     Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
 
+    Hmtx = sf.H(x1, x2)
+        x1   is a tuple of physical  co-ordinates (x,) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x,) locating vertex 2
+    returns
+         Hmtx is the derivative of shape functions 
+         theta = H * D in the contribution to nonlinear strain
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    Amtx = sf.A(x1, x2, x01, x02)
+        x1   is a tuple of physical  co-ordinates (x,) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x,) locating vertex 2
+        x01  is a tuple of reference co-ordinates (x0,) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x0,) locating vertex 2
+    returns
+        Amtx is the displacement gradient matrix at location xi 
+        EN = 1/2 * A * Theta
+    Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
+
+    Lmtx = sf.L(x1, x2)
+        x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
+    returns
+    Lmtx is the derivative of shape functions ( dA = L * D ) in the 
+    contribution to nonlinear strain
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    BLmtx = sf.BL(x1, x2)
+        x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
+    returns
+        BLmtx   is the linear strain displacement matrix
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    BNmtx = sf.BN(x1, x2, x01, x02)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+    returns
+        BNmtx is nonlinear contribution to the strain displacement matrix
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+
 Reference
     1) Guido Dhondt, "The Finite Element Method for Three-dimensional
        Thermomechanical Applications", John Wiley & Sons Ltd, 2004.
@@ -131,7 +174,7 @@ class ShapeFunction(ShapeFn):
     # constructor
 
     def __init__(self, coordinates):
-        super(ShapeFunction, self).__init(coordinates)
+        super(ShapeFunction, self).__init__(coordinates)
         if len(coordinates) == 1:
             xi = coordinates[0]
         else:
@@ -155,61 +198,106 @@ class ShapeFunction(ShapeFn):
         return  # the object
 
     # methods
-
+    # determine the interpolated value located at xi
     def interpolate(self, y1, y2):
         if type(y1) == type(y2):
-            y = self.N1 * y1 + self.N2 * y2
+            y = self.N1 * y1[0] + self.N2 * y2[0]
         else:
             raise RuntimeError("interpolate arguments must be the same type.")
         return y
-
+    
+    # determine the Jacobian Matrix
     def jacobianMatrix(self, x1, x2):
-        if (isinstance(x1, tuple) and len(x1) == 1
-           and isinstance(x2, tuple) and len(x2) == 1):
-            Jmtx = np.zeros((1, 1), dtype=float)
-            Jmtx[0, 0] = self.dN1dXi * x1[0] + self.dN2dXi * x2[0]
-        else:
-            raise RuntimeError("Each argument of shapeFunction.jacobianMatrix "
-                               + "must be a tuple of co-ordinates, eg., (x,).")
+        Jmtx = np.zeros((1, 1), dtype=float)
+        Jmtx[0, 0] = self.dN1dXi * x1[0] + self.dN2dXi * x2[0]
         return Jmtx
-
+    
+    # determine the determinant of the Jacobian matrix
     def jacobianDeterminant(self, x1, x2):
-        Jmtx = self.jacobianMartrix(x1, x2)
+        Jmtx = self.jacobianMatrix(x1, x2)
         return Jmtx[0, 0]
-
+    
+    # determine the displacement gradient matrix at location xi
     def G(self, x1, x2, x01, x02):
-        if (isinstance(x1, tuple) and len(x1) == 1
-           and isinstance(x2, tuple) and len(x2) == 1
-           and isinstance(x01, tuple) and len(x01) == 1
-           and isinstance(x02, tuple) and len(x02) == 1):
-            # determine the displacement gradient
-            disGrad = (self.dN1dXi * (x1[0] - x01[0])
-                       + self.dN2dXi * (x2[0] - x02[0]))
-            # determine the current position gradient
-            curGrad = self.dN1dXi * x1[0] + self.dN2dXi * x2[0]
-        else:
-            raise RuntimeError("Each argument of shapeFunction.G must be "
-                               + "a tuple of co-ordinates, e.g., (x,).")
+        # determine the displacement gradient
+        disGrad = (self.dN1dXi * (x1[0] - x01[0]) + self.dN2dXi * (x2[0] - x02[0]))
+        # determine the current position gradient
+        curGrad = self.dN1dXi * x1[0] + self.dN2dXi * x2[0]
+
         Gmtx = np.zeros((1, 1), dtype=float)
         Gmtx[0, 0] = disGrad / curGrad
         return Gmtx
-
+    
+    # determine  the deformation gradient matrix at location (xi)
     def F(self, x1, x2, x01, x02):
-        if (isinstance(x1, tuple) and len(x1) == 1
-           and isinstance(x2, tuple) and len(x2) == 1
-           and isinstance(x01, tuple) and len(x01) == 1
-           and isinstance(x02, tuple) and len(x02) == 1):
-            # determine the displacement gradient
-            disGrad = (self.dN1dXi * (x1[0] - x01[0])
-                       + self.dN2dXi * (x2[0] - x02[0]))
-            # determine the current gradient of position
-            refGrad = self.dN1dXi * x01[0] + self.dN2dXi * x02[0]
-        else:
-            raise RuntimeError("Each argument of shapeFunction.F must be "
-                               + "a tuple of co-ordinates, e.g., (x,).")
+        # determine the displacement gradient
+        disGrad = (self.dN1dXi * (x1[0] - x01[0]) 
+                   + self.dN2dXi * (x2[0] - x02[0]))
+        # determine the current gradient of position
+        refGrad = self.dN1dXi * x01[0] + self.dN2dXi * x02[0]
         Fmtx = np.zeros((1, 1), dtype=float)
         Fmtx[0, 0] = 1.0 + disGrad / refGrad
         return Fmtx
+    
+    # determine the derivative of shape functions ( theta = H * D )
+    def H(self, x1, x2):
+        Jmtx = self.jacobianMatrix(x1, x2)
+        H = np.zeros((1, 2), dtype=float)
+
+        H[0, 0] = self.dN1dXi * Jmtx[0, 0]
+        H[0, 1] = self.dN2dXi * Jmtx[0, 0]
+
+        detJ = np.linalg.det(Jmtx)
+        Hmtx = H / detJ
+
+        return Hmtx
+    
+    # determine the displacement gradient matrix at location xi 
+    # EN = 1/2 * A * Theta
+    def A(self, x1, x2, x01, x02):
+        # determine the displacement gradient
+        disGrad = (self.dN1dXi * (x1[0] - x01[0]) 
+                   + self.dN2dXi * (x2[0] - x02[0]))
+        # determine the current position gradient
+        curGrad = self.dN1dXi * x1[0] + self.dN2dXi * x2[0]
+        A = np.zeros((1, 1), dtype=float)
+        A[0, 0] = - disGrad / curGrad
+        return A
+    
+    # determine the derivative of shape functions ( dA = L * D )
+    def L(self, x1, x2):
+        Jmtx = self.jacobianMatrix(x1, x2)
+        L = np.zeros((1, 2), dtype=float)
+
+        L[0, 0] = - self.dN1dXi * Jmtx[0, 0]
+        L[0, 1] = - self.dN2dXi * Jmtx[0, 0]
+
+        detJ = np.linalg.det(Jmtx)
+        Lmtx = L / detJ
+
+        return Lmtx
+    
+    # determne the linear strain displacement matrix
+    def BL(self, x1, x2):
+        Jmtx = self.jacobianMatrix(x1, x2)
+        BL = np.zeros((1, 2), dtype=float)
+
+        BL[0, 0] = self.dN1dXi * Jmtx[0, 0]
+        BL[0, 1] = self.dN2dXi * Jmtx[0, 0]
+        
+        detJ = np.linalg.det(Jmtx)
+        BLmtx = BL / detJ
+
+        return BLmtx
+    
+    # determine the nonlinear strain displacement matrix ( EN = A * H )
+    def BN(self, x1, x2, x01, x02):
+        A = self.A(x1, x2, x01, x02)
+        H = self.H(x1, x2)
+        BNmtx = np.zeros((1, 2), dtype=float)
+
+        BNmtx = np.dot(A, H)
+        return BNmtx
 
 
 """

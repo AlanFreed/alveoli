@@ -27,7 +27,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "09-24-2019"
-__update__ = "07-17-2020"
+__update__ = "11-06-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -152,7 +152,9 @@ while
 
 constructor
 
-    E.g.:  ce = BioFiber(yVec0, rho, Cp, alpha, E1, E2, e_t, e_f=float("inf"))
+    E.g.:  ce = BioFiber(eVec0, xVec0, yVec0, rho, Cp, alpha, E1, E2, e_t, e_f=float("inf"))
+        eVec0       initial conditions for the thermodynamic control variables
+        xVec0       initial conditions for the physical control variables
         yVec0       initial conditions for the response variables
         rho         density of mass for the fiber
         Cp          density of specific heat at constant pressure for the fiber
@@ -233,7 +235,10 @@ and
 
 constructor
 
-    E.g.:  ce = SeptalChord(diaCollagen=None, diaElastin=None)
+    E.g.:  ce = SeptalChord(eVec, xVec, yChord0, diaCollagen=None, diaElastin=None)
+        eVec0       initial conditions for the thermodynamic control variables
+        xVec0       initial conditions for the physical control variables
+        yVec0       initial conditions for the response variables
         diaCollagen     the reference diameter of the collagen fiber
         diaElastin      the reference diameter of the elastin fiber
     If the diameters take on their default values of None, then they are
@@ -275,6 +280,20 @@ tangentModulus(eVec, xVec, yVec)
     / dEta \ - /   C        alpha Et / rho theta \ / dT / T \
     \  dS  / - \ -alpha Et           Et          / \ dL / L /
     Modulus E differs between the secant and tangent moduli implementations.
+
+mixedSecantModulus(eVec, xVec, yVec)
+    E.g.:  Mt = ce.mixedSecantModulus(eVec, xVec, yVec)
+        Mt = dy/de  a matrix of tangent moduli, i.e., a constitutive equation
+        eVec        a vector of thermodynamic control variables  (strains)
+        xVec        a vector of physical control variables       (stretches)
+        yVec        a vector of thermodynamic response variables (stresses)
+
+mixedtangentModulus(eVec, xVec, yVec)
+    E.g.:  Ms = ce.mixedtangentModulus(eVec, xVec, yVec)
+        Ms = dy/de  a matrix of tangent moduli, i.e., a constitutive equation
+        eVec        a vector of thermodynamic control variables  (strains)
+        xVec        a vector of physical control variables       (stretches)
+        yVec        a vector of thermodynamic response variables (stresses)
 
 isRuptured()
     E.g.:  ruptured = ce.isRuptured()
@@ -320,6 +339,10 @@ area()
     E.g.:  a = ce.area()
         a           the collective areas of both fibers in the septal chord
 
+volumeFraction()
+    E.g.:  phi = ce.volumeFraction()
+        phi         the volume fraction of the fiber in the chord
+
 volumeCollagen()
     E.g.:  vol = ce.volumeCollagen()
         vol         the volume of the collagen fiber in the chord
@@ -349,6 +372,10 @@ strain()
 stress()
     E.g.:  s = ce.stress()
         s           the nominal stress carried by the septal chord
+
+traction()
+    E.g.:  t = ce.traction()
+        t           the normal traction carried by the septal chord
 
 force()
     E.g.:  f = ce.force()
@@ -473,10 +500,10 @@ class BioFiber(Response):
 
     # constructor
 
-    def __init__(self, yVec0, rho, Cp, alpha, E1, E2, e_t, e_f=float("inf")):
+    def __init__(self, eVec0, xVec0, yVec0, rho, Cp, alpha, E1, E2, e_t, e_f=float("inf")):
         # A call to the base constructor creates and initializes the exported
         # variables.
-        super().__init__(yVec0)
+        super().__init__(eVec0, xVec0, yVec0)
         # Create and initialize any additional fields introduced by the user.
         if self.responses != 2:
             raise RuntimeError("A biologic fiber has two response variables.")
@@ -659,7 +686,12 @@ class SeptalChord(Response):
 
     # constructor
 
-    def __init__(self, diaCollagen=None, diaElastin=None):
+    def __init__(self, eVec, xVec, yChord0, diaCollagen=None, diaElastin=None):
+        # # Call the constructor of the base type to create and initialize the
+        # # exported variables.
+        super().__init__(eVec, xVec, yChord0)
+
+
         fiberResponses = 2
         yFiber0 = np.zeros((fiberResponses,), dtype=float)
         chordResponses = 2 * fiberResponses
@@ -672,7 +704,7 @@ class SeptalChord(Response):
         E1_c, E2_c, et_c, ef_c, s0_c = mp.collagenFiber()
         yFiber0[0] = mp.etaCollagen()
         yFiber0[1] = s0_c
-        self.fiberC = BioFiber(yFiber0, rho_c, Cp_c, alpha_c,
+        self.fiberC = BioFiber(eVec, xVec,yFiber0, rho_c, Cp_c, alpha_c,
                                E1_c, E2_c, et_c, ef_c)
         yChord0[0] = yFiber0[0]        # initial collagen entropy density
         yChord0[1] = yFiber0[1]        # initial collagen pre-stress
@@ -684,24 +716,24 @@ class SeptalChord(Response):
         E1_e, E2_e, et_e, s0_e = mp.elastinFiber()
         yFiber0[0] = mp.etaElastin()
         yFiber0[1] = s0_e
-        self.fiberE = BioFiber(yFiber0, rho_e, Cp_e, alpha_e, E1_e, E2_e, et_e)
+        self.fiberE = BioFiber(eVec, xVec, yFiber0, rho_e, Cp_e, alpha_e, E1_e, E2_e, et_e)
         yChord0[2] = yFiber0[0]         # initial elastin engropy density
         yChord0[3] = yFiber0[1]         # initial elastin pre-stress
         # call the base type constructor to create its data structure
-        super().__init__(yChord0)
+        # super().__init__(eVec, xVec)
         # verify and initialize the remaining data
         if diaCollagen is None:
             diaCollagen = mp.fiberDiameterCollagen()
         elif diaCollagen < 0.000005 or diaCollagen > 0.0005:
             raise RuntimeError("Diameter of the collagen fiber must be "
-                               + "within the range of 0.05 to 5 microns.")
+                              + "within the range of 0.05 to 5 microns.")
         else:
             pass
         if diaElastin is None:
             diaElastin = mp.fiberDiameterElastin()
         elif diaElastin < 0.000005 or diaElastin > 0.0005:
             raise RuntimeError("Diameter of the elastin fiber must be "
-                               + "within the range of 0.05 to 5 microns.")
+                              + "within the range of 0.05 to 5 microns.")
         else:
             pass
         self.A0_c = m.pi * diaCollagen**2 / 4.0
@@ -716,6 +748,12 @@ class SeptalChord(Response):
         self.stress_c = s0_c
         self.eta_e = mp.etaElastin()
         self.stress_e = s0_e
+
+        if self.firstCall:
+            self.strn0 = eVec[1]
+            self.temp0 = xVec[0]
+            self.len_0 = xVec[1]
+            
         return  # a new instance of type ceChord
 
     # inherited methods
@@ -779,6 +817,88 @@ class SeptalChord(Response):
         self.eta_e = yVec[2]
         self.stress_e = yVec[3]
         return Et
+    
+    def mixedSecantModulus(self, eVec, xVec, yVec):
+        if isinstance(yVec, np.ndarray):
+            (responses,) = np.shape(yVec)
+            if self.firstCall:
+                self.responses = responses                               
+                if responses != self.responses:
+                    raise RuntimeError("The yVec sent had a length of "
+                                       + "{}, but it must have ".format(responses)
+                                       + "a length of {}.".format(self.responses))
+        else:
+            raise RuntimeError("Argument yVec must be a NumPy array.")        
+
+        if isinstance(eVec, np.ndarray):
+            (controls,) = np.shape(eVec)
+            if self.firstCall:
+                self.controls = controls
+                if self.responses % self.controls != 0:
+                    raise RuntimeError("The number of response variables "
+                                       + "must be an integer mulitplier to "
+                                       + "the number of control variables.")
+            else:
+                if controls != self.controls:
+                    raise RuntimeError("The eVec sent had a length of "
+                                       + "{}, but it must ".format(controls)
+                                       + "have length "
+                                       + "{}.".format(self.controls))
+        else:
+            raise RuntimeError("Argument eVec must be a NumPy array.")
+
+        # create an empty matrix for inserting the secant moduli into
+        Ms = np.zeros((int(self.responses / 2), self.controls), dtype=float)
+        # update the first call flag
+        if self.firstCall:
+            self.firstCall = False        
+        
+        Es = self.secantModulus(eVec, xVec, yVec)
+        phi = self.volumeFraction()
+        for i in range(2):
+            Ms[i, :] = phi * Es[i, :] + (1 - phi) * Es[2 + i, :]
+        return Ms
+
+    def mixedtangentModulus(self, eVec, xVec, yVec):
+        if isinstance(yVec, np.ndarray):
+            (responses,) = np.shape(yVec)
+            if self.firstCall:
+                self.responses = responses                               
+                if responses != self.responses:
+                    raise RuntimeError("The yVec sent had a length of "
+                                       + "{}, but it must have ".format(responses)
+                                       + "a length of {}.".format(self.responses))
+        else:
+            raise RuntimeError("Argument yVec must be a NumPy array.")        
+
+        if isinstance(eVec, np.ndarray):
+            (controls,) = np.shape(eVec)
+            if self.firstCall:
+                self.controls = controls
+                if self.responses % self.controls != 0:
+                    raise RuntimeError("The number of response variables "
+                                       + "must be an integer mulitplier to "
+                                       + "the number of control variables.")
+            else:
+                if controls != self.controls:
+                    raise RuntimeError("The eVec sent had a length of "
+                                       + "{}, but it must ".format(controls)
+                                       + "have length "
+                                       + "{}.".format(self.controls))
+        else:
+            raise RuntimeError("Argument eVec must be a NumPy array.")
+
+        # create an empty matrix for inserting the secant moduli into
+        Mt = np.zeros((int(self.responses / 2), self.controls), dtype=float)
+        # update the first call flag
+        if self.firstCall:
+            self.firstCall = False        
+               
+        Et = self.tangentModulus(eVec, xVec, yVec)
+        phi = self.volumeFraction()
+        for i in range(2):
+            Mt[i, :] = phi * Et[i, :] + (1 - phi) * Et[2 + i, :]
+        return Mt
 
     def isRuptured(self):
         ruptured_c = self.fiberC.isRuptured()
@@ -876,6 +996,10 @@ class SeptalChord(Response):
     def area(self):
         a = self.areaCollagen() + self.areaElastin()
         return a
+    
+    def volumeFraction(self):
+        phi = self.areaCollagen() / self.area()
+        return phi
 
     def volumeCollagen(self):
         vol = self.A0_c * self.len_0
@@ -918,6 +1042,11 @@ class SeptalChord(Response):
     def stress(self):
         sigma = self.force() / self.area()
         return sigma
+    
+    def traction(self):
+        phi = self.volumeFraction()
+        t = phi * self.stress_c + (1 - phi) * self.stress_e
+        return t
 
     def force(self):
         if self.firstCall:

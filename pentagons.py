@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from chords import chord
+from ceMembranes import controlMembrane, ceMembrane
+from chords import Chord
+from pivotIncomingF import Pivot
 import materialProperties as mp
 import math as m
 from membranes import membrane
 import numpy as np
 from ridder import findRoot
-from shapeFnPentagons import pentShapeFunction
+from shapeFnPentagons import ShapeFunction as pentShapeFunction
 import spin as spinMtx
-from numpy.linalg import det
+from shapeFnChords import ShapeFunction as chordShapeFunction
+from gaussQuadChords import GaussQuadrature as chordGaussQuadrature
+from gaussQuadPentagons import GaussQuadrature as pentGaussQuadrature
 
 
 """
@@ -34,26 +38,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.1"
 __date__ = "08-08-2019"
-__update__ = "10-06-2019"
+__update__ = "11-06-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
 r"""
-
-Change in version "1.3.0":
-
-methods
-
-    massM = p.massMatrix(rho, width)
-        gaussPt  the Gauss point for which the mass matrix is to be supplied
-        rho      the mass density with units of mass per unit volume
-        width    the membrane thickness
-    returns
-        massM    a 10x10 mass matrix for the pentagon associated with 'gaussPt'
-
-    stiffM = p.stiffnessMatrix()
-
-    fFn = p.forcingFunction()
 
 Overview of module pentagons.py:
 
@@ -116,6 +105,39 @@ constructor
 
 methods
 
+    w = p.width(state)
+        returns the cross-sectional thickness or width of the membrane in
+        configuration 'state'
+
+    Geometric fields associated with a pentagonal surface in 3 space
+
+    a = p.area(state)
+        returns the area of this irregular pentagon in configuration 'state'
+
+    aLambda = p.arealStretch(state)
+            returns the square root of area(state) divided by reference area
+
+    aStrain = p.arealStrain(state)
+            returns the logarithm of areal stretch evaluated at 'state'
+
+    daStrain = p.dArealStrain(state)
+            returns the time rate of change in areal strain at 'state'
+
+    Material properties that associate with this septum.  Except for the mass
+    density, all are drawn randomly from a statistical distribution.
+
+    rho = p.massDensity()
+        returns the mass density of the chord (collagen and elastin fibers)
+
+    M1, M2, Me_t, N1, N2, Ne_t, G1, G2, Ge_t = c.matProp()
+        returns the constitutive properties for this septal membrane where
+            M1, M2, Me_t  pertain to the dilation response
+            N1, N2, Ne_t  pertain to the squeeze  response
+            G1, G2, Ge_t  pertain to the  shear   response
+        where the first in these sets describes the compliant response
+        the second in these sets describes the stiff response, and
+        the third in these sets establishes the strain of transition
+        
     s = p.toString()
         returns string representation for the pentagon in configuration 'state'
 
@@ -149,44 +171,48 @@ methods
         had their coordinates updated, and after all chords have been updated,
         too.  This may be called multiple times before freezing it with advance
 
-    p.advance()
+    p.advance(reindex)
+       input
+            reindex is an instance of Pivot object from module pivotIncomingF      
         assigns the current location into the previous location, and then it
         assigns the next location into the current location, thereby freezing
         the location of the present next-location in preparation to advance to
         the next step along a solution path
 
-    Material properties that associate with this septum.  Except for the mass
-    density, all are drawn randomly from a statistical distribution.
+    pMtx12 = c.rotation12(state)
+        returns a 2x2 orthogonal matrix that rotates the reference base vectors
+        into the set of local base vectors pertaining to 1-2 chord whose axis
+        aligns with the 1 direction, while the 2 direction passes through the
+        origin of the dodecahedral reference coordinate system.  The returned
+        matrix associates with configuration 'state'
 
-    rho = p.massDensity()
-        returns the mass density of the chord (collagen and elastin fibers)
+    pMtx23 = c.rotation23(state)
+        returns a 2x2 orthogonal matrix that rotates the reference base vectors
+        into the set of local base vectors pertaining to 2-3 chord whose axis
+        aligns with the 1 direction, while the 2 direction passes through the
+        origin of the dodecahedral reference coordinate system.  The returned
+        matrix associates with configuration 'state'
+        
+    pMtx34 = c.rotation34(state)
+        returns a 2x2 orthogonal matrix that rotates the reference base vectors
+        into the set of local base vectors pertaining to 3-4 chord whose axis
+        aligns with the 1 direction, while the 2 direction passes through the
+        origin of the dodecahedral reference coordinate system.  The returned
+        matrix associates with configuration 'state'
 
-    w = p.width(state)
-        returns the cross-sectional thickness or width of the membrane in
-        configuration 'state'
+    pMtx45 = c.rotation45(state)
+        returns a 2x2 orthogonal matrix that rotates the reference base vectors
+        into the set of local base vectors pertaining to 4-5 chord whose axis
+        aligns with the 1 direction, while the 2 direction passes through the
+        origin of the dodecahedral reference coordinate system.  The returned
+        matrix associates with configuration 'state'
 
-    M1, M2, Me_t, N1, N2, Ne_t, G1, G2, Ge_t = c.matProp()
-        returns the constitutive properties for this septal membrane where
-            M1, M2, Me_t  pertain to the dilation response
-            N1, N2, Ne_t  pertain to the squeeze  response
-            G1, G2, Ge_t  pertain to the  shear   response
-        where the first in these sets describes the compliant response
-        the second in these sets describes the stiff response, and
-        the third in these sets establishes the strain of transition
-
-    Geometric fields associated with a pentagonal surface in 3 space
-
-    a = p.area(state)
-        returns the area of this irregular pentagon in configuration 'state'
-
-    aLambda = p.arealStretch(state)
-            returns the square root of area(state) divided by reference area
-
-    aStrain = p.arealStrain(state)
-            returns the logarithm of areal stretch evaluated at 'state'
-
-    daStrain = p.dArealStrain(state)
-            returns the time rate of change in areal strain at 'state'
+    pMtx51 = c.rotation51(state)
+        returns a 2x2 orthogonal matrix that rotates the reference base vectors
+        into the set of local base vectors pertaining to 5-1 chord whose axis
+        aligns with the 1 direction, while the 2 direction passes through the
+        origin of the dodecahedral reference coordinate system.  The returned
+        matrix associates with configuration 'state'        
 
     [nx, ny, nz] = p.normal(state)
         returns the unit normal to this pentagon in configuration 'state'
@@ -199,14 +225,28 @@ methods
     [cx, cy, cz] = p.centroid(state)
         returns centroid of this irregular pentagon in configuration 'state'
 
-    [ux, uy, uz] = p.displacement(state)
+    [ux, uy, uz] = p.centroidDisplacement(reindex, state)
         returns the displacement at the centroid in configuration 'state'
-
-    [vx, vy, vz] = p.velocity(state)
+            
+    [vx, vy, vz] = p.centroidVelocity(reindex, state)
         returns the velocity at the centroid in configuration 'state'
 
-    [ax, ay, az] = p.acceleration(state)
+    [ax, ay, az] = p.centroidAcceleration(reindex, state)
         returns the acceleration at the centroid in configuration 'state'
+
+    Dmtx1 = sf.dDisplacement1(reindex)
+       input
+            reindex is an instance of Pivot object from module pivotIncomingF      
+       output
+            Dmtx1 is change in displacement ( dA1 = L1 * D1 ) in the contribution 
+            to the first nonlinear strain
+
+    Dmtx2 = sf.dDisplacement2(reindex)
+       input
+            reindex is an instance of Pivot object from module pivotIncomingF      
+       output
+            Dmtx1 is change in displacement ( dA2 = L2 * D2 ) in the contribution 
+            to the second nonlinear strain
 
     pMtx = p.rotation(state)
         returns a 3x3 orthogonal matrix that rotates the reference base vectors
@@ -300,16 +340,28 @@ methods
 
     Fields needed to construct finite element representations
 
-    sf = p.shapeFunction(pentGaussPt):
-        returns the shape function associated with the specified Gauss point.
+    Psf = p.pentShapeFunction(pentGaussPt):
+        returns the shape function associated with the specified Gauss point 
+        for pentagon
 
-    mMtx = p.massMatrix(rho, width)
+    csf = p.chordShapeFunction(chordGaussPt):
+        returns the shape function associated with the specified Gauss point 
+        for chord
+
+    pgq = p.pentGaussQuadrature():
+        returns the gauss Gauss quadrature rule to be used for pentaon
+
+    cgq = p.chordGaussQuadrature():
+        returns the gauss Gauss quadrature rule to be used for chord
+        
+    mMtx = p.massMatrix()
         returns an average of the lumped and consistent mass matrices (ensures
         the mass matrix is not singular) for the chosen number of Gauss points
         for a pentagon whose mass density, rho, and whose thickness, width, are
         specified.
 
-    kMtx = p.stiffnessMatrix()
+    kMtx = p.stiffnessMatrix(reindex)
+        reindex is an instance of Pivot object from module pivotIncomingF
         returns a tangent stiffness matrix for the chosen number of Gauss
         points.
 
@@ -333,24 +385,23 @@ References
 
 class pentagon(object):
 
-    def __init__(self, number, chord1, chord2, chord3, chord4, chord5, h,
-                 pentGaussPts, triaGaussPts):
+    def __init__(self, number, chord1, chord2, chord3, chord4, chord5, h):
         self._number = int(number)
 
         # verify the input
-        if not isinstance(chord1, chord):
+        if not isinstance(chord1, Chord):
             raise RuntimeError('chord1 passed to the pentagon constructor ' +
                                'was invalid.')
-        if not isinstance(chord2, chord):
+        if not isinstance(chord2, Chord):
             raise RuntimeError('chord2 passed to the pentagon constructor ' +
                                'was invalid.')
-        if not isinstance(chord3, chord):
+        if not isinstance(chord3, Chord):
             raise RuntimeError('chord3 passed to the pentagon constructor ' +
                                'was invalid.')
-        if not isinstance(chord4, chord):
+        if not isinstance(chord4, Chord):
             raise RuntimeError('chord4 passed to the pentagon constructor ' +
                                'was invalid.')
-        if not isinstance(chord5, chord):
+        if not isinstance(chord5, Chord):
             raise RuntimeError('chord5 passed to the pentagon constructor ' +
                                'was invalid.')
 
@@ -377,14 +428,14 @@ class pentagon(object):
         else:
             raise RuntimeError("The stepsize in the pentagon constructor " +
                                "wasn't positive.")
-
-        # check the number of Gauss points to use
-        if pentGaussPts == 1 or pentGaussPts == 4 or pentGaussPts == 7:
-            self._pentGaussPts = pentGaussPts
-        else:
-            raise RuntimeError('{} Gauss points were '.format(pentGaussPts) +
-                               'specified in the pentagon constructor; ' +
-                               'it must be 1, 4 or 7.')
+            
+        # assign the Gauss quadrature rule to be used for pentaon
+        self._pgq = pentGaussQuadrature()
+        
+        
+        # assign the Gauss quadrature rule to be used for chord
+        self._cgq = chordGaussQuadrature()
+        
 
         # establish the set of chords
         self._chord = {
@@ -444,384 +495,17 @@ class pentagon(object):
             raise RuntimeError('There were not 5 unique vertices ' +
                                'in this pentagon.')
 
-        # establish the shape functions located at the pentagon Gauss points
-        # (xi, eta)
-        if pentGaussPts == 1:
-            xi = 0.0000000000000000
-            eta = 0.0000000000000000
-            sf11 = pentShapeFunction(xi, eta)
-
-            self._pentShapeFns = {
-                11: sf11
-            }
-        elif pentGaussPts == 4:
-            xi1 = -0.0349156305831802
-            eta1 = 0.6469731019095136
-            sf11 = pentShapeFunction(xi1, eta1)
-
-            xi1 = -0.0349156305831802
-            eta2 = -0.0321196846022659
-            sf12 = pentShapeFunction(xi1, eta2)
-
-            xi1 = -0.0349156305831802
-            eta3 = -0.6469731019095134
-            sf13 = pentShapeFunction(xi1, eta3)
-
-            xi1 = -0.0349156305831802
-            eta4 = 0.0321196846022661
-            sf14 = pentShapeFunction(xi1, eta4)
-
-
-
-            xi2 = -0.5951653065516678
-            eta1 = 0.6469731019095136
-            sf21 = pentShapeFunction(xi2, eta1)
-
-            xi2 = -0.5951653065516678
-            eta2 = -0.0321196846022659
-            sf22 = pentShapeFunction(xi2, eta2)
-
-            xi2 = -0.5951653065516678
-            eta3 = -0.6469731019095134
-            sf23 = pentShapeFunction(xi2, eta3)
-
-            xi2 = -0.5951653065516678
-            eta4 = 0.0321196846022661
-            sf24 = pentShapeFunction(xi2, eta4)
-
-
-
-            xi3 = 0.0349156305831798
-            eta1 = 0.6469731019095136
-            sf31 = pentShapeFunction(xi3, eta1)
-
-            xi3 = 0.0349156305831798
-            eta2 = -0.0321196846022659
-            sf32 = pentShapeFunction(xi3, eta2)
-
-            xi3 = 0.0349156305831798
-            eta3 = -0.6469731019095134
-            sf33 = pentShapeFunction(xi3, eta3)
-
-            xi3 = 0.0349156305831798
-            eta4 = 0.0321196846022661
-            sf34 = pentShapeFunction(xi3, eta4)
-
-
-
-            xi4 = 0.5951653065516677
-            eta1 = 0.6469731019095136
-            sf41 = pentShapeFunction(xi4, eta1)
-
-            xi4 = 0.5951653065516677
-            eta2 = -0.0321196846022659
-            sf42 = pentShapeFunction(xi4, eta2)
-
-            xi4 = 0.5951653065516677
-            eta3 = -0.6469731019095134
-            sf43 = pentShapeFunction(xi4, eta3)
-
-            xi4 = 0.5951653065516677
-            eta4 = 0.0321196846022661
-            sf44 = pentShapeFunction(xi4, eta4)
-
-
-            self._pentShapeFns = {
-                11: sf11,
-                12: sf12,
-                13: sf13,
-                14: sf14,
-                21: sf21,
-                22: sf22,
-                23: sf23,
-                24: sf24,
-                31: sf31,
-                32: sf32,
-                33: sf33,
-                34: sf34,
-                41: sf41,
-                42: sf42,
-                43: sf43,
-                44: sf44
-            }
-        else:  # pentGaussPts = 7
-            xi1 = -0.0000000000000000
-            eta1 = -0.0000000000000002
-            sf11 = pentShapeFunction(xi1, eta1)
-
-            xi1 = -0.0000000000000000
-            eta2 = 0.7099621260052327
-            sf12 = pentShapeFunction(xi1, eta2)
-
-            xi1 = -0.0000000000000000
-            eta3 = 0.1907259121533272
-            sf13 = pentShapeFunction(xi1, eta3)
-
-            xi1 = -0.0000000000000000
-            eta4 = -0.5531465782166917
-            sf14 = pentShapeFunction(xi1, eta4)
-
-            xi1 = -0.0000000000000000
-            eta5 = -0.6644407817506509
-            sf15 = pentShapeFunction(xi1, eta5)
-
-            xi1 = -0.0000000000000000
-            eta6 = -0.1251071394727008
-            sf16 = pentShapeFunction(xi1, eta6)
-
-            xi1 = -0.0000000000000000
-            eta7 = 0.4872045224587945
-            sf17 = pentShapeFunction(xi1, eta7)
-
-
-
-
-            xi2 = -0.1351253857178451
-            eta1 = -0.0000000000000002
-            sf21 = pentShapeFunction(xi2, eta1)
-
-            xi2 = -0.1351253857178451
-            eta2 = 0.7099621260052327
-            sf22 = pentShapeFunction(xi2, eta2)
-
-            xi2 = -0.1351253857178451
-            eta3 = 0.1907259121533272
-            sf23 = pentShapeFunction(xi2, eta3)
-
-            xi2 = -0.1351253857178451
-            eta4 = -0.5531465782166917
-            sf24 = pentShapeFunction(xi2, eta4)
-
-            xi2 = -0.1351253857178451
-            eta5 = -0.6644407817506509
-            sf25 = pentShapeFunction(xi2, eta5)
-
-            xi2 = -0.1351253857178451
-            eta6 = -0.1251071394727008
-            sf26 = pentShapeFunction(xi2, eta6)
-
-            xi2 = -0.1351253857178451
-            eta7 = 0.4872045224587945
-            sf27 = pentShapeFunction(xi2, eta7)
-
-
-
-
-            xi3 = -0.6970858746672087
-            eta1 = -0.0000000000000002
-            sf31 = pentShapeFunction(xi3, eta1)
-
-            xi3 = -0.6970858746672087
-            eta2 = 0.7099621260052327
-            sf32 = pentShapeFunction(xi3, eta2)
-
-            xi3 = -0.6970858746672087
-            eta3 = 0.1907259121533272
-            sf33 = pentShapeFunction(xi3, eta3)
-
-            xi3 = -0.6970858746672087
-            eta4 = -0.5531465782166917
-            sf34 = pentShapeFunction(xi3, eta4)
-
-            xi3 = -0.6970858746672087
-            eta5 = -0.6644407817506509
-            sf35 = pentShapeFunction(xi3, eta5)
-
-            xi3 = -0.6970858746672087
-            eta6 = -0.1251071394727008
-            sf36 = pentShapeFunction(xi3, eta6)
-
-            xi3 = -0.6970858746672087
-            eta7 = 0.4872045224587945
-            sf37 = pentShapeFunction(xi3, eta7)
-
-
-
-
-            xi4 = -0.4651171392611024
-            eta1 = -0.0000000000000002
-            sf41 = pentShapeFunction(xi4, eta1)
-
-            xi4 = -0.4651171392611024
-            eta2 = 0.7099621260052327
-            sf42 = pentShapeFunction(xi4, eta2)
-
-            xi4 = -0.4651171392611024
-            eta3 = 0.1907259121533272
-            sf43 = pentShapeFunction(xi4, eta3)
-
-            xi4 = -0.4651171392611024
-            eta4 = -0.5531465782166917
-            sf44 = pentShapeFunction(xi4, eta4)
-
-            xi4 = -0.4651171392611024
-            eta5 = -0.6644407817506509
-            sf45 = pentShapeFunction(xi4, eta5)
-
-            xi4 = -0.4651171392611024
-            eta6 = -0.1251071394727008
-            sf46 = pentShapeFunction(xi4, eta6)
-
-            xi4 = -0.4651171392611024
-            eta7 = 0.4872045224587945
-            sf47 = pentShapeFunction(xi4, eta7)
-
-
-
-
-            xi5 = 0.2842948078559476
-            eta1 = -0.0000000000000002
-            sf51 = pentShapeFunction(xi5, eta1)
-
-            xi5 = 0.2842948078559476
-            eta2 = 0.7099621260052327
-            sf52 = pentShapeFunction(xi5, eta2)
-
-            xi5 = 0.2842948078559476
-            eta3 = 0.1907259121533272
-            sf53 = pentShapeFunction(xi5, eta3)
-
-            xi5 = 0.2842948078559476
-            eta4 = -0.5531465782166917
-            sf54 = pentShapeFunction(xi5, eta4)
-
-            xi5 = 0.2842948078559476
-            eta5 = -0.6644407817506509
-            sf55 = pentShapeFunction(xi5, eta5)
-
-            xi5 = 0.2842948078559476
-            eta6 = -0.1251071394727008
-            sf56 = pentShapeFunction(xi5, eta6)
-
-            xi5 = 0.2842948078559476
-            eta7 = 0.4872045224587945
-            sf57 = pentShapeFunction(xi5, eta7)
-
-
-
-
-            xi6 = 0.7117958231685716
-            eta1 = -0.0000000000000002
-            sf61 = pentShapeFunction(xi6, eta1)
-
-            xi6 = 0.7117958231685716
-            eta2 = 0.7099621260052327
-            sf62 = pentShapeFunction(xi6, eta2)
-
-            xi6 = 0.7117958231685716
-            eta3 = 0.1907259121533272
-            sf63 = pentShapeFunction(xi6, eta3)
-
-            xi6 = 0.7117958231685716
-            eta4 = -0.5531465782166917
-            sf64 = pentShapeFunction(xi6, eta4)
-
-            xi6 = 0.7117958231685716
-            eta5 = -0.6644407817506509
-            sf65 = pentShapeFunction(xi6, eta5)
-
-            xi6 = 0.7117958231685716
-            eta6 = -0.1251071394727008
-            sf66 = pentShapeFunction(xi6, eta6)
-
-            xi6 = 0.7117958231685716
-            eta7 = 0.4872045224587945
-            sf67 = pentShapeFunction(xi6, eta7)
-
-
-
-
-            xi7 = 0.5337947578638855
-            eta1 = -0.0000000000000002
-            sf71 = pentShapeFunction(xi7, eta1)
-
-            xi7 = 0.5337947578638855
-            eta2 = 0.7099621260052327
-            sf72 = pentShapeFunction(xi7, eta2)
-
-            xi7 = 0.5337947578638855
-            eta3 = 0.1907259121533272
-            sf73 = pentShapeFunction(xi7, eta3)
-
-            xi7 = 0.5337947578638855
-            eta4 = -0.5531465782166917
-            sf74 = pentShapeFunction(xi7, eta4)
-
-            xi7 = 0.5337947578638855
-            eta5 = -0.6644407817506509
-            sf75 = pentShapeFunction(xi7, eta5)
-
-            xi7 = 0.5337947578638855
-            eta6 = -0.1251071394727008
-            sf76 = pentShapeFunction(xi7, eta6)
-
-            xi7 = 0.5337947578638855
-            eta7 = 0.4872045224587945
-            sf77 = pentShapeFunction(xi7, eta7)
-
-            self._pentShapeFns = {
-                11: sf11,
-                12: sf12,
-                13: sf13,
-                14: sf14,
-                15: sf15,
-                16: sf16,
-                17: sf17,
-                21: sf21,
-                22: sf22,
-                23: sf23,
-                24: sf24,
-                25: sf25,
-                26: sf26,
-                27: sf27,
-                31: sf31,
-                32: sf32,
-                33: sf33,
-                34: sf34,
-                35: sf35,
-                36: sf36,
-                37: sf37,
-                41: sf41,
-                42: sf42,
-                43: sf43,
-                44: sf44,
-                45: sf45,
-                46: sf46,
-                47: sf47,
-                51: sf51,
-                52: sf52,
-                53: sf53,
-                54: sf54,
-                55: sf55,
-                56: sf56,
-                57: sf57,
-                61: sf61,
-                62: sf62,
-                63: sf63,
-                64: sf64,
-                65: sf65,
-                66: sf66,
-                67: sf67,
-                71: sf71,
-                72: sf72,
-                73: sf73,
-                74: sf74,
-                75: sf75,
-                76: sf76,
-                77: sf77
-            }
-
         # get the vertex coordinates in the reference configuration
-        x1, y1, z1 = v1.coordinates('ref')
-        x2, y2, z2 = v2.coordinates('ref')
-        x3, y3, z3 = v3.coordinates('ref')
-        x4, y4, z4 = v4.coordinates('ref')
-        x5, y5, z5 = v5.coordinates('ref')
+        x1 = v1.coordinates('ref')
+        x2 = v2.coordinates('ref')
+        x3 = v3.coordinates('ref')
+        x4 = v4.coordinates('ref')
+        x5 = v5.coordinates('ref')
 
         # base vector 1: connects the two shoulders of a pentagon
-        x = x5 - x2
-        y = y5 - y2
-        z = z5 - z2
+        x = x5[0] - x2[0]
+        y = x5[1] - x2[1]
+        z = x5[2] - x2[2]
         mag = m.sqrt(x * x + y * y + z * z)
         n1x = x / mag
         n1y = y / mag
@@ -830,9 +514,9 @@ class pentagon(object):
         # base vector 2: goes from the apex to a point along its base
 
         # establish the unit vector for the base of the pentagon
-        x = x4 - x3
-        y = y4 - y3
-        z = z4 - z3
+        x = x4[0] - x3[0]
+        y = x4[1] - x3[1]
+        z = x4[2] - x3[2]
         mag = m.sqrt(x * x + y * y + z * z)
         ex = x / mag
         ey = y / mag
@@ -842,9 +526,9 @@ class pentagon(object):
         # the pentagon that results in a vector n2 which is normal to n1
 
         def getDelta(delta):
-            nx = x1 - (x3 + delta * ex)
-            ny = y1 - (y3 + delta * ey)
-            nz = z1 - (z3 + delta * ez)
+            nx = x1[0] - (x3[0] + delta * ex)
+            ny = x1[1] - (x3[1] + delta * ey)
+            nz = x1[2] - (x3[2] + delta * ez)
             # when the dot product is zero then the two vectors are orthogonal
             n1Dotn2 = n1x * nx + n1y * ny + n1z * nz
             return n1Dotn2
@@ -855,9 +539,9 @@ class pentagon(object):
         delta = findRoot(deltaL, deltaH, getDelta)
 
         # create base vector 2
-        x = x1 - (x3 + delta * ex)
-        y = y1 - (y3 + delta * ey)
-        z = z1 - (z3 + delta * ez)
+        x = x1[0] - (x3[0] + delta * ex)
+        y = x1[1] - (x3[1] + delta * ey)
+        z = x1[2] - (x3[2] + delta * ez)
         mag = m.sqrt(x * x + y * y + z * z)
         n2x = x / mag
         n2y = y / mag
@@ -868,11 +552,6 @@ class pentagon(object):
         n3x = n1y * n2z - n1z * n2y
         n3y = n1z * n2x - n1x * n2z
         n3z = n1x * n2y - n1y * n2x
-
-        # initialize the normal vector
-        self._normalX0 = n3x
-        self._normalY0 = n3y
-        self._normalZ0 = n3z
 
         # create rotation matrix from dodecahedral to pentagonal coordinates
         self._Pr3D = np.zeros((3, 3), dtype=float)
@@ -886,17 +565,18 @@ class pentagon(object):
         self._Pr3D[2, 1] = n2z
         self._Pr3D[2, 2] = n3z
 
+
         # determine vertice coordinates in the pentagonal frame of reference
-        self._v1x0 = n1x * x1 + n1y * y1 + n1z * z1
-        self._v1y0 = n2x * x1 + n2y * y1 + n2z * z1
-        self._v2x0 = n1x * x2 + n1y * y2 + n1z * z2
-        self._v2y0 = n2x * x2 + n2y * y2 + n2z * z2
-        self._v3x0 = n1x * x3 + n1y * y3 + n1z * z3
-        self._v3y0 = n2x * x3 + n2y * y3 + n2z * z3
-        self._v4x0 = n1x * x4 + n1y * y4 + n1z * z4
-        self._v4y0 = n2x * x4 + n2y * y4 + n2z * z4
-        self._v5x0 = n1x * x5 + n1y * y5 + n1z * z5
-        self._v5y0 = n2x * x5 + n2y * y5 + n2z * z5
+        self._v1x0 = n1x * x1[0] + n1y * x1[1] + n1z * x1[2]
+        self._v1y0 = n2x * x1[0] + n2y * x1[1] + n2z * x1[2]
+        self._v2x0 = n1x * x2[0] + n1y * x2[1] + n1z * x2[2]
+        self._v2y0 = n2x * x2[0] + n2y * x2[1] + n2z * x2[2]
+        self._v3x0 = n1x * x3[0] + n1y * x3[1] + n1z * x3[2]
+        self._v3y0 = n2x * x3[0] + n2y * x3[1] + n2z * x3[2]
+        self._v4x0 = n1x * x4[0] + n1y * x4[1] + n1z * x4[2]
+        self._v4y0 = n2x * x4[0] + n2y * x4[1] + n2z * x4[2]
+        self._v5x0 = n1x * x5[0] + n1y * x5[1] + n1z * x5[2]
+        self._v5y0 = n2x * x5[0] + n2y * x5[1] + n2z * x5[2]
 
         # initialize current vertice coordinates in pentagonal frame of reference
         self._v1x = self._v1x0
@@ -911,11 +591,11 @@ class pentagon(object):
         self._v5y = self._v5y0
 
         # z offsets for the pentagonal plane (which should all be the same)
-        self._v1z = n3x * x1 + n3y * y1 + n3z * z1
-        self._v2z = n3x * x2 + n3y * y2 + n3z * z2
-        self._v3z = n3x * x3 + n3y * y3 + n3z * z3
-        self._v4z = n3x * x4 + n3y * y4 + n3z * z4
-        self._v5z = n3x * x5 + n3y * y5 + n3z * z5
+        self._v1z = n3x * x1[0] + n3y * x1[1] + n3z * x1[2]
+        self._v2z = n3x * x2[0] + n3y * x2[1] + n3z * x2[2]
+        self._v3z = n3x * x3[0] + n3y * x3[1] + n3z * x3[2]
+        self._v4z = n3x * x4[0] + n3y * x4[1] + n3z * x4[2]
+        self._v5z = n3x * x5[0] + n3y * x5[1] + n3z * x5[2]
         self._vz0 = ((self._v1z + self._v2z + self._v3z + self._v4z +
                       self._v5z) / 5.0)
 
@@ -978,1429 +658,593 @@ class pentagon(object):
         self._Pp3D[:, :] = self._Pr3D[:, :]
         self._Pc3D[:, :] = self._Pr3D[:, :]
         self._Pn3D[:, :] = self._Pr3D[:, :]
+        
+       
+        # create the rotation matrices for all chords of the pentagon
+        self._Pr2D12 = np.identity(2, dtype=float)
+        self._Pp2D12 = np.identity(2, dtype=float)
+        self._Pc2D12 = np.identity(2, dtype=float)
+        self._Pn2D12 = np.identity(2, dtype=float)
+        
+        self._Pr2D23 = np.identity(2, dtype=float)
+        self._Pp2D23 = np.identity(2, dtype=float)
+        self._Pc2D23 = np.identity(2, dtype=float)
+        self._Pn2D23 = np.identity(2, dtype=float)
+        
+        self._Pr2D34 = np.identity(2, dtype=float)
+        self._Pp2D34 = np.identity(2, dtype=float)
+        self._Pc2D34 = np.identity(2, dtype=float)
+        self._Pn2D34 = np.identity(2, dtype=float)
+        
+        self._Pr2D45 = np.identity(2, dtype=float)
+        self._Pp2D45 = np.identity(2, dtype=float)
+        self._Pc2D45 = np.identity(2, dtype=float)
+        self._Pn2D45 = np.identity(2, dtype=float)
+        
+        self._Pr2D51 = np.identity(2, dtype=float)
+        self._Pp2D51 = np.identity(2, dtype=float)
+        self._Pc2D51 = np.identity(2, dtype=float)
+        self._Pn2D51 = np.identity(2, dtype=float)
 
+        # initialize the 1-2 chordal lengths for all configurations
+        x1 = v1.coordinates('ref')
+        x2 = v2.coordinates('ref')
+        L120 = m.sqrt((x2[0] - x1[0])**2 + (x2[1] - x1[1])**2 
+                      + (x2[2] - x1[2])**2)
+        self._L120 = L120
+        self._L12p = L120
+        self._L12c = L120
+        self._L12n = L120
+        
+        # initialize the 2-3 chordal lengths for all configurations
+        x2 = v2.coordinates('ref')
+        x3 = v3.coordinates('ref')
+        L230 = m.sqrt((x3[0] - x2[0])**2 + (x3[1] - x2[1])**2 
+                      + (x3[2] - x2[2])**2)
+        self._L230 = L230
+        self._L23p = L230
+        self._L23c = L230
+        self._L23n = L230
+        
+        # initialize the 3-4 chordal lengths for all configurations
+        x3 = v3.coordinates('ref')
+        x4 = v4.coordinates('ref')
+        L340 = m.sqrt((x4[0] - x3[0])**2 + (x4[1] - x3[1])**2 
+                      + (x4[2] - x3[2])**2)
+        self._L340 = L340
+        self._L34p = L340
+        self._L34c = L340
+        self._L34n = L340
+        
+        # initialize the 4-5 chordal lengths for all configurations
+        x4 = v4.coordinates('ref')
+        x5 = v5.coordinates('ref')
+        L450 = m.sqrt((x5[0] - x4[0])**2 + (x5[1] - x4[1])**2 
+                      + (x5[2] - x4[2])**2)
+        self._L450 = L450
+        self._L45p = L450
+        self._L45c = L450
+        self._L45n = L450
+        
+        # initialize the 5-1 chordal lengths for all configurations
+        x5 = v5.coordinates('ref')
+        x1 = v1.coordinates('ref')
+        L510 = m.sqrt((x5[0] - x1[0])**2 + (x5[1] - x1[1])**2 
+                      + (x5[2] - x1[2])**2)
+        self._L510 = L510
+        self._L51p = L510
+        self._L51c = L510
+        self._L51n = L510
+                
+        # determine the rotation matrix for 1-2 chord 
+        # base vector 1: aligns with the axis of the 1-2 chord
+        x12 = x2[0] - x1[0]
+        y12 = x2[1] - x1[1]
+        z12 = x2[2] - x1[2]
+        mag12 = m.sqrt(x12 * x12 + y12 * y12  + z12 * z12)
+        n1x12 = x12 / mag12
+        n1y12 = y12 / mag12
+        n1z12 = z12 / mag12
+
+        # base vector 2: goes from the co-ordinate origin to the chord
+        # initial guess: base vector 2 points to the midpoint of the chord
+        x = (x1[0] + x2[0]) / 2.0
+        y = (x1[1] + x2[1]) / 2.0
+        z = (x1[2] + x2[2]) / 2.0
+        mag = m.sqrt(x * x + y * y  + z * z)
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the chordal
+        # axis which results in a vector n2 that is normal to base vector n1
+        def getDelta12(delta12):
+            nx = ex + delta12 * n1x12
+            ny = ey + delta12 * n1y12
+            nz = ez + delta12 * n1z12
+            # when the dot product is zero, the two vectors are orthogonal
+            n1Dotn2 = n1x12 * nx + n1y12 * ny + n1z12 * nz
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * self._L120
+        deltaH = 4.0 * self._L120
+        delta12 = findRoot(deltaL, deltaH, getDelta12)
+
+        # create base vector 2 (the radial vector out to the chord)
+        x = ex + delta12 * n1x12
+        y = ey + delta12 * n1y12
+        z = ez + delta12 * n1z12
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x12 = x / mag
+        n2y12 = y / mag   
+        n2z12 = z / mag
+        
+        # create the rotation matrix from dodecahedral to 1-2 chordal coordinates
+        self._Pr2D12[0, 0] = n1x12
+        self._Pr2D12[0, 1] = n2x12
+        self._Pr2D12[1, 0] = n1y12
+        self._Pr2D12[1, 1] = n2y12
+        self._Pp2D12[:, :] = self._Pr2D12[:, :]
+        self._Pc2D12[:, :] = self._Pr2D12[:, :]
+        self._Pn2D12[:, :] = self._Pr2D12[:, :]
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v1x120 = n1x12 * x1[0] + n1y12 * x1[1] + n1z12 * x1[2] 
+        self._v1y120 = n2x12 * x1[0] + n2y12 * x1[1] + n2z12 * x1[2]
+        self._v2x120 = n1x12 * x2[0] + n1y12 * x2[1] + n1z12 * x2[2]
+        self._v2y120 = n2x12 * x2[0] + n2y12 * x2[1] + n2z12 * x2[2]
+
+        self._v1x12 = self._v1x120 
+        self._v1y12 = self._v1y120 
+        self._v2x12 = self._v2x120 
+        self._v2y12 = self._v2y120 
+        
+                
+        # determine the rotation matrix for 2-3 chord 
+        # base vector 1: aligns with the axis of the 2-3 chord
+        x23 = x3[0] - x2[0]
+        y23 = x3[1] - x2[1]
+        z23 = x3[2] - x2[2]
+        mag23 = m.sqrt(x23 * x23 + y23 * y23 + z23 * z23)
+        n1x23 = x23 / mag23
+        n1y23 = y23 / mag23
+        n1z23 = z23 / mag23
+
+        # base vector 2: goes from the co-ordinate origin to the chord
+        # initial guess: base vector 2 points to the midpoint of the chord
+        x = (x3[0] + x2[0]) / 2.0
+        y = (x3[1] + x2[1]) / 2.0
+        z = (x3[2] + x2[2]) / 2.0
+        mag = m.sqrt(x * x + y * y  + z * z )
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the chordal
+        # axis which results in a vector n2 that is normal to base vector n1
+        def getDelta23(delta23):
+            nx = ex + delta23 * n1x23
+            ny = ey + delta23 * n1y23
+            nz = ez + delta23 * n1z23
+            # when the dot product is zero, the two vectors are orthogonal
+            n1Dotn2 = n1x23 * nx + n1y23 * ny + n1z23 * nz 
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * self._L230
+        deltaH = 4.0 * self._L230
+        delta23 = findRoot(deltaL, deltaH, getDelta23)
+
+        # create base vector 2 (the radial vector out to the chord)
+        x = ex + delta23 * n1x23
+        y = ey + delta23 * n1y23
+        z = ez + delta23 * n1z23
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x23 = x / mag
+        n2y23 = y / mag 
+        n2z23 = z / mag          
+                
+        # create the rotation matrix from dodecahedral to 2-3 chordal coordinates
+        self._Pr2D23[0, 0] = n1x23
+        self._Pr2D23[0, 1] = n2x23
+        self._Pr2D23[1, 0] = n1y23
+        self._Pr2D23[1, 1] = n2y23
+        self._Pp2D23[:, :] = self._Pr2D23[:, :]
+        self._Pc2D23[:, :] = self._Pr2D23[:, :]
+        self._Pn2D23[:, :] = self._Pr2D23[:, :]
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v2x230 = n1x23 * x2[0] + n1y23 * x2[1]  + n1z23 * x2[2] 
+        self._v2y230 = n2x23 * x2[0] + n2y23 * x2[1]  + n2z23 * x2[2]
+        self._v3x230 = n1x23 * x3[0] + n1y23 * x3[1]  + n1z23 * x3[2]
+        self._v3y230 = n2x23 * x3[0] + n2y23 * x3[1]  + n2z23 * x3[2]
+        
+        self._v2x23 = self._v2x230 
+        self._v2y23 = self._v2y230 
+        self._v3x23 = self._v3x230 
+        self._v3y23 = self._v3y230
+        
+        
+        # determine the rotation matrix for 3-4 chord 
+        # base vector 1: aligns with the axis of the 3-4 chord
+        x34 = x4[0] - x3[0]
+        y34 = x4[1] - x3[1]
+        z34 = x4[2] - x3[2]
+        mag34 = m.sqrt(x34 * x34 + y34 * y34 + z34 * z34)
+        n1x34 = x34 / mag34
+        n1y34 = y34 / mag34
+        n1z34 = z34 / mag34
+        
+        # base vector 2: goes from the co-ordinate origin to the chord
+        # initial guess: base vector 2 points to the midpoint of the chord
+        x = (x4[0] + x3[0]) / 2.0
+        y = (x4[1] + x3[1]) / 2.0
+        z = (x4[2] + x3[2]) / 2.0
+        mag = m.sqrt(x * x + y * y + z * z )
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the chordal
+        # axis which results in a vector n2 that is normal to base vector n1
+        def getDelta34(delta34):
+            nx = ex + delta34 * n1x34
+            ny = ey + delta34 * n1y34
+            nz = ez + delta34 * n1z34
+            # when the dot product is zero, the two vectors are orthogonal
+            n1Dotn2 = n1x34 * nx + n1y34 * ny + n1z34 * nz
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * self._L340
+        deltaH = 4.0 * self._L340
+        delta34 = findRoot(deltaL, deltaH, getDelta34)
+
+        # create base vector 2 (the radial vector out to the chord)
+        x = ex + delta34 * n1x34
+        y = ey + delta34 * n1y34
+        z = ez + delta34 * n1z34
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x34 = x / mag
+        n2y34 = y / mag   
+        n2z34 = z / mag
+        
+        # create the rotation matrix from dodecahedral to 3-4 chordal coordinates
+        self._Pr2D34[0, 0] = n1x34
+        self._Pr2D34[0, 1] = n2x34
+        self._Pr2D34[1, 0] = n1y34
+        self._Pr2D34[1, 1] = n2y34
+        self._Pp2D34[:, :] = self._Pr2D34[:, :]
+        self._Pc2D34[:, :] = self._Pr2D34[:, :]
+        self._Pn2D34[:, :] = self._Pr2D34[:, :]
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v3x340 = n1x34 * x3[0] + n1y34 * x3[1] + n1z34 * x3[2] 
+        self._v3y340 = n2x34 * x3[0] + n2y34 * x3[1] + n2z34 * x3[2]
+        self._v4x340 = n1x34 * x4[0] + n1y34 * x4[1] + n1z34 * x4[2]
+        self._v4y340 = n2x34 * x4[0] + n2y34 * x4[1] + n2z34 * x4[2]
+ 
+        self._v3x34 = self._v3x340 
+        self._v3y34 = self._v3y340 
+        self._v4x34 = self._v4x340 
+        self._v4y34 = self._v4y340 
+        
+        
+        # determine the rotation matrix for 4-5 chord 
+        # base vector 1: aligns with the axis of the 4-5 chord
+        x45 = x5[0] - x4[0]
+        y45 = x5[1] - x4[1]
+        z45 = x5[2] - x4[2]
+        mag45 = m.sqrt(x45 * x45 + y45 * y45 + z45 * z45)
+        n1x45 = x45 / mag45
+        n1y45 = y45 / mag45
+        n1z45 = z45 / mag45         
+        
+        # base vector 2: goes from the co-ordinate origin to the chord
+        # initial guess: base vector 2 points to the midpoint of the chord
+        x = (x5[0] + x4[0]) / 2.0
+        y = (x5[1] + x4[1]) / 2.0
+        z = (x5[2] + x4[2]) / 2.0
+        mag = m.sqrt(x * x + y * y + z * z )
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the chordal
+        # axis which results in a vector n2 that is normal to base vector n1
+        def getDelta45(delta45):
+            nx = ex + delta45 * n1x45
+            ny = ey + delta45 * n1y45
+            nz = ez + delta45 * n1z45
+            # when the dot product is zero, the two vectors are orthogonal
+            n1Dotn2 = n1x45 * nx + n1y45 * ny + n1z45 * nz
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * self._L450
+        deltaH = 4.0 * self._L450
+        delta45 = findRoot(deltaL, deltaH, getDelta45)
+
+        # create base vector 2 (the radial vector out to the chord)
+        x = ex + delta45 * n1x45
+        y = ey + delta45 * n1y45
+        z = ez + delta45 * n1z45
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x45 = x / mag
+        n2y45 = y / mag   
+        n2z45 = z / mag 
+        
+        # create the rotation matrix from dodecahedral to 4-5 chordal coordinates
+        self._Pr2D45[0, 0] = n1x45
+        self._Pr2D45[0, 1] = n2x45
+        self._Pr2D45[1, 0] = n1y45
+        self._Pr2D45[1, 1] = n2y45
+        self._Pp2D45[:, :] = self._Pr2D45[:, :]
+        self._Pc2D45[:, :] = self._Pr2D45[:, :]
+        self._Pn2D45[:, :] = self._Pr2D45[:, :]
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v4x450 = n1x45 * x4[0] + n1y45 * x4[1] + n1z45 * x4[2] 
+        self._v4y450 = n2x45 * x4[0] + n2y45 * x4[1] + n2z45 * x4[2]
+        self._v5x450 = n1x45 * x5[0] + n1y45 * x5[1] + n1z45 * x5[2]
+        self._v5y450 = n2x45 * x5[0] + n2y45 * x5[1] + n2z45 * x5[2]
+
+        self._v4x45 = self._v4x450 
+        self._v4y45 = self._v4y450 
+        self._v5x45 = self._v5x450 
+        self._v5y45 = self._v5y450 
+        
+        
+        # determine the rotation matrix for 5-1 chord 
+        # base vector 1: aligns with the axis of the 5-1 chord
+        x51 = x1[0] - x5[0]
+        y51 = x1[1] - x5[1]
+        z51 = x1[2] - x5[2]
+        mag51 = m.sqrt(x51 * x51 + y51 * y51 + z51 * z51)
+        n1x51 = x51 / mag51
+        n1y51 = y51 / mag51 
+        n1z51 = z51 / mag51
+        
+        # base vector 2: goes from the co-ordinate origin to the chord
+        # initial guess: base vector 2 points to the midpoint of the chord
+        x = (x1[0] + x5[0]) / 2.0
+        y = (x1[1] + x5[1]) / 2.0
+        z = (x1[2] + x5[2]) / 2.0
+        mag = m.sqrt(x * x + y * y + z * z )
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the chordal
+        # axis which results in a vector n2 that is normal to base vector n1
+        def getDelta51(delta51):
+            nx = ex + delta51 * n1x51
+            ny = ey + delta51 * n1y51
+            nz = ez + delta51 * n1z51
+            # when the dot product is zero, the two vectors are orthogonal
+            n1Dotn2 = n1x51 * nx + n1y51 * ny + n1z51 * nz 
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * self._L510
+        deltaH = 4.0 * self._L510
+        delta51 = findRoot(deltaL, deltaH, getDelta51)
+
+        # create base vector 2 (the radial vector out to the chord)
+        x = ex + delta51 * n1x51
+        y = ey + delta51 * n1y51
+        z = ez + delta51 * n1z51
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x51 = x / mag
+        n2y51 = y / mag   
+        n2z51 = z / mag 
+        
+        # create the rotation matrix from dodecahedral to 5-1 chordal coordinates
+        self._Pr2D51[0, 0] = n1x51
+        self._Pr2D51[0, 1] = n2x51
+        self._Pr2D51[1, 0] = n1y51
+        self._Pr2D51[1, 1] = n2y51
+        self._Pp2D51[:, :] = self._Pr2D51[:, :]
+        self._Pc2D51[:, :] = self._Pr2D51[:, :]
+        self._Pn2D51[:, :] = self._Pr2D51[:, :]
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v5x510 = n1x51 * x5[0] + n1y51 * x5[1] + n1z51 * x5[2]
+        self._v5y510 = n2x51 * x5[0] + n2y51 * x5[1] + n2z51 * x5[2]
+        self._v1x510 = n1x51 * x1[0] + n1y51 * x1[1] + n1z51 * x1[2]
+        self._v1y510 = n2x51 * x1[0] + n2y51 * x1[1] + n2z51 * x1[2]
+
+        self._v5x51 = self._v5x510 
+        self._v5y51 = self._v5y510 
+        self._v1x51 = self._v1x510 
+        self._v1y51 = self._v1y510         
+        
+        # establish the shape functions located at the various Gauss points 
+        # for pentagon
+        pentAtGaussPt = 1
+        Psf1 = pentShapeFunction(self._pgq.coordinates(pentAtGaussPt))
+        pentAtGaussPt = 2
+        Psf2 = pentShapeFunction(self._pgq.coordinates(pentAtGaussPt))
+        pentAtGaussPt = 3
+        Psf3 = pentShapeFunction(self._pgq.coordinates(pentAtGaussPt))
+        pentAtGaussPt = 4
+        Psf4 = pentShapeFunction(self._pgq.coordinates(pentAtGaussPt))
+        pentAtGaussPt = 5
+        Psf5 = pentShapeFunction(self._pgq.coordinates(pentAtGaussPt))
+        self._pentShapeFns = {
+            1: Psf1,
+            2: Psf2,
+            3: Psf3,
+            4: Psf4,
+            5: Psf5        
+        }
+        
+        # establish the shape functions located at the various Gauss points
+        # for chord
+        chordAtGaussPt = 1
+        csf1 = chordShapeFunction(self._cgq.coordinates(chordAtGaussPt))
+        chordAtGaussPt = 2
+        csf2 = chordShapeFunction(self._cgq.coordinates(chordAtGaussPt))
+        self._chordShapeFns = {
+            1: csf1,
+            2: csf2
+        }
+        
         # create matrices for a pentagon at its Gauss points via dictionaries
         # p implies previous, c implies current, n implies next
-        if pentGaussPts == 1:
             # displacement gradients located at the Gauss points of pentagon
-            self._G0 = {
-                11: np.zeros((2, 2), dtype=float)
-            }
-            self._Gp = {
-                11: np.zeros((2, 2), dtype=float)
-            }
-            self._Gc = {
-                11: np.zeros((2, 2), dtype=float)
-            }
-            self._Gn = {
-                11: np.zeros((2, 2), dtype=float)
-            }
+        self._G0 = {
+            1: np.zeros((2, 2), dtype=float),
+            2: np.zeros((2, 2), dtype=float),
+            3: np.zeros((2, 2), dtype=float),
+            4: np.zeros((2, 2), dtype=float),
+            5: np.zeros((2, 2), dtype=float)
+        }
+        self._Gp = {
+            1: np.zeros((2, 2), dtype=float),
+            2: np.zeros((2, 2), dtype=float),
+            3: np.zeros((2, 2), dtype=float),
+            4: np.zeros((2, 2), dtype=float),
+            5: np.zeros((2, 2), dtype=float)
+        }
+        self._Gc = {
+            1: np.zeros((2, 2), dtype=float),
+            2: np.zeros((2, 2), dtype=float),
+            3: np.zeros((2, 2), dtype=float),
+            4: np.zeros((2, 2), dtype=float),
+            5: np.zeros((2, 2), dtype=float),
+        }
+        self._Gn = {
+            1: np.zeros((2, 2), dtype=float),
+            2: np.zeros((2, 2), dtype=float),
+            3: np.zeros((2, 2), dtype=float),
+            4: np.zeros((2, 2), dtype=float),
+            5: np.zeros((2, 2), dtype=float)
+        }
 
-            # deformation gradients located at the Gauss points of pentagon
-            self._F0 = {
-                11: np.identity(2, dtype=float)
-            }
-            self._Fp = {
-                11: np.identity(2, dtype=float)
-            }
-            self._Fc = {
-                11: np.identity(2, dtype=float)
-            }
-            self._Fn = {
-                11: np.identity(2, dtype=float)
-            }
-
-        elif pentGaussPts == 4:
-            # displacement gradients located at the Gauss points of pentagon
-            self._G0 = {
-                11: np.zeros((2, 2), dtype=float),
-                12: np.zeros((2, 2), dtype=float),
-                13: np.zeros((2, 2), dtype=float),
-                14: np.zeros((2, 2), dtype=float),
-                21: np.zeros((2, 2), dtype=float),
-                22: np.zeros((2, 2), dtype=float),
-                23: np.zeros((2, 2), dtype=float),
-                24: np.zeros((2, 2), dtype=float),
-                31: np.zeros((2, 2), dtype=float),
-                32: np.zeros((2, 2), dtype=float),
-                33: np.zeros((2, 2), dtype=float),
-                34: np.zeros((2, 2), dtype=float),
-                41: np.zeros((2, 2), dtype=float),
-                42: np.zeros((2, 2), dtype=float),
-                43: np.zeros((2, 2), dtype=float),
-                44: np.zeros((2, 2), dtype=float)
-            }
-            self._Gp = {
-                11: np.zeros((2, 2), dtype=float),
-                12: np.zeros((2, 2), dtype=float),
-                13: np.zeros((2, 2), dtype=float),
-                14: np.zeros((2, 2), dtype=float),
-                21: np.zeros((2, 2), dtype=float),
-                22: np.zeros((2, 2), dtype=float),
-                23: np.zeros((2, 2), dtype=float),
-                24: np.zeros((2, 2), dtype=float),
-                31: np.zeros((2, 2), dtype=float),
-                32: np.zeros((2, 2), dtype=float),
-                33: np.zeros((2, 2), dtype=float),
-                34: np.zeros((2, 2), dtype=float),
-                41: np.zeros((2, 2), dtype=float),
-                42: np.zeros((2, 2), dtype=float),
-                43: np.zeros((2, 2), dtype=float),
-                44: np.zeros((2, 2), dtype=float)
-            }
-            self._Gc = {
-                11: np.zeros((2, 2), dtype=float),
-                12: np.zeros((2, 2), dtype=float),
-                13: np.zeros((2, 2), dtype=float),
-                14: np.zeros((2, 2), dtype=float),
-                21: np.zeros((2, 2), dtype=float),
-                22: np.zeros((2, 2), dtype=float),
-                23: np.zeros((2, 2), dtype=float),
-                24: np.zeros((2, 2), dtype=float),
-                31: np.zeros((2, 2), dtype=float),
-                32: np.zeros((2, 2), dtype=float),
-                33: np.zeros((2, 2), dtype=float),
-                34: np.zeros((2, 2), dtype=float),
-                41: np.zeros((2, 2), dtype=float),
-                42: np.zeros((2, 2), dtype=float),
-                43: np.zeros((2, 2), dtype=float),
-                44: np.zeros((2, 2), dtype=float)
-            }
-            self._Gn = {
-                11: np.zeros((2, 2), dtype=float),
-                12: np.zeros((2, 2), dtype=float),
-                13: np.zeros((2, 2), dtype=float),
-                14: np.zeros((2, 2), dtype=float),
-                21: np.zeros((2, 2), dtype=float),
-                22: np.zeros((2, 2), dtype=float),
-                23: np.zeros((2, 2), dtype=float),
-                24: np.zeros((2, 2), dtype=float),
-                31: np.zeros((2, 2), dtype=float),
-                32: np.zeros((2, 2), dtype=float),
-                33: np.zeros((2, 2), dtype=float),
-                34: np.zeros((2, 2), dtype=float),
-                41: np.zeros((2, 2), dtype=float),
-                42: np.zeros((2, 2), dtype=float),
-                43: np.zeros((2, 2), dtype=float),
-                44: np.zeros((2, 2), dtype=float)
-            }
-
-            # deformation gradients located at the Gauss points of pentagon
-            self._F0 = {
-                11: np.identity(2, dtype=float),
-                12: np.identity(2, dtype=float),
-                13: np.identity(2, dtype=float),
-                14: np.identity(2, dtype=float),
-                21: np.identity(2, dtype=float),
-                22: np.identity(2, dtype=float),
-                23: np.identity(2, dtype=float),
-                24: np.identity(2, dtype=float),
-                31: np.identity(2, dtype=float),
-                32: np.identity(2, dtype=float),
-                33: np.identity(2, dtype=float),
-                34: np.identity(2, dtype=float),
-                41: np.identity(2, dtype=float),
-                42: np.identity(2, dtype=float),
-                43: np.identity(2, dtype=float),
-                44: np.identity(2, dtype=float)
-            }
-            self._Fp = {
-                11: np.identity(2, dtype=float),
-                12: np.identity(2, dtype=float),
-                13: np.identity(2, dtype=float),
-                14: np.identity(2, dtype=float),
-                21: np.identity(2, dtype=float),
-                22: np.identity(2, dtype=float),
-                23: np.identity(2, dtype=float),
-                24: np.identity(2, dtype=float),
-                31: np.identity(2, dtype=float),
-                32: np.identity(2, dtype=float),
-                33: np.identity(2, dtype=float),
-                34: np.identity(2, dtype=float),
-                41: np.identity(2, dtype=float),
-                42: np.identity(2, dtype=float),
-                43: np.identity(2, dtype=float),
-                44: np.identity(2, dtype=float)
-            }
-            self._Fc = {
-                11: np.identity(2, dtype=float),
-                12: np.identity(2, dtype=float),
-                13: np.identity(2, dtype=float),
-                14: np.identity(2, dtype=float),
-                21: np.identity(2, dtype=float),
-                22: np.identity(2, dtype=float),
-                23: np.identity(2, dtype=float),
-                24: np.identity(2, dtype=float),
-                31: np.identity(2, dtype=float),
-                32: np.identity(2, dtype=float),
-                33: np.identity(2, dtype=float),
-                34: np.identity(2, dtype=float),
-                41: np.identity(2, dtype=float),
-                42: np.identity(2, dtype=float),
-                43: np.identity(2, dtype=float),
-                44: np.identity(2, dtype=float)
-            }
-            self._Fn = {
-                11: np.identity(2, dtype=float),
-                12: np.identity(2, dtype=float),
-                13: np.identity(2, dtype=float),
-                14: np.identity(2, dtype=float),
-                21: np.identity(2, dtype=float),
-                22: np.identity(2, dtype=float),
-                23: np.identity(2, dtype=float),
-                24: np.identity(2, dtype=float),
-                31: np.identity(2, dtype=float),
-                32: np.identity(2, dtype=float),
-                33: np.identity(2, dtype=float),
-                34: np.identity(2, dtype=float),
-                41: np.identity(2, dtype=float),
-                42: np.identity(2, dtype=float),
-                43: np.identity(2, dtype=float),
-                44: np.identity(2, dtype=float)
-            }
-
-        else:  # pentGaussPts = 7
-            # displacement gradients located at the Gauss points of pentagon
-            self._G0 = {
-                11: np.zeros((2, 2), dtype=float),
-                12: np.zeros((2, 2), dtype=float),
-                13: np.zeros((2, 2), dtype=float),
-                14: np.zeros((2, 2), dtype=float),
-                15: np.zeros((2, 2), dtype=float),
-                16: np.zeros((2, 2), dtype=float),
-                17: np.zeros((2, 2), dtype=float),
-                21: np.zeros((2, 2), dtype=float),
-                22: np.zeros((2, 2), dtype=float),
-                23: np.zeros((2, 2), dtype=float),
-                24: np.zeros((2, 2), dtype=float),
-                25: np.zeros((2, 2), dtype=float),
-                26: np.zeros((2, 2), dtype=float),
-                27: np.zeros((2, 2), dtype=float),
-                31: np.zeros((2, 2), dtype=float),
-                32: np.zeros((2, 2), dtype=float),
-                33: np.zeros((2, 2), dtype=float),
-                34: np.zeros((2, 2), dtype=float),
-                35: np.zeros((2, 2), dtype=float),
-                36: np.zeros((2, 2), dtype=float),
-                37: np.zeros((2, 2), dtype=float),
-                41: np.zeros((2, 2), dtype=float),
-                42: np.zeros((2, 2), dtype=float),
-                43: np.zeros((2, 2), dtype=float),
-                44: np.zeros((2, 2), dtype=float),
-                45: np.zeros((2, 2), dtype=float),
-                46: np.zeros((2, 2), dtype=float),
-                47: np.zeros((2, 2), dtype=float),
-                51: np.zeros((2, 2), dtype=float),
-                52: np.zeros((2, 2), dtype=float),
-                53: np.zeros((2, 2), dtype=float),
-                54: np.zeros((2, 2), dtype=float),
-                55: np.zeros((2, 2), dtype=float),
-                56: np.zeros((2, 2), dtype=float),
-                57: np.zeros((2, 2), dtype=float),
-                61: np.zeros((2, 2), dtype=float),
-                62: np.zeros((2, 2), dtype=float),
-                63: np.zeros((2, 2), dtype=float),
-                64: np.zeros((2, 2), dtype=float),
-                65: np.zeros((2, 2), dtype=float),
-                66: np.zeros((2, 2), dtype=float),
-                67: np.zeros((2, 2), dtype=float),
-                71: np.zeros((2, 2), dtype=float),
-                72: np.zeros((2, 2), dtype=float),
-                73: np.zeros((2, 2), dtype=float),
-                74: np.zeros((2, 2), dtype=float),
-                75: np.zeros((2, 2), dtype=float),
-                76: np.zeros((2, 2), dtype=float),
-                77: np.zeros((2, 2), dtype=float)
-            }
-            self._Gp = {
-                11: np.zeros((2, 2), dtype=float),
-                12: np.zeros((2, 2), dtype=float),
-                13: np.zeros((2, 2), dtype=float),
-                14: np.zeros((2, 2), dtype=float),
-                15: np.zeros((2, 2), dtype=float),
-                16: np.zeros((2, 2), dtype=float),
-                17: np.zeros((2, 2), dtype=float),
-                21: np.zeros((2, 2), dtype=float),
-                22: np.zeros((2, 2), dtype=float),
-                23: np.zeros((2, 2), dtype=float),
-                24: np.zeros((2, 2), dtype=float),
-                25: np.zeros((2, 2), dtype=float),
-                26: np.zeros((2, 2), dtype=float),
-                27: np.zeros((2, 2), dtype=float),
-                31: np.zeros((2, 2), dtype=float),
-                32: np.zeros((2, 2), dtype=float),
-                33: np.zeros((2, 2), dtype=float),
-                34: np.zeros((2, 2), dtype=float),
-                35: np.zeros((2, 2), dtype=float),
-                36: np.zeros((2, 2), dtype=float),
-                37: np.zeros((2, 2), dtype=float),
-                41: np.zeros((2, 2), dtype=float),
-                42: np.zeros((2, 2), dtype=float),
-                43: np.zeros((2, 2), dtype=float),
-                44: np.zeros((2, 2), dtype=float),
-                45: np.zeros((2, 2), dtype=float),
-                46: np.zeros((2, 2), dtype=float),
-                47: np.zeros((2, 2), dtype=float),
-                51: np.zeros((2, 2), dtype=float),
-                52: np.zeros((2, 2), dtype=float),
-                53: np.zeros((2, 2), dtype=float),
-                54: np.zeros((2, 2), dtype=float),
-                55: np.zeros((2, 2), dtype=float),
-                56: np.zeros((2, 2), dtype=float),
-                57: np.zeros((2, 2), dtype=float),
-                61: np.zeros((2, 2), dtype=float),
-                62: np.zeros((2, 2), dtype=float),
-                63: np.zeros((2, 2), dtype=float),
-                64: np.zeros((2, 2), dtype=float),
-                65: np.zeros((2, 2), dtype=float),
-                66: np.zeros((2, 2), dtype=float),
-                67: np.zeros((2, 2), dtype=float),
-                71: np.zeros((2, 2), dtype=float),
-                72: np.zeros((2, 2), dtype=float),
-                73: np.zeros((2, 2), dtype=float),
-                74: np.zeros((2, 2), dtype=float),
-                75: np.zeros((2, 2), dtype=float),
-                76: np.zeros((2, 2), dtype=float),
-                77: np.zeros((2, 2), dtype=float)
-            }
-            self._Gc = {
-                11: np.zeros((2, 2), dtype=float),
-                12: np.zeros((2, 2), dtype=float),
-                13: np.zeros((2, 2), dtype=float),
-                14: np.zeros((2, 2), dtype=float),
-                15: np.zeros((2, 2), dtype=float),
-                16: np.zeros((2, 2), dtype=float),
-                17: np.zeros((2, 2), dtype=float),
-                21: np.zeros((2, 2), dtype=float),
-                22: np.zeros((2, 2), dtype=float),
-                23: np.zeros((2, 2), dtype=float),
-                24: np.zeros((2, 2), dtype=float),
-                25: np.zeros((2, 2), dtype=float),
-                26: np.zeros((2, 2), dtype=float),
-                27: np.zeros((2, 2), dtype=float),
-                31: np.zeros((2, 2), dtype=float),
-                32: np.zeros((2, 2), dtype=float),
-                33: np.zeros((2, 2), dtype=float),
-                34: np.zeros((2, 2), dtype=float),
-                35: np.zeros((2, 2), dtype=float),
-                36: np.zeros((2, 2), dtype=float),
-                37: np.zeros((2, 2), dtype=float),
-                41: np.zeros((2, 2), dtype=float),
-                42: np.zeros((2, 2), dtype=float),
-                43: np.zeros((2, 2), dtype=float),
-                44: np.zeros((2, 2), dtype=float),
-                45: np.zeros((2, 2), dtype=float),
-                46: np.zeros((2, 2), dtype=float),
-                47: np.zeros((2, 2), dtype=float),
-                51: np.zeros((2, 2), dtype=float),
-                52: np.zeros((2, 2), dtype=float),
-                53: np.zeros((2, 2), dtype=float),
-                54: np.zeros((2, 2), dtype=float),
-                55: np.zeros((2, 2), dtype=float),
-                56: np.zeros((2, 2), dtype=float),
-                57: np.zeros((2, 2), dtype=float),
-                61: np.zeros((2, 2), dtype=float),
-                62: np.zeros((2, 2), dtype=float),
-                63: np.zeros((2, 2), dtype=float),
-                64: np.zeros((2, 2), dtype=float),
-                65: np.zeros((2, 2), dtype=float),
-                66: np.zeros((2, 2), dtype=float),
-                67: np.zeros((2, 2), dtype=float),
-                71: np.zeros((2, 2), dtype=float),
-                72: np.zeros((2, 2), dtype=float),
-                73: np.zeros((2, 2), dtype=float),
-                74: np.zeros((2, 2), dtype=float),
-                75: np.zeros((2, 2), dtype=float),
-                76: np.zeros((2, 2), dtype=float),
-                77: np.zeros((2, 2), dtype=float)
-            }
-            self._Gn = {
-                11: np.zeros((2, 2), dtype=float),
-                12: np.zeros((2, 2), dtype=float),
-                13: np.zeros((2, 2), dtype=float),
-                14: np.zeros((2, 2), dtype=float),
-                15: np.zeros((2, 2), dtype=float),
-                16: np.zeros((2, 2), dtype=float),
-                17: np.zeros((2, 2), dtype=float),
-                21: np.zeros((2, 2), dtype=float),
-                22: np.zeros((2, 2), dtype=float),
-                23: np.zeros((2, 2), dtype=float),
-                24: np.zeros((2, 2), dtype=float),
-                25: np.zeros((2, 2), dtype=float),
-                26: np.zeros((2, 2), dtype=float),
-                27: np.zeros((2, 2), dtype=float),
-                31: np.zeros((2, 2), dtype=float),
-                32: np.zeros((2, 2), dtype=float),
-                33: np.zeros((2, 2), dtype=float),
-                34: np.zeros((2, 2), dtype=float),
-                35: np.zeros((2, 2), dtype=float),
-                36: np.zeros((2, 2), dtype=float),
-                37: np.zeros((2, 2), dtype=float),
-                41: np.zeros((2, 2), dtype=float),
-                42: np.zeros((2, 2), dtype=float),
-                43: np.zeros((2, 2), dtype=float),
-                44: np.zeros((2, 2), dtype=float),
-                45: np.zeros((2, 2), dtype=float),
-                46: np.zeros((2, 2), dtype=float),
-                47: np.zeros((2, 2), dtype=float),
-                51: np.zeros((2, 2), dtype=float),
-                52: np.zeros((2, 2), dtype=float),
-                53: np.zeros((2, 2), dtype=float),
-                54: np.zeros((2, 2), dtype=float),
-                55: np.zeros((2, 2), dtype=float),
-                56: np.zeros((2, 2), dtype=float),
-                57: np.zeros((2, 2), dtype=float),
-                61: np.zeros((2, 2), dtype=float),
-                62: np.zeros((2, 2), dtype=float),
-                63: np.zeros((2, 2), dtype=float),
-                64: np.zeros((2, 2), dtype=float),
-                65: np.zeros((2, 2), dtype=float),
-                66: np.zeros((2, 2), dtype=float),
-                67: np.zeros((2, 2), dtype=float),
-                71: np.zeros((2, 2), dtype=float),
-                72: np.zeros((2, 2), dtype=float),
-                73: np.zeros((2, 2), dtype=float),
-                74: np.zeros((2, 2), dtype=float),
-                75: np.zeros((2, 2), dtype=float),
-                76: np.zeros((2, 2), dtype=float),
-                77: np.zeros((2, 2), dtype=float)
-            }
-
-            # deformation gradients located at the Gauss points of pentagon
-            self._F0 = {
-                11: np.identity(2, dtype=float),
-                12: np.identity(2, dtype=float),
-                13: np.identity(2, dtype=float),
-                14: np.identity(2, dtype=float),
-                15: np.identity(2, dtype=float),
-                16: np.identity(2, dtype=float),
-                17: np.identity(2, dtype=float),
-                21: np.identity(2, dtype=float),
-                22: np.identity(2, dtype=float),
-                23: np.identity(2, dtype=float),
-                24: np.identity(2, dtype=float),
-                25: np.identity(2, dtype=float),
-                26: np.identity(2, dtype=float),
-                27: np.identity(2, dtype=float),
-                31: np.identity(2, dtype=float),
-                32: np.identity(2, dtype=float),
-                33: np.identity(2, dtype=float),
-                34: np.identity(2, dtype=float),
-                35: np.identity(2, dtype=float),
-                36: np.identity(2, dtype=float),
-                37: np.identity(2, dtype=float),
-                41: np.identity(2, dtype=float),
-                42: np.identity(2, dtype=float),
-                43: np.identity(2, dtype=float),
-                44: np.identity(2, dtype=float),
-                45: np.identity(2, dtype=float),
-                46: np.identity(2, dtype=float),
-                47: np.identity(2, dtype=float),
-                51: np.identity(2, dtype=float),
-                52: np.identity(2, dtype=float),
-                53: np.identity(2, dtype=float),
-                54: np.identity(2, dtype=float),
-                55: np.identity(2, dtype=float),
-                56: np.identity(2, dtype=float),
-                57: np.identity(2, dtype=float),
-                61: np.identity(2, dtype=float),
-                62: np.identity(2, dtype=float),
-                63: np.identity(2, dtype=float),
-                64: np.identity(2, dtype=float),
-                65: np.identity(2, dtype=float),
-                66: np.identity(2, dtype=float),
-                67: np.identity(2, dtype=float),
-                71: np.identity(2, dtype=float),
-                72: np.identity(2, dtype=float),
-                73: np.identity(2, dtype=float),
-                74: np.identity(2, dtype=float),
-                75: np.identity(2, dtype=float),
-                76: np.identity(2, dtype=float),
-                77: np.identity(2, dtype=float)
-            }
-            self._Fp = {
-                11: np.identity(2, dtype=float),
-                12: np.identity(2, dtype=float),
-                13: np.identity(2, dtype=float),
-                14: np.identity(2, dtype=float),
-                15: np.identity(2, dtype=float),
-                16: np.identity(2, dtype=float),
-                17: np.identity(2, dtype=float),
-                21: np.identity(2, dtype=float),
-                22: np.identity(2, dtype=float),
-                23: np.identity(2, dtype=float),
-                24: np.identity(2, dtype=float),
-                25: np.identity(2, dtype=float),
-                26: np.identity(2, dtype=float),
-                27: np.identity(2, dtype=float),
-                31: np.identity(2, dtype=float),
-                32: np.identity(2, dtype=float),
-                33: np.identity(2, dtype=float),
-                34: np.identity(2, dtype=float),
-                35: np.identity(2, dtype=float),
-                36: np.identity(2, dtype=float),
-                37: np.identity(2, dtype=float),
-                41: np.identity(2, dtype=float),
-                42: np.identity(2, dtype=float),
-                43: np.identity(2, dtype=float),
-                44: np.identity(2, dtype=float),
-                45: np.identity(2, dtype=float),
-                46: np.identity(2, dtype=float),
-                47: np.identity(2, dtype=float),
-                51: np.identity(2, dtype=float),
-                52: np.identity(2, dtype=float),
-                53: np.identity(2, dtype=float),
-                54: np.identity(2, dtype=float),
-                55: np.identity(2, dtype=float),
-                56: np.identity(2, dtype=float),
-                57: np.identity(2, dtype=float),
-                61: np.identity(2, dtype=float),
-                62: np.identity(2, dtype=float),
-                63: np.identity(2, dtype=float),
-                64: np.identity(2, dtype=float),
-                65: np.identity(2, dtype=float),
-                66: np.identity(2, dtype=float),
-                67: np.identity(2, dtype=float),
-                71: np.identity(2, dtype=float),
-                72: np.identity(2, dtype=float),
-                73: np.identity(2, dtype=float),
-                74: np.identity(2, dtype=float),
-                75: np.identity(2, dtype=float),
-                76: np.identity(2, dtype=float),
-                77: np.identity(2, dtype=float)
-            }
-            self._Fc = {
-                11: np.identity(2, dtype=float),
-                12: np.identity(2, dtype=float),
-                13: np.identity(2, dtype=float),
-                14: np.identity(2, dtype=float),
-                15: np.identity(2, dtype=float),
-                16: np.identity(2, dtype=float),
-                17: np.identity(2, dtype=float),
-                21: np.identity(2, dtype=float),
-                22: np.identity(2, dtype=float),
-                23: np.identity(2, dtype=float),
-                24: np.identity(2, dtype=float),
-                25: np.identity(2, dtype=float),
-                26: np.identity(2, dtype=float),
-                27: np.identity(2, dtype=float),
-                31: np.identity(2, dtype=float),
-                32: np.identity(2, dtype=float),
-                33: np.identity(2, dtype=float),
-                34: np.identity(2, dtype=float),
-                35: np.identity(2, dtype=float),
-                36: np.identity(2, dtype=float),
-                37: np.identity(2, dtype=float),
-                41: np.identity(2, dtype=float),
-                42: np.identity(2, dtype=float),
-                43: np.identity(2, dtype=float),
-                44: np.identity(2, dtype=float),
-                45: np.identity(2, dtype=float),
-                46: np.identity(2, dtype=float),
-                47: np.identity(2, dtype=float),
-                51: np.identity(2, dtype=float),
-                52: np.identity(2, dtype=float),
-                53: np.identity(2, dtype=float),
-                54: np.identity(2, dtype=float),
-                55: np.identity(2, dtype=float),
-                56: np.identity(2, dtype=float),
-                57: np.identity(2, dtype=float),
-                61: np.identity(2, dtype=float),
-                62: np.identity(2, dtype=float),
-                63: np.identity(2, dtype=float),
-                64: np.identity(2, dtype=float),
-                65: np.identity(2, dtype=float),
-                66: np.identity(2, dtype=float),
-                67: np.identity(2, dtype=float),
-                71: np.identity(2, dtype=float),
-                72: np.identity(2, dtype=float),
-                73: np.identity(2, dtype=float),
-                74: np.identity(2, dtype=float),
-                75: np.identity(2, dtype=float),
-                76: np.identity(2, dtype=float),
-                77: np.identity(2, dtype=float)
-            }
-            self._Fn = {
-                11: np.identity(2, dtype=float),
-                12: np.identity(2, dtype=float),
-                13: np.identity(2, dtype=float),
-                14: np.identity(2, dtype=float),
-                15: np.identity(2, dtype=float),
-                16: np.identity(2, dtype=float),
-                17: np.identity(2, dtype=float),
-                21: np.identity(2, dtype=float),
-                22: np.identity(2, dtype=float),
-                23: np.identity(2, dtype=float),
-                24: np.identity(2, dtype=float),
-                25: np.identity(2, dtype=float),
-                26: np.identity(2, dtype=float),
-                27: np.identity(2, dtype=float),
-                31: np.identity(2, dtype=float),
-                32: np.identity(2, dtype=float),
-                33: np.identity(2, dtype=float),
-                34: np.identity(2, dtype=float),
-                35: np.identity(2, dtype=float),
-                36: np.identity(2, dtype=float),
-                37: np.identity(2, dtype=float),
-                41: np.identity(2, dtype=float),
-                42: np.identity(2, dtype=float),
-                43: np.identity(2, dtype=float),
-                44: np.identity(2, dtype=float),
-                45: np.identity(2, dtype=float),
-                46: np.identity(2, dtype=float),
-                47: np.identity(2, dtype=float),
-                51: np.identity(2, dtype=float),
-                52: np.identity(2, dtype=float),
-                53: np.identity(2, dtype=float),
-                54: np.identity(2, dtype=float),
-                55: np.identity(2, dtype=float),
-                56: np.identity(2, dtype=float),
-                57: np.identity(2, dtype=float),
-                61: np.identity(2, dtype=float),
-                62: np.identity(2, dtype=float),
-                63: np.identity(2, dtype=float),
-                64: np.identity(2, dtype=float),
-                65: np.identity(2, dtype=float),
-                66: np.identity(2, dtype=float),
-                67: np.identity(2, dtype=float),
-                71: np.identity(2, dtype=float),
-                72: np.identity(2, dtype=float),
-                73: np.identity(2, dtype=float),
-                74: np.identity(2, dtype=float),
-                75: np.identity(2, dtype=float),
-                76: np.identity(2, dtype=float),
-                77: np.identity(2, dtype=float)
-            }
+        # deformation gradients located at the Gauss points of pentagon
+        self._F0 = {
+            1: np.identity(2, dtype=float),
+            2: np.identity(2, dtype=float),
+            3: np.identity(2, dtype=float),
+            4: np.identity(2, dtype=float),
+            5: np.identity(2, dtype=float)
+        }
+        self._Fp = {
+            1: np.identity(2, dtype=float),
+            2: np.identity(2, dtype=float),
+            3: np.identity(2, dtype=float),
+            4: np.identity(2, dtype=float),
+            5: np.identity(2, dtype=float)
+        }
+        self._Fc = {
+            1: np.identity(2, dtype=float),
+            2: np.identity(2, dtype=float),
+            3: np.identity(2, dtype=float),
+            4: np.identity(2, dtype=float),
+            5: np.identity(2, dtype=float)
+        }
+        self._Fn = {
+            1: np.identity(2, dtype=float),
+            2: np.identity(2, dtype=float),
+            3: np.identity(2, dtype=float),
+            4: np.identity(2, dtype=float),
+            5: np.identity(2, dtype=float)
+        }
 
         # assign membrane objects to each Gauss point of pentagon
-        if pentGaussPts == 1:
-            mem11 = membrane(h)
+        mem1 = membrane(h)
+        mem2 = membrane(h)
+        mem3 = membrane(h)
+        mem4 = membrane(h)
+        mem5 = membrane(h)
 
-            self._septum = {
-                11: mem11
-            }
-        elif pentGaussPts == 4:
-            mem11 = membrane(h)
-            mem12 = membrane(h)
-            mem13 = membrane(h)
-            mem14 = membrane(h)
-            mem21 = membrane(h)
-            mem22 = membrane(h)
-            mem23 = membrane(h)
-            mem24 = membrane(h)
-            mem31 = membrane(h)
-            mem32 = membrane(h)
-            mem33 = membrane(h)
-            mem34 = membrane(h)
-            mem41 = membrane(h)
-            mem42 = membrane(h)
-            mem43 = membrane(h)
-            mem44 = membrane(h)
-
-            self._septum = {
-                11: mem11,
-                12: mem12,
-                13: mem13,
-                14: mem14,
-                21: mem21,
-                22: mem22,
-                23: mem23,
-                24: mem24,
-                31: mem31,
-                32: mem32,
-                33: mem33,
-                34: mem34,
-                41: mem41,
-                42: mem42,
-                43: mem43,
-                44: mem44
-            }
-        else:  # pentGaussPts = 7
-            mem11 = membrane(h)
-            mem12 = membrane(h)
-            mem13 = membrane(h)
-            mem14 = membrane(h)
-            mem15 = membrane(h)
-            mem16 = membrane(h)
-            mem17 = membrane(h)
-            mem21 = membrane(h)
-            mem22 = membrane(h)
-            mem23 = membrane(h)
-            mem24 = membrane(h)
-            mem25 = membrane(h)
-            mem26 = membrane(h)
-            mem27 = membrane(h)
-            mem31 = membrane(h)
-            mem32 = membrane(h)
-            mem33 = membrane(h)
-            mem34 = membrane(h)
-            mem35 = membrane(h)
-            mem36 = membrane(h)
-            mem37 = membrane(h)
-            mem41 = membrane(h)
-            mem42 = membrane(h)
-            mem43 = membrane(h)
-            mem44 = membrane(h)
-            mem45 = membrane(h)
-            mem46 = membrane(h)
-            mem47 = membrane(h)
-            mem51 = membrane(h)
-            mem52 = membrane(h)
-            mem53 = membrane(h)
-            mem54 = membrane(h)
-            mem55 = membrane(h)
-            mem56 = membrane(h)
-            mem57 = membrane(h)
-            mem61 = membrane(h)
-            mem62 = membrane(h)
-            mem63 = membrane(h)
-            mem64 = membrane(h)
-            mem65 = membrane(h)
-            mem66 = membrane(h)
-            mem67 = membrane(h)
-            mem71 = membrane(h)
-            mem72 = membrane(h)
-            mem73 = membrane(h)
-            mem74 = membrane(h)
-            mem75 = membrane(h)
-            mem76 = membrane(h)
-            mem77 = membrane(h)
-
-            self._septum = {
-                11: mem11,
-                12: mem12,
-                13: mem13,
-                14: mem14,
-                15: mem15,
-                16: mem16,
-                17: mem17,
-                21: mem21,
-                22: mem22,
-                23: mem23,
-                24: mem24,
-                25: mem25,
-                26: mem26,
-                27: mem27,
-                31: mem31,
-                32: mem32,
-                33: mem33,
-                34: mem34,
-                35: mem35,
-                36: mem36,
-                37: mem37,
-                41: mem41,
-                42: mem42,
-                43: mem43,
-                44: mem44,
-                45: mem45,
-                46: mem46,
-                47: mem47,
-                51: mem51,
-                52: mem52,
-                53: mem53,
-                54: mem54,
-                55: mem55,
-                56: mem56,
-                57: mem57,
-                61: mem61,
-                62: mem62,
-                63: mem63,
-                64: mem64,
-                65: mem65,
-                66: mem66,
-                67: mem67,
-                71: mem71,
-                72: mem72,
-                73: mem73,
-                74: mem74,
-                75: mem75,
-                76: mem76,
-                77: mem77
-            }
+        self._septum = {
+            1: mem1,
+            2: mem2,
+            3: mem3,
+            4: mem4,
+            5: mem5
+        }
 
         self._rho = mp.rhoSepta()
 
         self._width = mp.septalWidth()
 
-        M1, M2, Me_t, N1, N2, Ne_t, G1, G2, Ge_t = mp.septalMembrane()
+        M1, M2, M_t, N1, N2, N_t, G1, G2, G_t, xi_f, pi_0 = mp.septalMembrane()
         # the elastic moduli governing dilation
         self._M1 = M1
         self._M2 = M2
-        self._Me_t = Me_t
+        self._Me_t = M_t
         # the elastic moduli governing squeeze
         self._N1 = N1
         self._N2 = N2
-        self._Ne_t = Ne_t
+        self._Ne_t = N_t
         # the elastic moduli governing shear
         self._G1 = G1
         self._G2 = G2
-        self._Ge_t = Ge_t
-
-    def toString(self, state):
-        if self._number < 10:
-            s = 'pentagon[0'
-        else:
-            s = 'pentagon['
-        s = s + str(self._number)
-        s = s + '] has vertices: \n'
-        if isinstance(state, str):
-            s = s + '   1: ' + self._vertex[1].toString(state) + '\n'
-            s = s + '   2: ' + self._vertex[2].toString(state) + '\n'
-            s = s + '   3: ' + self._vertex[3].toString(state) + '\n'
-            s = s + '   4: ' + self._vertex[4].toString(state) + '\n'
-            s = s + '   5: ' + self._vertex[5].toString(state)
-        else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "in a call to pentagon.toString.")
-        return s
-
-    def number(self):
-        return self._number
-
-    def chordNumbers(self):
-        numbers = sorted(self._setOfChords)
-        return numbers[0], numbers[1], numbers[2], numbers[3], numbers[4]
-
-    def vertexNumbers(self):
-        numbers = sorted(self._setOfVertices)
-        return numbers[0], numbers[1], numbers[2], numbers[3], numbers[4]
-
-    def hasChord(self, number):
-        return number in self._setOfChords
-
-    def hasVertex(self, number):
-        return number in self._setOfVertices
-
-    def getChord(self, number):
-        if self._chord[1].number() == number:
-            return self._chord[1]
-        elif self._chord[2].number() == number:
-            return self._chord[2]
-        elif self._chord[3].number() == number:
-            return self._chord[3]
-        elif self._chord[4].number() == number:
-            return self._chord[4]
-        elif self._chord[5].number() == number:
-            return self._chord[5]
-        else:
-            raise RuntimeError('The requested chord {} '.format(number) +
-                               'is not in pentagon {}.'.format(self._number))
-
-    def getVertex(self, number):
-        if self._vertex[1].number() == number:
-            return self._vertex[1]
-        elif self._vertex[2].number() == number:
-            return self._vertex[2]
-        elif self._vertex[3].number() == number:
-            return self._vertex[3]
-        elif self._vertex[4].number() == number:
-            return self._vertex[4]
-        elif self._vertex[5].number() == number:
-            return self._vertex[5]
-        else:
-            raise RuntimeError('The requested vertex {} '.format(number) +
-                               'is not in pentagon {}.'.format(self._number))
-
-    def pentGaussPoints(self):
-        return self._pentGaussPts
-
-    def triaGaussPoints(self):
-        return self._triaGaussPts
-
-    def update(self):
-        # computes the fields positioned at the next time step
-
-        # get the updated coordinates for the vetices of the pentagon
-        x1, y1, z1 = self._vertex[1].coordinates('next')
-        x2, y2, z2 = self._vertex[2].coordinates('next')
-        x3, y3, z3 = self._vertex[3].coordinates('next')
-        x4, y4, z4 = self._vertex[4].coordinates('next')
-        x5, y5, z5 = self._vertex[5].coordinates('next')
-
-        # base vector 1: connects the two shoulders of the pentagon
-        x = x5 - x2
-        y = y5 - y2
-        z = z5 - z2
-        mag = m.sqrt(x * x + y * y + z * z)
-        n1x = x / mag
-        n1y = y / mag
-        n1z = z / mag
-
-        # base vector 2: goes from the apex to a point along its base
-
-        # establish the unit vector for the base of the pentagon
-        x = x4 - x3
-        y = y4 - y3
-        z = z4 - z3
-        mag = m.sqrt(x * x + y * y + z * z)
-        ex = x / mag
-        ey = y / mag
-        ez = z / mag
-
-        # an internal function is used to locate that point along the base of
-        # the pentagon that results in a vector n2 which is normal to n1
-
-        def getDelta(delta):
-            nx = x1 - (x3 + delta * ex)
-            ny = y1 - (y3 + delta * ey)
-            nz = z1 - (z3 + delta * ez)
-            # when the dot product is zero then the two vectors are orthogonal
-            n1Dotn2 = n1x * nx + n1y * ny + n1z * nz
-            return n1Dotn2
-
-        # use a root finder to secure a base vector n2 that is orthogonal to n1
-        deltaL = -4.0 * mag
-        deltaH = 5.0 * mag
-        delta = findRoot(deltaL, deltaH, getDelta)
-
-        # create base vector 2
-        x = x1 - (x3 + delta * ex)
-        y = y1 - (y3 + delta * ey)
-        z = z1 - (z3 + delta * ez)
-        mag = m.sqrt(x * x + y * y + z * z)
-        n2x = x / mag
-        n2y = y / mag
-        n2z = z / mag
-
-        # base vector 3 is obtained through the cross product
-        # it is normal to the pentagon and points outward from the dodecahedron
-        n3x = n1y * n2z - n1z * n2y
-        n3y = n1z * n2x - n1x * n2z
-        n3z = n1x * n2y - n1y * n2x
-
-        # create the rotation matrix from reference to pentagonal coordinates
-        self._Pn3D[0, 0] = n1x
-        self._Pn3D[0, 1] = n2x
-        self._Pn3D[0, 2] = n3x
-        self._Pn3D[1, 0] = n1y
-        self._Pn3D[1, 1] = n2y
-        self._Pn3D[1, 2] = n3y
-        self._Pn3D[2, 0] = n1z
-        self._Pn3D[2, 1] = n2z
-        self._Pn3D[2, 2] = n3z
-
-        # determine vertice coordinates in the pentagonal frame of reference
-        self._v1x = n1x * x1 + n1y * y1 + n1z * z1
-        self._v1y = n2x * x1 + n2y * y1 + n2z * z1
-        self._v2x = n1x * x2 + n1y * y2 + n1z * z2
-        self._v2y = n2x * x2 + n2y * y2 + n2z * z2
-        self._v3x = n1x * x3 + n1y * y3 + n1z * z3
-        self._v3y = n2x * x3 + n2y * y3 + n2z * z3
-        self._v4x = n1x * x4 + n1y * y4 + n1z * z4
-        self._v4y = n2x * x4 + n2y * y4 + n2z * z4
-        self._v5x = n1x * x5 + n1y * y5 + n1z * z5
-        self._v5y = n2x * x5 + n2y * y5 + n2z * z5
-
-        # z offsets for the pentagonal plane (which should all be the same)
-        self._v1z = n3x * x1 + n3y * y1 + n3z * z1
-        self._v2z = n3x * x2 + n3y * y2 + n3z * z2
-        self._v3z = n3x * x3 + n3y * y3 + n3z * z3
-        self._v4z = n3x * x4 + n3y * y4 + n3z * z4
-        self._v5z = n3x * x5 + n3y * y5 + n3z * z5
-
-        # determine the area of this irregular pentagon
-        self._An = (self._v1x * self._v2y - self._v2x * self._v1y +
-                    self._v2x * self._v3y - self._v3x * self._v2y +
-                    self._v3x * self._v4y - self._v4x * self._v3y +
-                    self._v4x * self._v5y - self._v5x * self._v4y +
-                    self._v5x * self._v1y - self._v1x * self._v5y) / 2.0
-        # the area will be positive if the vertices index counter clockwise
-
-        # determine the centroid of this pentagon in pentagonal coordinates
-        self._cx = ((self._v1x + self._v2x) *
-                    (self._v1x * self._v2y - self._v2x * self._v1y) +
-                    (self._v2x + self._v3x) *
-                    (self._v2x * self._v3y - self._v3x * self._v2y) +
-                    (self._v3x + self._v4x) *
-                    (self._v3x * self._v4y - self._v4x * self._v3y) +
-                    (self._v4x + self._v5x) *
-                    (self._v4x * self._v5y - self._v5x * self._v4y) +
-                    (self._v5x + self._v1x) *
-                    (self._v5x * self._v1y -
-                     self._v1x * self._v5y)) / (6.0 * self._An)
-        self._cy = ((self._v1y + self._v2y) *
-                    (self._v1x * self._v2y - self._v2x * self._v1y) +
-                    (self._v2y + self._v3y) *
-                    (self._v2x * self._v3y - self._v3x * self._v2y) +
-                    (self._v3y + self._v4y) *
-                    (self._v3x * self._v4y - self._v4x * self._v3y) +
-                    (self._v4y + self._v5y) *
-                    (self._v4x * self._v5y - self._v5x * self._v4y) +
-                    (self._v5y + self._v1y) *
-                    (self._v5x * self._v1y -
-                     self._v1x * self._v5y)) / (6.0 * self._An)
-        self._cz = ((self._v1z + self._v2z + self._v3z + self._v4z +
-                     self._v5z) / 5.0)
-
-        # rotate this centroid back into the reference coordinate system
-        self._centroidXn = n1x * self._cx + n2x * self._cy + n3x * self._cz
-        self._centroidYn = n1y * self._cx + n2y * self._cy + n3y * self._cz
-        self._centroidZn = n1z * self._cx + n2z * self._cy + n3z * self._cz
-
-        # Determine the deformation gradient for this irregular pentagon
-
-        # current vertex coordinates in pentagonal frame of reference
-        x1 = (self._v1x, self._v1y)
-        x2 = (self._v2x, self._v2y)
-        x3 = (self._v3x, self._v3y)
-        x4 = (self._v4x, self._v4y)
-        x5 = (self._v5x, self._v5y)
-
-        # reference vertex coordinates in pentagonal frame of reference
-        x10 = (self._v1x0, self._v1y0)
-        x20 = (self._v2x0, self._v2y0)
-        x30 = (self._v3x0, self._v3y0)
-        x40 = (self._v4x0, self._v4y0)
-        x50 = (self._v5x0, self._v5y0)
-
-        # establish the deformation and displacement gradients as dictionaries
-        if self._pentGaussPts == 1:
-            # displacement gradients located at the Gauss points of pentagon
-            self._Gn[11] = self._pentShapeFns[11].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            # deformation gradients located at the Gauss points of pentagon
-            self._Fn[11] = self._pentShapeFns[11].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-        elif self._pentGaussPts == 4:
-            # displacement gradients located at the Gauss points of pentagon
-            self._Gn[11] = self._pentShapeFns[11].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[12] = self._pentShapeFns[12].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[13] = self._pentShapeFns[13].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[14] = self._pentShapeFns[14].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Gn[21] = self._pentShapeFns[21].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[22] = self._pentShapeFns[22].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[23] = self._pentShapeFns[23].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[24] = self._pentShapeFns[24].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Gn[31] = self._pentShapeFns[31].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[32] = self._pentShapeFns[32].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[33] = self._pentShapeFns[33].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[34] = self._pentShapeFns[34].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Gn[41] = self._pentShapeFns[41].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[42] = self._pentShapeFns[42].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[43] = self._pentShapeFns[43].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[44] = self._pentShapeFns[44].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            # deformation gradients located at the Gauss points of pentagon
-            self._Fn[11] = self._pentShapeFns[11].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[12] = self._pentShapeFns[12].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[13] = self._pentShapeFns[13].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[14] = self._pentShapeFns[14].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Fn[21] = self._pentShapeFns[21].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[22] = self._pentShapeFns[22].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[23] = self._pentShapeFns[23].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[24] = self._pentShapeFns[24].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Fn[31] = self._pentShapeFns[31].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[32] = self._pentShapeFns[32].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[33] = self._pentShapeFns[33].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[34] = self._pentShapeFns[34].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Fn[41] = self._pentShapeFns[41].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[42] = self._pentShapeFns[42].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[43] = self._pentShapeFns[43].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[44] = self._pentShapeFns[44].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-        else:  # pentGaussPts = 7
-            # displacement gradients located at the Gauss points of pentagon
-            self._Gn[11] = self._pentShapeFns[11].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[12] = self._pentShapeFns[12].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[13] = self._pentShapeFns[13].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[14] = self._pentShapeFns[14].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[15] = self._pentShapeFns[15].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[16] = self._pentShapeFns[16].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[17] = self._pentShapeFns[17].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Gn[21] = self._pentShapeFns[21].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[22] = self._pentShapeFns[22].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[23] = self._pentShapeFns[23].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[24] = self._pentShapeFns[24].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[25] = self._pentShapeFns[25].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[26] = self._pentShapeFns[26].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[27] = self._pentShapeFns[27].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Gn[31] = self._pentShapeFns[31].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[32] = self._pentShapeFns[32].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[33] = self._pentShapeFns[33].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[34] = self._pentShapeFns[34].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[35] = self._pentShapeFns[35].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[36] = self._pentShapeFns[36].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[37] = self._pentShapeFns[37].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Gn[41] = self._pentShapeFns[41].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[42] = self._pentShapeFns[42].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[43] = self._pentShapeFns[43].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[44] = self._pentShapeFns[44].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[45] = self._pentShapeFns[45].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[46] = self._pentShapeFns[46].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[47] = self._pentShapeFns[47].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Gn[51] = self._pentShapeFns[51].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[52] = self._pentShapeFns[52].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[53] = self._pentShapeFns[53].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[54] = self._pentShapeFns[54].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[55] = self._pentShapeFns[55].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[56] = self._pentShapeFns[56].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[57] = self._pentShapeFns[57].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Gn[61] = self._pentShapeFns[61].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[62] = self._pentShapeFns[62].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[63] = self._pentShapeFns[63].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[64] = self._pentShapeFns[64].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[65] = self._pentShapeFns[65].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[66] = self._pentShapeFns[66].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[67] = self._pentShapeFns[67].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Gn[71] = self._pentShapeFns[71].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[72] = self._pentShapeFns[72].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[73] = self._pentShapeFns[73].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[74] = self._pentShapeFns[74].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[75] = self._pentShapeFns[75].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[76] = self._pentShapeFns[76].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Gn[77] = self._pentShapeFns[77].G(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            # deformation gradients located at the Gauss points of pentagon
-            self._Fn[11] = self._pentShapeFns[11].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[12] = self._pentShapeFns[12].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[13] = self._pentShapeFns[13].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[14] = self._pentShapeFns[14].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[15] = self._pentShapeFns[15].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[16] = self._pentShapeFns[16].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[17] = self._pentShapeFns[17].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Fn[21] = self._pentShapeFns[21].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[22] = self._pentShapeFns[22].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[23] = self._pentShapeFns[23].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[24] = self._pentShapeFns[24].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[25] = self._pentShapeFns[25].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[26] = self._pentShapeFns[26].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[27] = self._pentShapeFns[27].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Fn[31] = self._pentShapeFns[31].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[32] = self._pentShapeFns[32].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[33] = self._pentShapeFns[33].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[34] = self._pentShapeFns[34].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[35] = self._pentShapeFns[35].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[36] = self._pentShapeFns[36].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[37] = self._pentShapeFns[37].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Fn[41] = self._pentShapeFns[41].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[42] = self._pentShapeFns[42].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[43] = self._pentShapeFns[43].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[44] = self._pentShapeFns[44].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[45] = self._pentShapeFns[45].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[46] = self._pentShapeFns[46].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[47] = self._pentShapeFns[47].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Fn[51] = self._pentShapeFns[51].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[52] = self._pentShapeFns[52].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[53] = self._pentShapeFns[53].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[54] = self._pentShapeFns[54].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[55] = self._pentShapeFns[55].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[56] = self._pentShapeFns[56].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[57] = self._pentShapeFns[57].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Fn[61] = self._pentShapeFns[61].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[62] = self._pentShapeFns[62].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[63] = self._pentShapeFns[63].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[64] = self._pentShapeFns[64].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[65] = self._pentShapeFns[65].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[66] = self._pentShapeFns[66].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[67] = self._pentShapeFns[67].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-            self._Fn[71] = self._pentShapeFns[71].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[72] = self._pentShapeFns[72].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[73] = self._pentShapeFns[73].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[74] = self._pentShapeFns[74].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[75] = self._pentShapeFns[75].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[76] = self._pentShapeFns[76].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-            self._Fn[77] = self._pentShapeFns[77].F(x1, x2, x3, x4, x5,
-                                               x10, x20, x30, x40, x50)
-
-        # update the membrane objects at each Gauss point
-        if self._pentGaussPts == 1:
-            for i in range(11, self._pentGaussPts+11):
-                self._septum[i].update(self._Fn[i])
-
-        elif self._pentGaussPts == 4:
-            for i in range(11, self._pentGaussPts+11):
-                self._septum[i].update(self._Fn[i])
-            for i in range(21, self._pentGaussPts+21):
-                self._septum[i].update(self._Fn[i])
-            for i in range(31, self._pentGaussPts+31):
-                self._septum[i].update(self._Fn[i])
-            for i in range(41, self._pentGaussPts+41):
-                self._septum[i].update(self._Fn[i])
-
-        else:  # pentGaussPts = 7
-            for i in range(11, self._pentGaussPts+11):
-                self._septum[i].update(self._Fn[i])
-            for i in range(21, self._pentGaussPts+21):
-                self._septum[i].update(self._Fn[i])
-            for i in range(31, self._pentGaussPts+31):
-                self._septum[i].update(self._Fn[i])
-            for i in range(41, self._pentGaussPts+41):
-                self._septum[i].update(self._Fn[i])
-            for i in range(51, self._pentGaussPts+51):
-                self._septum[i].update(self._Fn[i])
-            for i in range(61, self._pentGaussPts+61):
-                self._septum[i].update(self._Fn[i])
-            for i in range(71, self._pentGaussPts+71):
-                self._septum[i].update(self._Fn[i])
-
-        return  # nothing
-
-    def advance(self):
-        # advance the geometric properties of the pentagon
-        self._Ap = self._Ac
-        self._Ac = self._An
-        self._centroidXp = self._centroidXc
-        self._centroidYp = self._centroidYc
-        self._centroidZp = self._centroidZc
-        self._centroidXc = self._centroidXn
-        self._centroidYc = self._centroidYn
-        self._centroidZc = self._centroidZn
-
-        # advance rotation matrix: from the dodecaheral into the pentagonal
-        self._Pp3D[:, :] = self._Pc3D[:, :]
-        self._Pc3D[:, :] = self._Pn3D[:, :]
-
-        # advance the matrix fields associated with each Gauss point
-        if self._pentGaussPts == 1:
-            for i in range(11, self._pentGaussPts+11):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-
-        elif self._pentGaussPts == 4:
-            for i in range(11, self._pentGaussPts+11):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-            for i in range(21, self._pentGaussPts+21):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-            for i in range(31, self._pentGaussPts+31):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-            for i in range(41, self._pentGaussPts+41):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-
-        else:  # pentGaussPts = 7
-            for i in range(11, self._pentGaussPts+11):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-            for i in range(21, self._pentGaussPts+21):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-            for i in range(31, self._pentGaussPts+31):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-            for i in range(41, self._pentGaussPts+41):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-            for i in range(51, self._pentGaussPts+51):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-            for i in range(61, self._pentGaussPts+61):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-            for i in range(71, self._pentGaussPts+71):
-                self._Fp[i][:, :] = self._Fc[i][:, :]
-                self._Fc[i][:, :] = self._Fn[i][:, :]
-                self._Gp[i][:, :] = self._Gc[i][:, :]
-                self._Gc[i][:, :] = self._Gn[i][:, :]
-
-
-        # advance the membrane objects at each Gauss point
-        if self._pentGaussPts == 1:
-            for i in range(11, self._pentGaussPts+11):
-                self._septum[i].advance()
-
-        elif self._pentGaussPts == 4:
-            for i in range(11, self._pentGaussPts+11):
-                self._septum[i].advance()
-            for i in range(21, self._pentGaussPts+21):
-                self._septum[i].advance()
-            for i in range(31, self._pentGaussPts+31):
-                self._septum[i].advance()
-            for i in range(41, self._pentGaussPts+41):
-                self._septum[i].advance()
-
-        else:  # pentGaussPts = 7
-            for i in range(11, self._pentGaussPts+11):
-                self._septum[i].advance()
-            for i in range(21, self._pentGaussPts+21):
-                self._septum[i].advance()
-            for i in range(31, self._pentGaussPts+31):
-                self._septum[i].advance()
-            for i in range(41, self._pentGaussPts+41):
-                self._septum[i].advance()
-            for i in range(51, self._pentGaussPts+51):
-                self._septum[i].advance()
-            for i in range(61, self._pentGaussPts+61):
-                self._septum[i].advance()
-            for i in range(71, self._pentGaussPts+71):
-                self._septum[i].advance()
-
-    # Material properties that associate with this tetrahedron.  Except for the
-    # mass density, all are drawn randomly from a statistical distribution.
-
-    def massDensity(self):
-        # returns the mass density of the membrane
-        return self._rho
-
+        self._Ge_t = G_t
+        # the maximum strain at rupture
+        self._xi_f = xi_f 
+        # the membrane pre-stressing of the surface tension
+        self._pi_0 = pi_0
+
+        nbrVars = 4   # for a chord they are: temperature and length
+        respVars = 4
+        T0 = 37.0     # body temperature in centigrade
+        # thermodynamic strains (thermal and mechanical) are 0 at reference
+        eVec0 = np.zeros((nbrVars,), dtype=float)
+        # physical variables have reference values of
+        xVec0 = np.zeros((nbrVars,), dtype=float)
+        # vector of thermodynamic response variables
+        yVec0 = np.zeros((respVars,), dtype=float)
+        
+        yVec0[1] = self._pi_0      # initial surface tension
+        yVec0[2] = 0.0             # initial normal stress difference
+        yVec0[3] = 0.0             # initial shear stress
+        
+        xVec0[0] = T0   # temperature in centigrade
+        xVec0[1] = 1.0  # elongation in 1 direction 
+        xVec0[2] = 1.0  # elongation in 2 direction 
+        xVec0[3] = 0.0  # magnitude of shear 
+
+        self._response = {
+            1: ceMembrane(),
+            2: ceMembrane(),
+            3: ceMembrane(),
+            4: ceMembrane(),
+            5: ceMembrane()
+        }
+
+        self._Ms = {
+            1: self._response[1].secMod(eVec0, xVec0, yVec0),
+            2: self._response[2].secMod(eVec0, xVec0, yVec0),
+            3: self._response[3].secMod(eVec0, xVec0, yVec0),
+            4: self._response[4].secMod(eVec0, xVec0, yVec0),
+            5: self._response[5].secMod(eVec0, xVec0, yVec0)
+        }
+        
+        self._Mt = {
+            1: self._response[1].tanMod(eVec0, xVec0, yVec0),
+            2: self._response[2].tanMod(eVec0, xVec0, yVec0),
+            3: self._response[3].tanMod(eVec0, xVec0, yVec0),
+            4: self._response[4].tanMod(eVec0, xVec0, yVec0),
+            5: self._response[5].tanMod(eVec0, xVec0, yVec0)
+        }        
+
+        self.st = {
+            1: self._response[1].stress(),
+            2: self._response[2].stress(),
+            3: self._response[3].stress(),
+            4: self._response[4].stress(),
+            5: self._response[5].stress()
+        }  
+
+              
+    def __str__(self):
+        return self.toString()
+    
     def width(self, state):
         # returns the cross-sectional thickness or width of the membrane
         # assuming volume is preserved
@@ -2419,21 +1263,6 @@ class pentagon(object):
         else:
             raise RuntimeError("An unknown state {} ".format(str(state)) +
                                "in a call to pentagon.width.")
-
-    def matProp(self):
-        # elastic properties describing planar dilation
-        M1 = self._M1
-        M2 = self._M2
-        Me_t = self._Me_t
-        # elastic properties describing planar squeeze
-        N1 = self._N1
-        N2 = self._N2
-        Ne_t = self._Ne_t
-        # elastic properties describing planar shear
-        G1 = self._G1
-        G2 = self._G2
-        Ge_t = self._Ge_t
-        return M1, M2, Me_t, N1, N2, Ne_t, G1, G2, Ge_t
 
     # geometric properties of a pentagon
 
@@ -2511,6 +1340,1043 @@ class pentagon(object):
         else:
             raise RuntimeError("An unknown state {} ".format(str(state)) +
                                "in a call to pentagon.dArealStrain.")
+
+    # Material properties that associate with this tetrahedron.  Except for the
+    # mass density, all are drawn randomly from a statistical distribution.
+    def massDensity(self):
+        # returns the mass density of the membrane
+        return self._rho
+    
+    def matProp(self):
+        # elastic properties describing planar dilation
+        M1 = self._M1
+        M2 = self._M2
+        Me_t = self._Me_t
+        # elastic properties describing planar squeeze
+        N1 = self._N1
+        N2 = self._N2
+        Ne_t = self._Ne_t
+        # elastic properties describing planar shear
+        G1 = self._G1
+        G2 = self._G2
+        Ge_t = self._Ge_t
+        return M1, M2, Me_t, N1, N2, Ne_t, G1, G2, Ge_t
+    
+    # These FE arrays are evaluated at the beginning of the current step of
+    # integration, i.e., they associate with an updated Lagrangian formulation.
+    def _massMatrix(self):
+        # create the returned mass matrix
+        mMtx = np.zeros((10, 10), dtype=float)
+
+        # construct the consistent mass matrix
+        massC = np.zeros((10, 10), dtype=float)
+        NtN = np.zeros((10, 10), dtype=float)
+        for i in range(1, self._pgq.gaussPoints()+1):
+            psfn = self._pentShapeFns[i]
+            wgt = self._pgq.weight(i)
+            NtN += wgt * np.matmul(np.transpose(psfn.Nmtx), psfn.Nmtx)
+        massC[:, :] = NtN[:, :]
+
+        # construct the lumped mass matrix in natural co-ordinates
+        massL = np.zeros((10, 10), dtype=float)
+        row, col = np.diag_indices_from(massC)
+        massL[row, col] = massC.sum(axis=1)
+        
+        # constrcuct the averaged mass matrix in natural co-ordinates
+        massA = np.zeros((10, 10), dtype=float)
+        massA = 0.5 * (massC + massL)
+
+        # the following print statements were used to verify the code
+        # print("\nThe averaged mass matrix in natural co-ordinates is")
+        # print(0.5 * massA)  
+
+        # current vertex coordinates in pentagonal frame of reference
+        x01 = (self._v1x0, self._v1y0)
+        x02 = (self._v2x0, self._v2y0)
+        x03 = (self._v3x0, self._v3y0)
+        x04 = (self._v4x0, self._v4y0)
+        x05 = (self._v5x0, self._v5y0)
+        
+        # convert average mass matrix from natural to physical co-ordinates
+        Jdet = psfn.jacobianDeterminant(x01, x02, x03, x04, x05)
+        rho = self.massDensity()
+        mMtx = (rho * self._width * Jdet) * massA
+
+        return mMtx
+
+    def _stiffnessMatrix(self, reindex):
+        
+        kMtx = np.zeros((10, 10), dtype=float)      
+        # current vertex coordinates in pentagonal frame of reference
+        xn1 = (self._v1x, self._v1y)
+        xn2 = (self._v2x, self._v2y)
+        xn3 = (self._v3x, self._v3y)
+        xn4 = (self._v4x, self._v4y)
+        xn5 = (self._v5x, self._v5y)
+
+        # assign coordinates at the vertices in the reference configuration
+        x01 = (self._v1x0, self._v1y0)
+        x02 = (self._v2x0, self._v2y0)
+        x03 = (self._v3x0, self._v3y0)
+        x04 = (self._v4x0, self._v4y0)
+        x05 = (self._v5x0, self._v5y0)
+        
+        Cs1 = np.zeros((10, 10), dtype=float)
+        Ct1 = np.zeros((10, 10), dtype=float)
+        Ks1 = np.zeros((10, 10), dtype=float)
+        Kt1 = np.zeros((10, 10), dtype=float)
+            
+        for i in range(1, self._pgq.gaussPoints()+1):
+            psfn = self._pentShapeFns[i]
+            wgt = self._pgq.weight(i) 
+            Ms = self._Ms[i]
+            Mt = self._Mt[i]
+            Ss = self.st[i]
+            
+            # determinant of jacobian matrix
+            Jdet = psfn.jacobianDeterminant(x01, x02, x03, x04, x05)
+
+            BLmtx = psfn.BL(xn1, xn2, xn3, xn4, xn5)
+
+            Hmtx1 = psfn.H1(xn1, xn2, xn3, xn4, xn5)
+            Lmtx1 = psfn.L1(xn1, xn2, xn3, xn4, xn5)
+            BNmtx1 = psfn.BN1(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
+            A1 = psfn.A1(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)              
+            Dmtx1 = self.dDisplacement1(reindex)      
+            dA1 = np.dot(Lmtx1, np.transpose(Dmtx1))            
+            dSt1 = A1.T.dot(Mt).dot(dA1)
+            
+            Hmtx2 = psfn.H2(xn1, xn2, xn3, xn4, xn5)
+            Lmtx2 = psfn.L2(xn1, xn2, xn3, xn4, xn5)
+            BNmtx2 = psfn.BN2(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
+            A2 = psfn.A2(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)              
+            Dmtx2 = self.dDisplacement2(reindex)      
+            dA2 = np.dot(Lmtx2, np.transpose(Dmtx2))            
+            dSt2 = A2.T.dot(Mt).dot(dA2)
+            
+            # total nonlinear Bmatrix
+            BNmtx = np.add(BNmtx1, BNmtx2)
+            
+            # the tangent stiffness matrix Cs1
+            Cs1 += (self._width * Jdet * wgt * ( Hmtx1.T.dot(Ss).dot(Hmtx1) 
+                                               + Hmtx2.T.dot(Ss).dot(Hmtx2) ))
+            # the tangent stiffness matrix Ct1
+            Ct1 += (self._width * Jdet * wgt * ( BLmtx.T.dot(Mt).dot(BLmtx) 
+                                               + BLmtx.T.dot(Mt).dot(BNmtx)
+                                               + BNmtx.T.dot(Mt).dot(BLmtx) 
+                                               + BNmtx.T.dot(Mt).dot(BNmtx) ))
+            # the secant stiffness matrix Ks1
+            Ks1 += (self._width * Jdet * wgt * ( BLmtx.T.dot(Ms).dot(BLmtx) 
+                                               + BLmtx.T.dot(Ms).dot(BNmtx) 
+                                               + BNmtx.T.dot(Ms).dot(BLmtx) 
+                                               + BNmtx.T.dot(Ms).dot(BNmtx) ))
+            # the secant stiffness matrix Kt1
+            Kt1 += (self._width * Jdet * wgt * ( Hmtx1.T.dot(dSt1).dot(Hmtx1) 
+                                               + Hmtx2.T.dot(dSt2).dot(Hmtx2) ))
+
+        Cs = np.zeros((10, 10), dtype=float)
+        Ct = np.zeros((10, 10), dtype=float)
+        Ks = np.zeros((10, 10), dtype=float)
+        Kt = np.zeros((10, 10), dtype=float)
+        
+        Cs[:, :] = Cs1[:, :]
+        Ct[:, :] = Ct1[:, :]
+        Ks[:, :] = Ks1[:, :]
+        Kt[:, :] = Kt1[:, :]
+              
+        # determine the total tangent stiffness matrix
+        kMtx = Cs + Ct + Ks + Kt
+
+        return kMtx
+
+    def _forcingFunction(self):
+        
+        state = 'ref'
+        fVec = np.zeros((10,1), dtype=float)
+                   
+        P12 = self.rotation12(state)
+        P23 = self.rotation23(state)
+        P34 = self.rotation34(state)
+        P45 = self.rotation45(state)
+        P51 = self.rotation51(state)
+        
+        # normal vector to each chord of pentagon
+        n12 = np.zeros((1,2), dtype=float)
+        n23 = np.zeros((1,2), dtype=float)
+        n34 = np.zeros((1,2), dtype=float)
+        n45 = np.zeros((1,2), dtype=float)
+        n51 = np.zeros((1,2), dtype=float)
+        
+        n12[0, 0] = P12[0, 1]
+        n12[0, 1] = P12[1, 1]
+        
+        n23[0, 0] = P23[0, 1]
+        n23[0, 1] = P23[1, 1]
+        
+        n34[0, 0] = P34[0, 1]
+        n34[0, 1] = P34[1, 1]
+        
+        n45[0, 0] = P45[0, 1]
+        n45[0, 1] = P45[1, 1]
+        
+        n51[0, 0] = P51[0, 1]
+        n51[0, 1] = P51[1, 1]
+
+                
+        # create the traction vector apply on each chord of pentagon 
+        t12 = np.dot(self.st[1], np.transpose(n12))   
+        t23 = np.dot(self.st[2], np.transpose(n23))  
+        t34 = np.dot(self.st[3], np.transpose(n34))  
+        t45 = np.dot(self.st[4], np.transpose(n45))  
+        t51 = np.dot(self.st[5], np.transpose(n51)) 
+        
+
+        # current vertex coordinates in pentagonal frame of reference
+        xn1 = (self._v1x, self._v1y)
+        xn2 = (self._v2x, self._v2y)
+        xn3 = (self._v3x, self._v3y)
+        xn4 = (self._v4x, self._v4y)
+        xn5 = (self._v5x, self._v5y)
+
+        # assign coordinates at the vertices in the reference configuration
+        x01 = (self._v1x0, self._v1y0)
+        x02 = (self._v2x0, self._v2y0)
+        x03 = (self._v3x0, self._v3y0)
+        x04 = (self._v4x0, self._v4y0)
+        x05 = (self._v5x0, self._v5y0)
+
+        # assign coordinates at the vertices in the reference configuration
+        x1012 = (self._v1x120, self._v1y120)
+        x2012 = (self._v2x120, self._v2y120)
+
+        x2023 = (self._v2x230, self._v2y230)
+        x3023 = (self._v3x230, self._v3y230)
+        
+        x3034 = (self._v3x340, self._v3y340)
+        x4034 = (self._v4x340, self._v4y340)
+
+        x4045 = (self._v4x450, self._v4y450)
+        x5045 = (self._v5x450, self._v5y450)
+
+        x5051 = (self._v5x510, self._v5y510)
+        x1051 = (self._v1x510, self._v1y510)
+
+        
+        Nmtx12 = np.zeros((10, 1), dtype=float)
+        Nmtx23 = np.zeros((10, 1), dtype=float)
+        Nmtx34 = np.zeros((10, 1), dtype=float)
+        Nmtx45 = np.zeros((10, 1), dtype=float)
+        Nmtx51 = np.zeros((10, 1), dtype=float)
+
+        BL1 = np.zeros((10, 3), dtype=float)
+        BN1 = np.zeros((10, 3), dtype=float)
+        BN2 = np.zeros((10, 3), dtype=float)
+                
+        for i in range(1, self._pgq.gaussPoints()+1):
+            Psfn = self._pentShapeFns[i]
+            wgt = self._pgq.weight(i)
+            sMtx = self.st[i]
+            T0 = np.zeros((3, 1), dtype=float)
+            T0[0, 0] = sMtx[0, 0]
+            T0[1, 0] = sMtx[1, 1]
+            T0[2, 0] = sMtx[0, 1]
+
+            BLmtx = Psfn.BL(xn1, xn2, xn3, xn4, xn5)
+            BNmtx1 = Psfn.BN1(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
+            BNmtx2 = Psfn.BN2(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
+            
+            BL1 += wgt * np.transpose(BLmtx)   
+            BN1 += wgt * np.transpose(BNmtx1)   
+            BN2 += wgt * np.transpose(BNmtx2)   
+            B = np.add(BL1, BN1, BN2)
+            BdotT0 = np.dot(B, T0)
+        
+        # determinant of jacobian matrix
+        pJdet = Psfn.jacobianDeterminant(x01, x02, x03, x04, x05)
+        
+        F0 = np.zeros((10, 1), dtype=float)
+        
+        F0 = pJdet * self._width * BdotT0
+
+        for i in range(1, self._cgq.gaussPoints()+1):
+            csfn = self._chordShapeFns[i]
+            wgt = self._cgq.weight(i)
+
+            N1 = csfn.N1
+            N2 = csfn.N2
+            
+            N12 = np.array([[N1, 0.0, N2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                            [0.0, N1, 0.0, N2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]])
+            N23 = np.array([[0.0, 0.0, N1, 0.0, N2, 0.0, 0.0, 0.0, 0.0, 0.0],
+                            [ 0.0, 0.0, 0.0, N1, 0.0, N2, 0.0, 0.0, 0.0, 0.0]])
+            N34 = np.array([[0.0, 0.0, 0.0, 0.0, N1, 0.0, N2, 0.0, 0.0, 0.0],
+                            [ 0.0, 0.0, 0.0, 0.0, 0.0, N1, 0.0, N2, 0.0, 0.0]])
+            N45 = np.array([[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, N1, 0.0, N2, 0.0],
+                            [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, N1, 0.0, N2]])
+            N51 = np.array([[N2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, N1, 0.0],
+                            [0.0, N2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, N1]])
+                            
+            Nmtx12 += wgt * N12.T.dot(t12) 
+            Nmtx23 += wgt * N23.T.dot(t23) 
+            Nmtx34 += wgt * N34.T.dot(t34) 
+            Nmtx45 += wgt * N45.T.dot(t45) 
+            Nmtx51 += wgt * N51.T.dot(t51)  
+        
+        # determinant of jacobian matrix
+        cJdet12 = csfn.jacobianDeterminant(x1012, x2012)
+        cJdet23 = csfn.jacobianDeterminant(x2023, x3023)
+        cJdet34 = csfn.jacobianDeterminant(x3034, x4034)
+        cJdet45 = csfn.jacobianDeterminant(x4045, x5045)
+        cJdet51 = csfn.jacobianDeterminant(x5051, x1051)
+        
+        FBc = np.zeros((10, 1), dtype=float)
+        
+        FBc = (cJdet12 * Nmtx12 + cJdet23 * Nmtx23 + cJdet34 * Nmtx34 
+               + cJdet45 * Nmtx45 + cJdet51 * Nmtx51)  
+
+
+        fVec = FBc - F0
+            
+        return fVec
+        
+    def toString(self, state):
+        if self._number < 10:
+            s = 'pentagon[0'
+        else:
+            s = 'pentagon['
+        s = s + str(self._number)
+        s = s + '] has vertices: \n'
+        if isinstance(state, str):
+            s = s + '   1: ' + self._vertex[1].toString(state) + '\n'
+            s = s + '   2: ' + self._vertex[2].toString(state) + '\n'
+            s = s + '   3: ' + self._vertex[3].toString(state) + '\n'
+            s = s + '   4: ' + self._vertex[4].toString(state) + '\n'
+            s = s + '   5: ' + self._vertex[5].toString(state)
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.toString.")
+        return s
+
+    def number(self):
+        return self._number
+
+    def chordNumbers(self):
+        numbers = sorted(self._setOfChords)
+        return numbers[0], numbers[1], numbers[2], numbers[3], numbers[4]
+
+    def vertexNumbers(self):
+        numbers = sorted(self._setOfVertices)
+        return numbers[0], numbers[1], numbers[2], numbers[3], numbers[4]
+
+    def hasChord(self, number):
+        return number in self._setOfChords
+
+    def hasVertex(self, number):
+        return number in self._setOfVertices
+
+    def getChord(self, number):
+        if self._chord[1].number() == number:
+            return self._chord[1]
+        elif self._chord[2].number() == number:
+            return self._chord[2]
+        elif self._chord[3].number() == number:
+            return self._chord[3]
+        elif self._chord[4].number() == number:
+            return self._chord[4]
+        elif self._chord[5].number() == number:
+            return self._chord[5]
+        else:
+            raise RuntimeError('The requested chord {} '.format(number) +
+                               'is not in pentagon {}.'.format(self._number))
+
+    def getVertex(self, number):
+        if self._vertex[1].number() == number:
+            return self._vertex[1]
+        elif self._vertex[2].number() == number:
+            return self._vertex[2]
+        elif self._vertex[3].number() == number:
+            return self._vertex[3]
+        elif self._vertex[4].number() == number:
+            return self._vertex[4]
+        elif self._vertex[5].number() == number:
+            return self._vertex[5]
+        else:
+            raise RuntimeError('The requested vertex {} '.format(number) +
+                               'is not in pentagon {}.'.format(self._number))
+
+    def update(self):
+        # computes the fields positioned at the next time step
+
+        # get the updated coordinates for the vetices of the pentagon
+        x1 = self._vertex[1].coordinates('next')
+        x2 = self._vertex[2].coordinates('next')
+        x3 = self._vertex[3].coordinates('next')
+        x4 = self._vertex[4].coordinates('next')
+        x5 = self._vertex[5].coordinates('next')
+
+        # base vector 1: connects the two shoulders of the pentagon
+        x = x5[0] - x2[0]
+        y = x5[1] - x2[1]
+        z = x5[2] - x2[2]
+        mag = m.sqrt(x * x + y * y + z * z)
+        n1x = x / mag
+        n1y = y / mag
+        n1z = z / mag
+
+        # base vector 2: goes from the apex to a point along its base
+
+        # establish the unit vector for the base of the pentagon
+        x = x4[0] - x3[0]
+        y = x4[1] - x3[1]
+        z = x4[2] - x3[2]
+        mag = m.sqrt(x * x + y * y + z * z)
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the base of
+        # the pentagon that results in a vector n2 which is normal to n1
+
+        def getDelta(delta):
+            nx = x1[0] - (x3[0] + delta * ex)
+            ny = x1[1] - (x3[1] + delta * ey)
+            nz = x1[2] - (x3[2] + delta * ez)
+            # when the dot product is zero then the two vectors are orthogonal
+            n1Dotn2 = n1x * nx + n1y * ny + n1z * nz
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * mag
+        deltaH = 5.0 * mag
+        delta = findRoot(deltaL, deltaH, getDelta)
+
+        # create base vector 2
+        x = x1[0] - (x3[0] + delta * ex)
+        y = x1[1] - (x3[1] + delta * ey)
+        z = x1[2] - (x3[2] + delta * ez)
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x = x / mag
+        n2y = y / mag
+        n2z = z / mag
+
+        # base vector 3 is obtained through the cross product
+        # it is normal to the pentagon and points outward from the dodecahedron
+        n3x = n1y * n2z - n1z * n2y
+        n3y = n1z * n2x - n1x * n2z
+        n3z = n1x * n2y - n1y * n2x
+
+        # create the rotation matrix from reference to pentagonal coordinates
+        self._Pn3D[0, 0] = n1x
+        self._Pn3D[0, 1] = n2x
+        self._Pn3D[0, 2] = n3x
+        self._Pn3D[1, 0] = n1y
+        self._Pn3D[1, 1] = n2y
+        self._Pn3D[1, 2] = n3y
+        self._Pn3D[2, 0] = n1z
+        self._Pn3D[2, 1] = n2z
+        self._Pn3D[2, 2] = n3z
+
+        # determine vertice coordinates in the pentagonal frame of reference
+        self._v1x0 = n1x * x1[0] + n1y * x1[1] + n1z * x1[2]
+        self._v1y0 = n2x * x1[0] + n2y * x1[1] + n2z * x1[2]
+        self._v2x0 = n1x * x2[0] + n1y * x2[1] + n1z * x2[2]
+        self._v2y0 = n2x * x2[0] + n2y * x2[1] + n2z * x2[2]
+        self._v3x0 = n1x * x3[0] + n1y * x3[1] + n1z * x3[2]
+        self._v3y0 = n2x * x3[0] + n2y * x3[1] + n2z * x3[2]
+        self._v4x0 = n1x * x4[0] + n1y * x4[1] + n1z * x4[2]
+        self._v4y0 = n2x * x4[0] + n2y * x4[1] + n2z * x4[2]
+        self._v5x0 = n1x * x5[0] + n1y * x5[1] + n1z * x5[2]
+        self._v5y0 = n2x * x5[0] + n2y * x5[1] + n2z * x5[2]
+
+        # initialize current vertice coordinates in pentagonal frame of reference
+        self._v1x = self._v1x0
+        self._v1y = self._v1y0
+        self._v2x = self._v2x0
+        self._v2y = self._v2y0
+        self._v3x = self._v3x0
+        self._v3y = self._v3y0
+        self._v4x = self._v4x0
+        self._v4y = self._v4y0
+        self._v5x = self._v5x0
+        self._v5y = self._v5y0
+        
+        # z offsets for the pentagonal plane (which should all be the same)
+        self._v1z = n3x * x1[0] + n3y * x1[1] + n3z * x1[2]
+        self._v2z = n3x * x2[0] + n3y * x2[1] + n3z * x2[2]
+        self._v3z = n3x * x3[0] + n3y * x3[1] + n3z * x3[2]
+        self._v4z = n3x * x4[0] + n3y * x4[1] + n3z * x4[2]
+        self._v5z = n3x * x5[0] + n3y * x5[1] + n3z * x5[2]
+
+        # determine the area of this irregular pentagon
+        self._An = (self._v1x * self._v2y - self._v2x * self._v1y +
+                    self._v2x * self._v3y - self._v3x * self._v2y +
+                    self._v3x * self._v4y - self._v4x * self._v3y +
+                    self._v4x * self._v5y - self._v5x * self._v4y +
+                    self._v5x * self._v1y - self._v1x * self._v5y) / 2.0
+        # the area will be positive if the vertices index counter clockwise
+
+        # determine the centroid of this pentagon in pentagonal coordinates
+        self._cx = ((self._v1x + self._v2x) *
+                    (self._v1x * self._v2y - self._v2x * self._v1y) +
+                    (self._v2x + self._v3x) *
+                    (self._v2x * self._v3y - self._v3x * self._v2y) +
+                    (self._v3x + self._v4x) *
+                    (self._v3x * self._v4y - self._v4x * self._v3y) +
+                    (self._v4x + self._v5x) *
+                    (self._v4x * self._v5y - self._v5x * self._v4y) +
+                    (self._v5x + self._v1x) *
+                    (self._v5x * self._v1y -
+                     self._v1x * self._v5y)) / (6.0 * self._An)
+        self._cy = ((self._v1y + self._v2y) *
+                    (self._v1x * self._v2y - self._v2x * self._v1y) +
+                    (self._v2y + self._v3y) *
+                    (self._v2x * self._v3y - self._v3x * self._v2y) +
+                    (self._v3y + self._v4y) *
+                    (self._v3x * self._v4y - self._v4x * self._v3y) +
+                    (self._v4y + self._v5y) *
+                    (self._v4x * self._v5y - self._v5x * self._v4y) +
+                    (self._v5y + self._v1y) *
+                    (self._v5x * self._v1y -
+                     self._v1x * self._v5y)) / (6.0 * self._An)
+        self._cz = ((self._v1z + self._v2z + self._v3z + self._v4z +
+                     self._v5z) / 5.0)
+
+        # rotate this centroid back into the reference coordinate system
+        self._centroidXn = n1x * self._cx + n2x * self._cy + n3x * self._cz
+        self._centroidYn = n1y * self._cx + n2y * self._cy + n3y * self._cz
+        self._centroidZn = n1z * self._cx + n2z * self._cy + n3z * self._cz
+        
+        
+        
+
+        # determine length of the 1-2 chord in the next configuration
+        self._L12n = m.sqrt((x2[0] - x1[0])**2 + (x2[1] - x1[1])**2
+                             + (x2[2] - x1[2])**2)
+        
+        # determine length of the 2-3 chord in the next configuration
+        self._L23n = m.sqrt((x3[0] - x2[0])**2 + (x3[1] - x2[1])**2
+                             + (x3[2] - x2[2])**2)
+        
+        # determine length of the 3-4 chord in the next configuration
+        self._L34n = m.sqrt((x4[0] - x3[0])**2 + (x4[1] - x3[1])**2
+                             + (x4[2] - x3[2])**2)
+        
+        # determine length of the 4-5 chord in the next configuration
+        self._L45n = m.sqrt((x5[0] - x4[0])**2 + (x5[1] - x4[1])**2
+                             + (x5[2] - x4[2])**2)
+        
+        # determine length of the 5-1 chord in the next configuration
+        self._L51n = m.sqrt((x5[0] - x1[0])**2 + (x5[1] - x1[1])**2
+                             + (x5[2] - x1[2])**2)
+
+        # determine the rotation matrix for 1-2 chord 
+        # base vector 1: aligns with the axis of the 1-2 chord
+        x12 = x2[0] - x1[0]
+        y12 = x2[1] - x1[1]
+        z12 = x2[2] - x1[2]
+        mag12 = m.sqrt(x12 * x12 + y12 * y12  + z12 * z12)
+        n1x12 = x12 / mag12
+        n1y12 = y12 / mag12
+        n1z12 = z12 / mag12
+
+        # base vector 2: goes from the co-ordinate origin to the chord
+        # initial guess: base vector 2 points to the midpoint of the chord
+        x = (x1[0] + x2[0]) / 2.0
+        y = (x1[1] + x2[1]) / 2.0
+        z = (x1[2] + x2[2]) / 2.0
+        mag = m.sqrt(x * x + y * y  + z * z)
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the chordal
+        # axis which results in a vector n2 that is normal to base vector n1
+        def getDelta12(delta12):
+            nx = ex + delta12 * n1x12
+            ny = ey + delta12 * n1y12
+            nz = ez + delta12 * n1z12
+            # when the dot product is zero, the two vectors are orthogonal
+            n1Dotn2 = n1x12 * nx + n1y12 * ny + n1z12 * nz
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * self._L120
+        deltaH = 4.0 * self._L120
+        delta12 = findRoot(deltaL, deltaH, getDelta12)
+
+        # create base vector 2 (the radial vector out to the chord)
+        x = ex + delta12 * n1x12
+        y = ey + delta12 * n1y12
+        z = ez + delta12 * n1z12
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x12 = x / mag
+        n2y12 = y / mag   
+        n2z12 = z / mag
+        
+        # create the rotation matrix from dodecahedral to 1-2 chordal coordinates
+        self._Pn2D12[0, 0] = n1x12
+        self._Pn2D12[0, 1] = n2x12
+        self._Pn2D12[1, 0] = n1y12
+        self._Pn2D12[1, 1] = n2y12
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v1x120 = n1x12 * x1[0] + n1y12 * x1[1] + n1z12 * x1[2] 
+        self._v1y120 = n2x12 * x1[0] + n2y12 * x1[1] + n2z12 * x1[2]
+        self._v2x120 = n1x12 * x2[0] + n1y12 * x2[1] + n1z12 * x2[2]
+        self._v2y120 = n2x12 * x2[0] + n2y12 * x2[1] + n2z12 * x2[2]
+
+        self._v1x12 = self._v1x120 
+        self._v1y12 = self._v1y120 
+        self._v2x12 = self._v2x120 
+        self._v2y12 = self._v2y120 
+
+
+
+        # determine the rotation matrix for 2-3 chord 
+        # base vector 1: aligns with the axis of the 2-3 chord
+        x23 = x3[0] - x2[0]
+        y23 = x3[1] - x2[1]
+        z23 = x3[2] - x2[2]
+        mag23 = m.sqrt(x23 * x23 + y23 * y23 + z23 * z23)
+        n1x23 = x23 / mag23
+        n1y23 = y23 / mag23
+        n1z23 = z23 / mag23
+        # create normal vector 
+
+        # base vector 2: goes from the co-ordinate origin to the chord
+        # initial guess: base vector 2 points to the midpoint of the chord
+        x = (x3[0] + x2[0]) / 2.0
+        y = (x3[1] + x2[1]) / 2.0
+        z = (x3[2] + x2[2]) / 2.0
+        mag = m.sqrt(x * x + y * y  + z * z )
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the chordal
+        # axis which results in a vector n2 that is normal to base vector n1
+        def getDelta23(delta23):
+            nx = ex + delta23 * n1x23
+            ny = ey + delta23 * n1y23
+            nz = ez + delta23 * n1z23
+            # when the dot product is zero, the two vectors are orthogonal
+            n1Dotn2 = n1x23 * nx + n1y23 * ny + n1z23 * nz 
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * self._L230
+        deltaH = 4.0 * self._L230
+        delta23 = findRoot(deltaL, deltaH, getDelta23)
+
+        # create base vector 2 (the radial vector out to the chord)
+        x = ex + delta23 * n1x23
+        y = ey + delta23 * n1y23
+        z = ez + delta23 * n1z23
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x23 = x / mag
+        n2y23 = y / mag 
+        n2z23 = z / mag     
+        
+        # create the rotation matrix from dodecahedral to 2-3 chordal coordinates
+        self._Pn2D23[0, 0] = n1x23
+        self._Pn2D23[0, 1] = n2x23
+        self._Pn2D23[1, 0] = n1y23
+        self._Pn2D23[1, 1] = n2y23
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v2x230 = n1x23 * x2[0] + n1y23 * x2[1]  + n1z23 * x2[2] 
+        self._v2y230 = n2x23 * x2[0] + n2y23 * x2[1]  + n2z23 * x2[2]
+        self._v3x230 = n1x23 * x3[0] + n1y23 * x3[1]  + n1z23 * x3[2]
+        self._v3y230 = n2x23 * x3[0] + n2y23 * x3[1]  + n2z23 * x3[2]
+
+        self._v2x23 = self._v2x230 
+        self._v2y23 = self._v2y230 
+        self._v3x23 = self._v3x230 
+        self._v3y23 = self._v3y230 
+        
+        
+        # determine the rotation matrix for 3-4 chord 
+        # base vector 1: aligns with the axis of the 3-4 chord
+        x34 = x4[0] - x3[0]
+        y34 = x4[1] - x3[1]
+        z34 = x4[2] - x3[2]
+        mag34 = m.sqrt(x34 * x34 + y34 * y34 + z34 * z34)
+        n1x34 = x34 / mag34
+        n1y34 = y34 / mag34
+        n1z34 = z34 / mag34
+        
+        # base vector 2: goes from the co-ordinate origin to the chord
+        # initial guess: base vector 2 points to the midpoint of the chord
+        x = (x4[0] + x3[0]) / 2.0
+        y = (x4[1] + x3[1]) / 2.0
+        z = (x4[2] + x3[2]) / 2.0
+        mag = m.sqrt(x * x + y * y + z * z )
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the chordal
+        # axis which results in a vector n2 that is normal to base vector n1
+        def getDelta34(delta34):
+            nx = ex + delta34 * n1x34
+            ny = ey + delta34 * n1y34
+            nz = ez + delta34 * n1z34
+            # when the dot product is zero, the two vectors are orthogonal
+            n1Dotn2 = n1x34 * nx + n1y34 * ny + n1z34 * nz
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * self._L340
+        deltaH = 4.0 * self._L340
+        delta34 = findRoot(deltaL, deltaH, getDelta34)
+
+        # create base vector 2 (the radial vector out to the chord)
+        x = ex + delta34 * n1x34
+        y = ey + delta34 * n1y34
+        z = ez + delta34 * n1z34
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x34 = x / mag
+        n2y34 = y / mag   
+        n2z34 = z / mag
+        
+        # create the rotation matrix from dodecahedral to 3-4 chordal coordinates
+        self._Pn2D34[0, 0] = n1x34
+        self._Pn2D34[0, 1] = n2x34
+        self._Pn2D34[1, 0] = n1y34
+        self._Pn2D34[1, 1] = n2y34
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v3x340 = n1x34 * x3[0] + n1y34 * x3[1] + n1z34 * x3[2] 
+        self._v3y340 = n2x34 * x3[0] + n2y34 * x3[1] + n2z34 * x3[2]
+        self._v4x340 = n1x34 * x4[0] + n1y34 * x4[1] + n1z34 * x4[2]
+        self._v4y340 = n2x34 * x4[0] + n2y34 * x4[1] + n2z34 * x4[2]
+
+        self._v3x34 = self._v3x340 
+        self._v3y34 = self._v3y340 
+        self._v4x34 = self._v4x340 
+        self._v4y34 = self._v4y340 
+        
+
+        # determine the rotation matrix for 4-5 chord 
+        # base vector 1: aligns with the axis of the 4-5 chord
+        x45 = x5[0] - x4[0]
+        y45 = x5[1] - x4[1]
+        z45 = x5[2] - x4[2]
+        mag45 = m.sqrt(x45 * x45 + y45 * y45 + z45 * z45)
+        n1x45 = x45 / mag45
+        n1y45 = y45 / mag45
+        n1z45 = z45 / mag45         
+        
+        # base vector 2: goes from the co-ordinate origin to the chord
+        # initial guess: base vector 2 points to the midpoint of the chord
+        x = (x5[0] + x4[0]) / 2.0
+        y = (x5[1] + x4[1]) / 2.0
+        z = (x5[2] + x4[2]) / 2.0
+        mag = m.sqrt(x * x + y * y + z * z )
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the chordal
+        # axis which results in a vector n2 that is normal to base vector n1
+        def getDelta45(delta45):
+            nx = ex + delta45 * n1x45
+            ny = ey + delta45 * n1y45
+            nz = ez + delta45 * n1z45
+            # when the dot product is zero, the two vectors are orthogonal
+            n1Dotn2 = n1x45 * nx + n1y45 * ny + n1z45 * nz
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * self._L450
+        deltaH = 4.0 * self._L450
+        delta45 = findRoot(deltaL, deltaH, getDelta45)
+
+        # create base vector 2 (the radial vector out to the chord)
+        x = ex + delta45 * n1x45
+        y = ey + delta45 * n1y45
+        z = ez + delta45 * n1z45
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x45 = x / mag
+        n2y45 = y / mag   
+        n2z45 = z / mag 
+        
+        # create the rotation matrix from dodecahedral to 4-5 chordal coordinates
+        self._Pn2D45[0, 0] = n1x45
+        self._Pn2D45[0, 1] = n2x45
+        self._Pn2D45[1, 0] = n1y45
+        self._Pn2D45[1, 1] = n2y45
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v4x450 = n1x45 * x4[0] + n1y45 * x4[1] + n1z45 * x4[2] 
+        self._v4y450 = n2x45 * x4[0] + n2y45 * x4[1] + n2z45 * x4[2]
+        self._v5x450 = n1x45 * x5[0] + n1y45 * x5[1] + n1z45 * x5[2]
+        self._v5y450 = n2x45 * x5[0] + n2y45 * x5[1] + n2z45 * x5[2]
+
+        self._v4x45 = self._v4x450 
+        self._v4y45 = self._v4y450 
+        self._v5x45 = self._v5x450 
+        self._v5y45 = self._v5y450 
+        
+                       
+        # determine the rotation matrix for 5-1 chord 
+        # base vector 1: aligns with the axis of the 5-1 chord
+        x51 = x1[0] - x5[0]
+        y51 = x1[1] - x5[1]
+        z51 = x1[2] - x5[2]
+        mag51 = m.sqrt(x51 * x51 + y51 * y51 + z51 * z51)
+        n1x51 = x51 / mag51
+        n1y51 = y51 / mag51 
+        n1z51 = z51 / mag51
+        
+        # base vector 2: goes from the co-ordinate origin to the chord
+        # initial guess: base vector 2 points to the midpoint of the chord
+        x = (x1[0] + x5[0]) / 2.0
+        y = (x1[1] + x5[1]) / 2.0
+        z = (x1[2] + x5[2]) / 2.0
+        mag = m.sqrt(x * x + y * y + z * z )
+        ex = x / mag
+        ey = y / mag
+        ez = z / mag
+
+        # an internal function is used to locate that point along the chordal
+        # axis which results in a vector n2 that is normal to base vector n1
+        def getDelta51(delta51):
+            nx = ex + delta51 * n1x51
+            ny = ey + delta51 * n1y51
+            nz = ez + delta51 * n1z51
+            # when the dot product is zero, the two vectors are orthogonal
+            n1Dotn2 = n1x51 * nx + n1y51 * ny + n1z51 * nz 
+            return n1Dotn2
+
+        # use a root finder to secure a base vector n2 that is orthogonal to n1
+        deltaL = -4.0 * self._L510
+        deltaH = 4.0 * self._L510
+        delta51 = findRoot(deltaL, deltaH, getDelta51)
+
+        # create base vector 2 (the radial vector out to the chord)
+        x = ex + delta51 * n1x51
+        y = ey + delta51 * n1y51
+        z = ez + delta51 * n1z51
+        mag = m.sqrt(x * x + y * y + z * z)
+        n2x51 = x / mag
+        n2y51 = y / mag   
+        n2z51 = z / mag 
+        
+        # create the rotation matrix from dodecahedral to 5-1 chordal coordinates
+        self._Pn2D51[0, 0] = n1x51
+        self._Pn2D51[0, 1] = n2x51
+        self._Pn2D51[1, 0] = n1y51
+        self._Pn2D51[1, 1] = n2y51
+
+        # determine vertice coordinates in the chordal frame of reference
+        self._v5x510 = n1x51 * x5[0] + n1y51 * x5[1] + n1z51 * x5[2]
+        self._v5y510 = n2x51 * x5[0] + n2y51 * x5[1] + n2z51 * x5[2]
+        self._v1x510 = n1x51 * x1[0] + n1y51 * x1[1] + n1z51 * x1[2]
+        self._v1y510 = n2x51 * x1[0] + n2y51 * x1[1] + n2z51 * x1[2]
+
+        self._v5x51 = self._v5x510 
+        self._v5y51 = self._v5y510 
+        self._v1x51 = self._v1x510 
+        self._v1y51 = self._v1y510 
+        
+
+        # Determine the deformation gradient for this irregular pentagon
+
+        # current vertex coordinates in pentagonal frame of reference
+        x1 = (self._v1x, self._v1y)
+        x2 = (self._v2x, self._v2y)
+        x3 = (self._v3x, self._v3y)
+        x4 = (self._v4x, self._v4y)
+        x5 = (self._v5x, self._v5y)
+
+        # reference vertex coordinates in pentagonal frame of reference
+        x10 = (self._v1x0, self._v1y0)
+        x20 = (self._v2x0, self._v2y0)
+        x30 = (self._v3x0, self._v3y0)
+        x40 = (self._v4x0, self._v4y0)
+        x50 = (self._v5x0, self._v5y0)
+
+        # establish the deformation and displacement gradients as dictionaries
+        # displacement gradients located at the Gauss points of pentagon
+        self._Gn[1] = self._pentShapeFns[1].G(x1, x2, x3, x4, x5,
+                                       x10, x20, x30, x40, x50)
+        self._Gn[2] = self._pentShapeFns[2].G(x1, x2, x3, x4, x5,
+                                       x10, x20, x30, x40, x50)
+        self._Gn[3] = self._pentShapeFns[3].G(x1, x2, x3, x4, x5,
+                                       x10, x20, x30, x40, x50)
+        self._Gn[4] = self._pentShapeFns[4].G(x1, x2, x3, x4, x5,
+                                       x10, x20, x30, x40, x50)
+        self._Gn[5] = self._pentShapeFns[5].G(x1, x2, x3, x4, x5,
+                                       x10, x20, x30, x40, x50)
+
+        # deformation gradients located at the Gauss points of pentagon
+        self._Fn[1] = self._pentShapeFns[1].F(x1, x2, x3, x4, x5,
+                                       x10, x20, x30, x40, x50)
+        self._Fn[2] = self._pentShapeFns[2].F(x1, x2, x3, x4, x5,
+                                       x10, x20, x30, x40, x50)
+        self._Fn[3] = self._pentShapeFns[3].F(x1, x2, x3, x4, x5,
+                                       x10, x20, x30, x40, x50)
+        self._Fn[4] = self._pentShapeFns[4].F(x1, x2, x3, x4, x5,
+                                       x10, x20, x30, x40, x50)
+        self._Fn[5] = self._pentShapeFns[5].F(x1, x2, x3, x4, x5,
+                                       x10, x20, x30, x40, x50)
+
+        # update the membrane objects at each Gauss point
+        for i in range(1, self._pgq.gaussPoints()+1):
+            self._septum[i].update(self._Fn[i])
+
+        return  # nothing
+
+    def advance(self, reindex):
+        # advance the geometric properties of the pentagon
+        self._Ap = self._Ac
+        self._Ac = self._An
+        self._centroidXp = self._centroidXc
+        self._centroidYp = self._centroidYc
+        self._centroidZp = self._centroidZc
+        self._centroidXc = self._centroidXn
+        self._centroidYc = self._centroidYn
+        self._centroidZc = self._centroidZn
+
+        # advance rotation matrix: from the dodecaheral into the pentagonal
+        self._Pp3D[:, :] = self._Pc3D[:, :]
+        self._Pc3D[:, :] = self._Pn3D[:, :]
+
+        # advance the matrix fields associated with each Gauss point
+
+        for i in range(1, self._pgq.gaussPoints()+1):
+            self._Fp[i][:, :] = self._Fc[i][:, :]
+            self._Fc[i][:, :] = self._Fn[i][:, :]
+            self._Gp[i][:, :] = self._Gc[i][:, :]
+            self._Gc[i][:, :] = self._Gn[i][:, :]
+
+        # advance the membrane objects at each Gauss point
+        for i in range(1, self._pgq.gaussPoints()+1):
+            self._septum[i].advance()
+
+        # assign current to previous values, and then next to current values
+        self._L12p = self._L12c
+        self._L12c = self._L12n
+        self._Pp2D12[:, :] = self._Pc2D12[:, :]
+        self._Pc2D12[:, :] = self._Pn2D12[:, :]        
+
+        self._L23p = self._L23c
+        self._L23c = self._L23n
+        self._Pp2D23[:, :] = self._Pc2D23[:, :]
+        self._Pc2D23[:, :] = self._Pn2D23[:, :]   
+        
+        self._L34p = self._L34c
+        self._L34c = self._L34n
+        self._Pp2D34[:, :] = self._Pc2D34[:, :]
+        self._Pc2D34[:, :] = self._Pn2D34[:, :]  
+        
+        self._L45p = self._L45c
+        self._L45c = self._L45n
+        self._Pp2D45[:, :] = self._Pc2D45[:, :]
+        self._Pc2D45[:, :] = self._Pn2D45[:, :]  
+        
+        self._L51p = self._L51c
+        self._L51c = self._L51n
+        self._Pp2D51[:, :] = self._Pc2D51[:, :]
+        self._Pc2D51[:, :] = self._Pn2D51[:, :] 
+
+
+        # compute the FE arrays needed for the next interval of integration
+        self.mMtx = self._massMatrix()
+        self.kMtx = self._stiffnessMatrix(reindex)
+        self.fVec = self._forcingFunction()
+
+           
+    def rotation12(self, state):
+        # rotation matrix for chord 1-2
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return np.copy(self._Pc2D12)
+            elif state == 'n' or state == 'next':
+                return np.copy(self._Pn2D12)
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return np.copy(self._Pp2D12)
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return np.copy(self._Pr2D12)
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.rotation.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.rotation.")
+            
+    def rotation23(self, state):
+        # rotation matrix for chord 2-3
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return np.copy(self._Pc2D23)
+            elif state == 'n' or state == 'next':
+                return np.copy(self._Pn2D23)
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return np.copy(self._Pp2D23)
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return np.copy(self._Pr2D23)
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.rotation.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.rotation.")
+
+    def rotation34(self, state):
+        # rotation matrix for chord 3-4
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return np.copy(self._Pc2D34)
+            elif state == 'n' or state == 'next':
+                return np.copy(self._Pn2D34)
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return np.copy(self._Pp2D34)
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return np.copy(self._Pr2D34)
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.rotation.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.rotation.")
+
+    def rotation45(self, state):
+        # rotation matrix for chord 4-5
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return np.copy(self._Pc2D45)
+            elif state == 'n' or state == 'next':
+                return np.copy(self._Pn2D45)
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return np.copy(self._Pp2D45)
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return np.copy(self._Pr2D45)
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.rotation.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.rotation.")
+
+    def rotation51(self, state):
+        # rotation matrix for chord 5-1
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return np.copy(self._Pc2D51)
+            elif state == 'n' or state == 'next':
+                return np.copy(self._Pn2D51)
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return np.copy(self._Pp2D51)
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return np.copy(self._Pr2D51)
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "sent in a call to chord.rotation.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "sent in a call to chord.rotation.")
 
     def normal(self, state):
         if isinstance(state, str):
@@ -2602,66 +2468,232 @@ class pentagon(object):
                                "in a call to pentagon.centroid.")
         return np.array([self._cx, self._cy, self._cz])
 
-    def displacement(self, state):
-        x0, y0, z0 = self.centroid('ref')
-        x, y, z = self.centroid(state)
-        ux = x - x0
-        uy = y - y0
-        uz = z - z0
-        return np.array([ux, uy, uz])
-
-    def velocity(self, state):
+    def centeroidDisplacement(self, reindex, state):
+        # verify the input
+        if not isinstance(reindex, Pivot):
+            raise RuntimeError("The 'reindex' variable sent to " +
+                               "pentagon.centroidDisplacement must be of type Pivot.")
+        # calculate the displacement in the specified configuration
+        u = np.zeros(3, dtype=float)
+        x0 = np.zeros(3, dtype=float)
+        
+        x0, y0, z0 = self.centroid('ref')        
+        xRef = np.array([x0, y0, z0])
+        fromCase = reindex.pivotCase('ref')
         if isinstance(state, str):
-            h = 2.0 * self._h
+            xp, yp, zp = self.centroid('prev')
+            xc, yc, zc = self.centroid('curr')
+            xn, yn, zn = self.centroid('next')
+            
+            if state == 'c' or state == 'curr' or state == 'current':
+                x = np.array([xc, yc, zc])
+                toCase = reindex.pivotCase('curr')
+                x0 = reindex.reindexVector(xRef, fromCase, toCase)
+            elif state == 'n' or state == 'next':
+                x = np.array([xn, yn, zn])
+                toCase = reindex.pivotCase('next')
+                x0 = reindex.reindexVector(xRef, fromCase, toCase)
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                x = np.array([xp, yp, zp])
+                toCase = reindex.pivotCase('prev')
+                x0 = reindex.reindexVector(xRef, fromCase, toCase)
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                x = np.array([x0, y0, z0])
+                x0 = np.array([x0, y0, z0])
+            else:
+                raise RuntimeError("Unknown state {} ".format(state) +
+                                   "in a call to pentagon.centroidDisplacement.")
+        else:
+            raise RuntimeError("Unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.centroidDisplacement.")
+        u = x - x0
+        
+        R = self.rotation(state)
+        uxr = R[0, 0] * u[0] + R[1, 0] * u[1] + R[2, 0] * u[2]
+        uyr = R[0, 1] * u[0] + R[1, 1] * u[1] + R[2, 1] * u[2]
+        uzr = R[0, 2] * u[0] + R[1, 2] * u[1] + R[2, 2] * u[2]
+
+        return np.array([uxr, uyr, uzr])
+    
+    def centeroidVelocity(self, reindex, state):
+        # verify the input
+        if not isinstance(reindex, Pivot):
+            raise RuntimeError("The 'reindex' variable sent to " +
+                               "pentagon.centroidVelocity must be of type Pivot.")
+        # calculate the velocity in the specified configuration
+        h = 2.0 * self._h
+        v = np.zeros(3, dtype=float)
+        if isinstance(state, str):
             xp, yp, zp = self.centroid('prev')
             xc, yc, zc = self.centroid('curr')
             xn, yn, zn = self.centroid('next')
             if state == 'c' or state == 'curr' or state == 'current':
+                toCase = reindex.pivotCase('curr')
+                # map vectors into co-ordinate system of current configuration
+                xPrev = np.array([xp, yp, zp])
+                fromCase = reindex.pivotCase('prev')
+                xP = reindex.reindexVector(xPrev, fromCase, toCase)
+                xNext = np.array([xn, yn, zn])
+                fromCase = reindex.pivotCase('next')
+                xN = reindex.reindexVector(xNext, fromCase, toCase)
+                
                 # use second-order central difference formula
-                vx = (xn - xp) / h
-                vy = (yn - yp) / h
-                vz = (zn - zp) / h
+                v = (xN - xP) / h
+                
             elif state == 'n' or state == 'next':
+                toCase = reindex.pivotCase('next')
+                # map vectors into co-ordinate system of next configuration
+                xPrev = np.array([xp, yp, zp])
+                fromCase = reindex.pivotCase('prev')
+                xP = reindex.reindexVector(xPrev, fromCase, toCase)
+                xCurr = np.array([xc, yc, zc])
+                fromCase = reindex.pivotCase('curr')
+                xC = reindex.reindexVector(xCurr, fromCase, toCase)
+                xN = np.array([xn, yn, zn])
                 # use second-order backward difference formula
-                vx = (3.0 * xn - 4.0 * xc + xp) / h
-                vy = (3.0 * yn - 4.0 * yc + yp) / h
-                vz = (3.0 * zn - 4.0 * zc + zp) / h
-            elif state == 'p' or state == 'prev' or state == 'previous':
-                # use second-order forward difference formula
-                vx = (-xn + 4.0 * xc - 3.0 * xp) / h
-                vy = (-yn + 4.0 * yc - 3.0 * yp) / h
-                vz = (-zn + 4.0 * zc - 3.0 * zp) / h
-            elif state == 'r' or state == 'ref' or state == 'reference':
-                vx = 0.0
-                vy = 0.0
-                vz = 0.0
-            else:
-                raise RuntimeError("An unknown state {} ".format(state) +
-                                   "in a call to pentagon.velocity.")
-        else:
-            raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "in a call to pentagon.velocity.")
-        return np.array([vx, vy, vz])
+                v = (3.0 * xN - 4.0 * xC + xP) / h
 
-    def acceleration(self, state):
-        if isinstance(state, str):
-            if state == 'r' or state == 'ref' or state == 'reference':
-                ax = 0.0
-                ay = 0.0
-                az = 0.0
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                toCase = reindex.pivotCase('prev')
+                # map vector into co-ordinate system of previous configuration
+                xP = np.array([xp, yp, zp])
+                xCurr = np.array([xc, yc, zc])
+                fromCase = reindex.pivotCase('curr')
+                xC = reindex.reindexVector(xCurr, fromCase, toCase)
+                xNext = np.array([xn, yn, zn])
+                fromCase = reindex.pivotCase('next')
+                xN = reindex.reindexVector(xNext, fromCase, toCase)
+                # use second-order forward difference formula
+                v = (-xN + 4.0 * xC - 3.0 * xP) / h
+                
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                # velocity is zero
+                pass
             else:
-                h2 = self._h**2
-                xp, yp, zp = self.prevCentroid()
-                xc, yc, zc = self.currCentroid()
-                xn, yn, zn = self.nextCentroid()
-                # use second-order central difference formula
-                ax = (xn - 2.0 * xc + xp) / h2
-                ay = (yn - 2.0 * yc + yp) / h2
-                az = (zn - 2.0 * zc + zp) / h2
+                raise RuntimeError("Unknown state {} ".format(state) +
+                                   "in a call to pentagon.centroidVelocity.")
         else:
             raise RuntimeError("An unknown state {} ".format(str(state)) +
-                               "in a call to pentagon.acceleration.")
-        return np.array([ax, ay, az])
+                               "in a call to pentagon.centroidVelocity.")
+
+        R = self.rotation(state)
+        vxr = R[0, 0] * v[0] + R[1, 0] * v[1] + R[2, 0] * v[2]
+        vyr = R[0, 1] * v[0] + R[1, 1] * v[1] + R[2, 1] * v[2]
+        vzr = R[0, 2] * v[0] + R[1, 2] * v[1] + R[2, 2] * v[2]
+
+        return np.array([vxr, vyr, vzr])
+
+    def centeroidAcceleration(self, reindex, state):
+        # verify the input
+        if not isinstance(reindex, Pivot):
+            raise RuntimeError("The 'reindex' variable sent to " +
+                               "pentagon.centroidAcceleration must be of type Pivot.")
+        # calculate the acceleration in the specified configuration
+        h2 = self._h**2
+        a = np.zeros(3, dtype=float)
+        if isinstance(state, str):
+            xp, yp, zp = self.centroid('prev')
+            xc, yc, zc = self.centroid('curr')
+            xn, yn, zn = self.centroid('next')
+            if state == 'c' or state == 'curr' or state == 'current':
+                toCase = reindex.pivotCase('curr')
+                # map vectors into co-ordinate system of current configuration
+                xPrev = np.array([xp, yp, zp])
+                fromCase = reindex.pivotCase('prev')
+                xP = reindex.reindexVector(xPrev, fromCase, toCase)
+                xC = np.array([xc, yc, zc])
+                xNext = np.array([xn, yn, zn])
+                fromCase = reindex.pivotCase('next')
+                xN = reindex.reindexVector(xNext, fromCase, toCase)
+            elif state == 'n' or state == 'next':
+                toCase = reindex.pivotCase('next')
+                # map vectors into co-ordinate system of next configuration
+                xPrev = np.array([xp, yp, zp])
+                fromCase = reindex.pivotCase('prev')
+                xP = reindex.reindexVector(xPrev, fromCase, toCase)
+                xCurr = np.array([xc, yc, zc])
+                fromCase = reindex.pivotCase('curr')
+                xC = reindex.reindexVector(xCurr, fromCase, toCase)
+                xN = np.array([xn, yn, zn])
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                toCase = reindex.pivotCase('prev')
+                # map vector into co-ordinate system of previous configuration
+                xP = np.array([xp, yp, zp])
+                xCurr = np.array([xc, yc, zc])
+                fromCase = reindex.pivotCase('curr')
+                xC = reindex.reindexVector(xCurr, fromCase, toCase)
+                xNext = np.array([xn, yn, zn])
+                fromCase = reindex.pivotCase('next')
+                xN = reindex.reindexVector(xNext, fromCase, toCase)
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                # acceleration is zero
+                pass
+            else:
+                raise RuntimeError("Unknown state {} ".format(state) +
+                                   "in a call to pentagon.centroidAcceleration.")
+        else:
+            raise RuntimeError("Unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.centroidAcceleration.")
+        a = (xN - 2.0 * xC + xP) / h2
+
+        R = self.rotation(state)
+        axr = R[0, 0] * a[0] + R[1, 0] * a[1] + R[2, 0] * a[2]
+        ayr = R[0, 1] * a[0] + R[1, 1] * a[1] + R[2, 1] * a[2]
+        azr = R[0, 2] * a[0] + R[1, 2] * a[1] + R[2, 2] * a[2]
+
+        return np.array([axr, ayr, azr])
+    
+    
+    # change in displacementin contribution to the first nonlinear strain
+    def dDisplacement1(self, reindex):
+        v1 = self._vertex[1].velocity(reindex, 'curr')
+        v2 = self._vertex[2].velocity(reindex, 'curr')
+        v3 = self._vertex[3].velocity(reindex, 'curr')
+        v4 = self._vertex[4].velocity(reindex, 'curr')
+        v5 = self._vertex[5].velocity(reindex, 'curr')
+
+        R = self.rotation('curr')        
+        Dmtx1 = np.zeros((2, 10), dtype=float)
+        Dmtx1[0, 0] = R[0, 0] * v1[0] + R[1, 0] * v1[1] + R[2, 0] * v1[2]
+        Dmtx1[0, 2] = R[0, 0] * v2[0] + R[1, 0] * v2[1] + R[2, 0] * v2[2]
+        Dmtx1[0, 4] = R[0, 0] * v3[0] + R[1, 0] * v3[1] + R[2, 0] * v3[2]
+        Dmtx1[0, 6] = R[0, 0] * v4[0] + R[1, 0] * v4[1] + R[2, 0] * v4[2]
+        Dmtx1[0, 8] = R[0, 0] * v5[0] + R[1, 0] * v5[1] + R[2, 0] * v5[2]
+
+
+        Dmtx1[1, 1] = R[0, 1] * v1[0] + R[1, 1] * v1[1] + R[2, 1] * v1[2]
+        Dmtx1[1, 3] = R[0, 1] * v2[0] + R[1, 1] * v2[1] + R[2, 1] * v2[2]
+        Dmtx1[1, 5] = R[0, 1] * v3[0] + R[1, 1] * v3[1] + R[2, 1] * v3[2]
+        Dmtx1[1, 7] = R[0, 1] * v4[0] + R[1, 1] * v4[1] + R[2, 1] * v4[2]
+        Dmtx1[1, 9] = R[0, 1] * v5[0] + R[1, 1] * v5[1] + R[2, 1] * v5[2]
+        
+        return Dmtx1
+
+
+    # change in displacementin contribution to the second nonlinear strain
+    def dDisplacement2(self, reindex):
+        v1 = self._vertex[1].velocity(reindex, 'curr')
+        v2 = self._vertex[2].velocity(reindex, 'curr')
+        v3 = self._vertex[3].velocity(reindex, 'curr')
+        v4 = self._vertex[4].velocity(reindex, 'curr')
+        v5 = self._vertex[5].velocity(reindex, 'curr')
+
+        R = self.rotation('curr')        
+        Dmtx2 = np.zeros((2, 10), dtype=float)
+        Dmtx2[0, 0] = R[0, 1] * v1[0] + R[1, 1] * v1[1] + R[2, 1] * v1[2]
+        Dmtx2[0, 2] = R[0, 1] * v2[0] + R[1, 1] * v2[1] + R[2, 1] * v2[2]
+        Dmtx2[0, 4] = R[0, 1] * v3[0] + R[1, 1] * v3[1] + R[2, 1] * v3[2]
+        Dmtx2[0, 6] = R[0, 1] * v4[0] + R[1, 1] * v4[1] + R[2, 1] * v4[2]
+        Dmtx2[0, 8] = R[0, 1] * v5[0] + R[1, 1] * v5[1] + R[2, 1] * v5[2]
+
+
+        Dmtx2[1, 1] = R[0, 0] * v1[0] + R[1, 0] * v1[1] + R[2, 0] * v1[2]
+        Dmtx2[1, 3] = R[0, 0] * v2[0] + R[1, 0] * v2[1] + R[2, 0] * v2[2]
+        Dmtx2[1, 5] = R[0, 0] * v3[0] + R[1, 0] * v3[1] + R[2, 0] * v3[2]
+        Dmtx2[1, 7] = R[0, 0] * v4[0] + R[1, 0] * v4[1] + R[2, 0] * v4[2]
+        Dmtx2[1, 9] = R[0, 0] * v5[0] + R[1, 0] * v5[1] + R[2, 0] * v5[2]
+        
+        return Dmtx2
 
     def rotation(self, state):
         if isinstance(state, str):
@@ -2703,20 +2735,20 @@ class pentagon(object):
     # fundamental fields from kinematics
 
     # displacement gradient at a Gauss point
-    def G(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
-                               "pentagon.G and you sent {}.".format(pentGaussPt))
+    def G(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.G and you sent {}.".format(PentGaussPt))
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
-                return np.copy(self._Gc[pentGaussPt])
+                return np.copy(self._Gc[PentGaussPt])
             elif state == 'n' or state == 'next':
-                return np.copy(self._Gn[pentGaussPt])
+                return np.copy(self._Gn[PentGaussPt])
             elif state == 'p' or state == 'prev' or state == 'previous':
-                return np.copy(self._Gp[pentGaussPt])
+                return np.copy(self._Gp[PentGaussPt])
             elif state == 'r' or state == 'ref' or state == 'reference':
-                return np.copy(self._G0[pentGaussPt])
+                return np.copy(self._G0[PentGaussPt])
             else:
                 raise RuntimeError("An unknown state {} ".format(state) +
                                    "in a call to pentagon.G.")
@@ -2725,20 +2757,20 @@ class pentagon(object):
                                "in a call to pentagon.G.")
 
     # deformation gradient at a Gauss point
-    def F(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
-                               "pentagon.F and you sent {}.".format(pentGaussPt))
+    def F(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.F and you sent {}.".format(PentGaussPt))
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
-                return np.copy(self._Fc[pentGaussPt])
+                return np.copy(self._Fc[PentGaussPt])
             elif state == 'n' or state == 'next':
-                return np.copy(self._Fn[pentGaussPt])
+                return np.copy(self._Fn[PentGaussPt])
             elif state == 'p' or state == 'prev' or state == 'previous':
-                return np.copy(self._Fp[pentGaussPt])
+                return np.copy(self._Fp[PentGaussPt])
             elif state == 'r' or state == 'ref' or state == 'reference':
-                return np.copy(self._F0[pentGaussPt])
+                return np.copy(self._F0[PentGaussPt])
             else:
                 raise RuntimeError("An unknown state {} ".format(state) +
                                    "in a call to pentagon.F.")
@@ -2747,11 +2779,11 @@ class pentagon(object):
                                "in a call to pentagon.F.")
 
     # velocity gradient at a Gauss point
-    def L(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
-                               "pentagon.L and you sent {}.".format(pentGaussPt))
+    def L(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.L and you sent {}.".format(PentGaussPt))
 
         def FInv(fMtx):
             fInv = np.array((2, 2), dtype=float)
@@ -2765,19 +2797,19 @@ class pentagon(object):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
                 # use central difference scheme
-                dF = ((self._Fn[pentGaussPt] - self._Fp[pentGaussPt])
+                dF = ((self._Fn[PentGaussPt] - self._Fp[PentGaussPt])
                       / (2.0 * self._h))
-                fInv = FInv(self._Fc[pentGaussPt])
+                fInv = FInv(self._Fc[PentGaussPt])
             elif state == 'n' or state == 'next':
                 # use backward difference scheme
-                dF = ((3.0 * self._Fn[pentGaussPt] - 4.0 * self._Fc[pentGaussPt] +
-                       self._Fp[pentGaussPt]) / (2.0 * self._h))
-                fInv = FInv(self._Fn[pentGaussPt])
+                dF = ((3.0 * self._Fn[PentGaussPt] - 4.0 * self._Fc[PentGaussPt] +
+                       self._Fp[PentGaussPt]) / (2.0 * self._h))
+                fInv = FInv(self._Fn[PentGaussPt])
             elif state == 'p' or state == 'prev' or state == 'previous':
                 # use forward difference scheme
-                dF = ((-self._Fn[pentGaussPt] + 4.0 * self._Fc[pentGaussPt] -
-                       3.0 * self._Fp[pentGaussPt]) / (2.0 * self._h))
-                fInv = FInv(self._Fp[pentGaussPt])
+                dF = ((-self._Fn[PentGaussPt] + 4.0 * self._Fc[PentGaussPt] -
+                       3.0 * self._Fp[PentGaussPt]) / (2.0 * self._h))
+                fInv = FInv(self._Fp[PentGaussPt])
             elif state == 'r' or state == 'ref' or state == 'reference':
                 dF = np.zeros(2, dtype=float)
                 fInv = np.zeros(2, dtype=float)
@@ -2792,1791 +2824,148 @@ class pentagon(object):
     # methods that associate with a QR decomposition
 
     # the orthogonal matrix that relabels the coordinate directions
-    def Q(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
-                               "pentagon.Q and you sent {}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].Q(state)
+    def Q(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.Q and you sent {}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].Q(state)
 
     # the orthogonal matrix from a Gram-Schmidt factorization of (relabeled) F
-    def R(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
-                               "pentagon.R and you sent {}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].R(state)
+    def R(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be" +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.R and you sent {}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].R(state)
 
     # a skew-symmetric matrix for the spin associated with R
-    def Omega(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
-                               "pentagon.Omega, you sent {}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].spin(state)
+    def Omega(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.Omega, you sent {}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].spin(state)
 
     # Laplace stretch from a Gram-Schmidt factorization of (relabeled) F
-    def U(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
-                               "pentagon.U and you sent {}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].U(state)
+    def U(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.U and you sent {}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].U(state)
 
     # inverse Laplace stretch from Gram-Schmidt factorization of (relabeled) F
-    def UInv(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
-                               "pentagon.UInv, you sent {}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].UInv(state)
+    def UInv(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.UInv, you sent {}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].UInv(state)
 
     # differential in the Laplace stretch from Gram-Schmidt factorization of F
-    def dU(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
-                               "pentagon.dU and you sent {}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].dU(state)
+    def dU(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.dU and you sent {}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].dU(state)
 
     # inverse Laplace stretch from Gram-Schmidt factorization of (relabeled) F
-    def dUInv(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
-                               "pentagon.dUInv, you sent {}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].dUInv(state)
+    def dUInv(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.dUInv, you sent {}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].dUInv(state)
 
     # physical kinematic attributes at a Gauss point in the pentagon
 
-    def dilation(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
+    def dilation(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
                                "pentagon.dilation and you sent " +
-                               "{}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].dilation(state)
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].dilation(state)
 
-    def squeeze(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
+    def squeeze(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
                                "pentagon.squeeze and you sent " +
-                               "{}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].squeeze(state)
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].squeeze(state)
 
-    def shear(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
+    def shear(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
                                "pentagon.shear and you sent " +
-                               "{}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].shear(state)
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].shear(state)
 
-    def dDilation(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
+    def dDilation(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pentGaussPts) +
                                "pentagon.dDilation and you sent " +
-                               "{}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].dDilation(state)
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].dDilation(state)
 
-    def dSqueeze(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
+    def dSqueeze(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
                                "pentagon.dSqueeze and you sent " +
-                               "{}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].dSqueeze(state)
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].dSqueeze(state)
 
-    def dShear(self, pentGaussPt, state):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("The pentGaussPt must be in the range of " +
-                               "[1, {}] in call to ".format(self._pentGaussPts) +
+    def dShear(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
                                "pentagon.dShear and you sent " +
-                               "{}.".format(pentGaussPt))
-        return self._septum[pentGaussPt].dShear(state)
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].dShear(state)
 
     # properties used in finite elements
 
-    def shapeFunction(self, pentGaussPt):
-        if (pentGaussPt < 1) or (pentGaussPt > self._pentGaussPts):
-            raise RuntimeError("pentGaussPt must be in the range of " +
-                               "[1, {}] in call ".format(self._pentGaussPts) +
-                               "to pentagon.shapeFunction and you sent " +
-                               "{}.".format(pentGaussPt))
-            sf = self._pentShapeFns[pentGaussPt]
-        return sf
+    def pentShapeFunction(self, PentGaussPt):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("pentGaussPt must be " +
+                               "{} in call ".format(self._pgq.gaussPoints()) +
+                               "to pentagon.pentShapeFunction and you sent " +
+                               "{}.".format(PentGaussPt))
+            Psf = self._pentShapeFns[PentGaussPt]
+        return Psf
+    
 
+    def chordShapeFunction(self, chordGaussPt):
+        if chordGaussPt != self._cgq.gaussPoints():
+            raise RuntimeError("gaussPt must be " +
+                                   "{} ".format(self._cgq.gaussPoints()) +
+                                   "in a call to chord.shapeFunction " +
+                                   "and you sent {}.".format(chordGaussPt))
+            csf = self._chordShapeFns[chordGaussPt]
+        return csf
+
+    def pentGaussQuadrature(self):
+        return self._pgq
+    
+    def chordGaussQuadrature(self):
+        return self._cgq
+    
     def massMatrix(self):
-        # current vertex coordinates in pentagonal frame of reference
-        x1 = (self._v1x, self._v1y)
-        x2 = (self._v2x, self._v2y)
-        x3 = (self._v3x, self._v3y)
-        x4 = (self._v4x, self._v4y)
-        x5 = (self._v5x, self._v5y)
-
-        # determine the mass matrix
-        if self._pentGaussPts == 1:
-            # 'natural' weight of the element
-            w = np.array([2.3776412907378837])
-
-            jacob = self._pentShapeFns[11].jacobian(x1, x2, x3, x4, x5)
-
-            # determinant of the Jacobian matrix
-            detJ = det(jacob)
-
-            nn1 = np.dot(np.transpose(self._pentShapeFns[11].Nmatx),
-                         self._pentShapeFns[11].Nmatx)
-
-            # the consistent mass matrix for 1 Gauss point
-            massC = self._rho * self._width * (detJ * w[0] * w[0] * nn1)
-
-            # the lumped mass matrix for 1 Gauss point
-            massL = np.zeros((10, 10), dtype=float)
-            row, col = np.diag_indices_from(massC)
-            massL[row, col] = massC.sum(axis=1)
-
-            # the mass matrix is the average of the above two mass matrices
-            mass = 0.5 * (massC + massL)
-        elif self._pentGaussPts == 4:
-            # 'natural' weights of the element
-            w = np.array([0.5449124407446143, 0.6439082046243272,
-                          0.5449124407446146, 0.6439082046243275])
-
-            jacob11 = self._pentShapeFns[11].jacobian(x1, x2, x3, x4, x5)
-            jacob12 = self._pentShapeFns[12].jacobian(x1, x2, x3, x4, x5)
-            jacob13 = self._pentShapeFns[13].jacobian(x1, x2, x3, x4, x5)
-            jacob14 = self._pentShapeFns[14].jacobian(x1, x2, x3, x4, x5)
-
-            jacob21 = self._pentShapeFns[21].jacobian(x1, x2, x3, x4, x5)
-            jacob22 = self._pentShapeFns[22].jacobian(x1, x2, x3, x4, x5)
-            jacob23 = self._pentShapeFns[23].jacobian(x1, x2, x3, x4, x5)
-            jacob24 = self._pentShapeFns[24].jacobian(x1, x2, x3, x4, x5)
-
-            jacob31 = self._pentShapeFns[31].jacobian(x1, x2, x3, x4, x5)
-            jacob32 = self._pentShapeFns[32].jacobian(x1, x2, x3, x4, x5)
-            jacob33 = self._pentShapeFns[33].jacobian(x1, x2, x3, x4, x5)
-            jacob34 = self._pentShapeFns[34].jacobian(x1, x2, x3, x4, x5)
-
-            jacob41 = self._pentShapeFns[41].jacobian(x1, x2, x3, x4, x5)
-            jacob42 = self._pentShapeFns[42].jacobian(x1, x2, x3, x4, x5)
-            jacob43 = self._pentShapeFns[43].jacobian(x1, x2, x3, x4, x5)
-            jacob44 = self._pentShapeFns[44].jacobian(x1, x2, x3, x4, x5)
-
-
-            # determinant of the Jacobian matrix
-            detJ11 = det(jacob11)
-            detJ12 = det(jacob12)
-            detJ13 = det(jacob13)
-            detJ14 = det(jacob14)
-
-            detJ21 = det(jacob21)
-            detJ22 = det(jacob22)
-            detJ23 = det(jacob23)
-            detJ24 = det(jacob24)
-
-            detJ31 = det(jacob31)
-            detJ32 = det(jacob32)
-            detJ33 = det(jacob33)
-            detJ34 = det(jacob34)
-
-            detJ41 = det(jacob41)
-            detJ42 = det(jacob42)
-            detJ43 = det(jacob43)
-            detJ44 = det(jacob44)
-
-            nn11 = np.dot(np.transpose(self._pentShapeFns[11].Nmatx),
-                         self._pentShapeFns[11].Nmatx)
-            nn12 = np.dot(np.transpose(self._pentShapeFns[12].Nmatx),
-                         self._pentShapeFns[12].Nmatx)
-            nn13 = np.dot(np.transpose(self._pentShapeFns[13].Nmatx),
-                         self._pentShapeFns[13].Nmatx)
-            nn14 = np.dot(np.transpose(self._pentShapeFns[14].Nmatx),
-                         self._pentShapeFns[14].Nmatx)
-
-            nn21 = np.dot(np.transpose(self._pentShapeFns[21].Nmatx),
-                         self._pentShapeFns[21].Nmatx)
-            nn22 = np.dot(np.transpose(self._pentShapeFns[22].Nmatx),
-                         self._pentShapeFns[22].Nmatx)
-            nn23 = np.dot(np.transpose(self._pentShapeFns[23].Nmatx),
-                         self._pentShapeFns[23].Nmatx)
-            nn24 = np.dot(np.transpose(self._pentShapeFns[24].Nmatx),
-                         self._pentShapeFns[24].Nmatx)
-
-            nn31 = np.dot(np.transpose(self._pentShapeFns[31].Nmatx),
-                         self._pentShapeFns[31].Nmatx)
-            nn32 = np.dot(np.transpose(self._pentShapeFns[32].Nmatx),
-                         self._pentShapeFns[32].Nmatx)
-            nn33 = np.dot(np.transpose(self._pentShapeFns[33].Nmatx),
-                         self._pentShapeFns[33].Nmatx)
-            nn34 = np.dot(np.transpose(self._pentShapeFns[34].Nmatx),
-                         self._pentShapeFns[34].Nmatx)
-
-            nn41 = np.dot(np.transpose(self._pentShapeFns[41].Nmatx),
-                         self._pentShapeFns[41].Nmatx)
-            nn42 = np.dot(np.transpose(self._pentShapeFns[42].Nmatx),
-                         self._pentShapeFns[42].Nmatx)
-            nn43 = np.dot(np.transpose(self._pentShapeFns[43].Nmatx),
-                         self._pentShapeFns[43].Nmatx)
-            nn44 = np.dot(np.transpose(self._pentShapeFns[44].Nmatx),
-                         self._pentShapeFns[44].Nmatx)
-
-            # the consistent mass matrix for 4 Gauss points
-            massC = (self._rho * self._width * (detJ11 * w[0] * w[0] * nn11 +
-                                                detJ12 * w[0] * w[1] * nn12 +
-                                                detJ13 * w[0] * w[2] * nn13 +
-                                                detJ14 * w[0] * w[3] * nn14 +
-                                                detJ21 * w[1] * w[0] * nn21 +
-                                                detJ22 * w[1] * w[1] * nn22 +
-                                                detJ23 * w[1] * w[2] * nn23 +
-                                                detJ24 * w[1] * w[3] * nn24 +
-                                                detJ31 * w[2] * w[0] * nn31 +
-                                                detJ32 * w[2] * w[1] * nn32 +
-                                                detJ33 * w[2] * w[2] * nn33 +
-                                                detJ34 * w[2] * w[3] * nn34 +
-                                                detJ41 * w[3] * w[0] * nn41 +
-                                                detJ42 * w[3] * w[1] * nn42 +
-                                                detJ43 * w[3] * w[2] * nn43 +
-                                                detJ44 * w[3] * w[3] * nn44))
-
-            # the lumped mass matrix for 4 Gauss points
-            massL = np.zeros((10, 10), dtype=float)
-            row, col = np.diag_indices_from(massC)
-            massL[row, col] = massC.sum(axis=1)
-
-            # the mass matrix is the average of the above two mass matrices
-            mass = 0.5 * (massC + massL)
-        else:  # pentGaussPts = 7
-            # 'natural' weights of the element
-            w = np.array([0.6257871064166934, 0.3016384608809768,
-                          0.3169910433902452, 0.3155445150066620,
-                          0.2958801959111726, 0.2575426306970870,
-                          0.2642573384350463])
-
-            jacob11 = self._pentShapeFns[11].jacobian(x1, x2, x3, x4, x5)
-            jacob12 = self._pentShapeFns[12].jacobian(x1, x2, x3, x4, x5)
-            jacob13 = self._pentShapeFns[13].jacobian(x1, x2, x3, x4, x5)
-            jacob14 = self._pentShapeFns[14].jacobian(x1, x2, x3, x4, x5)
-            jacob15 = self._pentShapeFns[15].jacobian(x1, x2, x3, x4, x5)
-            jacob16 = self._pentShapeFns[16].jacobian(x1, x2, x3, x4, x5)
-            jacob17 = self._pentShapeFns[17].jacobian(x1, x2, x3, x4, x5)
-
-            jacob21 = self._pentShapeFns[21].jacobian(x1, x2, x3, x4, x5)
-            jacob22 = self._pentShapeFns[22].jacobian(x1, x2, x3, x4, x5)
-            jacob23 = self._pentShapeFns[23].jacobian(x1, x2, x3, x4, x5)
-            jacob24 = self._pentShapeFns[24].jacobian(x1, x2, x3, x4, x5)
-            jacob25 = self._pentShapeFns[25].jacobian(x1, x2, x3, x4, x5)
-            jacob26 = self._pentShapeFns[26].jacobian(x1, x2, x3, x4, x5)
-            jacob27 = self._pentShapeFns[27].jacobian(x1, x2, x3, x4, x5)
-
-            jacob31 = self._pentShapeFns[31].jacobian(x1, x2, x3, x4, x5)
-            jacob32 = self._pentShapeFns[32].jacobian(x1, x2, x3, x4, x5)
-            jacob33 = self._pentShapeFns[33].jacobian(x1, x2, x3, x4, x5)
-            jacob34 = self._pentShapeFns[34].jacobian(x1, x2, x3, x4, x5)
-            jacob35 = self._pentShapeFns[35].jacobian(x1, x2, x3, x4, x5)
-            jacob36 = self._pentShapeFns[36].jacobian(x1, x2, x3, x4, x5)
-            jacob37 = self._pentShapeFns[37].jacobian(x1, x2, x3, x4, x5)
-
-            jacob41 = self._pentShapeFns[41].jacobian(x1, x2, x3, x4, x5)
-            jacob42 = self._pentShapeFns[42].jacobian(x1, x2, x3, x4, x5)
-            jacob43 = self._pentShapeFns[43].jacobian(x1, x2, x3, x4, x5)
-            jacob44 = self._pentShapeFns[44].jacobian(x1, x2, x3, x4, x5)
-            jacob45 = self._pentShapeFns[45].jacobian(x1, x2, x3, x4, x5)
-            jacob46 = self._pentShapeFns[46].jacobian(x1, x2, x3, x4, x5)
-            jacob47 = self._pentShapeFns[47].jacobian(x1, x2, x3, x4, x5)
-
-            jacob51 = self._pentShapeFns[51].jacobian(x1, x2, x3, x4, x5)
-            jacob52 = self._pentShapeFns[52].jacobian(x1, x2, x3, x4, x5)
-            jacob53 = self._pentShapeFns[53].jacobian(x1, x2, x3, x4, x5)
-            jacob54 = self._pentShapeFns[54].jacobian(x1, x2, x3, x4, x5)
-            jacob55 = self._pentShapeFns[55].jacobian(x1, x2, x3, x4, x5)
-            jacob56 = self._pentShapeFns[56].jacobian(x1, x2, x3, x4, x5)
-            jacob57 = self._pentShapeFns[57].jacobian(x1, x2, x3, x4, x5)
-
-            jacob61 = self._pentShapeFns[61].jacobian(x1, x2, x3, x4, x5)
-            jacob62 = self._pentShapeFns[62].jacobian(x1, x2, x3, x4, x5)
-            jacob63 = self._pentShapeFns[63].jacobian(x1, x2, x3, x4, x5)
-            jacob64 = self._pentShapeFns[64].jacobian(x1, x2, x3, x4, x5)
-            jacob65 = self._pentShapeFns[65].jacobian(x1, x2, x3, x4, x5)
-            jacob66 = self._pentShapeFns[66].jacobian(x1, x2, x3, x4, x5)
-            jacob67 = self._pentShapeFns[67].jacobian(x1, x2, x3, x4, x5)
-
-            jacob71 = self._pentShapeFns[71].jacobian(x1, x2, x3, x4, x5)
-            jacob72 = self._pentShapeFns[72].jacobian(x1, x2, x3, x4, x5)
-            jacob73 = self._pentShapeFns[73].jacobian(x1, x2, x3, x4, x5)
-            jacob74 = self._pentShapeFns[74].jacobian(x1, x2, x3, x4, x5)
-            jacob75 = self._pentShapeFns[75].jacobian(x1, x2, x3, x4, x5)
-            jacob76 = self._pentShapeFns[76].jacobian(x1, x2, x3, x4, x5)
-            jacob77 = self._pentShapeFns[77].jacobian(x1, x2, x3, x4, x5)
-
-            # determinant of the Jacobian matrix
-            detJ11 = det(jacob11)
-            detJ12 = det(jacob12)
-            detJ13 = det(jacob13)
-            detJ14 = det(jacob14)
-            detJ15 = det(jacob15)
-            detJ16 = det(jacob16)
-            detJ17 = det(jacob17)
-
-            detJ21 = det(jacob21)
-            detJ22 = det(jacob22)
-            detJ23 = det(jacob23)
-            detJ24 = det(jacob24)
-            detJ25 = det(jacob25)
-            detJ26 = det(jacob26)
-            detJ27 = det(jacob27)
-
-            detJ31 = det(jacob31)
-            detJ32 = det(jacob32)
-            detJ33 = det(jacob33)
-            detJ34 = det(jacob34)
-            detJ35 = det(jacob35)
-            detJ36 = det(jacob36)
-            detJ37 = det(jacob37)
-
-            detJ41 = det(jacob41)
-            detJ42 = det(jacob42)
-            detJ43 = det(jacob43)
-            detJ44 = det(jacob44)
-            detJ45 = det(jacob45)
-            detJ46 = det(jacob46)
-            detJ47 = det(jacob47)
-
-            detJ51 = det(jacob51)
-            detJ52 = det(jacob52)
-            detJ53 = det(jacob53)
-            detJ54 = det(jacob54)
-            detJ55 = det(jacob55)
-            detJ56 = det(jacob56)
-            detJ57 = det(jacob57)
-
-            detJ61 = det(jacob61)
-            detJ62 = det(jacob62)
-            detJ63 = det(jacob63)
-            detJ64 = det(jacob64)
-            detJ65 = det(jacob65)
-            detJ66 = det(jacob66)
-            detJ67 = det(jacob67)
-
-            detJ71 = det(jacob71)
-            detJ72 = det(jacob72)
-            detJ73 = det(jacob73)
-            detJ74 = det(jacob74)
-            detJ75 = det(jacob75)
-            detJ76 = det(jacob76)
-            detJ77 = det(jacob77)
-
-            nn11 = np.dot(np.transpose(self._pentShapeFns[11].Nmatx),
-                         self._pentShapeFns[11].Nmatx)
-            nn12 = np.dot(np.transpose(self._pentShapeFns[12].Nmatx),
-                         self._pentShapeFns[12].Nmatx)
-            nn13 = np.dot(np.transpose(self._pentShapeFns[13].Nmatx),
-                         self._pentShapeFns[13].Nmatx)
-            nn14 = np.dot(np.transpose(self._pentShapeFns[14].Nmatx),
-                         self._pentShapeFns[14].Nmatx)
-            nn15 = np.dot(np.transpose(self._pentShapeFns[15].Nmatx),
-                         self._pentShapeFns[15].Nmatx)
-            nn16 = np.dot(np.transpose(self._pentShapeFns[16].Nmatx),
-                         self._pentShapeFns[16].Nmatx)
-            nn17 = np.dot(np.transpose(self._pentShapeFns[17].Nmatx),
-                         self._pentShapeFns[17].Nmatx)
-
-            nn21 = np.dot(np.transpose(self._pentShapeFns[21].Nmatx),
-                         self._pentShapeFns[21].Nmatx)
-            nn22 = np.dot(np.transpose(self._pentShapeFns[22].Nmatx),
-                         self._pentShapeFns[22].Nmatx)
-            nn23 = np.dot(np.transpose(self._pentShapeFns[23].Nmatx),
-                         self._pentShapeFns[23].Nmatx)
-            nn24 = np.dot(np.transpose(self._pentShapeFns[24].Nmatx),
-                         self._pentShapeFns[24].Nmatx)
-            nn25 = np.dot(np.transpose(self._pentShapeFns[25].Nmatx),
-                         self._pentShapeFns[25].Nmatx)
-            nn26 = np.dot(np.transpose(self._pentShapeFns[26].Nmatx),
-                         self._pentShapeFns[26].Nmatx)
-            nn27 = np.dot(np.transpose(self._pentShapeFns[27].Nmatx),
-                         self._pentShapeFns[27].Nmatx)
-
-            nn31 = np.dot(np.transpose(self._pentShapeFns[31].Nmatx),
-                         self._pentShapeFns[31].Nmatx)
-            nn32 = np.dot(np.transpose(self._pentShapeFns[32].Nmatx),
-                         self._pentShapeFns[32].Nmatx)
-            nn33 = np.dot(np.transpose(self._pentShapeFns[33].Nmatx),
-                         self._pentShapeFns[33].Nmatx)
-            nn34 = np.dot(np.transpose(self._pentShapeFns[34].Nmatx),
-                         self._pentShapeFns[34].Nmatx)
-            nn35 = np.dot(np.transpose(self._pentShapeFns[35].Nmatx),
-                         self._pentShapeFns[35].Nmatx)
-            nn36 = np.dot(np.transpose(self._pentShapeFns[36].Nmatx),
-                         self._pentShapeFns[36].Nmatx)
-            nn37 = np.dot(np.transpose(self._pentShapeFns[37].Nmatx),
-                         self._pentShapeFns[37].Nmatx)
-
-            nn41 = np.dot(np.transpose(self._pentShapeFns[41].Nmatx),
-                         self._pentShapeFns[41].Nmatx)
-            nn42 = np.dot(np.transpose(self._pentShapeFns[42].Nmatx),
-                         self._pentShapeFns[42].Nmatx)
-            nn43 = np.dot(np.transpose(self._pentShapeFns[43].Nmatx),
-                         self._pentShapeFns[43].Nmatx)
-            nn44 = np.dot(np.transpose(self._pentShapeFns[44].Nmatx),
-                         self._pentShapeFns[44].Nmatx)
-            nn45 = np.dot(np.transpose(self._pentShapeFns[45].Nmatx),
-                         self._pentShapeFns[45].Nmatx)
-            nn46 = np.dot(np.transpose(self._pentShapeFns[46].Nmatx),
-                         self._pentShapeFns[46].Nmatx)
-            nn47 = np.dot(np.transpose(self._pentShapeFns[47].Nmatx),
-                         self._pentShapeFns[47].Nmatx)
-
-            nn51 = np.dot(np.transpose(self._pentShapeFns[51].Nmatx),
-                         self._pentShapeFns[51].Nmatx)
-            nn52 = np.dot(np.transpose(self._pentShapeFns[52].Nmatx),
-                         self._pentShapeFns[52].Nmatx)
-            nn53 = np.dot(np.transpose(self._pentShapeFns[53].Nmatx),
-                         self._pentShapeFns[53].Nmatx)
-            nn54 = np.dot(np.transpose(self._pentShapeFns[54].Nmatx),
-                         self._pentShapeFns[54].Nmatx)
-            nn55 = np.dot(np.transpose(self._pentShapeFns[55].Nmatx),
-                         self._pentShapeFns[55].Nmatx)
-            nn56 = np.dot(np.transpose(self._pentShapeFns[56].Nmatx),
-                         self._pentShapeFns[56].Nmatx)
-            nn57 = np.dot(np.transpose(self._pentShapeFns[57].Nmatx),
-                         self._pentShapeFns[57].Nmatx)
-
-            nn61 = np.dot(np.transpose(self._pentShapeFns[61].Nmatx),
-                         self._pentShapeFns[61].Nmatx)
-            nn62 = np.dot(np.transpose(self._pentShapeFns[62].Nmatx),
-                         self._pentShapeFns[62].Nmatx)
-            nn63 = np.dot(np.transpose(self._pentShapeFns[63].Nmatx),
-                         self._pentShapeFns[63].Nmatx)
-            nn64 = np.dot(np.transpose(self._pentShapeFns[64].Nmatx),
-                         self._pentShapeFns[64].Nmatx)
-            nn65 = np.dot(np.transpose(self._pentShapeFns[65].Nmatx),
-                         self._pentShapeFns[65].Nmatx)
-            nn66 = np.dot(np.transpose(self._pentShapeFns[66].Nmatx),
-                         self._pentShapeFns[66].Nmatx)
-            nn67 = np.dot(np.transpose(self._pentShapeFns[67].Nmatx),
-                         self._pentShapeFns[67].Nmatx)
-
-            nn71 = np.dot(np.transpose(self._pentShapeFns[71].Nmatx),
-                         self._pentShapeFns[71].Nmatx)
-            nn72 = np.dot(np.transpose(self._pentShapeFns[72].Nmatx),
-                         self._pentShapeFns[72].Nmatx)
-            nn73 = np.dot(np.transpose(self._pentShapeFns[73].Nmatx),
-                         self._pentShapeFns[73].Nmatx)
-            nn74 = np.dot(np.transpose(self._pentShapeFns[74].Nmatx),
-                         self._pentShapeFns[74].Nmatx)
-            nn75 = np.dot(np.transpose(self._pentShapeFns[75].Nmatx),
-                         self._pentShapeFns[75].Nmatx)
-            nn76 = np.dot(np.transpose(self._pentShapeFns[76].Nmatx),
-                         self._pentShapeFns[76].Nmatx)
-            nn77 = np.dot(np.transpose(self._pentShapeFns[77].Nmatx),
-                         self._pentShapeFns[77].Nmatx)
-
-            # the consistent mass matrix for 7 Gauss points
-            massC = (self._rho * self._width * (detJ11 * w[0] * w[0] * nn11 +
-                                                detJ12 * w[0] * w[1] * nn12 +
-                                                detJ13 * w[0] * w[2] * nn13 +
-                                                detJ14 * w[0] * w[3] * nn14 +
-                                                detJ15 * w[0] * w[4] * nn15 +
-                                                detJ16 * w[0] * w[5] * nn16 +
-                                                detJ17 * w[0] * w[6] * nn17 +
-                                                detJ21 * w[1] * w[0] * nn21 +
-                                                detJ22 * w[1] * w[1] * nn22 +
-                                                detJ23 * w[1] * w[2] * nn23 +
-                                                detJ24 * w[1] * w[3] * nn24 +
-                                                detJ25 * w[1] * w[4] * nn25 +
-                                                detJ26 * w[1] * w[5] * nn26 +
-                                                detJ27 * w[1] * w[6] * nn27 +
-                                                detJ31 * w[2] * w[0] * nn31 +
-                                                detJ32 * w[2] * w[1] * nn32 +
-                                                detJ33 * w[2] * w[2] * nn33 +
-                                                detJ34 * w[2] * w[3] * nn34 +
-                                                detJ35 * w[2] * w[4] * nn35 +
-                                                detJ36 * w[2] * w[5] * nn36 +
-                                                detJ37 * w[2] * w[6] * nn37 +
-                                                detJ41 * w[3] * w[0] * nn41 +
-                                                detJ42 * w[3] * w[1] * nn42 +
-                                                detJ43 * w[3] * w[2] * nn43 +
-                                                detJ44 * w[3] * w[3] * nn44 +
-                                                detJ45 * w[3] * w[4] * nn45 +
-                                                detJ46 * w[3] * w[5] * nn46 +
-                                                detJ47 * w[3] * w[6] * nn47 +
-                                                detJ51 * w[4] * w[0] * nn51 +
-                                                detJ52 * w[4] * w[1] * nn52 +
-                                                detJ53 * w[4] * w[2] * nn53 +
-                                                detJ54 * w[4] * w[3] * nn54 +
-                                                detJ55 * w[4] * w[4] * nn55 +
-                                                detJ56 * w[4] * w[5] * nn56 +
-                                                detJ57 * w[4] * w[6] * nn57 +
-                                                detJ61 * w[5] * w[0] * nn61 +
-                                                detJ62 * w[5] * w[1] * nn62 +
-                                                detJ63 * w[5] * w[2] * nn63 +
-                                                detJ64 * w[5] * w[3] * nn64 +
-                                                detJ65 * w[5] * w[4] * nn65 +
-                                                detJ66 * w[5] * w[5] * nn66 +
-                                                detJ67 * w[5] * w[6] * nn67 +
-                                                detJ71 * w[6] * w[0] * nn71 +
-                                                detJ72 * w[6] * w[1] * nn72 +
-                                                detJ73 * w[6] * w[2] * nn73 +
-                                                detJ74 * w[6] * w[3] * nn74 +
-                                                detJ75 * w[6] * w[4] * nn75 +
-                                                detJ76 * w[6] * w[5] * nn76 +
-                                                detJ77 * w[6] * w[6] * nn77))
-
-            # the lumped mass matrix for 7 Gauss points
-            massL = np.zeros((10, 10), dtype=float)
-            row, col = np.diag_indices_from(massC)
-            massL[row, col] = massC.sum(axis=1)
-
-            # the mass matrix is the average of the above two mass matrices
-            mass = 0.5 * (massC + massL)
-        return mass
-
-    def stiffnessMatrix(self, M, sp, st, ss):
-        # current vertex coordinates in pentagonal frame of reference
-        x1 = (self._v1x, self._v1y)
-        x2 = (self._v2x, self._v2y)
-        x3 = (self._v3x, self._v3y)
-        x4 = (self._v4x, self._v4y)
-        x5 = (self._v5x, self._v5y)
-
-        # assign coordinates at the vertices in the reference configuration
-        x01 = (self._v1x0, self._v1y0)
-        x02 = (self._v2x0, self._v2y0)
-        x03 = (self._v3x0, self._v3y0)
-        x04 = (self._v4x0, self._v4y0)
-        x05 = (self._v5x0, self._v5y0)
-
-        # create the stress matrix
-        T = np.zeros((2, 2), dtype=float)
-        T[0, 0] = sp
-        T[0, 1] = st
-        T[1, 0] = st
-        T[1, 1] = ss
-
-        # determine the stiffness matrix
-        if self._pentGaussPts == 1:
-            # 'natural' weight of the element
-            w = np.array([2.3776412907378837])
-
-            jacob = self._pentShapeFns[11].jacobian(x1, x2, x3, x4, x5)
-
-            # determinant of the Jacobian matrix
-            detJ = det(jacob)
-
-            # create the linear Bmatrix
-            BL = self._pentShapeFns[11].BLinear(x1, x2, x3, x4, x5)
-            # the linear stiffness matrix for 1 Gauss point
-            KL = self._width * (detJ * w[0] * w[0] * BL.T.dot(M).dot(BL))
-
-            # create the nonlinear Bmatrix
-            BNF = self._pentShapeFns[11].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS = self._pentShapeFns[11].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            # total nonlinear Bmatrix
-            BN = np.add(BNF, BNS)
-
-            # creat the H1 matrix
-            HF = self._pentShapeFns[11].HmatrixF(x1, x2, x3, x4, x5)
-            # creat the H2 matrix
-            HS = self._pentShapeFns[11].HmatrixS(x1, x2, x3, x4, x5)
-
-            # the nonlinear stiffness matrix for 1 Gauss point
-            KN = self._width * (detJ * w[0] * w[0] * (BL.T.dot(M).dot(BN) +
-                                BN.T.dot(M).dot(BL) + BN.T.dot(M).dot(BN)))
-
-            # create the stress stiffness matrix
-            KS = self._width * (detJ * w[0] * w[0] * HF.T.dot(T).dot(HF) +
-                                detJ * w[0] * w[0] * HS.T.dot(T).dot(HS))
-
-            # determine the total tangent stiffness matrix
-            stiffT = KL + KN + KS
-
-        elif self._pentGaussPts == 4:
-            # 'natural' weights of the element
-            w = np.array([0.5449124407446143, 0.6439082046243272,
-                          0.5449124407446146, 0.6439082046243275])
-
-            jacob11 = self._pentShapeFns[11].jacobian(x1, x2, x3, x4, x5)
-            jacob12 = self._pentShapeFns[12].jacobian(x1, x2, x3, x4, x5)
-            jacob13 = self._pentShapeFns[13].jacobian(x1, x2, x3, x4, x5)
-            jacob14 = self._pentShapeFns[14].jacobian(x1, x2, x3, x4, x5)
-
-            jacob21 = self._pentShapeFns[21].jacobian(x1, x2, x3, x4, x5)
-            jacob22 = self._pentShapeFns[22].jacobian(x1, x2, x3, x4, x5)
-            jacob23 = self._pentShapeFns[23].jacobian(x1, x2, x3, x4, x5)
-            jacob24 = self._pentShapeFns[24].jacobian(x1, x2, x3, x4, x5)
-
-            jacob31 = self._pentShapeFns[31].jacobian(x1, x2, x3, x4, x5)
-            jacob32 = self._pentShapeFns[32].jacobian(x1, x2, x3, x4, x5)
-            jacob33 = self._pentShapeFns[33].jacobian(x1, x2, x3, x4, x5)
-            jacob34 = self._pentShapeFns[34].jacobian(x1, x2, x3, x4, x5)
-
-            jacob41 = self._pentShapeFns[41].jacobian(x1, x2, x3, x4, x5)
-            jacob42 = self._pentShapeFns[42].jacobian(x1, x2, x3, x4, x5)
-            jacob43 = self._pentShapeFns[43].jacobian(x1, x2, x3, x4, x5)
-            jacob44 = self._pentShapeFns[44].jacobian(x1, x2, x3, x4, x5)
-
-            # determinant of the Jacobian matrix
-            detJ11 = det(jacob11)
-            detJ12 = det(jacob12)
-            detJ13 = det(jacob13)
-            detJ14 = det(jacob14)
-
-            detJ21 = det(jacob21)
-            detJ22 = det(jacob22)
-            detJ23 = det(jacob23)
-            detJ24 = det(jacob24)
-
-            detJ31 = det(jacob31)
-            detJ32 = det(jacob32)
-            detJ33 = det(jacob33)
-            detJ34 = det(jacob34)
-
-            detJ41 = det(jacob41)
-            detJ42 = det(jacob42)
-            detJ43 = det(jacob43)
-            detJ44 = det(jacob44)
-
-            # create the linear Bmatrix
-            BL11 = self._pentShapeFns[11].BLinear(x1, x2, x3, x4, x5)
-            BL12 = self._pentShapeFns[12].BLinear(x1, x2, x3, x4, x5)
-            BL13 = self._pentShapeFns[13].BLinear(x1, x2, x3, x4, x5)
-            BL14 = self._pentShapeFns[14].BLinear(x1, x2, x3, x4, x5)
-
-            BL21 = self._pentShapeFns[21].BLinear(x1, x2, x3, x4, x5)
-            BL22 = self._pentShapeFns[22].BLinear(x1, x2, x3, x4, x5)
-            BL23 = self._pentShapeFns[23].BLinear(x1, x2, x3, x4, x5)
-            BL24 = self._pentShapeFns[24].BLinear(x1, x2, x3, x4, x5)
-
-            BL31 = self._pentShapeFns[31].BLinear(x1, x2, x3, x4, x5)
-            BL32 = self._pentShapeFns[32].BLinear(x1, x2, x3, x4, x5)
-            BL33 = self._pentShapeFns[33].BLinear(x1, x2, x3, x4, x5)
-            BL34 = self._pentShapeFns[34].BLinear(x1, x2, x3, x4, x5)
-
-            BL41 = self._pentShapeFns[41].BLinear(x1, x2, x3, x4, x5)
-            BL42 = self._pentShapeFns[42].BLinear(x1, x2, x3, x4, x5)
-            BL43 = self._pentShapeFns[43].BLinear(x1, x2, x3, x4, x5)
-            BL44 = self._pentShapeFns[44].BLinear(x1, x2, x3, x4, x5)
-
-            # the linear stiffness matrix for 4 Gauss points
-            KL = self._width * (detJ11 * w[0] * w[0] * BL11.T.dot(M).dot(BL11)+
-                                detJ12 * w[0] * w[1] * BL12.T.dot(M).dot(BL12)+
-                                detJ13 * w[0] * w[2] * BL13.T.dot(M).dot(BL13)+
-                                detJ14 * w[0] * w[3] * BL14.T.dot(M).dot(BL14)+
-                                detJ21 * w[1] * w[0] * BL21.T.dot(M).dot(BL21)+
-                                detJ22 * w[1] * w[1] * BL22.T.dot(M).dot(BL22)+
-                                detJ23 * w[1] * w[2] * BL23.T.dot(M).dot(BL23)+
-                                detJ24 * w[1] * w[3] * BL24.T.dot(M).dot(BL24)+
-                                detJ31 * w[2] * w[0] * BL31.T.dot(M).dot(BL31)+
-                                detJ32 * w[2] * w[1] * BL32.T.dot(M).dot(BL32)+
-                                detJ33 * w[2] * w[2] * BL33.T.dot(M).dot(BL33)+
-                                detJ34 * w[2] * w[3] * BL34.T.dot(M).dot(BL34)+
-                                detJ41 * w[3] * w[0] * BL41.T.dot(M).dot(BL41)+
-                                detJ42 * w[3] * w[1] * BL42.T.dot(M).dot(BL42)+
-                                detJ43 * w[3] * w[2] * BL43.T.dot(M).dot(BL43)+
-                                detJ44 * w[3] * w[3] * BL44.T.dot(M).dot(BL44))
-
-            # create the first nonlinear Bmatrix
-            BNF11 = self._pentShapeFns[11].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF12 = self._pentShapeFns[12].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF13 = self._pentShapeFns[13].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF14 = self._pentShapeFns[14].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNF21 = self._pentShapeFns[21].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF22 = self._pentShapeFns[22].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF23 = self._pentShapeFns[23].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF24 = self._pentShapeFns[24].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNF31 = self._pentShapeFns[31].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF32 = self._pentShapeFns[32].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF33 = self._pentShapeFns[33].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF34 = self._pentShapeFns[34].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNF41 = self._pentShapeFns[41].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF42 = self._pentShapeFns[42].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF43 = self._pentShapeFns[43].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF44 = self._pentShapeFns[44].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            # create the second nonlinear Bmatrix
-            BNS11 = self._pentShapeFns[11].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS12 = self._pentShapeFns[12].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS13 = self._pentShapeFns[13].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS14 = self._pentShapeFns[14].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNS21 = self._pentShapeFns[21].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS22 = self._pentShapeFns[22].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS23 = self._pentShapeFns[23].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS24 = self._pentShapeFns[24].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNS31 = self._pentShapeFns[31].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS32 = self._pentShapeFns[32].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS33 = self._pentShapeFns[33].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS34 = self._pentShapeFns[34].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNS41 = self._pentShapeFns[41].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS42 = self._pentShapeFns[42].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS43 = self._pentShapeFns[43].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS44 = self._pentShapeFns[44].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            # total nonlinear Bmatrix
-            BN11 = np.add(BNF11, BNS11)
-            BN12 = np.add(BNF12, BNS12)
-            BN13 = np.add(BNF13, BNS13)
-            BN14 = np.add(BNF14, BNS14)
-
-            BN21 = np.add(BNF21, BNS21)
-            BN22 = np.add(BNF22, BNS22)
-            BN23 = np.add(BNF23, BNS23)
-            BN24 = np.add(BNF24, BNS24)
-
-            BN31 = np.add(BNF31, BNS31)
-            BN32 = np.add(BNF32, BNS32)
-            BN33 = np.add(BNF33, BNS33)
-            BN34 = np.add(BNF34, BNS34)
-
-            BN41 = np.add(BNF41, BNS41)
-            BN42 = np.add(BNF42, BNS42)
-            BN43 = np.add(BNF43, BNS43)
-            BN44 = np.add(BNF44, BNS44)
-
-            # create the first H matrix
-            HF11 = self._pentShapeFns[11].HmatrixF(x1, x2, x3, x4, x5)
-            HF12 = self._pentShapeFns[12].HmatrixF(x1, x2, x3, x4, x5)
-            HF13 = self._pentShapeFns[13].HmatrixF(x1, x2, x3, x4, x5)
-            HF14 = self._pentShapeFns[14].HmatrixF(x1, x2, x3, x4, x5)
-
-            HF21 = self._pentShapeFns[21].HmatrixF(x1, x2, x3, x4, x5)
-            HF22 = self._pentShapeFns[22].HmatrixF(x1, x2, x3, x4, x5)
-            HF23 = self._pentShapeFns[23].HmatrixF(x1, x2, x3, x4, x5)
-            HF24 = self._pentShapeFns[24].HmatrixF(x1, x2, x3, x4, x5)
-
-            HF31 = self._pentShapeFns[31].HmatrixF(x1, x2, x3, x4, x5)
-            HF32 = self._pentShapeFns[32].HmatrixF(x1, x2, x3, x4, x5)
-            HF33 = self._pentShapeFns[33].HmatrixF(x1, x2, x3, x4, x5)
-            HF34 = self._pentShapeFns[34].HmatrixF(x1, x2, x3, x4, x5)
-
-            HF41 = self._pentShapeFns[41].HmatrixF(x1, x2, x3, x4, x5)
-            HF42 = self._pentShapeFns[42].HmatrixF(x1, x2, x3, x4, x5)
-            HF43 = self._pentShapeFns[43].HmatrixF(x1, x2, x3, x4, x5)
-            HF44 = self._pentShapeFns[44].HmatrixF(x1, x2, x3, x4, x5)
-
-            # create the second H matrix
-            HS11 = self._pentShapeFns[11].HmatrixS(x1, x2, x3, x4, x5)
-            HS12 = self._pentShapeFns[12].HmatrixS(x1, x2, x3, x4, x5)
-            HS13 = self._pentShapeFns[13].HmatrixS(x1, x2, x3, x4, x5)
-            HS14 = self._pentShapeFns[14].HmatrixS(x1, x2, x3, x4, x5)
-
-            HS21 = self._pentShapeFns[21].HmatrixS(x1, x2, x3, x4, x5)
-            HS22 = self._pentShapeFns[22].HmatrixS(x1, x2, x3, x4, x5)
-            HS23 = self._pentShapeFns[23].HmatrixS(x1, x2, x3, x4, x5)
-            HS24 = self._pentShapeFns[24].HmatrixS(x1, x2, x3, x4, x5)
-
-            HS31 = self._pentShapeFns[31].HmatrixS(x1, x2, x3, x4, x5)
-            HS32 = self._pentShapeFns[32].HmatrixS(x1, x2, x3, x4, x5)
-            HS33 = self._pentShapeFns[33].HmatrixS(x1, x2, x3, x4, x5)
-            HS34 = self._pentShapeFns[34].HmatrixS(x1, x2, x3, x4, x5)
-
-            HS41 = self._pentShapeFns[41].HmatrixS(x1, x2, x3, x4, x5)
-            HS42 = self._pentShapeFns[42].HmatrixS(x1, x2, x3, x4, x5)
-            HS43 = self._pentShapeFns[43].HmatrixS(x1, x2, x3, x4, x5)
-            HS44 = self._pentShapeFns[44].HmatrixS(x1, x2, x3, x4, x5)
-
-
-            # the nonlinear stiffness matrix for 4 Gauss point
-            f11 = (BL11.T.dot(M).dot(BN11) + BN11.T.dot(M).dot(BL11) +
-                   BN11.T.dot(M).dot(BN11))
-            f12 = (BL12.T.dot(M).dot(BN12) + BN12.T.dot(M).dot(BL12) +
-                   BN12.T.dot(M).dot(BN12))
-            f13 = (BL13.T.dot(M).dot(BN13) + BN13.T.dot(M).dot(BL13) +
-                   BN13.T.dot(M).dot(BN13))
-            f14 = (BL14.T.dot(M).dot(BN14) + BN14.T.dot(M).dot(BL14) +
-                   BN14.T.dot(M).dot(BN14))
-
-            f21 = (BL21.T.dot(M).dot(BN21) + BN21.T.dot(M).dot(BL21) +
-                   BN21.T.dot(M).dot(BN21))
-            f22 = (BL22.T.dot(M).dot(BN22) + BN22.T.dot(M).dot(BL22) +
-                   BN22.T.dot(M).dot(BN22))
-            f23 = (BL23.T.dot(M).dot(BN23) + BN23.T.dot(M).dot(BL23) +
-                   BN23.T.dot(M).dot(BN23))
-            f24 = (BL24.T.dot(M).dot(BN24) + BN24.T.dot(M).dot(BL24) +
-                   BN24.T.dot(M).dot(BN24))
-
-            f31 = (BL31.T.dot(M).dot(BN31) + BN31.T.dot(M).dot(BL31) +
-                   BN31.T.dot(M).dot(BN31))
-            f32 = (BL32.T.dot(M).dot(BN32) + BN32.T.dot(M).dot(BL32) +
-                   BN32.T.dot(M).dot(BN32))
-            f33 = (BL33.T.dot(M).dot(BN33) + BN33.T.dot(M).dot(BL33) +
-                   BN33.T.dot(M).dot(BN33))
-            f34 = (BL34.T.dot(M).dot(BN34) + BN34.T.dot(M).dot(BL34) +
-                   BN34.T.dot(M).dot(BN34))
-
-            f41 = (BL41.T.dot(M).dot(BN41) + BN41.T.dot(M).dot(BL41) +
-                   BN41.T.dot(M).dot(BN41))
-            f42 = (BL42.T.dot(M).dot(BN42) + BN42.T.dot(M).dot(BL42) +
-                   BN42.T.dot(M).dot(BN42))
-            f43 = (BL43.T.dot(M).dot(BN43) + BN43.T.dot(M).dot(BL43) +
-                   BN43.T.dot(M).dot(BN43))
-            f44 = (BL44.T.dot(M).dot(BN44) + BN44.T.dot(M).dot(BL44) +
-                   BN44.T.dot(M).dot(BN44))
-
-
-            KN = (self._width * (detJ11 * w[0] * w[0] * f11 +
-                                 detJ12 * w[0] * w[1] * f12 +
-                                 detJ13 * w[0] * w[2] * f13 +
-                                 detJ14 * w[0] * w[3] * f14 +
-                                 detJ21 * w[1] * w[0] * f21 +
-                                 detJ22 * w[1] * w[1] * f22 +
-                                 detJ23 * w[1] * w[2] * f23 +
-                                 detJ24 * w[1] * w[3] * f24 +
-                                 detJ31 * w[2] * w[0] * f31 +
-                                 detJ32 * w[2] * w[1] * f32 +
-                                 detJ33 * w[2] * w[2] * f33 +
-                                 detJ34 * w[2] * w[3] * f34 +
-                                 detJ41 * w[3] * w[0] * f41 +
-                                 detJ42 * w[3] * w[1] * f42 +
-                                 detJ43 * w[3] * w[2] * f43 +
-                                 detJ44 * w[3] * w[3] * f44))
-
-            # create the stress stiffness matrix
-            KS = self._width * (detJ11 * w[0] * w[0] * HF11.T.dot(T).dot(HF11)+
-                                detJ12 * w[0] * w[1] * HF12.T.dot(T).dot(HF12)+
-                                detJ13 * w[0] * w[2] * HF13.T.dot(T).dot(HF13)+
-                                detJ14 * w[0] * w[3] * HF14.T.dot(T).dot(HF14)+
-                                detJ11 * w[0] * w[0] * HS11.T.dot(T).dot(HS11)+
-                                detJ12 * w[0] * w[1] * HS12.T.dot(T).dot(HS12)+
-                                detJ13 * w[0] * w[2] * HS13.T.dot(T).dot(HS13)+
-                                detJ14 * w[0] * w[3] * HS14.T.dot(T).dot(HS14)+
-                                detJ21 * w[1] * w[0] * HF21.T.dot(T).dot(HF21)+
-                                detJ22 * w[1] * w[1] * HF22.T.dot(T).dot(HF22)+
-                                detJ23 * w[1] * w[2] * HF23.T.dot(T).dot(HF23)+
-                                detJ24 * w[1] * w[3] * HF24.T.dot(T).dot(HF24)+
-                                detJ21 * w[1] * w[0] * HS21.T.dot(T).dot(HS21)+
-                                detJ22 * w[1] * w[1] * HS22.T.dot(T).dot(HS22)+
-                                detJ23 * w[1] * w[2] * HS23.T.dot(T).dot(HS23)+
-                                detJ24 * w[1] * w[3] * HS24.T.dot(T).dot(HS24)+
-                                detJ31 * w[2] * w[0] * HF31.T.dot(T).dot(HF31)+
-                                detJ32 * w[2] * w[1] * HF32.T.dot(T).dot(HF32)+
-                                detJ33 * w[2] * w[2] * HF33.T.dot(T).dot(HF33)+
-                                detJ34 * w[2] * w[3] * HF34.T.dot(T).dot(HF34)+
-                                detJ31 * w[2] * w[0] * HS31.T.dot(T).dot(HS31)+
-                                detJ32 * w[2] * w[1] * HS32.T.dot(T).dot(HS32)+
-                                detJ33 * w[2] * w[2] * HS33.T.dot(T).dot(HS33)+
-                                detJ34 * w[2] * w[3] * HS34.T.dot(T).dot(HS34)+
-                                detJ41 * w[3] * w[0] * HF41.T.dot(T).dot(HF41)+
-                                detJ42 * w[3] * w[1] * HF42.T.dot(T).dot(HF42)+
-                                detJ43 * w[3] * w[2] * HF43.T.dot(T).dot(HF43)+
-                                detJ44 * w[3] * w[3] * HF44.T.dot(T).dot(HF44)+
-                                detJ41 * w[3] * w[0] * HS41.T.dot(T).dot(HS41)+
-                                detJ42 * w[3] * w[1] * HS42.T.dot(T).dot(HS42)+
-                                detJ43 * w[3] * w[2] * HS43.T.dot(T).dot(HS43)+
-                                detJ44 * w[3] * w[3] * HS44.T.dot(T).dot(HS44))
-
-            # determine the total tangent stiffness matrix
-            stiffT = KL + KN + KS
-
-        else:  # pentGaussPts = 7
-            # 'natural' weights of the element
-            w = np.array([0.6257871064166934, 0.3016384608809768,
-                            0.3169910433902452, 0.3155445150066620,
-                            0.2958801959111726, 0.2575426306970870,
-                            0.2642573384350463])
-
-            jacob11 = self._pentShapeFns[11].jacobian(x1, x2, x3, x4, x5)
-            jacob12 = self._pentShapeFns[12].jacobian(x1, x2, x3, x4, x5)
-            jacob13 = self._pentShapeFns[13].jacobian(x1, x2, x3, x4, x5)
-            jacob14 = self._pentShapeFns[14].jacobian(x1, x2, x3, x4, x5)
-            jacob15 = self._pentShapeFns[15].jacobian(x1, x2, x3, x4, x5)
-            jacob16 = self._pentShapeFns[16].jacobian(x1, x2, x3, x4, x5)
-            jacob17 = self._pentShapeFns[17].jacobian(x1, x2, x3, x4, x5)
-
-            jacob21 = self._pentShapeFns[21].jacobian(x1, x2, x3, x4, x5)
-            jacob22 = self._pentShapeFns[22].jacobian(x1, x2, x3, x4, x5)
-            jacob23 = self._pentShapeFns[23].jacobian(x1, x2, x3, x4, x5)
-            jacob24 = self._pentShapeFns[24].jacobian(x1, x2, x3, x4, x5)
-            jacob25 = self._pentShapeFns[25].jacobian(x1, x2, x3, x4, x5)
-            jacob26 = self._pentShapeFns[26].jacobian(x1, x2, x3, x4, x5)
-            jacob27 = self._pentShapeFns[27].jacobian(x1, x2, x3, x4, x5)
-
-            jacob31 = self._pentShapeFns[31].jacobian(x1, x2, x3, x4, x5)
-            jacob32 = self._pentShapeFns[32].jacobian(x1, x2, x3, x4, x5)
-            jacob33 = self._pentShapeFns[33].jacobian(x1, x2, x3, x4, x5)
-            jacob34 = self._pentShapeFns[34].jacobian(x1, x2, x3, x4, x5)
-            jacob35 = self._pentShapeFns[35].jacobian(x1, x2, x3, x4, x5)
-            jacob36 = self._pentShapeFns[36].jacobian(x1, x2, x3, x4, x5)
-            jacob37 = self._pentShapeFns[37].jacobian(x1, x2, x3, x4, x5)
-
-            jacob41 = self._pentShapeFns[41].jacobian(x1, x2, x3, x4, x5)
-            jacob42 = self._pentShapeFns[42].jacobian(x1, x2, x3, x4, x5)
-            jacob43 = self._pentShapeFns[43].jacobian(x1, x2, x3, x4, x5)
-            jacob44 = self._pentShapeFns[44].jacobian(x1, x2, x3, x4, x5)
-            jacob45 = self._pentShapeFns[45].jacobian(x1, x2, x3, x4, x5)
-            jacob46 = self._pentShapeFns[46].jacobian(x1, x2, x3, x4, x5)
-            jacob47 = self._pentShapeFns[47].jacobian(x1, x2, x3, x4, x5)
-
-            jacob51 = self._pentShapeFns[51].jacobian(x1, x2, x3, x4, x5)
-            jacob52 = self._pentShapeFns[52].jacobian(x1, x2, x3, x4, x5)
-            jacob53 = self._pentShapeFns[53].jacobian(x1, x2, x3, x4, x5)
-            jacob54 = self._pentShapeFns[54].jacobian(x1, x2, x3, x4, x5)
-            jacob55 = self._pentShapeFns[55].jacobian(x1, x2, x3, x4, x5)
-            jacob56 = self._pentShapeFns[56].jacobian(x1, x2, x3, x4, x5)
-            jacob57 = self._pentShapeFns[57].jacobian(x1, x2, x3, x4, x5)
-
-            jacob61 = self._pentShapeFns[61].jacobian(x1, x2, x3, x4, x5)
-            jacob62 = self._pentShapeFns[62].jacobian(x1, x2, x3, x4, x5)
-            jacob63 = self._pentShapeFns[63].jacobian(x1, x2, x3, x4, x5)
-            jacob64 = self._pentShapeFns[64].jacobian(x1, x2, x3, x4, x5)
-            jacob65 = self._pentShapeFns[65].jacobian(x1, x2, x3, x4, x5)
-            jacob66 = self._pentShapeFns[66].jacobian(x1, x2, x3, x4, x5)
-            jacob67 = self._pentShapeFns[67].jacobian(x1, x2, x3, x4, x5)
-
-            jacob71 = self._pentShapeFns[71].jacobian(x1, x2, x3, x4, x5)
-            jacob72 = self._pentShapeFns[72].jacobian(x1, x2, x3, x4, x5)
-            jacob73 = self._pentShapeFns[73].jacobian(x1, x2, x3, x4, x5)
-            jacob74 = self._pentShapeFns[74].jacobian(x1, x2, x3, x4, x5)
-            jacob75 = self._pentShapeFns[75].jacobian(x1, x2, x3, x4, x5)
-            jacob76 = self._pentShapeFns[76].jacobian(x1, x2, x3, x4, x5)
-            jacob77 = self._pentShapeFns[77].jacobian(x1, x2, x3, x4, x5)
-
-            # determinant of the Jacobian matrix
-            detJ11 = det(jacob11)
-            detJ12 = det(jacob12)
-            detJ13 = det(jacob13)
-            detJ14 = det(jacob14)
-            detJ15 = det(jacob15)
-            detJ16 = det(jacob16)
-            detJ17 = det(jacob17)
-
-            detJ21 = det(jacob21)
-            detJ22 = det(jacob22)
-            detJ23 = det(jacob23)
-            detJ24 = det(jacob24)
-            detJ25 = det(jacob25)
-            detJ26 = det(jacob26)
-            detJ27 = det(jacob27)
-
-            detJ31 = det(jacob31)
-            detJ32 = det(jacob32)
-            detJ33 = det(jacob33)
-            detJ34 = det(jacob34)
-            detJ35 = det(jacob35)
-            detJ36 = det(jacob36)
-            detJ37 = det(jacob37)
-
-            detJ41 = det(jacob41)
-            detJ42 = det(jacob42)
-            detJ43 = det(jacob43)
-            detJ44 = det(jacob44)
-            detJ45 = det(jacob45)
-            detJ46 = det(jacob46)
-            detJ47 = det(jacob47)
-
-            detJ51 = det(jacob51)
-            detJ52 = det(jacob52)
-            detJ53 = det(jacob53)
-            detJ54 = det(jacob54)
-            detJ55 = det(jacob55)
-            detJ56 = det(jacob56)
-            detJ57 = det(jacob57)
-
-            detJ61 = det(jacob61)
-            detJ62 = det(jacob62)
-            detJ63 = det(jacob63)
-            detJ64 = det(jacob64)
-            detJ65 = det(jacob65)
-            detJ66 = det(jacob66)
-            detJ67 = det(jacob67)
-
-            detJ71 = det(jacob71)
-            detJ72 = det(jacob72)
-            detJ73 = det(jacob73)
-            detJ74 = det(jacob74)
-            detJ75 = det(jacob75)
-            detJ76 = det(jacob76)
-            detJ77 = det(jacob77)
-
-            # create the linear Bmatrix
-            BL11 = self._pentShapeFns[11].BLinear(x1, x2, x3, x4, x5)
-            BL12 = self._pentShapeFns[12].BLinear(x1, x2, x3, x4, x5)
-            BL13 = self._pentShapeFns[13].BLinear(x1, x2, x3, x4, x5)
-            BL14 = self._pentShapeFns[14].BLinear(x1, x2, x3, x4, x5)
-            BL15 = self._pentShapeFns[15].BLinear(x1, x2, x3, x4, x5)
-            BL16 = self._pentShapeFns[16].BLinear(x1, x2, x3, x4, x5)
-            BL17 = self._pentShapeFns[17].BLinear(x1, x2, x3, x4, x5)
-
-            BL21 = self._pentShapeFns[21].BLinear(x1, x2, x3, x4, x5)
-            BL22 = self._pentShapeFns[22].BLinear(x1, x2, x3, x4, x5)
-            BL23 = self._pentShapeFns[23].BLinear(x1, x2, x3, x4, x5)
-            BL24 = self._pentShapeFns[24].BLinear(x1, x2, x3, x4, x5)
-            BL25 = self._pentShapeFns[25].BLinear(x1, x2, x3, x4, x5)
-            BL26 = self._pentShapeFns[26].BLinear(x1, x2, x3, x4, x5)
-            BL27 = self._pentShapeFns[27].BLinear(x1, x2, x3, x4, x5)
-
-            BL31 = self._pentShapeFns[31].BLinear(x1, x2, x3, x4, x5)
-            BL32 = self._pentShapeFns[32].BLinear(x1, x2, x3, x4, x5)
-            BL33 = self._pentShapeFns[33].BLinear(x1, x2, x3, x4, x5)
-            BL34 = self._pentShapeFns[34].BLinear(x1, x2, x3, x4, x5)
-            BL35 = self._pentShapeFns[35].BLinear(x1, x2, x3, x4, x5)
-            BL36 = self._pentShapeFns[36].BLinear(x1, x2, x3, x4, x5)
-            BL37 = self._pentShapeFns[37].BLinear(x1, x2, x3, x4, x5)
-
-            BL41 = self._pentShapeFns[41].BLinear(x1, x2, x3, x4, x5)
-            BL42 = self._pentShapeFns[42].BLinear(x1, x2, x3, x4, x5)
-            BL43 = self._pentShapeFns[43].BLinear(x1, x2, x3, x4, x5)
-            BL44 = self._pentShapeFns[44].BLinear(x1, x2, x3, x4, x5)
-            BL45 = self._pentShapeFns[45].BLinear(x1, x2, x3, x4, x5)
-            BL46 = self._pentShapeFns[46].BLinear(x1, x2, x3, x4, x5)
-            BL47 = self._pentShapeFns[47].BLinear(x1, x2, x3, x4, x5)
-
-            BL51 = self._pentShapeFns[51].BLinear(x1, x2, x3, x4, x5)
-            BL52 = self._pentShapeFns[52].BLinear(x1, x2, x3, x4, x5)
-            BL53 = self._pentShapeFns[53].BLinear(x1, x2, x3, x4, x5)
-            BL54 = self._pentShapeFns[54].BLinear(x1, x2, x3, x4, x5)
-            BL55 = self._pentShapeFns[55].BLinear(x1, x2, x3, x4, x5)
-            BL56 = self._pentShapeFns[56].BLinear(x1, x2, x3, x4, x5)
-            BL57 = self._pentShapeFns[57].BLinear(x1, x2, x3, x4, x5)
-
-            BL61 = self._pentShapeFns[61].BLinear(x1, x2, x3, x4, x5)
-            BL62 = self._pentShapeFns[62].BLinear(x1, x2, x3, x4, x5)
-            BL63 = self._pentShapeFns[63].BLinear(x1, x2, x3, x4, x5)
-            BL64 = self._pentShapeFns[64].BLinear(x1, x2, x3, x4, x5)
-            BL65 = self._pentShapeFns[65].BLinear(x1, x2, x3, x4, x5)
-            BL66 = self._pentShapeFns[66].BLinear(x1, x2, x3, x4, x5)
-            BL67 = self._pentShapeFns[67].BLinear(x1, x2, x3, x4, x5)
-
-            BL71 = self._pentShapeFns[71].BLinear(x1, x2, x3, x4, x5)
-            BL72 = self._pentShapeFns[72].BLinear(x1, x2, x3, x4, x5)
-            BL73 = self._pentShapeFns[73].BLinear(x1, x2, x3, x4, x5)
-            BL74 = self._pentShapeFns[74].BLinear(x1, x2, x3, x4, x5)
-            BL75 = self._pentShapeFns[75].BLinear(x1, x2, x3, x4, x5)
-            BL76 = self._pentShapeFns[76].BLinear(x1, x2, x3, x4, x5)
-            BL77 = self._pentShapeFns[77].BLinear(x1, x2, x3, x4, x5)
-
-            # the consistent mass matrix for 7 Gauss points
-            KL = self._width * (detJ11 * w[0] * w[0] * BL11.T.dot(M).dot(BL11)+
-                                detJ12 * w[0] * w[1] * BL12.T.dot(M).dot(BL12)+
-                                detJ13 * w[0] * w[2] * BL13.T.dot(M).dot(BL13)+
-                                detJ14 * w[0] * w[3] * BL14.T.dot(M).dot(BL14)+
-                                detJ15 * w[0] * w[4] * BL15.T.dot(M).dot(BL15)+
-                                detJ16 * w[0] * w[5] * BL16.T.dot(M).dot(BL16)+
-                                detJ17 * w[0] * w[6] * BL17.T.dot(M).dot(BL17)+
-                                detJ21 * w[1] * w[0] * BL21.T.dot(M).dot(BL21)+
-                                detJ22 * w[1] * w[1] * BL22.T.dot(M).dot(BL22)+
-                                detJ23 * w[1] * w[2] * BL23.T.dot(M).dot(BL23)+
-                                detJ24 * w[1] * w[3] * BL24.T.dot(M).dot(BL24)+
-                                detJ25 * w[1] * w[4] * BL25.T.dot(M).dot(BL25)+
-                                detJ26 * w[1] * w[5] * BL26.T.dot(M).dot(BL26)+
-                                detJ27 * w[1] * w[6] * BL27.T.dot(M).dot(BL27)+
-                                detJ31 * w[2] * w[0] * BL31.T.dot(M).dot(BL31)+
-                                detJ32 * w[2] * w[1] * BL32.T.dot(M).dot(BL32)+
-                                detJ33 * w[2] * w[2] * BL33.T.dot(M).dot(BL33)+
-                                detJ34 * w[2] * w[3] * BL34.T.dot(M).dot(BL34)+
-                                detJ35 * w[2] * w[4] * BL35.T.dot(M).dot(BL35)+
-                                detJ36 * w[2] * w[5] * BL36.T.dot(M).dot(BL36)+
-                                detJ37 * w[2] * w[6] * BL37.T.dot(M).dot(BL37)+
-                                detJ41 * w[3] * w[0] * BL41.T.dot(M).dot(BL41)+
-                                detJ42 * w[3] * w[1] * BL42.T.dot(M).dot(BL42)+
-                                detJ43 * w[3] * w[2] * BL43.T.dot(M).dot(BL43)+
-                                detJ44 * w[3] * w[3] * BL44.T.dot(M).dot(BL44)+
-                                detJ45 * w[3] * w[4] * BL45.T.dot(M).dot(BL45)+
-                                detJ46 * w[3] * w[5] * BL46.T.dot(M).dot(BL46)+
-                                detJ47 * w[3] * w[6] * BL47.T.dot(M).dot(BL47)+
-                                detJ51 * w[4] * w[0] * BL51.T.dot(M).dot(BL51)+
-                                detJ52 * w[4] * w[1] * BL52.T.dot(M).dot(BL52)+
-                                detJ53 * w[4] * w[2] * BL53.T.dot(M).dot(BL53)+
-                                detJ54 * w[4] * w[3] * BL54.T.dot(M).dot(BL54)+
-                                detJ55 * w[4] * w[4] * BL55.T.dot(M).dot(BL55)+
-                                detJ56 * w[4] * w[5] * BL56.T.dot(M).dot(BL56)+
-                                detJ57 * w[4] * w[6] * BL57.T.dot(M).dot(BL57)+
-                                detJ61 * w[5] * w[0] * BL61.T.dot(M).dot(BL61)+
-                                detJ62 * w[5] * w[1] * BL62.T.dot(M).dot(BL62)+
-                                detJ63 * w[5] * w[2] * BL63.T.dot(M).dot(BL63)+
-                                detJ64 * w[5] * w[3] * BL64.T.dot(M).dot(BL64)+
-                                detJ65 * w[5] * w[4] * BL65.T.dot(M).dot(BL65)+
-                                detJ66 * w[5] * w[5] * BL66.T.dot(M).dot(BL66)+
-                                detJ67 * w[5] * w[6] * BL67.T.dot(M).dot(BL67)+
-                                detJ71 * w[6] * w[0] * BL71.T.dot(M).dot(BL71)+
-                                detJ72 * w[6] * w[1] * BL72.T.dot(M).dot(BL72)+
-                                detJ73 * w[6] * w[2] * BL73.T.dot(M).dot(BL73)+
-                                detJ74 * w[6] * w[3] * BL74.T.dot(M).dot(BL74)+
-                                detJ75 * w[6] * w[4] * BL75.T.dot(M).dot(BL75)+
-                                detJ76 * w[6] * w[5] * BL76.T.dot(M).dot(BL76)+
-                                detJ77 * w[6] * w[6] * BL77.T.dot(M).dot(BL77))
-
-            # create the first nonlinear Bmatrix
-            BNF11 = self._pentShapeFns[11].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF12 = self._pentShapeFns[12].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF13 = self._pentShapeFns[13].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF14 = self._pentShapeFns[14].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF15 = self._pentShapeFns[15].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF16 = self._pentShapeFns[16].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF17 = self._pentShapeFns[17].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNF21 = self._pentShapeFns[21].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF22 = self._pentShapeFns[22].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF23 = self._pentShapeFns[23].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF24 = self._pentShapeFns[24].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF25 = self._pentShapeFns[25].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF26 = self._pentShapeFns[26].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF27 = self._pentShapeFns[27].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNF31 = self._pentShapeFns[31].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF32 = self._pentShapeFns[32].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF33 = self._pentShapeFns[33].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF34 = self._pentShapeFns[34].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF35 = self._pentShapeFns[35].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF36 = self._pentShapeFns[36].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF37 = self._pentShapeFns[37].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNF41 = self._pentShapeFns[41].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF42 = self._pentShapeFns[42].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF43 = self._pentShapeFns[43].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF44 = self._pentShapeFns[44].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF45 = self._pentShapeFns[45].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF46 = self._pentShapeFns[46].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF47 = self._pentShapeFns[47].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNF51 = self._pentShapeFns[51].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF52 = self._pentShapeFns[52].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF53 = self._pentShapeFns[53].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF54 = self._pentShapeFns[54].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF55 = self._pentShapeFns[55].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF56 = self._pentShapeFns[56].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF57 = self._pentShapeFns[57].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNF61 = self._pentShapeFns[61].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF62 = self._pentShapeFns[62].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF63 = self._pentShapeFns[63].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF64 = self._pentShapeFns[64].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF65 = self._pentShapeFns[65].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF66 = self._pentShapeFns[66].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF67 = self._pentShapeFns[67].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNF71 = self._pentShapeFns[71].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF72 = self._pentShapeFns[72].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF73 = self._pentShapeFns[73].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF74 = self._pentShapeFns[74].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF75 = self._pentShapeFns[75].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF76 = self._pentShapeFns[76].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNF77 = self._pentShapeFns[77].FirstBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            # create the first nonlinear Bmatrix
-            BNS11 = self._pentShapeFns[11].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS12 = self._pentShapeFns[12].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS13 = self._pentShapeFns[13].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS14 = self._pentShapeFns[14].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS15 = self._pentShapeFns[15].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS16 = self._pentShapeFns[16].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS17 = self._pentShapeFns[17].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNS21 = self._pentShapeFns[21].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS22 = self._pentShapeFns[22].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS23 = self._pentShapeFns[23].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS24 = self._pentShapeFns[24].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS25 = self._pentShapeFns[25].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS26 = self._pentShapeFns[26].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS27 = self._pentShapeFns[27].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNS31 = self._pentShapeFns[31].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS32 = self._pentShapeFns[32].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS33 = self._pentShapeFns[33].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS34 = self._pentShapeFns[34].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS35 = self._pentShapeFns[35].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS36 = self._pentShapeFns[36].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS37 = self._pentShapeFns[37].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNS41 = self._pentShapeFns[41].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS42 = self._pentShapeFns[42].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS43 = self._pentShapeFns[43].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS44 = self._pentShapeFns[44].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS45 = self._pentShapeFns[45].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS46 = self._pentShapeFns[46].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS47 = self._pentShapeFns[47].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNS51 = self._pentShapeFns[51].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS52 = self._pentShapeFns[52].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS53 = self._pentShapeFns[53].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS54 = self._pentShapeFns[54].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS55 = self._pentShapeFns[55].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS56 = self._pentShapeFns[56].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS57 = self._pentShapeFns[57].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNS61 = self._pentShapeFns[61].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS62 = self._pentShapeFns[62].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS63 = self._pentShapeFns[63].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS64 = self._pentShapeFns[64].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS65 = self._pentShapeFns[65].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS66 = self._pentShapeFns[66].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS67 = self._pentShapeFns[67].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            BNS71 = self._pentShapeFns[71].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS72 = self._pentShapeFns[72].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS73 = self._pentShapeFns[73].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS74 = self._pentShapeFns[74].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS75 = self._pentShapeFns[75].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS76 = self._pentShapeFns[76].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-            BNS77 = self._pentShapeFns[77].SecondBNonLinear(x1, x2, x3, x4, x5,
-                                  x01, x02, x03, x04, x05)
-
-            # total nonlinear Bmatrix
-            BN11 = np.add(BNF11, BNS11)
-            BN12 = np.add(BNF12, BNS12)
-            BN13 = np.add(BNF13, BNS13)
-            BN14 = np.add(BNF14, BNS14)
-            BN15 = np.add(BNF15, BNS15)
-            BN16 = np.add(BNF16, BNS16)
-            BN17 = np.add(BNF17, BNS17)
-
-            BN21 = np.add(BNF21, BNS21)
-            BN22 = np.add(BNF22, BNS22)
-            BN23 = np.add(BNF23, BNS23)
-            BN24 = np.add(BNF24, BNS24)
-            BN25 = np.add(BNF25, BNS25)
-            BN26 = np.add(BNF26, BNS26)
-            BN27 = np.add(BNF27, BNS27)
-
-            BN31 = np.add(BNF31, BNS31)
-            BN32 = np.add(BNF32, BNS32)
-            BN33 = np.add(BNF33, BNS33)
-            BN34 = np.add(BNF34, BNS34)
-            BN35 = np.add(BNF35, BNS35)
-            BN36 = np.add(BNF36, BNS36)
-            BN37 = np.add(BNF37, BNS37)
-
-            BN41 = np.add(BNF41, BNS41)
-            BN42 = np.add(BNF42, BNS42)
-            BN43 = np.add(BNF43, BNS43)
-            BN44 = np.add(BNF44, BNS44)
-            BN45 = np.add(BNF45, BNS45)
-            BN46 = np.add(BNF46, BNS46)
-            BN47 = np.add(BNF47, BNS47)
-
-            BN51 = np.add(BNF51, BNS51)
-            BN52 = np.add(BNF52, BNS52)
-            BN53 = np.add(BNF53, BNS53)
-            BN54 = np.add(BNF54, BNS54)
-            BN55 = np.add(BNF55, BNS55)
-            BN56 = np.add(BNF56, BNS56)
-            BN57 = np.add(BNF57, BNS57)
-
-            BN61 = np.add(BNF61, BNS61)
-            BN62 = np.add(BNF62, BNS62)
-            BN63 = np.add(BNF63, BNS63)
-            BN64 = np.add(BNF64, BNS64)
-            BN65 = np.add(BNF65, BNS65)
-            BN66 = np.add(BNF66, BNS66)
-            BN67 = np.add(BNF67, BNS67)
-
-            BN71 = np.add(BNF71, BNS71)
-            BN72 = np.add(BNF72, BNS72)
-            BN73 = np.add(BNF73, BNS73)
-            BN74 = np.add(BNF74, BNS74)
-            BN75 = np.add(BNF75, BNS75)
-            BN76 = np.add(BNF76, BNS76)
-            BN77 = np.add(BNF77, BNS77)
-
-            # create the first H matrix
-            HF11 = self._pentShapeFns[11].HmatrixF(x1, x2, x3, x4, x5)
-            HF12 = self._pentShapeFns[12].HmatrixF(x1, x2, x3, x4, x5)
-            HF13 = self._pentShapeFns[13].HmatrixF(x1, x2, x3, x4, x5)
-            HF14 = self._pentShapeFns[14].HmatrixF(x1, x2, x3, x4, x5)
-            HF15 = self._pentShapeFns[15].HmatrixF(x1, x2, x3, x4, x5)
-            HF16 = self._pentShapeFns[16].HmatrixF(x1, x2, x3, x4, x5)
-            HF17 = self._pentShapeFns[17].HmatrixF(x1, x2, x3, x4, x5)
-
-            HF21 = self._pentShapeFns[21].HmatrixF(x1, x2, x3, x4, x5)
-            HF22 = self._pentShapeFns[22].HmatrixF(x1, x2, x3, x4, x5)
-            HF23 = self._pentShapeFns[23].HmatrixF(x1, x2, x3, x4, x5)
-            HF24 = self._pentShapeFns[24].HmatrixF(x1, x2, x3, x4, x5)
-            HF25 = self._pentShapeFns[25].HmatrixF(x1, x2, x3, x4, x5)
-            HF26 = self._pentShapeFns[26].HmatrixF(x1, x2, x3, x4, x5)
-            HF27 = self._pentShapeFns[27].HmatrixF(x1, x2, x3, x4, x5)
-
-            HF31 = self._pentShapeFns[31].HmatrixF(x1, x2, x3, x4, x5)
-            HF32 = self._pentShapeFns[32].HmatrixF(x1, x2, x3, x4, x5)
-            HF33 = self._pentShapeFns[33].HmatrixF(x1, x2, x3, x4, x5)
-            HF34 = self._pentShapeFns[34].HmatrixF(x1, x2, x3, x4, x5)
-            HF35 = self._pentShapeFns[35].HmatrixF(x1, x2, x3, x4, x5)
-            HF36 = self._pentShapeFns[36].HmatrixF(x1, x2, x3, x4, x5)
-            HF37 = self._pentShapeFns[37].HmatrixF(x1, x2, x3, x4, x5)
-
-            HF41 = self._pentShapeFns[41].HmatrixF(x1, x2, x3, x4, x5)
-            HF42 = self._pentShapeFns[42].HmatrixF(x1, x2, x3, x4, x5)
-            HF43 = self._pentShapeFns[43].HmatrixF(x1, x2, x3, x4, x5)
-            HF44 = self._pentShapeFns[44].HmatrixF(x1, x2, x3, x4, x5)
-            HF45 = self._pentShapeFns[45].HmatrixF(x1, x2, x3, x4, x5)
-            HF46 = self._pentShapeFns[46].HmatrixF(x1, x2, x3, x4, x5)
-            HF47 = self._pentShapeFns[47].HmatrixF(x1, x2, x3, x4, x5)
-
-            HF51 = self._pentShapeFns[51].HmatrixF(x1, x2, x3, x4, x5)
-            HF52 = self._pentShapeFns[52].HmatrixF(x1, x2, x3, x4, x5)
-            HF53 = self._pentShapeFns[53].HmatrixF(x1, x2, x3, x4, x5)
-            HF54 = self._pentShapeFns[54].HmatrixF(x1, x2, x3, x4, x5)
-            HF55 = self._pentShapeFns[55].HmatrixF(x1, x2, x3, x4, x5)
-            HF56 = self._pentShapeFns[56].HmatrixF(x1, x2, x3, x4, x5)
-            HF57 = self._pentShapeFns[57].HmatrixF(x1, x2, x3, x4, x5)
-
-            HF61 = self._pentShapeFns[61].HmatrixF(x1, x2, x3, x4, x5)
-            HF62 = self._pentShapeFns[62].HmatrixF(x1, x2, x3, x4, x5)
-            HF63 = self._pentShapeFns[63].HmatrixF(x1, x2, x3, x4, x5)
-            HF64 = self._pentShapeFns[64].HmatrixF(x1, x2, x3, x4, x5)
-            HF65 = self._pentShapeFns[65].HmatrixF(x1, x2, x3, x4, x5)
-            HF66 = self._pentShapeFns[66].HmatrixF(x1, x2, x3, x4, x5)
-            HF67 = self._pentShapeFns[67].HmatrixF(x1, x2, x3, x4, x5)
-
-            HF71 = self._pentShapeFns[71].HmatrixF(x1, x2, x3, x4, x5)
-            HF72 = self._pentShapeFns[72].HmatrixF(x1, x2, x3, x4, x5)
-            HF73 = self._pentShapeFns[73].HmatrixF(x1, x2, x3, x4, x5)
-            HF74 = self._pentShapeFns[74].HmatrixF(x1, x2, x3, x4, x5)
-            HF75 = self._pentShapeFns[75].HmatrixF(x1, x2, x3, x4, x5)
-            HF76 = self._pentShapeFns[76].HmatrixF(x1, x2, x3, x4, x5)
-            HF77 = self._pentShapeFns[77].HmatrixF(x1, x2, x3, x4, x5)
-
-            # create the second H matrix
-            HS11 = self._pentShapeFns[11].HmatrixS(x1, x2, x3, x4, x5)
-            HS12 = self._pentShapeFns[12].HmatrixS(x1, x2, x3, x4, x5)
-            HS13 = self._pentShapeFns[13].HmatrixS(x1, x2, x3, x4, x5)
-            HS14 = self._pentShapeFns[14].HmatrixS(x1, x2, x3, x4, x5)
-            HS15 = self._pentShapeFns[15].HmatrixS(x1, x2, x3, x4, x5)
-            HS16 = self._pentShapeFns[16].HmatrixS(x1, x2, x3, x4, x5)
-            HS17 = self._pentShapeFns[17].HmatrixS(x1, x2, x3, x4, x5)
-
-            HS21 = self._pentShapeFns[21].HmatrixS(x1, x2, x3, x4, x5)
-            HS22 = self._pentShapeFns[22].HmatrixS(x1, x2, x3, x4, x5)
-            HS23 = self._pentShapeFns[23].HmatrixS(x1, x2, x3, x4, x5)
-            HS24 = self._pentShapeFns[24].HmatrixS(x1, x2, x3, x4, x5)
-            HS25 = self._pentShapeFns[25].HmatrixS(x1, x2, x3, x4, x5)
-            HS26 = self._pentShapeFns[26].HmatrixS(x1, x2, x3, x4, x5)
-            HS27 = self._pentShapeFns[27].HmatrixS(x1, x2, x3, x4, x5)
-
-            HS31 = self._pentShapeFns[31].HmatrixS(x1, x2, x3, x4, x5)
-            HS32 = self._pentShapeFns[32].HmatrixS(x1, x2, x3, x4, x5)
-            HS33 = self._pentShapeFns[33].HmatrixS(x1, x2, x3, x4, x5)
-            HS34 = self._pentShapeFns[34].HmatrixS(x1, x2, x3, x4, x5)
-            HS35 = self._pentShapeFns[35].HmatrixS(x1, x2, x3, x4, x5)
-            HS36 = self._pentShapeFns[36].HmatrixS(x1, x2, x3, x4, x5)
-            HS37 = self._pentShapeFns[37].HmatrixS(x1, x2, x3, x4, x5)
-
-            HS41 = self._pentShapeFns[41].HmatrixS(x1, x2, x3, x4, x5)
-            HS42 = self._pentShapeFns[42].HmatrixS(x1, x2, x3, x4, x5)
-            HS43 = self._pentShapeFns[43].HmatrixS(x1, x2, x3, x4, x5)
-            HS44 = self._pentShapeFns[44].HmatrixS(x1, x2, x3, x4, x5)
-            HS45 = self._pentShapeFns[45].HmatrixS(x1, x2, x3, x4, x5)
-            HS46 = self._pentShapeFns[46].HmatrixS(x1, x2, x3, x4, x5)
-            HS47 = self._pentShapeFns[47].HmatrixS(x1, x2, x3, x4, x5)
-
-            HS51 = self._pentShapeFns[51].HmatrixS(x1, x2, x3, x4, x5)
-            HS52 = self._pentShapeFns[52].HmatrixS(x1, x2, x3, x4, x5)
-            HS53 = self._pentShapeFns[53].HmatrixS(x1, x2, x3, x4, x5)
-            HS54 = self._pentShapeFns[54].HmatrixS(x1, x2, x3, x4, x5)
-            HS55 = self._pentShapeFns[55].HmatrixS(x1, x2, x3, x4, x5)
-            HS56 = self._pentShapeFns[56].HmatrixS(x1, x2, x3, x4, x5)
-            HS57 = self._pentShapeFns[57].HmatrixS(x1, x2, x3, x4, x5)
-
-            HS61 = self._pentShapeFns[61].HmatrixS(x1, x2, x3, x4, x5)
-            HS62 = self._pentShapeFns[62].HmatrixS(x1, x2, x3, x4, x5)
-            HS63 = self._pentShapeFns[63].HmatrixS(x1, x2, x3, x4, x5)
-            HS64 = self._pentShapeFns[64].HmatrixS(x1, x2, x3, x4, x5)
-            HS65 = self._pentShapeFns[65].HmatrixS(x1, x2, x3, x4, x5)
-            HS66 = self._pentShapeFns[66].HmatrixS(x1, x2, x3, x4, x5)
-            HS67 = self._pentShapeFns[67].HmatrixS(x1, x2, x3, x4, x5)
-
-            HS71 = self._pentShapeFns[71].HmatrixS(x1, x2, x3, x4, x5)
-            HS72 = self._pentShapeFns[72].HmatrixS(x1, x2, x3, x4, x5)
-            HS73 = self._pentShapeFns[73].HmatrixS(x1, x2, x3, x4, x5)
-            HS74 = self._pentShapeFns[74].HmatrixS(x1, x2, x3, x4, x5)
-            HS75 = self._pentShapeFns[75].HmatrixS(x1, x2, x3, x4, x5)
-            HS76 = self._pentShapeFns[76].HmatrixS(x1, x2, x3, x4, x5)
-            HS77 = self._pentShapeFns[77].HmatrixS(x1, x2, x3, x4, x5)
-
-
-            # the nonlinear stiffness matrix for 7 Gauss point
-            f11 = (BL11.T.dot(M).dot(BN11) + BN11.T.dot(M).dot(BL11) +
-                   BN11.T.dot(M).dot(BN11))
-            f12 = (BL12.T.dot(M).dot(BN12) + BN12.T.dot(M).dot(BL12) +
-                   BN12.T.dot(M).dot(BN12))
-            f13 = (BL13.T.dot(M).dot(BN13) + BN13.T.dot(M).dot(BL13) +
-                   BN13.T.dot(M).dot(BN13))
-            f14 = (BL14.T.dot(M).dot(BN14) + BN14.T.dot(M).dot(BL14) +
-                   BN14.T.dot(M).dot(BN14))
-            f15 = (BL15.T.dot(M).dot(BN15) + BN15.T.dot(M).dot(BL15) +
-                   BN15.T.dot(M).dot(BN15))
-            f16 = (BL16.T.dot(M).dot(BN16) + BN16.T.dot(M).dot(BL16) +
-                   BN16.T.dot(M).dot(BN16))
-            f17 = (BL17.T.dot(M).dot(BN17) + BN17.T.dot(M).dot(BL17) +
-                   BN17.T.dot(M).dot(BN17))
-
-            f21 = (BL21.T.dot(M).dot(BN21) + BN21.T.dot(M).dot(BL21) +
-                   BN21.T.dot(M).dot(BN21))
-            f22 = (BL22.T.dot(M).dot(BN22) + BN22.T.dot(M).dot(BL22) +
-                   BN22.T.dot(M).dot(BN22))
-            f23 = (BL23.T.dot(M).dot(BN23) + BN23.T.dot(M).dot(BL23) +
-                   BN23.T.dot(M).dot(BN23))
-            f24 = (BL24.T.dot(M).dot(BN24) + BN24.T.dot(M).dot(BL24) +
-                   BN24.T.dot(M).dot(BN24))
-            f25 = (BL25.T.dot(M).dot(BN25) + BN25.T.dot(M).dot(BL25) +
-                   BN25.T.dot(M).dot(BN25))
-            f26 = (BL26.T.dot(M).dot(BN26) + BN26.T.dot(M).dot(BL26) +
-                   BN26.T.dot(M).dot(BN26))
-            f27 = (BL27.T.dot(M).dot(BN27) + BN27.T.dot(M).dot(BL27) +
-                   BN27.T.dot(M).dot(BN27))
-
-            f31 = (BL31.T.dot(M).dot(BN31) + BN31.T.dot(M).dot(BL31) +
-                   BN31.T.dot(M).dot(BN31))
-            f32 = (BL32.T.dot(M).dot(BN32) + BN32.T.dot(M).dot(BL32) +
-                   BN32.T.dot(M).dot(BN32))
-            f33 = (BL33.T.dot(M).dot(BN33) + BN33.T.dot(M).dot(BL33) +
-                   BN33.T.dot(M).dot(BN33))
-            f34 = (BL34.T.dot(M).dot(BN34) + BN34.T.dot(M).dot(BL34) +
-                   BN34.T.dot(M).dot(BN34))
-            f35 = (BL35.T.dot(M).dot(BN35) + BN35.T.dot(M).dot(BL35) +
-                   BN35.T.dot(M).dot(BN35))
-            f36 = (BL36.T.dot(M).dot(BN36) + BN36.T.dot(M).dot(BL36) +
-                   BN36.T.dot(M).dot(BN36))
-            f37 = (BL37.T.dot(M).dot(BN37) + BN37.T.dot(M).dot(BL37) +
-                   BN37.T.dot(M).dot(BN37))
-
-            f41 = (BL41.T.dot(M).dot(BN41) + BN41.T.dot(M).dot(BL41) +
-                   BN41.T.dot(M).dot(BN41))
-            f42 = (BL42.T.dot(M).dot(BN42) + BN42.T.dot(M).dot(BL42) +
-                   BN42.T.dot(M).dot(BN42))
-            f43 = (BL43.T.dot(M).dot(BN43) + BN43.T.dot(M).dot(BL43) +
-                   BN43.T.dot(M).dot(BN43))
-            f44 = (BL44.T.dot(M).dot(BN44) + BN44.T.dot(M).dot(BL44) +
-                   BN44.T.dot(M).dot(BN44))
-            f45 = (BL45.T.dot(M).dot(BN45) + BN45.T.dot(M).dot(BL45) +
-                   BN45.T.dot(M).dot(BN45))
-            f46 = (BL46.T.dot(M).dot(BN46) + BN46.T.dot(M).dot(BL46) +
-                   BN46.T.dot(M).dot(BN46))
-            f47 = (BL47.T.dot(M).dot(BN47) + BN47.T.dot(M).dot(BL47) +
-                   BN47.T.dot(M).dot(BN47))
-
-            f51 = (BL51.T.dot(M).dot(BN51) + BN51.T.dot(M).dot(BL51) +
-                   BN51.T.dot(M).dot(BN51))
-            f52 = (BL52.T.dot(M).dot(BN52) + BN52.T.dot(M).dot(BL52) +
-                   BN52.T.dot(M).dot(BN52))
-            f53 = (BL53.T.dot(M).dot(BN53) + BN53.T.dot(M).dot(BL53) +
-                   BN53.T.dot(M).dot(BN53))
-            f54 = (BL54.T.dot(M).dot(BN54) + BN54.T.dot(M).dot(BL54) +
-                   BN54.T.dot(M).dot(BN54))
-            f55 = (BL55.T.dot(M).dot(BN55) + BN55.T.dot(M).dot(BL55) +
-                   BN55.T.dot(M).dot(BN55))
-            f56 = (BL56.T.dot(M).dot(BN56) + BN56.T.dot(M).dot(BL56) +
-                   BN56.T.dot(M).dot(BN56))
-            f57 = (BL57.T.dot(M).dot(BN57) + BN57.T.dot(M).dot(BL57) +
-                   BN57.T.dot(M).dot(BN57))
-
-            f61 = (BL61.T.dot(M).dot(BN61) + BN61.T.dot(M).dot(BL61) +
-                   BN61.T.dot(M).dot(BN61))
-            f62 = (BL62.T.dot(M).dot(BN62) + BN62.T.dot(M).dot(BL62) +
-                   BN62.T.dot(M).dot(BN62))
-            f63 = (BL63.T.dot(M).dot(BN63) + BN63.T.dot(M).dot(BL63) +
-                   BN63.T.dot(M).dot(BN63))
-            f64 = (BL64.T.dot(M).dot(BN64) + BN64.T.dot(M).dot(BL64) +
-                   BN64.T.dot(M).dot(BN64))
-            f65 = (BL65.T.dot(M).dot(BN65) + BN65.T.dot(M).dot(BL65) +
-                   BN65.T.dot(M).dot(BN65))
-            f66 = (BL66.T.dot(M).dot(BN66) + BN66.T.dot(M).dot(BL66) +
-                   BN66.T.dot(M).dot(BN66))
-            f67 = (BL67.T.dot(M).dot(BN67) + BN67.T.dot(M).dot(BL67) +
-                   BN67.T.dot(M).dot(BN67))
-
-            f71 = (BL71.T.dot(M).dot(BN71) + BN71.T.dot(M).dot(BL71) +
-                   BN71.T.dot(M).dot(BN71))
-            f72 = (BL72.T.dot(M).dot(BN72) + BN72.T.dot(M).dot(BL72) +
-                   BN72.T.dot(M).dot(BN72))
-            f73 = (BL73.T.dot(M).dot(BN73) + BN73.T.dot(M).dot(BL73) +
-                   BN73.T.dot(M).dot(BN73))
-            f74 = (BL74.T.dot(M).dot(BN74) + BN74.T.dot(M).dot(BL74) +
-                   BN74.T.dot(M).dot(BN74))
-            f75 = (BL75.T.dot(M).dot(BN75) + BN75.T.dot(M).dot(BL75) +
-                   BN75.T.dot(M).dot(BN75))
-            f76 = (BL76.T.dot(M).dot(BN76) + BN76.T.dot(M).dot(BL76) +
-                   BN76.T.dot(M).dot(BN76))
-            f77 = (BL77.T.dot(M).dot(BN77) + BN77.T.dot(M).dot(BL77) +
-                   BN77.T.dot(M).dot(BN77))
-
-            KN = self._width * (detJ11 * w[0] * w[0] * f11 +
-                                detJ12 * w[0] * w[1] * f12 +
-                                detJ13 * w[0] * w[2] * f13 +
-                                detJ14 * w[0] * w[3] * f14 +
-                                detJ15 * w[0] * w[4] * f15 +
-                                detJ16 * w[0] * w[5] * f16 +
-                                detJ17 * w[0] * w[6] * f17 +
-                                detJ21 * w[1] * w[0] * f21 +
-                                detJ22 * w[1] * w[1] * f22 +
-                                detJ23 * w[1] * w[2] * f23 +
-                                detJ24 * w[1] * w[3] * f24 +
-                                detJ25 * w[1] * w[4] * f25 +
-                                detJ26 * w[1] * w[5] * f26 +
-                                detJ27 * w[1] * w[6] * f27 +
-                                detJ31 * w[2] * w[0] * f31 +
-                                detJ32 * w[2] * w[1] * f32 +
-                                detJ33 * w[2] * w[2] * f33 +
-                                detJ34 * w[2] * w[3] * f34 +
-                                detJ35 * w[2] * w[4] * f35 +
-                                detJ36 * w[2] * w[5] * f36 +
-                                detJ37 * w[2] * w[6] * f37 +
-                                detJ41 * w[3] * w[0] * f41 +
-                                detJ42 * w[3] * w[1] * f42 +
-                                detJ43 * w[3] * w[2] * f43 +
-                                detJ44 * w[3] * w[3] * f44 +
-                                detJ45 * w[3] * w[4] * f45 +
-                                detJ46 * w[3] * w[5] * f46 +
-                                detJ47 * w[3] * w[6] * f47 +
-                                detJ51 * w[4] * w[0] * f51 +
-                                detJ52 * w[4] * w[1] * f52 +
-                                detJ53 * w[4] * w[2] * f53 +
-                                detJ54 * w[4] * w[3] * f54 +
-                                detJ55 * w[4] * w[4] * f55 +
-                                detJ56 * w[4] * w[5] * f56 +
-                                detJ57 * w[4] * w[6] * f57 +
-                                detJ61 * w[5] * w[0] * f61 +
-                                detJ62 * w[5] * w[1] * f62 +
-                                detJ63 * w[5] * w[2] * f63 +
-                                detJ64 * w[5] * w[3] * f64 +
-                                detJ65 * w[5] * w[4] * f65 +
-                                detJ66 * w[5] * w[5] * f66 +
-                                detJ67 * w[5] * w[6] * f67 +
-                                detJ71 * w[6] * w[0] * f71 +
-                                detJ72 * w[6] * w[1] * f72 +
-                                detJ73 * w[6] * w[2] * f73 +
-                                detJ74 * w[6] * w[3] * f74 +
-                                detJ75 * w[6] * w[4] * f75 +
-                                detJ76 * w[6] * w[5] * f76 +
-                                detJ77 * w[6] * w[6] * f77)
-
-
-            # create the stress stiffness matrix
-            KS = self._width * (detJ11 * w[0] * w[0] * HF11.T.dot(T).dot(HF11)+
-                                detJ12 * w[0] * w[1] * HF12.T.dot(T).dot(HF12)+
-                                detJ13 * w[0] * w[2] * HF13.T.dot(T).dot(HF13)+
-                                detJ14 * w[0] * w[3] * HF14.T.dot(T).dot(HF14)+
-                                detJ15 * w[0] * w[4] * HF15.T.dot(T).dot(HF15)+
-                                detJ16 * w[0] * w[5] * HF16.T.dot(T).dot(HF16)+
-                                detJ17 * w[0] * w[6] * HF17.T.dot(T).dot(HF17)+
-                                detJ11 * w[0] * w[0] * HS11.T.dot(T).dot(HS11)+
-                                detJ12 * w[0] * w[1] * HS12.T.dot(T).dot(HS12)+
-                                detJ13 * w[0] * w[2] * HS13.T.dot(T).dot(HS13)+
-                                detJ14 * w[0] * w[3] * HS14.T.dot(T).dot(HS14)+
-                                detJ15 * w[0] * w[4] * HS15.T.dot(T).dot(HS15)+
-                                detJ16 * w[0] * w[5] * HS16.T.dot(T).dot(HS16)+
-                                detJ17 * w[0] * w[6] * HS17.T.dot(T).dot(HS17)+
-                                detJ21 * w[1] * w[0] * HF21.T.dot(T).dot(HF21)+
-                                detJ22 * w[1] * w[1] * HF22.T.dot(T).dot(HF22)+
-                                detJ23 * w[1] * w[2] * HF23.T.dot(T).dot(HF23)+
-                                detJ24 * w[1] * w[3] * HF24.T.dot(T).dot(HF24)+
-                                detJ25 * w[1] * w[4] * HF25.T.dot(T).dot(HF25)+
-                                detJ26 * w[1] * w[5] * HF26.T.dot(T).dot(HF26)+
-                                detJ27 * w[1] * w[6] * HF27.T.dot(T).dot(HF27)+
-                                detJ21 * w[1] * w[0] * HS21.T.dot(T).dot(HS21)+
-                                detJ22 * w[1] * w[1] * HS22.T.dot(T).dot(HS22)+
-                                detJ23 * w[1] * w[2] * HS23.T.dot(T).dot(HS23)+
-                                detJ24 * w[1] * w[3] * HS24.T.dot(T).dot(HS24)+
-                                detJ25 * w[1] * w[4] * HS25.T.dot(T).dot(HS25)+
-                                detJ26 * w[1] * w[5] * HS26.T.dot(T).dot(HS26)+
-                                detJ27 * w[1] * w[6] * HS27.T.dot(T).dot(HS27)+
-                                detJ31 * w[2] * w[0] * HF31.T.dot(T).dot(HF31)+
-                                detJ32 * w[2] * w[1] * HF32.T.dot(T).dot(HF32)+
-                                detJ33 * w[2] * w[2] * HF33.T.dot(T).dot(HF33)+
-                                detJ34 * w[2] * w[3] * HF34.T.dot(T).dot(HF34)+
-                                detJ35 * w[2] * w[4] * HF35.T.dot(T).dot(HF35)+
-                                detJ36 * w[2] * w[5] * HF36.T.dot(T).dot(HF36)+
-                                detJ37 * w[2] * w[6] * HF37.T.dot(T).dot(HF37)+
-                                detJ31 * w[2] * w[0] * HS31.T.dot(T).dot(HS31)+
-                                detJ32 * w[2] * w[1] * HS32.T.dot(T).dot(HS32)+
-                                detJ33 * w[2] * w[2] * HS33.T.dot(T).dot(HS33)+
-                                detJ34 * w[2] * w[3] * HS34.T.dot(T).dot(HS34)+
-                                detJ35 * w[2] * w[4] * HS35.T.dot(T).dot(HS35)+
-                                detJ36 * w[2] * w[5] * HS36.T.dot(T).dot(HS36)+
-                                detJ37 * w[2] * w[6] * HS37.T.dot(T).dot(HS37)+
-                                detJ41 * w[3] * w[0] * HF41.T.dot(T).dot(HF31)+
-                                detJ42 * w[3] * w[1] * HF42.T.dot(T).dot(HF42)+
-                                detJ43 * w[3] * w[2] * HF43.T.dot(T).dot(HF43)+
-                                detJ44 * w[3] * w[3] * HF44.T.dot(T).dot(HF44)+
-                                detJ45 * w[3] * w[4] * HF45.T.dot(T).dot(HF45)+
-                                detJ46 * w[3] * w[5] * HF46.T.dot(T).dot(HF46)+
-                                detJ47 * w[3] * w[6] * HF47.T.dot(T).dot(HF47)+
-                                detJ41 * w[3] * w[0] * HS41.T.dot(T).dot(HS41)+
-                                detJ42 * w[3] * w[1] * HS42.T.dot(T).dot(HS42)+
-                                detJ43 * w[3] * w[2] * HS43.T.dot(T).dot(HS43)+
-                                detJ44 * w[3] * w[3] * HS44.T.dot(T).dot(HS44)+
-                                detJ45 * w[3] * w[4] * HS45.T.dot(T).dot(HS45)+
-                                detJ46 * w[3] * w[5] * HS46.T.dot(T).dot(HS46)+
-                                detJ47 * w[3] * w[6] * HS47.T.dot(T).dot(HS47)+
-                                detJ51 * w[4] * w[0] * HF51.T.dot(T).dot(HF51)+
-                                detJ52 * w[4] * w[1] * HF52.T.dot(T).dot(HF52)+
-                                detJ53 * w[4] * w[2] * HF53.T.dot(T).dot(HF53)+
-                                detJ54 * w[4] * w[3] * HF54.T.dot(T).dot(HF54)+
-                                detJ55 * w[4] * w[4] * HF55.T.dot(T).dot(HF55)+
-                                detJ56 * w[4] * w[5] * HF56.T.dot(T).dot(HF56)+
-                                detJ57 * w[4] * w[6] * HF57.T.dot(T).dot(HF57)+
-                                detJ51 * w[4] * w[0] * HS51.T.dot(T).dot(HS51)+
-                                detJ52 * w[4] * w[1] * HS52.T.dot(T).dot(HS52)+
-                                detJ53 * w[4] * w[2] * HS53.T.dot(T).dot(HS53)+
-                                detJ54 * w[4] * w[3] * HS54.T.dot(T).dot(HS54)+
-                                detJ55 * w[4] * w[4] * HS55.T.dot(T).dot(HS55)+
-                                detJ56 * w[4] * w[5] * HS56.T.dot(T).dot(HS56)+
-                                detJ57 * w[4] * w[6] * HS57.T.dot(T).dot(HS57)+
-                                detJ61 * w[5] * w[0] * HF61.T.dot(T).dot(HF61)+
-                                detJ62 * w[5] * w[1] * HF62.T.dot(T).dot(HF62)+
-                                detJ63 * w[5] * w[2] * HF63.T.dot(T).dot(HF63)+
-                                detJ64 * w[5] * w[3] * HF64.T.dot(T).dot(HF64)+
-                                detJ65 * w[5] * w[4] * HF65.T.dot(T).dot(HF65)+
-                                detJ66 * w[5] * w[5] * HF66.T.dot(T).dot(HF66)+
-                                detJ67 * w[5] * w[6] * HF67.T.dot(T).dot(HF67)+
-                                detJ61 * w[5] * w[0] * HS61.T.dot(T).dot(HS61)+
-                                detJ62 * w[5] * w[1] * HS62.T.dot(T).dot(HS62)+
-                                detJ63 * w[5] * w[2] * HS63.T.dot(T).dot(HS63)+
-                                detJ64 * w[5] * w[3] * HS64.T.dot(T).dot(HS64)+
-                                detJ65 * w[5] * w[4] * HS65.T.dot(T).dot(HS65)+
-                                detJ66 * w[5] * w[5] * HS66.T.dot(T).dot(HS66)+
-                                detJ67 * w[5] * w[6] * HS67.T.dot(T).dot(HS67)+
-                                detJ71 * w[6] * w[0] * HF71.T.dot(T).dot(HF71)+
-                                detJ72 * w[6] * w[1] * HF72.T.dot(T).dot(HF72)+
-                                detJ73 * w[6] * w[2] * HF73.T.dot(T).dot(HF73)+
-                                detJ74 * w[6] * w[3] * HF74.T.dot(T).dot(HF74)+
-                                detJ75 * w[6] * w[4] * HF75.T.dot(T).dot(HF75)+
-                                detJ76 * w[6] * w[5] * HF76.T.dot(T).dot(HF76)+
-                                detJ77 * w[6] * w[6] * HF77.T.dot(T).dot(HF77)+
-                                detJ71 * w[6] * w[0] * HS71.T.dot(T).dot(HS71)+
-                                detJ72 * w[6] * w[1] * HS72.T.dot(T).dot(HS72)+
-                                detJ73 * w[6] * w[2] * HS73.T.dot(T).dot(HS73)+
-                                detJ74 * w[6] * w[3] * HS74.T.dot(T).dot(HS74)+
-                                detJ75 * w[6] * w[4] * HS75.T.dot(T).dot(HS75)+
-                                detJ76 * w[6] * w[5] * HS76.T.dot(T).dot(HS76)+
-                                detJ77 * w[6] * w[6] * HS77.T.dot(T).dot(HS77))
-
-            # determine the total tangent stiffness matrix
-            stiffT = KL + KN + KS
-        return stiffT
+        mMtx = np.copy(self._massMatrix())
+        return mMtx
+
+    def stiffnessMatrix(self, reindex):
+        kMtx = np.copy(self._stiffnessMatrix(reindex))
+        return kMtx
+
+    def forcingFunction(self):
+        fVec = np.copy(self._forcingFunction())
+        return fVec    
+    
+    

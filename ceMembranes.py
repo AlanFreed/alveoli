@@ -9,7 +9,7 @@ Created on Thu May 28 05:24:07 2020
 import materialProperties as mp
 import math as m
 import numpy as np
-from peceHE import control, response
+from peceHE import Control, Response
 
 """
 Module ceMembranes.py provides a constitutive description for alveolar septa.
@@ -32,7 +32,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "05-28-2020"
-__update__ = "06-24-2020"
+__update__ = "11-06-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -179,16 +179,21 @@ variables: treat these as read-only
 
 inherited methods
 
-secMod(eVec, xVec, yVec)
-    E.g.:  E = ce.secMod(eVec, xVec, yVec)
+secantModulus(eVec, xVec, yVec)
+    E.g.:  E = ce.secantModulus(eVec, xVec, yVec)
         Es          a matrix of secant moduli, i.e., the constitutive matrix
         eVec        a vector of thermodynamic control variables  (strains)
         xVec        a vector of physical control variables       (stretches)
         yVec        a vector of thermodynamic response variables (stresses)
     Solves hyper-elastic equation of form:  s - s_0 = Es * e.
 
-tanMod(eVec, xVec, yVec)
-    E.g.:  Et = ce.tanMod(eVec, xVec, yVec)
+secMod(eVec, xVec, yVec)
+        eVec        a vector of thermodynamic control variables  (strains)
+        xVec        a vector of physical control variables       (stretches)
+        yVec        a vector of thermodynamic response variables (stresses)
+
+tangentModulus(eVec, xVec, yVec)
+    E.g.:  Et = ce.tangentModulus(eVec, xVec, yVec)
         dyde        a matrix of tangent moduli, i.e., a constitutive equation
         eVec        a vector of thermodynamic control variables  (strains)
         xVec        a vector of physical control variables       (stretches)
@@ -200,6 +205,11 @@ tanMod(eVec, xVec, yVec)
         dy/de       a matrix of tangent moduli (the constitutive equation)
         de/dt       is supplied by objects from class controlMembrane
     Solves a hypo-elastic equation of the form: ds = Et * de.
+
+tanMod(eVec, xVec, yVec)
+        eVec        a vector of thermodynamic control variables  (strains)
+        xVec        a vector of physical control variables       (stretches)
+        yVec        a vector of thermodynamic response variables (stresses)
 
 isRuptured()
     E.g.:  ruptured = ce.isRuptured()
@@ -275,7 +285,7 @@ References:
 """
 
 
-class controlMembrane(control):
+class controlMembrane(Control):
 
     # control vector arguments have interpretations of:
     # variables inherited from the base type: treat these as read-only:
@@ -373,7 +383,7 @@ class controlMembrane(control):
 
 # constitutive class for biologic membranes
 
-class ceMembrane(response):
+class ceMembrane(Response):
     # implements the Freed-Rajagopal model for biologic fibers as a membrane
     # model, akin to that of Freed, Erel and Moreno, where
     #   xVec[0]  temperature                  'T'            (centigrade)
@@ -417,8 +427,13 @@ class ceMembrane(response):
         yVec0[1] = pi_0            # initial surface tension
         yVec0[2] = 0.0             # initial normal stress difference
         yVec0[3] = 0.0             # initial shear stress
+
+        # create and initialize the two control vectors
+        eVec0 = np.zeros((controls,), dtype=float)
+        xVec0 = np.zeros((controls,), dtype=float)
+
         # now call the base type to create the exported response fields
-        super().__init__(yVec0)
+        super().__init__(eVec0, xVec0, yVec0)
         # establish the geometric property of thickness
         if thickness is None:
             self.thickness = mp.septalWidth()
@@ -488,9 +503,9 @@ class ceMembrane(response):
                  1.0 / self.G2)
         return c
 
-    def secMod(self, eVec, xVec, yVec):
+    def secantModulus(self, eVec, xVec, yVec):
         # call the base type to verify the inputs and to create matrix ceMtx
-        Es = super().secMod(eVec, xVec, yVec)
+        Es = super().secantModulus(eVec, xVec, yVec)
         # assemble the secant moduli
         # y = y0 + Es * e
         #    e   is a vector of thermodynamic control variables  (strains)
@@ -520,6 +535,14 @@ class ceMembrane(response):
         self.xN[:] = xVec[:]
         self.yN[:] = yVec[:]
         return Es
+    
+    def secMod(self, eVec, xVec, yVec):    
+        Es = self.secantModulus(eVec, xVec, yVec)
+        Ms = np.zeros((3, 3), dtype=float)
+        Ms[0, 0] = Es[1, 1]
+        Ms[1, 1] = Es[2, 2] 
+        Ms[2, 2] = Es[3, 3]
+        return Ms    
 
     def _M_tanCompliance(self, temp, xi, s_pi):
         # a membrane can only rupture under an excessive surface tension
@@ -597,9 +620,9 @@ class ceMembrane(response):
                 c = (self.G1 + self.G2) / (self.G1 * self.G2)
         return c
 
-    def tanMod(self, eVec, xVec, yVec):
+    def tangentModulus(self, eVec, xVec, yVec):
         # call the base type to verify the inputs and to create matrix ceMtx
-        Et = super().tanMod(eVec, xVec, yVec)
+        Et = super().tangentModulus(eVec, xVec, yVec)
         # assemble the tangent moduli
         # dy = Et * de
         #    e   a vector of thermodynamic control variables  (strains)
@@ -633,6 +656,14 @@ class ceMembrane(response):
         self.yN[:] = yVec[:]
         return Et
 
+    def tanMod(self, eVec, xVec, yVec):    
+        Et = self.tangentModulus(eVec, xVec, yVec)
+        Mt = np.zeros((3, 3), dtype=float)
+        Mt[0, 0] = Et[1, 1]
+        Mt[1, 1] = Et[2, 2] 
+        Mt[2, 2] = Et[3, 3]
+        return Mt  
+    
     def isRuptured(self):
         if self.firstCall:
             hasRuptured = (False,)
@@ -741,7 +772,7 @@ class ceMembrane(response):
             tau = self.yN[3]
         s = np.zeros((2, 2), dtype=float)
         s[0, 0] = (pi + sigma) / 2.0
-        s[0, 1] = b * tau / a
+        s[0, 1] = (b * tau) / a
         s[1, 0] = s[0, 1]
         s[1, 1] = (pi - sigma) / 2.0
         return s
