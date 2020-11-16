@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "09-18-2019"
-__update__ = "10-19-2020"
+__update__ = "11-16-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -469,7 +469,7 @@ class ShapeFunction(ShapeFn):
     def BL(self, x1, x2, x3, x4):
         Jmtx = self.jacobianMatrix(x1, x2, x3, x4)
 
-        BL = np.zeros((7, 12), dtype=float)
+        BL = np.zeros((6, 12), dtype=float)
 
         BL[0, 0] = ((self.dN1dXi * Jmtx[0, 0] + self.dN1dEta * Jmtx[0, 1] +
                      self.dN1dZeta * Jmtx[0, 2]) / 3)
@@ -530,22 +530,22 @@ class ShapeFunction(ShapeFn):
         BL[2, 11] = (-(self.dN4dXi * Jmtx[2, 0] + self.dN4dEta * Jmtx[2, 1] +
                        self.dN4dZeta * Jmtx[2, 2]) / 3)
 
-        BL[3, 0] = (-(self.dN1dXi * Jmtx[0, 0] + self.dN1dEta * Jmtx[0, 1] +
-                      self.dN1dZeta * Jmtx[0, 2]) / 3)
-        BL[3, 2] = ((self.dN1dXi * Jmtx[2, 0] + self.dN1dEta * Jmtx[2, 1] +
-                     self.dN1dZeta * Jmtx[2, 2]) / 3)
-        BL[3, 3] = (-(self.dN2dXi * Jmtx[0, 0] + self.dN2dEta * Jmtx[0, 1] +
-                      self.dN2dZeta * Jmtx[0, 2]) / 3)
-        BL[3, 5] = ((self.dN2dXi * Jmtx[2, 0] + self.dN2dEta * Jmtx[2, 1] +
-                     self.dN2dZeta * Jmtx[2, 2]) / 3)
-        BL[3, 6] = (-(self.dN3dXi * Jmtx[0, 0] + self.dN3dEta * Jmtx[0, 1] +
-                      self.dN3dZeta * Jmtx[0, 2]) / 3)
-        BL[3, 8] = ((self.dN3dXi * Jmtx[2, 0] + self.dN3dEta * Jmtx[2, 1] +
-                     self.dN3dZeta * Jmtx[2, 2]) / 3)
-        BL[3, 9] = (-(self.dN4dXi * Jmtx[0, 0] + self.dN4dEta * Jmtx[0, 1] +
-                      self.dN4dZeta * Jmtx[0, 2]) / 3)
-        BL[3, 11] = ((self.dN4dXi * Jmtx[2, 0] + self.dN4dEta * Jmtx[2, 1] +
-                     self.dN4dZeta * Jmtx[2, 2]) / 3)
+        BL[3, 1] = (self.dN1dXi * Jmtx[2, 0] + self.dN1dEta * Jmtx[2, 1] +
+                    self.dN1dZeta * Jmtx[2, 2])
+        BL[3, 2] = (self.dN1dXi * Jmtx[1, 0] + self.dN1dEta * Jmtx[1, 1] +
+                    self.dN1dZeta * Jmtx[1, 2])
+        BL[3, 4] = (self.dN2dXi * Jmtx[2, 0] + self.dN2dEta * Jmtx[2, 1] +
+                    self.dN2dZeta * Jmtx[2, 2])
+        BL[3, 5] = (self.dN2dXi * Jmtx[1, 0] + self.dN2dEta * Jmtx[1, 1] +
+                    self.dN2dZeta * Jmtx[1, 2])
+        BL[3, 7] = (self.dN3dXi * Jmtx[2, 0] + self.dN3dEta * Jmtx[2, 1] +
+                    self.dN3dZeta * Jmtx[2, 2])
+        BL[3, 8] = (self.dN3dXi * Jmtx[1, 0] + self.dN3dEta * Jmtx[1, 1] +
+                    self.dN3dZeta * Jmtx[1, 2])
+        BL[3, 10] = (self.dN4dXi * Jmtx[2, 0] + self.dN4dEta * Jmtx[2, 1] +
+                     self.dN4dZeta * Jmtx[2, 2])
+        BL[3, 11] = (self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
+                     self.dN4dZeta * Jmtx[1, 2])
 
         BL[4, 1] = (self.dN1dXi * Jmtx[2, 0] + self.dN1dEta * Jmtx[2, 1] +
                     self.dN1dZeta * Jmtx[2, 2])
@@ -564,38 +564,21 @@ class ShapeFunction(ShapeFn):
         BL[4, 11] = (self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
                      self.dN4dZeta * Jmtx[1, 2])
 
-        BL[5, 1] = (self.dN1dXi * Jmtx[2, 0] + self.dN1dEta * Jmtx[2, 1] +
-                    self.dN1dZeta * Jmtx[2, 2])
-        BL[5, 2] = (self.dN1dXi * Jmtx[1, 0] + self.dN1dEta * Jmtx[1, 1] +
+        BL[5, 0] = (self.dN1dXi * Jmtx[1, 0] + self.dN1dEta * Jmtx[1, 1] +
                     self.dN1dZeta * Jmtx[1, 2])
-        BL[5, 4] = (self.dN2dXi * Jmtx[2, 0] + self.dN2dEta * Jmtx[2, 1] +
-                    self.dN2dZeta * Jmtx[2, 2])
-        BL[5, 5] = (self.dN2dXi * Jmtx[1, 0] + self.dN2dEta * Jmtx[1, 1] +
-                    self.dN2dZeta * Jmtx[1, 2])
-        BL[5, 7] = (self.dN3dXi * Jmtx[2, 0] + self.dN3dEta * Jmtx[2, 1] +
-                    self.dN3dZeta * Jmtx[2, 2])
-        BL[5, 8] = (self.dN3dXi * Jmtx[1, 0] + self.dN3dEta * Jmtx[1, 1] +
-                    self.dN3dZeta * Jmtx[1, 2])
-        BL[5, 10] = (self.dN4dXi * Jmtx[2, 0] + self.dN4dEta * Jmtx[2, 1] +
-                     self.dN4dZeta * Jmtx[2, 2])
-        BL[5, 11] = (self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
-                     self.dN4dZeta * Jmtx[1, 2])
-
-        BL[6, 0] = (self.dN1dXi * Jmtx[1, 0] + self.dN1dEta * Jmtx[1, 1] +
-                    self.dN1dZeta * Jmtx[1, 2])
-        BL[6, 1] = (self.dN1dXi * Jmtx[0, 0] + self.dN1dEta * Jmtx[0, 1] +
+        BL[5, 1] = (self.dN1dXi * Jmtx[0, 0] + self.dN1dEta * Jmtx[0, 1] +
                     self.dN1dZeta * Jmtx[0, 2])
-        BL[6, 3] = (self.dN2dXi * Jmtx[1, 0] + self.dN2dEta * Jmtx[1, 1] +
+        BL[5, 3] = (self.dN2dXi * Jmtx[1, 0] + self.dN2dEta * Jmtx[1, 1] +
                     self.dN2dZeta * Jmtx[1, 2])
-        BL[6, 4] = (self.dN2dXi * Jmtx[0, 0] + self.dN2dEta * Jmtx[0, 1] +
+        BL[5, 4] = (self.dN2dXi * Jmtx[0, 0] + self.dN2dEta * Jmtx[0, 1] +
                     self.dN2dZeta * Jmtx[0, 2])
-        BL[6, 6] = (self.dN3dXi * Jmtx[1, 0] + self.dN3dEta * Jmtx[1, 1] +
+        BL[5, 6] = (self.dN3dXi * Jmtx[1, 0] + self.dN3dEta * Jmtx[1, 1] +
                     self.dN3dZeta * Jmtx[1, 2])
-        BL[6, 7] = (self.dN3dXi * Jmtx[0, 0] + self.dN3dEta * Jmtx[0, 1] +
+        BL[5, 7] = (self.dN3dXi * Jmtx[0, 0] + self.dN3dEta * Jmtx[0, 1] +
                     self.dN3dZeta * Jmtx[0, 2])
-        BL[6, 9] = (self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
+        BL[5, 9] = (self.dN4dXi * Jmtx[1, 0] + self.dN4dEta * Jmtx[1, 1] +
                     self.dN4dZeta * Jmtx[1, 2])
-        BL[6, 10] = (self.dN4dXi * Jmtx[0, 0] + self.dN4dEta * Jmtx[0, 1] +
+        BL[5, 10] = (self.dN4dXi * Jmtx[0, 0] + self.dN4dEta * Jmtx[0, 1] +
                      self.dN4dZeta * Jmtx[0, 2])
 
         detJ = np.linalg.det(Jmtx)
@@ -715,7 +698,7 @@ class ShapeFunction(ShapeFn):
 
 
     def A1(self, x1, x2, x3, x4, x01, x02, x03, x04):
-        A1mtx = np.zeros((7, 3), dtype=float)
+        A1mtx = np.zeros((6, 3), dtype=float)
         Gmtx = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
 
         # create the A1 matrix from nonlinear part of strain
@@ -726,19 +709,17 @@ class ShapeFunction(ShapeFn):
         A1mtx[1, 1] = Gmtx[1, 1] / 3
         A1mtx[2, 1] = - Gmtx[1, 1] / 3
         A1mtx[2, 2] = Gmtx[2, 2] / 3
-        A1mtx[3, 0] = Gmtx[0, 0] / 3
-        A1mtx[3, 2] = - Gmtx[2, 2] / 3
-        A1mtx[4, 1] = - 2 * Gmtx[1, 2] 
+        A1mtx[3, 1] = - 2 * Gmtx[1, 2] 
+        A1mtx[3, 2] = 2 * Gmtx[2, 1]
+        A1mtx[4, 1] = 2 * Gmtx[1, 2] 
         A1mtx[4, 2] = 2 * Gmtx[2, 1]
-        A1mtx[5, 1] = 2 * Gmtx[1, 2] 
-        A1mtx[5, 2] = 2 * Gmtx[2, 1]
-        A1mtx[6, 0] = - 2 * Gmtx[0, 1]
-        A1mtx[6, 1] = 2 * Gmtx[1, 0]
+        A1mtx[5, 0] = - 2 * Gmtx[0, 1]
+        A1mtx[5, 1] = 2 * Gmtx[1, 0]
         
         return A1mtx
 
     def A2(self, x1, x2, x3, x4, x01, x02, x03, x04):
-        A2mtx = np.zeros((7, 3), dtype=float)
+        A2mtx = np.zeros((6, 3), dtype=float)
         Gmtx = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
 
         # create the A2 matrix from nonlinear part of strain
@@ -749,16 +730,13 @@ class ShapeFunction(ShapeFn):
         A2mtx[2, 0] = - Gmtx[0, 2] / 3
         A2mtx[2, 1] = Gmtx[1, 2] / 3
         A2mtx[2, 2] = Gmtx[2, 1] 
-        A2mtx[3, 0] = Gmtx[0, 2] / 3
-        A2mtx[3, 1] = - Gmtx[1, 2] / 3
-        A2mtx[3, 2] = - 2 * Gmtx[2, 1] / 3
-        A2mtx[5, 0] = 2 * Gmtx[0, 1] 
-        A2mtx[6, 2] = 2 * Gmtx[2, 0]
+        A2mtx[4, 0] = 2 * Gmtx[0, 1] 
+        A2mtx[5, 2] = 2 * Gmtx[2, 0]
         
         return A2mtx
 
     def A3(self, x1, x2, x3, x4, x01, x02, x03, x04):
-        A3mtx = np.zeros((7, 3), dtype=float)
+        A3mtx = np.zeros((6, 3), dtype=float)
         Gmtx = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
 
         # create the A3 matrix from nonlinear part of strain
@@ -769,35 +747,32 @@ class ShapeFunction(ShapeFn):
         A3mtx[1, 2] = Gmtx[2, 0] / 3
         A3mtx[2, 0] = - 2 * Gmtx[1, 0] / 3
         A3mtx[2, 1] = 4 * Gmtx[2, 1] / 3
-        A3mtx[3, 1] = - 4 * Gmtx[2, 1] / 3
-        A3mtx[3, 2] = - Gmtx[2, 0] / 3
         
         return A3mtx
 
     def A4(self, x1, x2, x3, x4, x01, x02, x03, x04):
-        A4mtx = np.zeros((7, 3), dtype=float)
+        A4mtx = np.zeros((6, 3), dtype=float)
         Gmtx = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
 
         # create the A4 matrix from nonlinear part of strain
         A4mtx[1, 1] = 2 * Gmtx[1, 0] / 3
         A4mtx[2, 1] = - Gmtx[1, 0] / 3
-        A4mtx[3, 1] = - Gmtx[1, 0] / 3
-        A4mtx[4, 0] = 4 * Gmtx[1, 2] 
-        A4mtx[4, 2] = 4 * Gmtx[0, 0] 
-        A4mtx[5, 0] = - 4 * Gmtx[1, 2] 
-        A4mtx[5, 2] = - 4 * Gmtx[0, 0] 
-        A4mtx[6, 0] = - 4 * Gmtx[1, 0] 
+        A4mtx[3, 0] = 4 * Gmtx[1, 2] 
+        A4mtx[3, 2] = 4 * Gmtx[0, 0] 
+        A4mtx[4, 0] = - 4 * Gmtx[1, 2] 
+        A4mtx[4, 2] = - 4 * Gmtx[0, 0] 
+        A4mtx[5, 0] = - 4 * Gmtx[1, 0] 
         
         return A4mtx
 
     def A5(self, x1, x2, x3, x4, x01, x02, x03, x04):
-        A5mtx = np.zeros((7, 3), dtype=float)
+        A5mtx = np.zeros((6, 3), dtype=float)
         Gmtx = self.G(x1, x2, x3, x4, x01, x02, x03, x04)
 
         # create the A5 matrix from nonlinear part of strain
-        A5mtx[4, 0] = - 2 * Gmtx[1, 0] 
-        A5mtx[4, 1] = - 4 * Gmtx[2, 1] 
-        A5mtx[4, 2] = - 2 * Gmtx[1, 0] 
+        A5mtx[3, 0] = - 2 * Gmtx[1, 0] 
+        A5mtx[3, 1] = - 4 * Gmtx[2, 1] 
+        A5mtx[3, 2] = - 2 * Gmtx[1, 0] 
         
         return A5mtx
 
@@ -805,7 +780,7 @@ class ShapeFunction(ShapeFn):
     # strain
     def L1(self, x1, x2, x3, x4):
         B = self.BL(x1, x2, x3, x4)
-        L1 = np.zeros((7, 12), dtype=float)
+        L1 = np.zeros((6, 12), dtype=float)
 
         L1[0, 0] = - B[0, 0]
         L1[0, 1] = - B[0, 1]
@@ -837,42 +812,33 @@ class ShapeFunction(ShapeFn):
         L1[2, 8] = - B[2, 8]
         L1[2, 10] = - B[2, 10]
         L1[2, 11] = - B[2, 11]
-
-        L1[3, 0] = - B[3, 0]
-        L1[3, 2] = - B[3, 2]
-        L1[3, 3] = - B[3, 3]
-        L1[3, 5] = - B[3, 5]
-        L1[3, 6] = - B[3, 6]
-        L1[3, 8] = - B[3, 8]
-        L1[3, 9] = - B[3, 9]
-        L1[3, 11] = - B[3, 11]
         
-        L1[4, 1] = - 2 * B[4, 1]
+        L1[3, 1] = - 2 * B[3, 1]
+        L1[3, 2] = 2 * B[3, 2]
+        L1[3, 4] = - 2 * B[3, 4]
+        L1[3, 5] = 2 * B[3, 5]
+        L1[3, 7] = - 2 * B[3, 7]
+        L1[3, 8] = 2 * B[3, 8]
+        L1[3, 10] = - 2 * B[3, 10]
+        L1[3, 11] = 2 * B[3, 11]
+
+        L1[4, 1] = 2 * B[4, 1]
         L1[4, 2] = 2 * B[4, 2]
-        L1[4, 4] = - 2 * B[4, 4]
+        L1[4, 4] = 2 * B[4, 4]
         L1[4, 5] = 2 * B[4, 5]
-        L1[4, 7] = - 2 * B[4, 7]
+        L1[4, 7] = 2 * B[4, 7]
         L1[4, 8] = 2 * B[4, 8]
-        L1[4, 10] = - 2 * B[4, 10]
+        L1[4, 10] = 2 * B[4, 10]
         L1[4, 11] = 2 * B[4, 11]
 
+        L1[5, 0] = - 2 * B[5, 0]
         L1[5, 1] = 2 * B[5, 1]
-        L1[5, 2] = 2 * B[5, 2]
+        L1[5, 3] = - 2 * B[5, 3]
         L1[5, 4] = 2 * B[5, 4]
-        L1[5, 5] = 2 * B[5, 5]
+        L1[5, 6] = - 2 * B[5, 6]
         L1[5, 7] = 2 * B[5, 7]
-        L1[5, 8] = 2 * B[5, 8]
+        L1[5, 9] = - 2 * B[5, 9]
         L1[5, 10] = 2 * B[5, 10]
-        L1[5, 11] = 2 * B[5, 11]
-
-        L1[6, 0] = - 2 * B[6, 0]
-        L1[6, 1] = 2 * B[6, 1]
-        L1[6, 3] = - 2 * B[6, 3]
-        L1[6, 4] = 2 * B[6, 4]
-        L1[6, 6] = - 2 * B[6, 6]
-        L1[6, 7] = 2 * B[6, 7]
-        L1[6, 9] = - 2 * B[6, 9]
-        L1[6, 10] = 2 * B[6, 10]
         
         return L1
 
@@ -880,7 +846,7 @@ class ShapeFunction(ShapeFn):
     # strain
     def L2(self, x1, x2, x3, x4):
         B = self.BL(x1, x2, x3, x4)
-        L2 = np.zeros((7, 12), dtype=float)
+        L2 = np.zeros((6, 12), dtype=float)
 
         L2[0, 0] = B[0, 2]
         L2[0, 1] = - B[0, 2]
@@ -911,30 +877,17 @@ class ShapeFunction(ShapeFn):
         L2[2, 8] = 3 * B[2, 7]
         L2[2, 9] = B[2, 11]
         L2[2, 10] = - B[2, 11]
-        L2[2, 11] = 3 * B[2, 10]
+        L2[2, 11] = 3 * B[2, 10] 
 
-        L2[3, 0] = B[3, 2]
-        L2[3, 1] = - B[3, 2]
-        L2[3, 2] = - 2 * B[2, 2] / 3
-        L2[3, 3] = B[3, 5]
-        L2[3, 4] = - B[3, 5]
-        L2[3, 5] = - 2 * B[2, 5] / 3
-        L2[3, 6] = B[3, 8]
-        L2[3, 7] = - B[3, 8]
-        L2[3, 8] = - 2 * B[2, 8] / 3
-        L2[3, 9] = B[3, 11]
-        L2[3, 10] = - B[3, 11]
-        L2[3, 11] = - 2 * B[2, 11] 
+        L2[4, 0] = 2 * B[4, 2]
+        L2[4, 3] = 2 * B[4, 5]
+        L2[4, 6] = 2 * B[4, 8]
+        L2[4, 9] = 2 * B[4, 11]
 
-        L2[5, 0] = 2 * B[5, 2]
-        L2[5, 3] = 2 * B[5, 5]
-        L2[5, 6] = 2 * B[5, 8]
-        L2[5, 9] = 2 * B[5, 11]
-
-        L2[6, 2] = 2 * B[6, 1]
-        L2[6, 5] = 2 * B[6, 4]
-        L2[6, 8] = 2 * B[6, 7]
-        L2[6, 11] = 2 * B[6, 10]
+        L2[5, 2] = 2 * B[5, 1]
+        L2[5, 5] = 2 * B[5, 4]
+        L2[5, 8] = 2 * B[5, 7]
+        L2[5, 11] = 2 * B[5, 10]
        
         return L2
    
@@ -942,7 +895,7 @@ class ShapeFunction(ShapeFn):
     # strain
     def L3(self, x1, x2, x3, x4):
         B = self.BL(x1, x2, x3, x4)
-        L3 = np.zeros((7, 12), dtype=float)
+        L3 = np.zeros((6, 12), dtype=float)
 
         L3[0, 0] = -2 * B[0, 0]
         L3[0, 1] = - 4 * B[0,1]
@@ -974,15 +927,6 @@ class ShapeFunction(ShapeFn):
         L3[2, 7] = 4 * B[2, 7]
         L3[2, 9] = - B[1, 9]
         L3[2, 10] = 4 * B[2, 10]
-
-        L3[3, 1] = - B[2, 1]
-        L3[3, 2] = B[3, 0]
-        L3[3, 4] = - B[2, 4]
-        L3[3, 5] = B[3, 3]
-        L3[3, 7] = - B[2, 7]
-        L3[3, 8] = B[3, 6]
-        L3[3, 10] = - B[2, 10]
-        L3[3, 11] = B[3, 9] 
        
         return L3
  
@@ -990,7 +934,7 @@ class ShapeFunction(ShapeFn):
     # strain
     def L4(self, x1, x2, x3, x4):
         B = self.BL(x1, x2, x3, x4)
-        L4 = np.zeros((7, 12), dtype=float)
+        L4 = np.zeros((6, 12), dtype=float)
         
         L4[1, 1] = 2 * B[1, 0]
         L4[1, 4] = 2 * B[1, 3]
@@ -1002,33 +946,28 @@ class ShapeFunction(ShapeFn):
         L4[2, 7] = - B[1, 6]
         L4[2, 10] = - B[1, 9]
 
-        L4[3, 1] = B[3, 0]
-        L4[3, 4] = B[3, 3]
-        L4[3, 7] = B[3, 6]
-        L4[3, 10] = B[3, 9]
+        L4[3, 0] = 4 * B[3, 1]
+        L4[3, 2] = 4 * B[5, 1]
+        L4[3, 3] = 4 * B[3, 4]
+        L4[3, 5] = 4 * B[5, 4]
+        L4[3, 6] = 4 * B[3, 7]
+        L4[3, 8] = 4 * B[5, 7]
+        L4[3, 9] = 4 * B[3, 10]
+        L4[3, 11] = 4 * B[5, 10]
 
-        L4[4, 0] = 4 * B[4, 1]
-        L4[4, 2] = 4 * B[6, 1]
-        L4[4, 3] = 4 * B[4, 4]
-        L4[4, 5] = 4 * B[6, 4]
-        L4[4, 6] = 4 * B[4, 7]
-        L4[4, 8] = 4 * B[4, 7]
-        L4[4, 9] = 4 * B[4, 10]
-        L4[4, 11] = 4 * B[4, 10]
-
-        L4[5, 0] = - 4 * B[5, 1]
-        L4[5, 2] = - 4 * B[6, 1]
-        L4[5, 3] = - 4 * B[5, 4]
-        L4[5, 5] = - 4 * B[6, 4]
-        L4[5, 6] = - 4 * B[5, 7]
-        L4[5, 8] = - 4 * B[5, 7]
-        L4[5, 9] = - 4 * B[5, 10]
-        L4[5, 11] = - 4 * B[5, 10]
+        L4[4, 0] = - 4 * B[4, 1]
+        L4[4, 2] = - 4 * B[5, 1]
+        L4[4, 3] = - 4 * B[4, 4]
+        L4[4, 5] = - 4 * B[5, 4]
+        L4[4, 6] = - 4 * B[4, 7]
+        L4[4, 8] = - 4 * B[5, 7]
+        L4[4, 9] = - 4 * B[4, 10]
+        L4[4, 11] = - 4 * B[5, 10]
         
-        L4[6, 0] = - 4 * B[6, 1]
-        L4[6, 3] = - 4 * B[6, 4]
-        L4[6, 6] = - 4 * B[6, 7]
-        L4[6, 9] = - 4 * B[6, 10]
+        L4[5, 0] = - 4 * B[5, 1]
+        L4[5, 3] = - 4 * B[5, 4]
+        L4[5, 6] = - 4 * B[5, 7]
+        L4[5, 9] = - 4 * B[5, 10]
        
         return L4
 
@@ -1036,20 +975,20 @@ class ShapeFunction(ShapeFn):
     # strain
     def L5(self, x1, x2, x3, x4):
         B = self.BL(x1, x2, x3, x4)
-        L5 = np.zeros((7, 12), dtype=float)
+        L5 = np.zeros((6, 12), dtype=float)
 
-        L5[4, 0] = - 2 * B[6, 1]
-        L5[4, 1] = - 4 * B[4, 2]
-        L5[4, 2] = - 2 * B[6, 1]
-        L5[4, 3] = - 2 * B[6, 4]
-        L5[4, 4] = - 4 * B[4, 5]
-        L5[4, 5] = - 2 * B[6, 4]
-        L5[4, 6] = - 2 * B[6, 7]
-        L5[4, 7] = - 4 * B[4, 8]
-        L5[4, 8] = - 2 * B[4, 7]
-        L5[4, 9] = - 2 * B[4, 10]
-        L5[4, 10] = - 4 * B[4, 11]
-        L5[4, 11] = - 2 * B[4, 10]
+        L5[3, 0] = - 2 * B[5, 1]
+        L5[3, 1] = - 4 * B[5, 0]
+        L5[3, 2] = - 2 * B[5, 1]
+        L5[3, 3] = - 2 * B[5, 4]
+        L5[3, 4] = - 4 * B[5, 3]
+        L5[3, 5] = - 2 * B[5, 4]
+        L5[3, 6] = - 2 * B[5, 7]
+        L5[3, 7] = - 4 * B[5, 6]
+        L5[3, 8] = - 2 * B[5, 7]
+        L5[3, 9] = - 2 * B[5, 10]
+        L5[3, 10] = - 4 * B[5, 9]
+        L5[3, 11] = - 2 * B[5, 10]
        
         return L5
     
@@ -1058,7 +997,7 @@ class ShapeFunction(ShapeFn):
         A1mtx = self.A1(x1, x2, x3, x4, x01, x02, x03, x04)
         H1mtx = self.H1(x1, x2, x3, x4)
 
-        B1Nmtx = np.zeros((7, 12), dtype=float)
+        B1Nmtx = np.zeros((6, 12), dtype=float)
         B1Nmtx = np.matmul(A1mtx, H1mtx)
 
         return B1Nmtx
@@ -1068,7 +1007,7 @@ class ShapeFunction(ShapeFn):
         A2mtx = self.A2(x1, x2, x3, x4, x01, x02, x03, x04)
         H2mtx = self.H2(x1, x2, x3, x4)
 
-        B2Nmtx = np.zeros((7, 12), dtype=float)
+        B2Nmtx = np.zeros((6, 12), dtype=float)
         B2Nmtx = np.matmul(A2mtx, H2mtx)
 
         return B2Nmtx
@@ -1078,7 +1017,7 @@ class ShapeFunction(ShapeFn):
         A3mtx = self.A3(x1, x2, x3, x4, x01, x02, x03, x04)
         H3mtx = self.H3(x1, x2, x3, x4)
 
-        B3Nmtx = np.zeros((7, 12), dtype=float)
+        B3Nmtx = np.zeros((6, 12), dtype=float)
         B3Nmtx = np.matmul(A3mtx, H3mtx)
 
         return B3Nmtx
@@ -1088,7 +1027,7 @@ class ShapeFunction(ShapeFn):
         A4mtx = self.A4(x1, x2, x3, x4, x01, x02, x03, x04)
         H4mtx = self.H4(x1, x2, x3, x4)
 
-        B4Nmtx = np.zeros((7, 12), dtype=float)
+        B4Nmtx = np.zeros((6, 12), dtype=float)
         B4Nmtx = np.matmul(A4mtx, H4mtx)
 
         return B4Nmtx
@@ -1098,7 +1037,7 @@ class ShapeFunction(ShapeFn):
         A5mtx = self.A5(x1, x2, x3, x4, x01, x02, x03, x04)
         H5mtx = self.H5(x1, x2, x3, x4)
 
-        B5Nmtx = np.zeros((7, 12), dtype=float)
+        B5Nmtx = np.zeros((6, 12), dtype=float)
         B5Nmtx = np.matmul(A5mtx, H5mtx)
 
         return B5Nmtx    

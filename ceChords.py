@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import materialProperties as mp
+import meanProperties as mp
 import math as m
 import numpy as np
 from peceHE import Control, Response

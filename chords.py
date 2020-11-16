@@ -12,7 +12,7 @@ import spin as spinMtx
 from vertices import Vertex
 import math as m
 from decimal import *
-import materialProperties as mp
+import meanProperties as mp
 
 
 

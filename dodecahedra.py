@@ -662,6 +662,25 @@ class dodecahedron(object):
             raise RuntimeError("An unknown state {} ".format(str(state)) +
                                "in a call to dodecahedron.volume.")
 
+
+    def V0V(self, state):
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return (self._refVol / self._currVol)
+            elif state == 'n' or state == 'next':
+                return (self._refVol / self._nextVol)
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return (self._refVol / self._prevVol)
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return 1.0
+            else:
+                raise RuntimeError("An unknown state {} in a ".format(state) +
+                                   "call to dodecahedron.V0V.")
+        else:
+            raise RuntimeError("An unknown state {} in ".format(str(state)) +
+                               "a call to dodecahedron.V0V.")
+
+
     def volumetricStretch(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':

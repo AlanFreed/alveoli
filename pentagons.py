@@ -4,7 +4,7 @@
 from ceMembranes import controlMembrane, ceMembrane
 from chords import Chord
 from pivotIncomingF import Pivot
-import materialProperties as mp
+import meanProperties as mp
 import math as m
 from membranes import membrane
 import numpy as np
@@ -38,7 +38,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.1"
 __date__ = "08-08-2019"
-__update__ = "11-06-2020"
+__update__ = "11-16-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -1233,14 +1233,21 @@ class pentagon(object):
             5: self._response[5].tanMod(eVec0, xVec0, yVec0)
         }        
 
-        self.st = {
-            1: self._response[1].stress(),
-            2: self._response[2].stress(),
-            3: self._response[3].stress(),
-            4: self._response[4].stress(),
-            5: self._response[5].stress()
+        self.Ss = {
+            1: self._response[1].stressMtx(),
+            2: self._response[2].stressMtx(),
+            3: self._response[3].stressMtx(),
+            4: self._response[4].stressMtx(),
+            5: self._response[5].stressMtx()
         }  
 
+        self.T = {
+            1: self._response[1].intensiveStressVec(),
+            2: self._response[2].intensiveStressVec(),
+            3: self._response[3].intensiveStressVec(),
+            4: self._response[4].intensiveStressVec(),
+            5: self._response[5].intensiveStressVec()
+        }
               
     def __str__(self):
         return self.toString()
@@ -1431,7 +1438,7 @@ class pentagon(object):
             wgt = self._pgq.weight(i) 
             Ms = self._Ms[i]
             Mt = self._Mt[i]
-            Ss = self.st[i]
+            Ss = self.Ss[i]
             
             # determinant of jacobian matrix
             Jdet = psfn.jacobianDeterminant(x01, x02, x03, x04, x05)
@@ -1524,11 +1531,11 @@ class pentagon(object):
 
                 
         # create the traction vector apply on each chord of pentagon 
-        t12 = np.dot(self.st[1], np.transpose(n12))   
-        t23 = np.dot(self.st[2], np.transpose(n23))  
-        t34 = np.dot(self.st[3], np.transpose(n34))  
-        t45 = np.dot(self.st[4], np.transpose(n45))  
-        t51 = np.dot(self.st[5], np.transpose(n51)) 
+        t12 = np.dot(self.Ss[1], np.transpose(n12))   
+        t23 = np.dot(self.Ss[2], np.transpose(n23))  
+        t34 = np.dot(self.Ss[3], np.transpose(n34))  
+        t45 = np.dot(self.Ss[4], np.transpose(n45))  
+        t51 = np.dot(self.Ss[5], np.transpose(n51)) 
         
 
         # current vertex coordinates in pentagonal frame of reference
@@ -1575,11 +1582,7 @@ class pentagon(object):
         for i in range(1, self._pgq.gaussPoints()+1):
             Psfn = self._pentShapeFns[i]
             wgt = self._pgq.weight(i)
-            sMtx = self.st[i]
-            T0 = np.zeros((3, 1), dtype=float)
-            T0[0, 0] = sMtx[0, 0]
-            T0[1, 0] = sMtx[1, 1]
-            T0[2, 0] = sMtx[0, 1]
+            T0 = self.T[i]
 
             BLmtx = Psfn.BL(xn1, xn2, xn3, xn4, xn5)
             BNmtx1 = Psfn.BN1(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)

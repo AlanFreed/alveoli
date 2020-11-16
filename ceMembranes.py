@@ -6,7 +6,7 @@ Created on Thu May 28 05:24:07 2020
 @author: al
 """
 
-import materialProperties as mp
+import meanProperties as mp
 import math as m
 import numpy as np
 from peceHE import Control, Response
@@ -32,7 +32,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "05-28-2020"
-__update__ = "11-06-2020"
+__update__ = "11-15-2020"
 __author__ = "Alan D. Freed"
 __author_email__ = "afreed@tamu.edu"
 
@@ -256,10 +256,15 @@ entropyDensity()
     E.g., eta = ce.entropyDensity()
         eta         returns the entropy density of the septal membrane
 
-stress()
-    E.g., S = ce.stress()
-        S           returns stress in the co-ordinate frame of the membrane
+stressMtx()
+    E.g., S = ce.stressMtx()
+        S           returns stress matrix in the co-ordinate frame of the 
+        membrane
 
+intensiveStressVec()
+    E.g., T = ce.intensiveStressVec()
+        T           returns stress vector T conjugate to strain vector E
+        
 # relative measures
 
 relativeTemperature()
@@ -330,7 +335,7 @@ class controlMembrane(Control):
         super().update(xVec, restart)
         # Update any additional fields introduced by the user.
         return  # nothing
-
+ 
     def advance(self):
         # Call the base implementation of this method to advance its data
         # structure by copying the current data into their previous fields,
@@ -757,7 +762,7 @@ class ceMembrane(Response):
             eta = self.yN[0]
         return eta
 
-    def stress(self):
+    def stressMtx(self):
         if self.firstCall:
             a = self.xR[1]
             b = self.xR[2]
@@ -777,6 +782,21 @@ class ceMembrane(Response):
         s[1, 1] = (pi - sigma) / 2.0
         return s
 
+    def intensiveStressVec(self):
+        if self.firstCall:
+            pi = self.yR[1]
+            sigma = self.yR[2]
+            tau = self.yR[3]
+        else:
+            pi = self.yN[1]
+            sigma = self.yN[2]
+            tau = self.yN[3]
+        T = np.zeros((3,1), dtype=float)
+        T[0, 0] = pi 
+        T[1, 0] = sigma
+        T[2, 0] = tau
+        return T
+    
     # relative measures
 
     def relativeTemperature(self):
