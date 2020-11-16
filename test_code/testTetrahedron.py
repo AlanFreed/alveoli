@@ -10,7 +10,7 @@ from tetrahedra import tetrahedron
 
 """
 Created on Tue Oct 16 2020
-Updated on Fri Oct 19 2020
+Updated on Fri Nov 16 2020
 
 A test file for class tetrahedron in file tetrahedra.py.
 
@@ -150,12 +150,21 @@ def run():
     piF2 = pi.pivotedF('curr')
     piF3 = pi.pivotedF('next')
     
+    volR = t.volume('ref')
+    print(volR*60)
+    
+    volN = t.volume('next')
+    print(volN*60)
+    
+    volC = t.volume('curr')
+    print(volC*60)
+    
     mass = t.massMatrix()
     
     # normalize this matrix
     maxEle = np.amax(mass)
     mass = mass / maxEle
-
+    
     
     print("\nThe Noralized mass matrix for this tetrahedron is:")
     print(mass)
