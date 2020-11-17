@@ -675,10 +675,10 @@ class dodecahedron(object):
                 return 1.0
             else:
                 raise RuntimeError("An unknown state {} in a ".format(state) +
-                                   "call to dodecahedron.V0V.")
+                                    "call to dodecahedron.V0V.")
         else:
             raise RuntimeError("An unknown state {} in ".format(str(state)) +
-                               "a call to dodecahedron.V0V.")
+                                "a call to dodecahedron.V0V.")
 
 
     def volumetricStretch(self, state):

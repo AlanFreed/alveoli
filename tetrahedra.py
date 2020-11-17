@@ -463,20 +463,20 @@ class tetrahedron(object):
         yVec0 = np.zeros((respVars,), dtype=float)
 
 
-        yVec0[1] = -3 * self._p_0       # pressure                   'pi'                                 (barye)
-        yVec0[2] = 0.0                  # normal stress difference   'sigma1'                              (barye)
-        yVec0[3] = 0.0                  # normal stress difference   'sigma2'                              (barye)
-        yVec0[4] = 0.0                  # shear stress               'tau1'                                (barye)
-        yVec0[5] = 0.0                  # shear stress               'tau2'                                (barye)
-        yVec0[6] = 0.0                  # shear stress               'tau3'
+        yVec0[1] = -3 * self._p_0   # pressure                   'pi'      (barye)
+        yVec0[2] = 0.0              # normal stress difference   'sigma1'  (barye)
+        yVec0[3] = 0.0              # normal stress difference   'sigma2'  (barye)
+        yVec0[4] = 0.0              # shear stress               'tau1'    (barye)
+        yVec0[5] = 0.0              # shear stress               'tau2'    (barye)
+        yVec0[6] = 0.0              # shear stress               'tau3'
 
-        xVec0[0] = T0    # temperature                                'T'                   (centigrade)
-        xVec0[1] = 1.0   # elongation in 1 direction                  'a'                   (dimensionless)
-        xVec0[2] = 1.0   # elongation in 2 direction                  'b'                   (dimensionless)
-        xVec0[3] = 1.0   # elongation in 3 direction                  'c'                   (dimensionless)
-        xVec0[4] = 0.0   # magnitude of shear in the 23 plane         'alp'                  (dimensionless)
-        xVec0[5] = 0.0   # magnitude of shear in the 13 plane         'bet'                  (dimensionless)
-        xVec0[6] = 0.0   # magnitude of shear in the 12 plane         'gam'
+        xVec0[0] = T0    # temperature                          'T'   (centigrade)
+        xVec0[1] = 1.0   # elongation in 1 direction            'a'   (dimensionless)
+        xVec0[2] = 1.0   # elongation in 2 direction            'b'   (dimensionless)
+        xVec0[3] = 1.0   # elongation in 3 direction            'c'   (dimensionless)
+        xVec0[4] = 0.0   # magnitude of shear in the 23 plane   'alp' (dimensionless)
+        xVec0[5] = 0.0   # magnitude of shear in the 13 plane   'bet' (dimensionless)
+        xVec0[6] = 0.0   # magnitude of shear in the 12 plane   'gam'
         
         self._response = {
             1:ceSac(),
@@ -694,7 +694,7 @@ class tetrahedron(object):
     
     def _forcingFunction(self):
         
-        state = 'ref'
+        state = 'curr'
         
         
         fVec = np.zeros((12,1), dtype=float)            

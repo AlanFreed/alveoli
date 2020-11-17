@@ -465,7 +465,7 @@ class ceSac(Response):
         p_0 = self.yR[1]
         # temperature
         T_0 = 37.0
-        T = 273.0 + self.xN[0]   # convert Centigrade into Kelvin
+        T = T_0
         # bulk modulus
         kt = p_0 * (T / T_0) * self.v0v
         # The maximum bulk modulus
