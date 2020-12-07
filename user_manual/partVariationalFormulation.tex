@@ -34,7 +34,7 @@ Symbol $\boldsymbol{\Delta}$ is used to denote an assemblage of all nodal displa
 
 Our problem is not cast as a typical finite element solution, in the sense that we know the nodal displacements $\boldsymbol{\Delta}$, velocities $\dot{\boldsymbol{\Delta}}$ and accelerations $\ddot{\boldsymbol{\Delta}}$ \textit{a~priori}, for which nodal forces $\boldsymbol{F}$ are to be found.  Typically, boundary conditions are known for which displacements are determined in a weak sense, which is the opposite of our situation. Inputs for our model are considered to come from a finite element model of a torso subjected to an impact caused by either a ballistic projectile or a blast wave.  Say, for example, that a location of interest in the lung has been selected.  What will serve as input to our dodecahedral model will be a history of the deformation gradient sequenced in time and taken from that element containing this location of interest.  For example, if 8-noded brick elements are used, then the deformation gradient will be constant over its volume.  An element of size $1~\text{mm}^3$, which is at the resolution capability of current lung imaging technologies, would have one to two hundred alveoli in it.  Consequently, taking a statistical average over many dodecahedral model runs ought to provide a reasonable representation for the parenchymal response at that lung location.  Predictions coming from our dodecahedral model can be compared with predictions coming from a continuum model used to represent the parenchyma of lung in a torso model.  This information from our micro\-scopic alveolar model will allow for refinement and parameterization of a macro\-scopic continuum model for parenchyma.  This is particularly relevant because the spongy nature of lung tissue makes it extremely difficult to perform experiments that are suitable for parameterizing such models.
 
-The assembled nodal forces $\boldsymbol{F}(\boldsymbol{T})$, discussed in \S\ref{secForceVectors}, depend upon stresses $\boldsymbol{T}$ evaluated at the Gauss points, as do the tangent and secant stiffness matrices, i.e., $\mathbf{C}(\boldsymbol{T})$ and $\mathbf{K}(\boldsymbol{T})$, which thereby couples the system of equations that are to be solved.  As such, an iterative solver is proposed.  The mass matrix $\mathbf{M}$ will vary between solution steps, too, but not because the mass matrix of a particular element changes, but rather, because rotations of the local co-ordinate systems for the elements about the global reference frame for the dodecahedron can become large, and as such, affect change in the assembled mass matrix.
+The assembled nodal forces $\boldsymbol{F}(\boldsymbol{T})$, discussed in \S\ref{secForceVectors}, depend upon stresses $\boldsymbol{T}$ evaluated at the Gauss points, as do the tangent and secant stiffness matrices, i.e., $\mathbf{C}(\boldsymbol{T})$ and $\mathbf{K}(\boldsymbol{T})$, which thereby couples the system of equations that are to be solved. As such, an iterative solver is proposed.  The mass matrix $\mathbf{M}$ will vary between solution steps, too, but not because the mass matrix of a particular element changes, but rather, because rotations of the local co-ordinate systems for the elements about the global reference frame for the dodecahedron can become large, and as such, affect change in the assembled mass matrix.
 
 The stress that arises from $\mathbf{K} \boldsymbol{\Delta}$ is due to an elastic deformation that begins in some reference state (at an initial time $t_0$) and ends at the current state (at present time $t_i$).  The stress that arises from $\mathbf{C} \dot{\boldsymbol{\Delta}}$ is due to an additional elastic deformation that begins in this current state (at time $t_i$) and ends at some nearby state (at a future time $t_{i+1} = t_i + \mathrm{d}t$).  While an inertial contribution to stress results from $\mathbf{M} \ddot{\boldsymbol{\Delta}}$.
 
@@ -92,7 +92,7 @@ Equation~(\ref{FEsolver}) is used to advance all solution steps from the third s
 
 As a modeling simplification, the alveolar chords, the alveolar membranes, and the alveolar sac are each considered to be described by their own finite element model.  It is assumed that there is no coupling occurring between these three structural groups.  This is an important simplification, because the mass and compliance of these three geometric structures are vastly different, and as such, if not decoupled, these differences in mass and compliance would become problematic sources out of which numerical difficulties would likely arise.
 
-From physics, we know that forces add, and therefore, the nodal forces coming from these three finite-element models can be summed.  These summed forces, positioned at the dodecahedral vertices, are obtained by taking stresses integrated at the various Guass points throughout each geometric model and extrapolating them out to their respective common nodes, i.e., the set of dodecahedral vertices, using the formul\ae\ of \S\ref{sec:Gauss}.  From these three sources for micro\-scopic alveolar force, one can construct a homo\-genized (averaged) state of macro\-scopic stress descriptive of the parenchymal response.
+From physics, we know that forces add, and therefore, the nodal forces coming from these three finite-element models can be summed.  \textcolor{red}{These summed forces, positioned at the dodecahedral vertices, are obtained by taking stresses integrated at the various Guass points throughout each geometric model and extrapolating them out to their respective common nodes, i.e., the set of dodecahedral vertices, using the formul\ae\ of \S\ref{sec:Gauss}.}  From these three sources for micro\-scopic alveolar force, one can construct a homo\-genized (averaged) state of macro\-scopic stress descriptive of the parenchymal response.
 
 Consequently, we construct three, individual, finite-element models governed by the following three systems of differential equations
 \begin{subequations}
@@ -221,7 +221,7 @@ The consistent mass matrix for a 1D alveolar chord modeled as a two-noded rod, w
 \end{aligned}
 \label{ConsMassMatrix1DA}
 \end{equation}
-where $\textbf{N} (\xi_i)$ is a matrix of shape functions evaluated at a node of quadrature $\xi_i$ whose associated weight of quadrature is $w_i$, both evaluated at Gauss point $i$ for a selected Gauss integration rule comprised of $m$ Gauss points.  Table~\ref{tab:2nodeRod} presents values for the co-ordinates $\xi_i$ and weights $w_i$ of quadrature where two Gauss points of integration ($m=2$) are employed for integrating over a length of chord.  
+where $\textbf{N} (\xi_i)$ is a matrix of shape functions evaluated at a node of quadrature $\xi_i$ whose associated weight of quadrature is $w_i$, both evaluated at Gauss point $i$ for a selected Gauss integration rule comprised of $m$ Gauss points. Table~\ref{tab:2nodeRod} presents values for the co-ordinates $\xi_i$ and weights $w_i$ of quadrature where two Gauss points of integration ($m=2$) are employed for integrating over a length of chord.  
 
 A lumped mass matrix for a 1D alveolar chord, when evaluated in the co-ordinate system of a chord is 
 \begin{equation}
@@ -339,7 +339,7 @@ From this example, following standard procedures, \cite{ClaytonChung18} it becom
 
 \subsection{Mass Matrix for a Triangle}
 
-Even though we need to know the shape functions and quadrature rule for triangles in our analysis (they are used to extrapolate Gauss point forces out to the vertices of a dodecahedron in our analysis of alveolar sacs), we do not need to construct their mass matrix for our specific application.
+Even though we need to know the shape functions and quadrature rule for triangles in our analysis \textcolor{red}{(they are used to extrapolate Gauss point forces out to the vertices of a dodecahedron in our analysis of alveolar sacs),} we do not need to construct their mass matrix for our specific application.
 
 \subsection{Mass Matrix for a Pentagon}
 
@@ -381,7 +381,7 @@ wherein $\mathrm{N}_i$, $i = 1, \ldots, 5$, are the five shape functions that co
 
 A consistent mass matrix $\mathbf{M}_{\mathrm{C2D}}$ is constructed by substituting the above matrix of shape functions into the following expression
 \begin{equation}
-    \mathbf{M}_{\mathrm{C2D}} = \iint_{\pentagon} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,|\mathbf{J}| \, h \, \mathrm{d} \xi \, \mathrm{d} \eta 
+    \mathbf{M}_{\mathrm{C2D}} = \int_{\pentagon} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,|\mathbf{J}| \, h \, \mathrm{d} \xi \, \mathrm{d} \eta 
     = | \mathbf{J} | \sum_{i=1}^m \rho_i h_i \, \mathbf{N}^{\mathsf{T}} \mathbf{N} 
     (\xi_i , \eta_i) \, w_i
     \label{massintegral2d}
@@ -407,7 +407,7 @@ where the shape function gradients $N_{i,\xi}$ and $N_{i,\eta}$ are provided by 
 \frac{\partial x}{\partial \eta} \frac{\partial y}{\partial \xi}
 \label{jacobianpent}
 \end{equation}
-establishing the Jacobian determinant.  It is proportional to the area of the pentagon $A_{\pentagon}$ because $A_{\pentagon} = \iint_{\pentagon} \mathrm{d}x \, \mathrm{d}y = \iint_{\pentagon} | \mathbf{J} | \, \mathrm{d}\xi \, \mathrm{d}\eta = | \mathbf{J} | \sum_{i=1}^5 w_i = 2.378 | \mathbf{J} |$ using the quadrature rule for pentagons given in Eqn.~\eqref{pentagonQuadrature}, cf.\ Eqn.~\eqref{regPentagonArea}.
+establishing the Jacobian determinant.  It is proportional to the area of the pentagon $A_{\pentagon}$ because $A_{\pentagon} = \int_{\pentagon} \mathrm{d}x \, \mathrm{d}y = \int_{\pentagon} | \mathbf{J} | \, \mathrm{d}\xi \, \mathrm{d}\eta = | \mathbf{J} | \sum_{i=1}^5 w_i = 2.378 | \mathbf{J} |$ using the quadrature rule for pentagons given in Eqn.~\eqref{pentagonQuadrature}, cf.\ Eqn.~\eqref{regPentagonArea}.
 
 From the consistent mass matrix of Eqn.~(\ref{massintegral2d}), its associated lumped mass matrix is readily computed via Eqn.~(\ref{lumpedMassMatrix2D}) that when averaged with Eqn.~(\ref{massintegral2d}) results in the 2D mass matrix $\mathbf{M}_{\mathrm{2D}}$ that we implement.
 
@@ -545,7 +545,7 @@ out of which consistent, lumped and weighted mass matrices can be constructed.
 Numerical integration is used to obtain a consistent mass matrix for a tetrahedron
 \begin{equation}
 \begin{aligned}
-\mathbf{M}_{\mathrm{C3D}} & = \iiint_V \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \, \mathrm{d} \mathbf{z} \, \mathrm{d} \mathbf{y} \, \mathrm{d} \mathbf{x} \\ & = \int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \, | \mathbf{J} | \, \mathrm{d} \mathbf{\zeta} \, \mathrm{d} \mathbf{\eta} \, \mathrm{d} \mathbf{\xi} \\ & = \rho \, |\mathbf{J} | \sum_{i=1}^m \mathbf{N}^{\mathsf{T}} \mathbf{N} (\xi_i , \eta_i , \zeta_i ) \, w_i
+\mathbf{M}_{\mathrm{C3D}} & = \int_V \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \, \mathrm{d} \mathbf{z} \, \mathrm{d} \mathbf{y} \, \mathrm{d} \mathbf{x} \\ & = \int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \, | \mathbf{J} | \, \mathrm{d} \mathbf{\zeta} \, \mathrm{d} \mathbf{\eta} \, \mathrm{d} \mathbf{\xi} \\ & = \rho \, |\mathbf{J} | \sum_{i=1}^m \mathbf{N}^{\mathsf{T}} \mathbf{N} (\xi_i , \eta_i , \zeta_i ) \, w_i
 \end{aligned}
 \label{consMass3D}
 \end{equation}
@@ -576,7 +576,7 @@ x_4 - x_1 & y_4 - y_1 & z_4 - z_1
 \end{aligned}
 \tag{\ref{tetJacobian}}
 \end{equation}
-whose determinant $| \mathbf{J} |$ is proportional to the volume of this element when evaluated in the physical co-ordinate system $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$.  Specifically, $| \mathbf{J} | = 6V_{tet}$ because $V_{tet} = \iiint_{V_{tet}} \mathrm{d} z \, \mathrm{d} y \, \mathrm{d} x = \int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} | \mathbf{J} | \, \mathrm{d} \zeta \, \mathrm{d} \eta \, \mathrm{d} \xi = | \mathbf{J} | \sum_{i=1}^m w_i = \tfrac{1}{6} | \mathbf{J} |$.  
+whose determinant $| \mathbf{J} |$ is proportional to the volume of this element when evaluated in the physical co-ordinate system $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$.  Specifically, $| \mathbf{J} | = 6V_{tet}$ because $V_{tet} = \int_{V_{tet}} \mathrm{d} z \, \mathrm{d} y \, \mathrm{d} x = \int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} | \mathbf{J} | \, \mathrm{d} \zeta \, \mathrm{d} \eta \, \mathrm{d} \xi = | \mathbf{J} | \sum_{i=1}^m w_i = \tfrac{1}{6} | \mathbf{J} |$.  
 
 Averaging this mass matrix based on Eqn.~(\ref{tetNtN}) with its lumped version based on Eqn.~(\ref{tetSumNtN}), according to Eqn.~\eqref{consMass3D}, gives the 3D mass matrix $\mathbf{M}_{\textrm{3D}}$ that we implement.
 
@@ -839,7 +839,7 @@ Only in the mode of dilation is membrane rupture considered to be possible.  Nev
 Like the fiber compliance (Eqn.~\ref{fiberCompliance}) used to model an alveolar chord, the membrane compliance (Eqn.~\ref{planarCompliance}) used to model an alveolar septa has components that depend upon stress, but not upon strain.  Consequently, the tangent modulus of Eqn.~(\ref{elasticModuliViaCs}) required of our finite element implementation has components of
 \small
 \begin{multline}
-    \boldsymbol{\mathcal{M}}^t = \\ \begin{bmatrix}
+    \boldsymbol{\mathcal{M}}^t =  \begin{bmatrix}
     \frac{1}{4M^s} + ( s^{\pi} - s^{\pi}_0 ) \frac{\mathrm{d} (1 / 4M^s)}
     {\mathrm{d} s^{\pi}}
     & 0 & 0 \\
@@ -1243,7 +1243,7 @@ where $\mathrm{d} \mathbf{S}^t \defeq \mathbf{A}^{\mathsf{T}} \, \boldsymbol{\ma
 
 \subsection{Kinematic Matrices for a Pentagon}
 
-For a planar member, components of Laplace stretch $\boldsymbol{\mathcal{U}}$, obtained from a Cholesky factorization of the right Cauchy-Green tensor $\mathbf{C}\defeq \mathbf{F}^{\mathsf{T}} \mathbf{F} = \boldsymbol{\mathcal{U}}^{\mathsf{T}} \boldsymbol{\mathcal{U}}$, cf.\ Eqn.~\eqref{LaplaceStretch2D}, such that \cite{Freedetal17}
+For a planar membrane, components of Laplace stretch $\boldsymbol{\mathcal{U}}$, obtained from a Cholesky factorization of the right Cauchy-Green tensor $\mathbf{C}\defeq \mathbf{F}^{\mathsf{T}} \mathbf{F} = \boldsymbol{\mathcal{U}}^{\mathsf{T}} \boldsymbol{\mathcal{U}}$, cf.\ Eqn.~\eqref{LaplaceStretch2D}, such that \cite{Freedetal17}
 \begin{equation}
 \begin{aligned}
 {\mathcal{U}}_{11} = a & = \sqrt{C_{11}} \;\; & 
@@ -1267,7 +1267,7 @@ where $a$ and $b$ are elongations (stretches) in the 1 and 2~directions, respect
     \end{bmatrix}
     \end{align}
 \end{subequations}
-where $u$ and $v$ are displacements associated with deformation of a planar member.
+where $u$ and $v$ are displacements associated with deformation of a planar membrane.
 
 Gradients of shape functions are used to construct the above spatial gradients, viz.,
 \begin{displaymath}
@@ -1323,12 +1323,12 @@ The thermodynamic strain attributes that we use are defined in Eqn.~\eqref{therm
 \end{equation}
 Without loss of generality, we consider the membrane to be initially undeformed, which allows us to set $a_0$ and $b_0$ to one, while the initial shear $g_0$ is taken as zero.  To gain computational advantage, we decompose these strain attributes into linear and nonlinear components; specifically, we consider
 \begin{equation}
-    \xi = \xi_{L} + \xi_{N1} + \xi_{N2} , \quad
-    \varepsilon = \varepsilon_{L} + \varepsilon_{N1} + \varepsilon_{N2} , \quad
-    \gamma = \gamma_{L} + \gamma_{N1} + \gamma_{N2}.
+    \xi = \xi_{L} + \xi_{N1} + \xi_{N2} + \xi_{N3} , \quad
+    \varepsilon = \varepsilon_{L} + \varepsilon_{N1} + \varepsilon_{N2} + \varepsilon_{N3} , \quad
+    \gamma = \gamma_{L} + \gamma_{N1} + \gamma_{N2} + \gamma_{N3}.
     \label{totalVirtualStrain}
 \end{equation}
-Traditionally, finite element constructions decompose strain into a linear component and a non\-linear component.  However, in our case, a further decomposition of the non\-linear strain component into two separate components makes our computation much easier, as will be realized later. 
+Traditionally, finite element constructions decompose strain into a linear component and a non\-linear component.  However, in our case, a further decomposition of the non\-linear strain component into three separate components makes our computation much easier, as will be realized later. 
 
 Decomposition of strain attributes in Eqn.~\eqref{strainAttributesPentagon} is achieved via Taylor expansions that retain terms through second-order.  The linear and nonlinear components of these strain attributes, thus obtained, are given as
 \begin{subequations}
@@ -1336,7 +1336,7 @@ Decomposition of strain attributes in Eqn.~\eqref{strainAttributesPentagon} is a
 		\mathrm \xi_{L} & = \frac{1}{2} \, \left(\mathrm{\frac{\partial u}{\partial x}} + \mathrm{\frac{\partial v}{\partial y}}\right)\\
 		\mathrm \xi_{N} & = \frac{1}{4} \, \left(- \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} - 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
 		\mathrm \varepsilon_{L} & = \frac{1}{2} \, \left(\mathrm{\frac{\partial u}{\partial x}} - \mathrm{\frac{\partial v}{\partial y}}\right)\\
-		\mathrm \varepsilon_{N} & = \frac{1}{4} \, \left(\mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} + 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
+		\mathrm \varepsilon_{N} & = \frac{1}{4} \, \left(2 \, \mathrm{\frac{ \partial v}{\partial x}}\, \mathrm{\frac{ \partial v}{\partial x}} + \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} -\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} + 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
 		\mathrm \gamma_{L} & = \mathrm{\frac{\partial u}{\partial y}} + \mathrm{\frac{\partial v}{\partial x}}\\
 		\mathrm \gamma_{N} & = \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial y}} - 2\, \mathrm{\frac{ \partial u}{\partial x}}\, \mathrm{\frac{ \partial v}{\partial x}} 
 		-\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial y}} 
@@ -1388,13 +1388,13 @@ Now let nonlinear strain $\boldsymbol{E}_{N1}$ be written as a product between s
 \mathrm \varepsilon_{N1} \\
 \mathrm \gamma_{N1} \end{Bmatrix} =
 \begin{Bmatrix}
--\tfrac{1}{4} \, u_{,x}^2 -   \tfrac{1}{4} \, v_{,y}^2 \\
+ - \tfrac{1}{4} \, v_{,y}^2 \\
 -\tfrac{1}{4} \, u_{,x}^2 + \tfrac{1}{4} \, v_{,y}^2 \\
--u_{,y} \, u_{,x} + v_{,x} \, v_{,y} \end{Bmatrix} \notag \\
+ v_{,x} \, v_{,y} \end{Bmatrix} \notag \\
 & = \frac{1}{2} \, \begin{bmatrix}
--\tfrac{1}{2} \, \partial u / \partial x &  - \tfrac{1}{2} \, \partial v / \partial y \\
+0 &  - \tfrac{1}{2} \, \partial v / \partial y \\
 -\tfrac{1}{2} \, \partial u / \partial x &  \tfrac{1}{2} \, \partial v / \partial y \\
--2 \, \partial u / \partial y  & 2 \, \partial v / \partial x  \end{bmatrix} \, \begin{Bmatrix}
+0  & 2 \, \partial v / \partial x  \end{bmatrix} \, \begin{Bmatrix}
 \partial u / \partial x\\
 \partial v / \partial y
 \end{Bmatrix}\\
@@ -1405,64 +1405,64 @@ with
 \begin{subequations}
 	\begin{align}
 	\mathrm{d} \mathbf{A}_1 & =  \begin{bmatrix}
-	-\tfrac{1}{2} \, \partial \mathrm{d} u / \partial x &  - \tfrac{1}{2} \, \partial \mathrm{d} v / \partial y \\
+	0 &  - \tfrac{1}{2} \, \partial \mathrm{d} v / \partial y \\
 	-\tfrac{1}{2} \, \partial \mathrm{d} u / \partial x &  \tfrac{1}{2} \, \partial \mathrm{d} v / \partial y \\
-	-2 \, \partial \mathrm{d} u / \partial y  & 2 \, \partial \mathrm{d} v / \partial x  \end{bmatrix} \notag \\
+	0  & 2 \, \partial \mathrm{d} v / \partial x  \end{bmatrix} \notag \\
 	& = \begin{bmatrix}
-	-\tfrac{1}{2} \, \sum\nolimits_{i=1}^5 N_{i,x} \, \mathrm{d} u_i &  - \tfrac{1}{2} \, \sum\nolimits_{i=1}^5 N_{i,y} \, \mathrm{d} v_i \\
+	0 &  - \tfrac{1}{2} \, \sum\nolimits_{i=1}^5 N_{i,y} \, \mathrm{d} v_i \\
 	-\tfrac{1}{2} \, \sum\nolimits_{i=1}^5 N_{i,x} \, \mathrm{d} u_i &  \tfrac{1}{2} \, \sum\nolimits_{i=1}^5 N_{i,y} \, \mathrm{d} v_i \\
-	-2 \, \sum\nolimits_{i=1}^5 N_{i,y} \, \mathrm{d} u_i  & 2 \, \sum\nolimits_{i=1}^5 N_{i,x} \, \mathrm{d} v_i  \end{bmatrix}\notag \\
+	0  & 2 \, \sum\nolimits_{i=1}^5 N_{i,x} \, \mathrm{d} v_i  \end{bmatrix}\notag \\
 	& = \begin{bmatrix}
 	[\mathbf{l}_1] [\mathbf{l}_2] [\mathbf{l}_3] [\mathbf{l}_4] [\mathbf{l}_5] 
 	\end{bmatrix} \, \begin{bmatrix} [\mathbf{d}_1] [\mathbf{d}_2] [\mathbf{d}_3] [\mathbf{d}_4] [\mathbf{d}_5] \end{bmatrix}^{\mathsf{T}}
 	= \mathbf{L}_1 \mathbf{D}_1 \\
 	\intertext{wherein}
 	[\mathbf{l}_i] & = \begin{bmatrix}
-	-\tfrac{1}{2} \, N_{i,x} &  - \tfrac{1}{2} \, N_{i,y} \\
+	0 &  - \tfrac{1}{2} \, N_{i,y} \\
 	-\tfrac{1}{2} \, N_{i,x} &  \tfrac{1}{2} \, N_{i,y} \\
-	-2 \, N_{i,y} \, & 2 \, N_{i,x} \end{bmatrix}  \quad \text{and} \quad	[\mathbf{d}_i] = \begin{bmatrix}
+	0 & 2 \, N_{i,x} \end{bmatrix}  \quad \text{and} \quad	[\mathbf{d}_i] = \begin{bmatrix}
 	\mathrm{d} u_i & 0 \\
 	0 &  \mathrm{d} v_i  \end{bmatrix} .
 	\end{align}
 \end{subequations}
 To obtain the nonlinear strain--displacement matrix, we require the nonlinear strain to be expressed in terms of the nodal displacements. This is achieved by expressing the elements of displacement gradient in terms of the nodal displacements by using the shape functions, specifically, the vector $\boldsymbol{\theta}_1$ can be written as
 \small
-\begin{equation}
-\boldsymbol{\theta}_1 =  \begin{Bmatrix}
-\partial u / \partial x\\
-\partial v / \partial y
-\end{Bmatrix}
-= \begin{Bmatrix}
-\sum\nolimits_{i=1}^5 N_{i,x} \, u_i\\
-\sum\nolimits_{i=1}^5 N_{i,y} \, v_i
-\end{Bmatrix} 
-= \begin{bmatrix}
-[\mathbf{h}_1] [\mathbf{h}_2] [\mathbf{h}_3] [\mathbf{h}_4] [\mathbf{h}_5] 
-\end{bmatrix} \bigl\{ \begin{matrix} \mathbf{u}^{(e)} \end{matrix} \bigr\} \\ 
-= \mathbf{H}_1  \mathbf{u}^{(e)}
-\end{equation}
-\normalsize
-where the components of $\mathbf{H}_1$ contains the derivatives of shape functions with respect to spatial variables, i.e.,
-\begin{equation}
-[\mathbf{h}_i] = \begin{bmatrix}
-N_{i,x} &  0  \\
-0 & N_{i,y}  \end{bmatrix} .
-\end{equation}
+\begin{subequations}
+	\begin{align}
+	\boldsymbol{\theta}_1 =  \begin{Bmatrix}
+		\partial u / \partial x\\
+		\partial v / \partial y
+	\end{Bmatrix}
+	= \begin{Bmatrix}
+		\sum\nolimits_{i=1}^5 N_{i,x} \, u_i\\
+		\sum\nolimits_{i=1}^5 N_{i,y} \, v_i
+	\end{Bmatrix} 
+	& = \begin{bmatrix}
+		[\mathbf{h}_1] [\mathbf{h}_2] [\mathbf{h}_3] [\mathbf{h}_4] [\mathbf{h}_5] 
+	\end{bmatrix} \bigl\{ \begin{matrix} \mathbf{u}^{(e)} \end{matrix} \bigr\} 
+	= \mathbf{H}_1  \mathbf{u}^{(e)} \\
+		\intertext{where the components of $\mathbf{H}_1$ contains the derivatives of shape functions with respect to spatial variables, i.e.,}
+		[\mathbf{h}_i] & = \begin{bmatrix}
+			N_{i,x} &  0  \\
+			0 & N_{i,y}  \end{bmatrix} .
+	\end{align}
+\end{subequations}
+\normalsize 
 Therefore, the first nonlinear strain--displacement matrix $\mathbf{B}_{N1}$ can be written as
-\begin{equation}
-\mathbf{B}_{N1} = \mathbf{A}_1 \, \mathbf{H}_1 = \begin{bmatrix}
-[\mathbf{b}_{N1}] [\mathbf{b}_{N2}] [\mathbf{b}_{N3}] [\mathbf{b}_{N4}] [\mathbf{b}_{N5}] 
-\end{bmatrix} 
-\end{equation}
-where the components of $\mathbf{B}_{N1}$ are given as
-\begin{equation}
-[\mathbf{b}_{Ni}] = \begin{bmatrix}
--\tfrac{1}{2} \, \partial u / \partial x &  - \tfrac{1}{2} \, \partial v / \partial y \\
--\tfrac{1}{2} \, \partial u / \partial x &  \tfrac{1}{2} \, \partial v / \partial y \\
--2 \, \partial u / \partial y  & 2 \, \partial v / \partial x  \end{bmatrix}  \, \begin{bmatrix}
-N_{i,x} &  0  \\
-0 & N_{i,y}  \end{bmatrix}. 
-\end{equation}
+\begin{subequations}
+	\begin{align}
+	\mathbf{B}_{N1} = \mathbf{A}_1 \, \mathbf{H}_1 = \begin{bmatrix}
+		[\mathbf{b}_{N1}] [\mathbf{b}_{N2}] [\mathbf{b}_{N3}] [\mathbf{b}_{N4}] [\mathbf{b}_{N5}] 
+	\end{bmatrix}  \\
+		\intertext{where the components of $\mathbf{B}_{N1}$ are given as}
+		[\mathbf{b}_{Ni}] = \begin{bmatrix}
+			0 &  - \tfrac{1}{2} \, \partial v / \partial y \\
+			-\tfrac{1}{2} \, \partial u / \partial x &  \tfrac{1}{2} \, \partial v / \partial y \\
+			0  & 2 \, \partial v / \partial x  \end{bmatrix}  \, \begin{bmatrix}
+			N_{i,x} &  0  \\
+			0 & N_{i,y}  \end{bmatrix}.
+	\end{align}
+\end{subequations}
 
 In a similar manner, the second nonlinear strain terms can be written as
 \begin{equation}
@@ -1474,15 +1474,13 @@ In a similar manner, the second nonlinear strain terms can be written as
 \begin{Bmatrix}
 -\tfrac{1}{2} \, u_{,y} \, v_{,x}  \\
 \tfrac{1}{2} \, u_{,y} \, v_{,x} \\
--2 \, u_{,x} \, v_{,x} \end{Bmatrix} \\ 
-& = \frac{1}{2} \, \begin{bmatrix}
+-2 \, u_{,x} \, v_{,x} \end{Bmatrix} = \frac{1}{2} \, \begin{bmatrix}
 - \partial v / \partial x &  0 \\
 \partial v / \partial x & 0 \\
 0 & -4 \, \partial u / \partial x  \end{bmatrix} \, \begin{Bmatrix}
 \partial u / \partial y\\
 \partial v / \partial x
-\end{Bmatrix} \\
-& = \tfrac{1}{2} \, \mathbf{A}_2 \, \boldsymbol{\theta}_2
+\end{Bmatrix} = \tfrac{1}{2} \, \mathbf{A}_2 \, \boldsymbol{\theta}_2
 \end{aligned}
 \end{equation}
 with  
@@ -1511,43 +1509,127 @@ with
 \end{subequations}
 The vector $\boldsymbol{\theta}_2$ is expressed in terms of the nodal displacements with the use of shape functions as
 \small
-\begin{equation}
-\boldsymbol{\theta}_2 =  \begin{Bmatrix}
-\partial u / \partial y\\
-\partial v / \partial x
-\end{Bmatrix}
-= \begin{Bmatrix}
-\sum\nolimits_{i=1}^5 N_{i,y} \, u_i\\
-\sum\nolimits_{i=1}^5 N_{i,x} \, v_i
-\end{Bmatrix} 
-= \begin{bmatrix}
-[\mathbf{h}_1] [\mathbf{h}_2] [\mathbf{h}_3] [\mathbf{h}_4] [\mathbf{h}_5] 
-\end{bmatrix} \bigl\{ \begin{matrix} \mathbf{u}^{(e)} \end{matrix} \bigr\}
-= \mathbf{H}_2  \mathbf{u}^{(e)}  
-\end{equation}
+\begin{subequations}
+	\begin{align}
+		\boldsymbol{\theta}_2 =  \begin{Bmatrix}
+			\partial u / \partial y\\
+			\partial v / \partial x
+		\end{Bmatrix}
+		= \begin{Bmatrix}
+			\sum\nolimits_{i=1}^5 N_{i,y} \, u_i\\
+			\sum\nolimits_{i=1}^5 N_{i,x} \, v_i
+		\end{Bmatrix} 
+		& = \begin{bmatrix}
+			[\mathbf{h}_1] [\mathbf{h}_2] [\mathbf{h}_3] [\mathbf{h}_4] [\mathbf{h}_5] 
+		\end{bmatrix} \bigl\{ \begin{matrix} \mathbf{u}^{(e)} \end{matrix} \bigr\}
+		= \mathbf{H}_2  \mathbf{u}^{(e)}  \\
+		\intertext{where the elements of $\mathbf{H}_2$ are given as}
+		[\mathbf{h}_i] & = \begin{bmatrix}
+			N_{i,y} &  0  \\
+			0 & N_{i,x}  \end{bmatrix}.
+	\end{align}
+\end{subequations}
 \normalsize
-where the elements of $\mathbf{H}_2$ are given as
-\begin{equation}
-[\mathbf{h}_i] = \begin{bmatrix}
-N_{i,y} &  0  \\
-0 & N_{i,x}  \end{bmatrix}. 
-\end{equation}
 Hence, the second nonlinear strain--displacement matrix $\mathbf{B}_{N2}$ becomes
+\begin{subequations}
+	\begin{align}
+		\mathbf{B}_{N2} = \mathbf{A}_2 \, \mathbf{H}_2 = \begin{bmatrix}
+			[\mathbf{b}_{N1}] [\mathbf{b}_{N2}] [\mathbf{b}_{N3}] [\mathbf{b}_{N4}] [\mathbf{b}_{N5}] 
+		\end{bmatrix}  \\
+		\intertext{where its elements are given as}
+		[\mathbf{b}_{Ni}] = \begin{bmatrix}
+			- \partial v / \partial x &  0 \\
+			\partial v / \partial x &  0 \\
+			0 & -4 \, \partial u / \partial x  \end{bmatrix} \, \begin{bmatrix}
+			N_{i,y} &  0  \\
+			0 & N_{i,x}  \end{bmatrix}.
+	\end{align}
+\end{subequations}
+
+
+Also, the third nonlinear strain terms can be written as
 \begin{equation}
-\mathbf{B}_{N2} = \mathbf{A}_2 \, \mathbf{H}_2 = \begin{bmatrix}
-[\mathbf{b}_{N1}] [\mathbf{b}_{N2}] [\mathbf{b}_{N3}] [\mathbf{b}_{N4}] [\mathbf{b}_{N5}] 
-\end{bmatrix} 
+	\begin{aligned}
+		\mathbf{E}_{N3} & =  \begin{Bmatrix}
+			\mathrm \xi_{N3} \\
+			\mathrm \varepsilon_{N3} \\
+			\mathrm \gamma_{N3} \end{Bmatrix} =
+		\begin{Bmatrix}
+			-\tfrac{1}{4} \, u_{,x}^2  \\
+			\tfrac{1}{2} \, v_{,x}^2  \\
+			-u_{,y} \, u_{,x}  \end{Bmatrix}  = \frac{1}{2} \, \begin{bmatrix}
+			-\tfrac{1}{2} \, \partial u / \partial x & 0  \\
+			0 & \partial v / \partial x \\
+			-2 \, \partial u / \partial y  & 0  \end{bmatrix} \, \begin{Bmatrix}
+			\partial u / \partial x\\
+			\partial v / \partial x
+		\end{Bmatrix} = \tfrac{1}{2} \, \mathbf{A}_3 \, \boldsymbol{\theta}_3
+	\end{aligned}
 \end{equation}
-where its elements are given as
-\begin{equation}
-[\mathbf{b}_{Ni}] = \begin{bmatrix}
-- \partial v / \partial x &  0 \\
-\partial v / \partial x &  0 \\
-0 & -4 \, \partial u / \partial x  \end{bmatrix} \, \begin{bmatrix}
-N_{i,y} &  0  \\
-0 & N_{i,x}  \end{bmatrix}. 
-\end{equation}
-The total nonlinear strain--displacement matrix is evaluated as the summation of its components $ \mathbf{B}_{N1}$ and $\mathbf{B}_{N2}$. Now, with all the strain--displacement matrices evaluated, we are ready to compute the stiffness matrix for a planar membrane.
+with 
+\begin{subequations}
+	\begin{align}
+		\mathrm{d} \mathbf{A}_3 & =  \begin{bmatrix}
+			-\tfrac{1}{2} \, \partial \mathrm{d} u / \partial x &  0 \\
+			0 & \partial \mathrm{d} v / \partial x \\
+			-2 \, \partial \mathrm{d} u / \partial y  & 0 \end{bmatrix} \notag \\
+		& = \begin{bmatrix}
+			-\tfrac{1}{2} \, \sum\nolimits_{i=1}^5 N_{i,x} \, \mathrm{d} u_i &  0 \\
+			0 &  \sum\nolimits_{i=1}^5 N_{i,x} \, \mathrm{d} v_i \\
+			-2 \, \sum\nolimits_{i=1}^5 N_{i,y} \, \mathrm{d} u_i  & 0 \end{bmatrix}\notag \\
+		& = \begin{bmatrix}
+			[\mathbf{l}_1] [\mathbf{l}_2] [\mathbf{l}_3] [\mathbf{l}_4] [\mathbf{l}_5] 
+		\end{bmatrix} \, \begin{bmatrix} [\mathbf{d}_1] [\mathbf{d}_2] [\mathbf{d}_3] [\mathbf{d}_4] [\mathbf{d}_5] \end{bmatrix}^{\mathsf{T}}
+		= \mathbf{L}_3 \mathbf{D}_3 \\
+		\intertext{wherein}
+		[\mathbf{l}_i] & = \begin{bmatrix}
+			-\tfrac{1}{2} \, N_{i,x} &  0 \\
+		0 &  N_{i,x} \\
+			-2 \, N_{i,y} \, & 0 \end{bmatrix}  \quad \text{and} \quad	[\mathbf{d}_i] = \begin{bmatrix}
+			\mathrm{d} u_i & 0 \\
+			0 &  \mathrm{d} v_i  \end{bmatrix} .
+	\end{align}
+\end{subequations}
+The vector $\boldsymbol{\theta}_3$ is expressed in terms of the nodal displacements with the use of shape functions as
+\small
+\begin{subequations}
+	\begin{align}
+		\boldsymbol{\theta}_3 =  \begin{Bmatrix}
+			\partial u / \partial x\\
+			\partial v / \partial x
+		\end{Bmatrix}
+		= \begin{Bmatrix}
+			\sum\nolimits_{i=1}^5 N_{i,x} \, u_i\\
+			\sum\nolimits_{i=1}^5 N_{i,x} \, v_i
+		\end{Bmatrix} 
+		& = \begin{bmatrix}
+			[\mathbf{h}_1] [\mathbf{h}_2] [\mathbf{h}_3] [\mathbf{h}_4] [\mathbf{h}_5] 
+		\end{bmatrix} \bigl\{ \begin{matrix} \mathbf{u}^{(e)} \end{matrix} \bigr\} 
+		= \mathbf{H}_3  \mathbf{u}^{(e)} \\
+		\intertext{where the components of $\mathbf{H}_3$ contains the derivatives of shape functions with respect to spatial variables, i.e.,}
+		[\mathbf{h}_i] & = \begin{bmatrix}
+			N_{i,x} &  0  \\
+			0 & N_{i,x}  \end{bmatrix} .
+	\end{align}
+\end{subequations}
+\normalsize 
+Therefore, the first nonlinear strain--displacement matrix $\mathbf{B}_{N3}$ can be written as
+\begin{subequations}
+	\begin{align}
+		\mathbf{B}_{N3} = \mathbf{A}_3 \, \mathbf{H}_3 = \begin{bmatrix}
+			[\mathbf{b}_{N1}] [\mathbf{b}_{N2}] [\mathbf{b}_{N3}] [\mathbf{b}_{N4}] [\mathbf{b}_{N5}] 
+		\end{bmatrix}  \\
+		\intertext{where the components of $\mathbf{B}_{N3}$ are given as}
+		[\mathbf{b}_{Ni}] = \begin{bmatrix}
+			-\tfrac{1}{2} \, \partial u / \partial x &  0 \\
+			0 &  \partial v / \partial y \\
+			-2 \, \partial u / \partial y  & 0  \end{bmatrix}  \, \begin{bmatrix}
+			N_{i,x} &  0  \\
+			0 & N_{i,x}  \end{bmatrix}.
+	\end{align}
+\end{subequations}
+
+The total nonlinear strain--displacement matrix is evaluated as the summation of its components $ \mathbf{B}_{N1}$, $\mathbf{B}_{N2}$, and $\mathbf{B}_{N3}$. Now, with all the strain--displacement matrices evaluated, we are ready to compute the stiffness matrix for a planar membrane.
 
 To obtain the stiffness matrix for a planar membrane, we need to compute the four constituent strain-displacement matrices $\mathbf{C}^s$, $\mathbf{C}^t$, $\mathbf{K}^s$ and $\mathbf{K}^t$, as mentioned earlier. These strain-displacement matrices are obtained by expressing their corresponding strain components in terms of the five nodal displacements, with help from the shape functions.
 
@@ -1653,7 +1735,7 @@ It is possible to express the components of Laplace stretch $\boldsymbol{\mathca
 \end{equation}
 where ${C_{11}}$, ${C_{12}}$, ${C_{13}}$, $C_{22}$, $C_{23}$ and ${C_{33}}$ are components of the right Cauchy--Green tensor $\mathbf{C}$.
 
-Now in order to obtain the stiffness matrix for an alveolar volume, first we need to we derive the strain attributes and express them in terms of the nodal displacements. The strain attributes are defined in terms of the derived elements of Laplace stretch, as mentioned earlier.
+Now in order to obtain the stiffness matrix for an alveolar volume, first we need to derive the strain attributes and express them in terms of the nodal displacements. The strain attributes are defined in terms of the derived elements of Laplace stretch, as mentioned earlier.
 
 The dilatation $\delta$ for an alveolar volume is
 \begin{subequations}
@@ -1882,7 +1964,7 @@ In a similar manner, we can obtain the strain-displacement matrices correspondin
 \mathrm \gamma_{2N} \\
 \mathrm \gamma_{3N} \end{Bmatrix} =
 \begin{Bmatrix}
-\tfrac{1}{6} \,  \left( v_{,z}^2 - v_{,z}^2 - w_{,y}^2  \right)\\
+\tfrac{1}{6} \,  \left( u_{,z}^2 - v_{,z}^2 - w_{,y}^2  \right)\\
 \tfrac{-1}{6} \, w_{,y}^2 \\
 \tfrac{1}{6} \,  \left( - u_{,z}^2  + v_{,z}^2 + 3 \, w_{,y}^2 \right) \\
 0 \\
@@ -2043,8 +2125,8 @@ with
 		0 &  0 & 0  \\
 		0 &  0 & 0  \\
 		0 &  0 & 0  \end{bmatrix}  \quad \text{and} \quad	[\mathbf{d}_i] = \begin{bmatrix}
-		\mathrm{d} u_i & 0  & 0  \\
-		0 &  \mathrm{d} v_i   & 0  \\
+		\mathrm{d} v_i & 0  & 0  \\
+		0 &  \mathrm{d} w_i   & 0  \\
 		0 & 0 & \mathrm{d} w_i \end{bmatrix} .
 	\end{align}
 \end{subequations}
@@ -2155,9 +2237,9 @@ with
 			4 \,  N_{i,z}  &  0 & 4 \,  N_{i,x}   \\
 			-4 \,  N_{i,z} &  0 & - 4 \,  N_{i,x}  \\
 			- 4 \,  N_{i,x} &  0 & 0  \end{bmatrix}   \quad \text{and} \quad	[\mathbf{d}_i] = \begin{bmatrix}
-			\mathrm{d} u_i & 0  & 0  \\
+			\mathrm{d} v_i & 0  & 0  \\
 			0 &  \mathrm{d} v_i   & 0  \\
-			0 & 0 & \mathrm{d} w_i \end{bmatrix} .
+			0 & 0 & \mathrm{d} u_i \end{bmatrix} .
 	\end{align}
 \end{subequations}
 
@@ -2221,14 +2303,14 @@ The last nonlinear strain term, $\mathbf{E}_{N5}$ can be written as
 			0\\
 			0   \\
 			0  \\
-			-2 \, v_{,x} \, u_{,z} - 4 \, w_{,y} \, v_{,y}  - 2 \, v_{,x} \, w_{,x} \\
+			- v_{,x} \, u_{,z} - 2 \, w_{,y} \, v_{,y}  - u_{,y} \, w_{,x} \\
 			0 \\ 
 			0 \end{Bmatrix} \\
 		& = \frac{1}{2} \, \begin{bmatrix}
 			0 & 0 &  0   \\
 			0 &  0 & 0  \\
 			0 &  0 & 0 \\
-			- 2 \, \partial v / \partial x & - 4 \, \partial w / \partial y & - 2 \, \partial v / \partial x  \\
+			- 2 \, \partial v / \partial x & - 4 \, \partial w / \partial y & - 2 \, \partial u / \partial y  \\
 			0 &  0 & 0  \\
 			0 &  0 & 0  \end{bmatrix} \, \begin{Bmatrix}
 			\partial u / \partial z\\
@@ -2245,14 +2327,14 @@ with
 			0 & 0 &  0   \\
 			0 &  0 & 0  \\
 			0 &  0 & 0 \\
-			- 2 \, \partial \mathrm{d} v / \partial x & - 4 \, \partial \mathrm{d} w / \partial y & - 2 \, \partial \mathrm{d} v / \partial x  \\
+			- 2 \, \partial \mathrm{d} v / \partial x & - 4 \, \partial \mathrm{d} w / \partial y & - 2 \, \partial \mathrm{d} u / \partial y  \\
 			0 &  0 & 0  \\
 			0 &  0 & 0  \end{bmatrix} \notag\\
 		& = \begin{bmatrix}
 			0 & 0 &  0   \\
 			0 &  0 & 0  \\
 			0 &  0 & 0 \\
-			- 2 \, \sum\nolimits_{i=1}^4 N_{i,x} \, \mathrm{d} v_i  & - 4 \, \sum\nolimits_{i=1}^4 N_{i,y} \, \mathrm{d} w_i  & - 2 \, \sum\nolimits_{i=1}^4 N_{i,x} \, \mathrm{d} v_i   \\
+			- 2 \, \sum\nolimits_{i=1}^4 N_{i,x} \, \mathrm{d} v_i  & - 4 \, \sum\nolimits_{i=1}^4 N_{i,y} \, \mathrm{d} w_i  & - 2 \, \sum\nolimits_{i=1}^4 N_{i,y} \, \mathrm{d} u_i   \\
 			0 &  0 & 0  \\
 			0 &  0 & 0  \end{bmatrix} \notag \\	
 		& = \begin{bmatrix}
@@ -2264,12 +2346,12 @@ with
 			0 & 0 &  0   \\
 			0 &  0 & 0  \\
 			0 &  0 & 0 \\
-			- 2 \, N_{i,x}  & - 4 \,  N_{i,y}  & - 2 \, N_{i,x}  \\
+			- 2 \, N_{i,x}  & - 4 \,  N_{i,y}  & - 2 \, N_{i,y}  \\
 			0 &  0 & 0  \\
 			0 &  0 & 0  \end{bmatrix}    \quad \text{and} \quad	[\mathbf{d}_i] = \begin{bmatrix}
-			\mathrm{d} u_i & 0  & 0  \\
-			0 &  \mathrm{d} v_i   & 0  \\
-			0 & 0 & \mathrm{d} w_i \end{bmatrix} .
+			\mathrm{d} v_i & 0  & 0  \\
+			0 &  \mathrm{d} w_i   & 0  \\
+			0 & 0 & \mathrm{d} u_i \end{bmatrix} .
 	\end{align}
 \end{subequations}
 
@@ -2309,7 +2391,7 @@ whose components are given as
 		0 & 0 &  0   \\
 		0 &  0 & 0  \\
 		0 &  0 & 0 \\
-		- 2 \, \partial v / \partial x & - 4 \, \partial w / \partial y & - 2 \, \partial v / \partial x  \\
+		- 2 \, \partial v / \partial x & - 4 \, \partial w / \partial y & - 2 \, \partial u / \partial y  \\
 		0 &  0 & 0  \\
 		0 &  0 & 0  \end{bmatrix} \, \begin{bmatrix}
 		N_{i,z} &  0 & 0  \\
@@ -2420,16 +2502,16 @@ where the first integral only needs to be evaluated once, as the argument is con
 
 Following the procedure described above,the force vector of the 1-D alveolar chord is evaluated numerically in its natural co-ordinate system as
 \begin{equation}
-\mathbf{F}_{BC} = \int_L \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} L  =  \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, | \mathbf{J} | \, \mathrm{w}_i
+\mathbf{F}_{BC} = \int_L \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} L  =  \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, | \mathbf{J} | \, \mathrm{w}_i
 \end{equation}
-where $\mathrm{w}_i$ are the  weighting coefficients of the Gauss integration rule, $\mathbf{N}$ is the shape function matrix for chord, and $\mathbf{t}$ is the traction on the septal chord that is selected so that the traction can be additively decomposed into that carried by the collagen and elastin fibers, i.e., $\mathbf{t} = \mathbf{t}^c + \mathbf{t}^e $ as described in part 4.
+where $\mathrm{w}_i$ are the  weighting coefficients of the Gauss integration rule, $\mathbf{N}$ is the shape function matrix for chord, and $\mathbf{t}$ is the traction on the septal chord that is selected so that the traction can be additively decomposed into that carried by the collagen and elastin fibers, i.e., $\mathbf{t} = \mathbf{t}^c + \mathbf{t}^e $.
 
 The internal force $\boldsymbol{F}_0$ accounting for an initial residual stress of $\boldsymbol{T}_0$ as two separate integrals can be computed as
 
 \begin{subequations}
 	\begin{align}
 		\boldsymbol{F}_0 & = \int_L \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, \mathrm{d} L + \int_L \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, \mathrm{d} L \\
-		& =  \sum_{i=1}^{n} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, | \mathbf{J} | \, \mathrm{w}_i +  \sum_{i=1}^{n} \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, | \mathbf{J} | \, \mathrm{w}_i
+		& =  \sum_{i=1}^{2} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, | \mathbf{J} | \, \mathrm{w}_i +  \sum_{i=1}^{2} \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, | \mathbf{J} | \, \mathrm{w}_i
 		\intertext{where the first integral will only need to be evaluated once, as the argument is constant valued.
 		Here the initial stress $\mathbf{T}_0 = [s_0] \mapsto \mathbf{S}_0 = [s_0]$  contains the initial stress $s_0$ carried by the collagen and elastin fibers; specifically, from the rule of mixtures}
 		s_0 & = \bigl( \phi s_0^c + (1-\phi) s_0^e \bigr) 
@@ -2443,13 +2525,13 @@ The superscripts $c$ and $e$ designating collagen and elastin.
 \subsection{Force Vector for a Pentagon}
 
 The boundary of a two dimensional pentagon consists of line segments, which can be considered as one-dimensional chords. Hence, the evaluation of the boundary integrals on pentagon amounts to evaluating the line integrals on these boundary lines. Once the interpolation function for a pentagon are evaluated on the boundary of pentagon, we can obtain the corresponding chordal interpolation functions \cite{Reddy93}.
-Thus, the force vector $\mathbf{F}_{BC}$  for a pentagon can be obtained by integrating the traction vectors over all sides of pentagon. Specifically, the force on the boundary of the membrane can be obtained as
+Thus, the force vector $\mathbf{F}_{BC}$  for a pentagon can be obtained by integrating the traction vectors multiplied by appropriate shape functions over all sides of pentagon. Specifically, the force on the boundary of the membrane can be obtained as
 \begin{equation}
 \begin{aligned}
 \mathbf{F}_{BC}  = \oint_L \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} L & = \int_{L_{12}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{12} \,|\mathbf{J}| \, \mathrm{d} L + \int_{L_{23}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{23} \,|\mathbf{J}| \, \mathrm{d} L + \int_{L_{34}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{34} \,|\mathbf{J}| \, \mathrm{d} L \\
 & + \int_{L_{45}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{45} \, \,|\mathbf{J}| \, \mathrm{d} L + \int_{L_{51}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{51} \,|\mathbf{J}| \, \mathrm{d} L \\
-& = \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{12} \,|\mathbf{J}| \, \mathrm{w}_i + \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{23} \,|\mathbf{J}| \, \mathrm{w}_i + \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{34} \,|\mathbf{J}| \, \mathrm{w}_i \\
-& + \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{45} \, \,|\mathbf{J}| \, \mathrm{w}_i + \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{51} \,|\mathbf{J}| \, \mathrm{w}_i
+& = \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{12} \,|\mathbf{J}| \, \mathrm{w}_i + \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{23} \,|\mathbf{J}| \, \mathrm{w}_i + \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{34} \,|\mathbf{J}| \, \mathrm{w}_i \\
+& + \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{45} \, \,|\mathbf{J}| \, \mathrm{w}_i + \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{51} \,|\mathbf{J}| \, \mathrm{w}_i
 \end{aligned}
 \end{equation}
 where $\mathbf{N}$ represents the shape function matrix of a chord, but with the matrix dimension of a pentagon, $|\mathbf{J}|$ is the determinant of the Jacobian for a 1-D chord, $\mathrm{w}_i$ denotes the natural weight of the chord, $\mathrm{d} S$ is the arc-length of an infinitesimal line element along the boundary, and $\mathbf{t}$ is the traction vector on each edge of the pentagon defined as
@@ -2464,10 +2546,10 @@ The internal force $\boldsymbol{F}_0$ accounting for an initial residual stress 
 	\begin{aligned}
 		\boldsymbol{F}_0 &= \int_V \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, 
 		\mathrm{d}V + 	\int_V \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, \mathrm{d}V \\
-		& =  \sum_{i=1}^{n} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, h \, | \mathbf{J} | \, \mathrm{w}_i +  \sum_{i=1}^{n} \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, h \, | \mathbf{J} | \, \mathrm{w}_i
+		& =  \sum_{i=1}^{5} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, h \, | \mathbf{J} | \, \mathrm{w}_i +  \sum_{i=1}^{5} \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, h \, | \mathbf{J} | \, \mathrm{w}_i
 	\end{aligned}
 \end{equation}
-Here the initial stress $\mathbf{T}_0 = [s_0] \mapsto \mathbf{S}_0 = [s_0]$  contains the initial stress $s_0$ carried by the septal membrane.
+where $\mathbf{B}$ and $\mathbf{J}$ are the strain displacement and Jacobian matrix of pentagon, respectively. Here the initial stress $\mathbf{T}_0 = [s_0] \mapsto \mathbf{S}_0 = [s_0]$  contains the initial stress $s_0$ carried by the septal membrane.
 
 \subsection{Force Vector for a Tetrahedron}
 
@@ -2476,8 +2558,8 @@ The force vector on the alveolar volume is computed by integrating the traction 
 \begin{aligned}
 \mathbf{F}_{BC} &= \oint_{A} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} A = \int_{\triangle_{1}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{1}} \, \mathrm{d} A  + \int_{\triangle_{2}}  \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{2}}  \, \mathrm{d} A \\
 & + \int_{\triangle_{3}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{3}} \, \mathrm{d} A + \int_{\triangle_{4}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{4}} \, \mathrm{d} A \\
-& = \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{1}} \,|\mathbf{J}| \, \mathrm{w}_i  + \sum_{i=1}^{n}  \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{2}} \,|\mathbf{J}| \, \mathrm{w}_i  \\
-& + \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{3}} \,|\mathbf{J}| \, \mathrm{w}_i  + \sum_{i=1}^{n}  \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{4}} \,|\mathbf{J}| \, \mathrm{w}_i 
+& = \sum_{i=1}^{3} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{1}} \,|\mathbf{J}| \, \mathrm{w}_i  + \sum_{i=1}^{3}  \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{2}} \,|\mathbf{J}| \, \mathrm{w}_i  \\
+& + \sum_{i=1}^{3} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{3}} \,|\mathbf{J}| \, \mathrm{w}_i  + \sum_{i=1}^{3}  \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{4}} \,|\mathbf{J}| \, \mathrm{w}_i 
 \end{aligned}
 \end{equation}
 where $\Delta_i, i=1, 2, 3, 4$ represents the triangular boundary surface of the tetrahedron. Here $ \mathbf{N}$ represents the shape function matrix for these associated triangular boundaries.   $|\mathbf{J}|$ is the determinant of the Jacobian for triangle, $n$ denotes the number of Gauss points, $\mathrm{w}_i$ is the natural weight of the triangle from Table~\ref{tab:3nodeTriangle}, and $\mathbf{t}$ is the surface traction on the triangle surface. $\oint$ denotes the integral over the surface boundary of the tetrahedron.
@@ -2485,7 +2567,7 @@ where $\Delta_i, i=1, 2, 3, 4$ represents the triangular boundary surface of the
 Note that except for the base of the tetrahedron, the tractions on its other sides have equal and opposite contributions to the total force vector. Therefore, contributions from opposite boundary surfaces of the tetrahedron nullify each other. Hence, in order to obtain the total force vector for a tetrahedron, it is sufficient to only consider the contributions due to the traction on its base. Therefore, the total force vector takes the form of
 
 \begin{equation}
-\mathbf{F}_{BC} = \sum_{i=1}^{n} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{1}} \,|\mathbf{J}| \, \mathrm{w}_i 
+\mathbf{F}_{BC} = \sum_{i=1}^{3} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{1}} \,|\mathbf{J}| \, \mathrm{w}_i 
 \end{equation}
 where $\mathbf{t}_{\triangle_{1}}$ is the traction vector on the surface of triangle defined as
 \begin{equation}
@@ -2499,9 +2581,9 @@ The internal force $\boldsymbol{F}_0$ accounting for an initial residual stress 
 	\begin{align}
 		\boldsymbol{F}_0 & = \int_{V} \mathbf{B}^{\mathsf{T}} \,	\boldsymbol{T}_0 \, 
 		\mathrm{d} V \\
-		& =  \sum_{i=1}^{n} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, | \mathbf{J} | \, \mathrm{w}_i +  \sum_{i=1}^{n} \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, | \mathbf{J} | \, \mathrm{w}_i
+		& =  \sum_{i=1}^{4} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, | \mathbf{J} | \, \mathrm{w}_i +  \sum_{i=1}^{4} \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, | \mathbf{J} | \, \mathrm{w}_i
 	\end{align}
 \end{subequations}
-where the first integral will only need to be evaluated once, as the argument is constant valued.
+where $\mathbf{B}$ and $\mathbf{J}$ are the strain displacement and Jacobian matrix of tetrahedron, respectively. 
 Here the stress vector $\boldsymbol{T}_0 = \{ \Pi, \sigma_1, \sigma_2, \tau_1, \tau_2, \tau_3 \}^{\mathsf{T}}$ conjugate to strain $\boldsymbol{E}$, where $\mathbf{T}_0 = [s_0] \mapsto \mathbf{S}_0 = [s_0]$  contains the pressure $s_0$ inside the tetrahedron.
 
