@@ -38,7 +38,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.1"
 __date__ = "08-08-2019"
-__update__ = "11-16-2020"
+__update__ = "12-06-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -245,9 +245,16 @@ methods
        input
             reindex is an instance of Pivot object from module pivotIncomingF      
        output
-            Dmtx1 is change in displacement ( dA2 = L2 * D2 ) in the contribution 
+            Dmtx2 is change in displacement ( dA2 = L2 * D2 ) in the contribution 
             to the second nonlinear strain
 
+    Dmtx3 = sf.dDisplacement3(reindex)
+       input
+            reindex is an instance of Pivot object from module pivotIncomingF      
+       output
+            Dmtx3 is change in displacement ( dA3 = L3 * D3 ) in the contribution 
+            to the third nonlinear strain
+            
     pMtx = p.rotation(state)
         returns a 3x3 orthogonal matrix that rotates the reference base vectors
         of the dodecahedron into a set of local base vectors pertaining to an
@@ -1460,13 +1467,22 @@ class pentagon(object):
             Dmtx2 = self.dDisplacement2(reindex)      
             dA2 = np.dot(Lmtx2, np.transpose(Dmtx2))            
             dSt2 = A2.T.dot(Mt).dot(dA2)
+
+            Hmtx3 = psfn.H3(xn1, xn2, xn3, xn4, xn5)
+            Lmtx3 = psfn.L3(xn1, xn2, xn3, xn4, xn5)
+            BNmtx3 = psfn.BN3(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
+            A3 = psfn.A3(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)              
+            Dmtx3 = self.dDisplacement3(reindex)      
+            dA3 = np.dot(Lmtx3, np.transpose(Dmtx3))            
+            dSt3 = A3.T.dot(Mt).dot(dA3)
             
             # total nonlinear Bmatrix
-            BNmtx = np.add(BNmtx1, BNmtx2)
+            BNmtx = BNmtx1 + BNmtx2 + BNmtx3
             
             # the tangent stiffness matrix Cs1
             Cs1 += (self._width * Jdet * wgt * ( Hmtx1.T.dot(Ss).dot(Hmtx1) 
-                                               + Hmtx2.T.dot(Ss).dot(Hmtx2) ))
+                                               + Hmtx2.T.dot(Ss).dot(Hmtx2)
+                                               + Hmtx3.T.dot(Ss).dot(Hmtx3)))
             # the tangent stiffness matrix Ct1
             Ct1 += (self._width * Jdet * wgt * ( BLmtx.T.dot(Mt).dot(BLmtx) 
                                                + BLmtx.T.dot(Mt).dot(BNmtx)
@@ -1479,7 +1495,8 @@ class pentagon(object):
                                                + BNmtx.T.dot(Ms).dot(BNmtx) ))
             # the secant stiffness matrix Kt1
             Kt1 += (self._width * Jdet * wgt * ( Hmtx1.T.dot(dSt1).dot(Hmtx1) 
-                                               + Hmtx2.T.dot(dSt2).dot(Hmtx2) ))
+                                               + Hmtx2.T.dot(dSt2).dot(Hmtx2)
+                                               + Hmtx3.T.dot(dSt3).dot(Hmtx3)))
 
         Cs = np.zeros((10, 10), dtype=float)
         Ct = np.zeros((10, 10), dtype=float)
@@ -1578,6 +1595,7 @@ class pentagon(object):
         BL1 = np.zeros((10, 3), dtype=float)
         BN1 = np.zeros((10, 3), dtype=float)
         BN2 = np.zeros((10, 3), dtype=float)
+        BN3 = np.zeros((10, 3), dtype=float)
                 
         for i in range(1, self._pgq.gaussPoints()+1):
             Psfn = self._pentShapeFns[i]
@@ -1587,11 +1605,13 @@ class pentagon(object):
             BLmtx = Psfn.BL(xn1, xn2, xn3, xn4, xn5)
             BNmtx1 = Psfn.BN1(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
             BNmtx2 = Psfn.BN2(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
+            BNmtx3 = Psfn.BN3(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
             
             BL1 += wgt * np.transpose(BLmtx)   
             BN1 += wgt * np.transpose(BNmtx1)   
-            BN2 += wgt * np.transpose(BNmtx2)   
-            B = np.add(BL1, BN1, BN2)
+            BN2 += wgt * np.transpose(BNmtx2)  
+            BN3 += wgt * np.transpose(BNmtx3)
+            B = BL1 + BN1 + BN2 + BN3
             BdotT0 = np.dot(B, T0)
         
         # determinant of jacobian matrix
@@ -2698,6 +2718,30 @@ class pentagon(object):
         
         return Dmtx2
 
+    def dDisplacement3(self, reindex):
+        v1 = self._vertex[1].velocity(reindex, 'curr')
+        v2 = self._vertex[2].velocity(reindex, 'curr')
+        v3 = self._vertex[3].velocity(reindex, 'curr')
+        v4 = self._vertex[4].velocity(reindex, 'curr')
+        v5 = self._vertex[5].velocity(reindex, 'curr')
+
+        R = self.rotation('curr')        
+        Dmtx3 = np.zeros((2, 10), dtype=float)
+        Dmtx3[0, 0] = R[0, 0] * v1[0] + R[1, 0] * v1[1] + R[2, 0] * v1[2]
+        Dmtx3[0, 2] = R[0, 0] * v2[0] + R[1, 0] * v2[1] + R[2, 0] * v2[2]
+        Dmtx3[0, 4] = R[0, 0] * v3[0] + R[1, 0] * v3[1] + R[2, 0] * v3[2]
+        Dmtx3[0, 6] = R[0, 0] * v4[0] + R[1, 0] * v4[1] + R[2, 0] * v4[2]
+        Dmtx3[0, 8] = R[0, 0] * v5[0] + R[1, 0] * v5[1] + R[2, 0] * v5[2]
+
+
+        Dmtx3[1, 1] = R[0, 1] * v1[0] + R[1, 1] * v1[1] + R[2, 1] * v1[2]
+        Dmtx3[1, 3] = R[0, 1] * v2[0] + R[1, 1] * v2[1] + R[2, 1] * v2[2]
+        Dmtx3[1, 5] = R[0, 1] * v3[0] + R[1, 1] * v3[1] + R[2, 1] * v3[2]
+        Dmtx3[1, 7] = R[0, 1] * v4[0] + R[1, 1] * v4[1] + R[2, 1] * v4[2]
+        Dmtx3[1, 9] = R[0, 1] * v5[0] + R[1, 1] * v5[1] + R[2, 1] * v5[2]
+        
+        return Dmtx3
+    
     def rotation(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':

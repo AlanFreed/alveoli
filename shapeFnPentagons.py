@@ -26,7 +26,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "04-30-2019"
-__update__ = "10-13-2020"
+__update__ = "12-06-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -222,10 +222,21 @@ inherited methods
         x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
         x5   is a tuple of physical co-ordinates (x, y) locating vertex 5
     returns
-        H2mtx is the derivative of shape functions from theta2 = H2 * D2 in second 
-        contribution to nonlinear strain
+        H2mtx is the derivative of shape functions from theta2 = H2 * D2 in 
+        second contribution to nonlinear strain
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
+    H3mtx = sf.H3(x1, x2, x3, x4, x5)
+        x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical co-ordinates (x, y) locating vertex 5
+    returns
+        H3mtx is the derivative of shape functions from theta3 = H3 * D3 in 
+        third contribution to nonlinear strain
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+    
     A1mtx = sf.A1(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
         x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
         x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
@@ -238,8 +249,7 @@ inherited methods
         x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
         x05  is a tuple of reference co-ordinates (x, y) locating vertex 5
     returns
-        A1mtx is the displacement gradient matrix at location xi 
-        EN1 = 1/2 * A1 * Theta1
+        A1mtx is the displacement gradient matrix EN1 = 1/2 * A1 * Theta1
     Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
 
     A2mtx = sf.A2(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
@@ -254,10 +264,24 @@ inherited methods
         x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
         x05  is a tuple of reference co-ordinates (x, y) locating vertex 5
     returns
-        A2mtx is the displacement gradient matrix at location xi 
-        EN2 = 1/2 * A2 * Theta2
+        A2mtx is the displacement gradient matrix EN2 = 1/2 * A2 * Theta2
     Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
 
+    A3mtx = sf.A3(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical  co-ordinates (x, y) locating vertex 5
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+        x05  is a tuple of reference co-ordinates (x, y) locating vertex 5
+    returns
+        A3mtx is the displacement gradient matrix EN3 = 1/2 * A3 * Theta3
+    Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
+    
     L1mtx = sf.L1(x1, x2, x3, x4, x5)
         x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
         x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
@@ -277,6 +301,17 @@ inherited methods
         x5   is a tuple of physical  co-ordinates (x, y) locating vertex 5
     returns
     L2mtx is the derivative of shape functions from dA2 = L2 * D2 in 
+          contribution to nonlinear strain
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    L3mtx = sf.L3(x1, x2, x3, x4, x5)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical  co-ordinates (x, y) locating vertex 5
+    returns
+    L3mtx is the derivative of shape functions from dA3 = L3 * D3 in 
           contribution to nonlinear strain
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
     
@@ -310,6 +345,21 @@ inherited methods
         BN2mtx is second nonlinear contribution to the strain displacement matrix
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
+    BN3mtx = sf.BN3(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x5   is a tuple of physical  co-ordinates (x, y) locating vertex 5
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+        x05  is a tuple of reference co-ordinates (x, y) locating vertex 5
+    returns
+        BN3mtx is third nonlinear contribution to the strain displacement matrix
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+    
 Reference
     1) Dasgupta, G., "Interpolants within convex polygons: Wachspress shape
        functions", Journal of Aerospace Engineering, vol. 16, 2003, pp. 1-8.
@@ -684,17 +734,33 @@ class ShapeFunction(ShapeFn):
 
         return H2mtx
 
+    def H3(self, x1, x2, x3, x4, x5):
+        H3mtx = np.zeros((2, 10), dtype=float)
+        BLmtx = self.BL(x1, x2, x3, x4, x5)
 
+        # create the H3 matrix by differentiation of shape functions.
+        H3mtx[0, 0] = 2 * BLmtx[0, 0]
+        H3mtx[0, 2] = 2 * BLmtx[0, 2]
+        H3mtx[0, 4] = 2 * BLmtx[0, 4]
+        H3mtx[0, 6] = 2 * BLmtx[0, 6]
+        H3mtx[0, 8] = 2 * BLmtx[0, 8]
+
+        H3mtx[1, 1] = 2 * BLmtx[0, 0]
+        H3mtx[1, 3] = 2 * BLmtx[0, 2]
+        H3mtx[1, 5] = 2 * BLmtx[0, 4]
+        H3mtx[1, 7] = 2 * BLmtx[0, 6]
+        H3mtx[1, 9] = 2 * BLmtx[0, 8]
+
+        return H3mtx
+    
     def A1(self, x1, x2, x3, x4, x5, x01, x02, x03, x04, x05):
         A1mtx = np.zeros((3, 2), dtype=float)
         Gmtx = self.G(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
 
         # create the A1 matrix from nonlinear part of strain
-        A1mtx[0, 0] = - Gmtx[0, 0] / 2
         A1mtx[0, 1] = - Gmtx[1, 1] / 2
         A1mtx[1, 0] = - Gmtx[0, 0] / 2
         A1mtx[1, 1] = Gmtx[1, 1] / 2
-        A1mtx[2, 0] = - 2 * Gmtx[0, 1]
         A1mtx[2, 1] = 2 * Gmtx[1, 0]
 
         return A1mtx
@@ -709,6 +775,17 @@ class ShapeFunction(ShapeFn):
         A2mtx[2, 1] = - 4 * Gmtx[0, 0]
 
         return A2mtx
+
+    def A3(self, x1, x2, x3, x4, x5, x01, x02, x03, x04, x05):
+        A3mtx = np.zeros((3, 2), dtype=float)
+        Gmtx = self.G(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
+
+        # create the A1 matrix from nonlinear part of strain
+        A3mtx[0, 0] = - Gmtx[0, 0] / 2
+        A3mtx[1, 1] = Gmtx[1, 0] 
+        A3mtx[2, 0] = - 2 * Gmtx[0, 1] 
+
+        return A3mtx
     
     # derivative of shape functions in contribution to the first nonlinear 
     # strain
@@ -716,15 +793,10 @@ class ShapeFunction(ShapeFn):
         B = self.BL(x1, x2, x3, x4, x5)
         L1 = np.zeros((3, 10), dtype=float)
 
-        L1[0, 0] = - B[0, 0]
         L1[0, 1] = - B[0, 1]
-        L1[0, 2] = - B[0, 2]
         L1[0, 3] = - B[0, 3]
-        L1[0, 4] = - B[0, 4]
         L1[0, 5] = - B[0, 5]
-        L1[0, 6] = - B[0, 6]
         L1[0, 7] = - B[0, 7]
-        L1[0, 8] = - B[0, 8]
         L1[0, 9] = - B[0, 9]
 
         L1[1, 0] = - B[1, 0]
@@ -738,15 +810,10 @@ class ShapeFunction(ShapeFn):
         L1[1, 8] = - B[1, 8]
         L1[1, 9] = - B[1, 9]
         
-        L1[2, 0] = - 2 * B[2, 0]
         L1[2, 1] = 2 * B[2, 1]
-        L1[2, 2] = - 2 * B[2, 2]
         L1[2, 3] = 2 * B[2, 3]
-        L1[2, 4] = - 2 * B[2, 4]
         L1[2, 5] = 2 * B[2, 5]
-        L1[2, 6] = - 2 * B[2, 6]
         L1[2, 7] = 2 * B[2, 7]
-        L1[2, 8] = - 2 * B[2, 8]
         L1[2, 9] = 2 * B[2, 9]
 
         return L1
@@ -776,6 +843,30 @@ class ShapeFunction(ShapeFn):
         L2[2, 9] = - 4 * B[2, 9]
 
         return L2   
+
+    def L3(self, x1, x2, x3, x4, x5):
+        B = self.BL(x1, x2, x3, x4, x5)
+        L3 = np.zeros((3, 10), dtype=float)
+
+        L3[0, 0] = - B[0, 0]
+        L3[0, 2] = - B[0, 2]
+        L3[0, 4] = - B[0, 4]
+        L3[0, 6] = - B[0, 6]
+        L3[0, 8] = - B[0, 8]
+
+        L3[1, 1] = - B[1, 1]
+        L3[1, 3] = - B[1, 3]
+        L3[1, 5] = - B[1, 5]
+        L3[1, 7] = - B[1, 7]
+        L3[1, 9] = - B[1, 9]
+        
+        L3[2, 0] = - 2 * B[2, 0]
+        L3[2, 2] = - 2 * B[2, 2]
+        L3[2, 4] = - 2 * B[2, 4]
+        L3[2, 6] = - 2 * B[2, 6]
+        L3[2, 8] = - 2 * B[2, 8]
+
+        return L3
         
     # first nonlinear contribution to strain displacement matrix
     def BN1(self, x1, x2, x3, x4, x5, x01, x02, x03, x04, x05):
@@ -796,6 +887,16 @@ class ShapeFunction(ShapeFn):
         B2Nmtx = np.matmul(A2mtx, H2mtx)
 
         return B2Nmtx
+
+    # third nonlinear contribution to strain displacement matrix
+    def BN3(self, x1, x2, x3, x4, x5, x01, x02, x03, x04, x05):
+        H3mtx = self.H3(x1, x2, x3, x4, x5)
+        A3mtx = self.A3(x1, x2, x3, x4, x5, x01, x02, x03, x04, x05)
+
+        B3Nmtx = np.zeros((3, 10), dtype=float)
+        B3Nmtx = np.matmul(A3mtx, H3mtx)
+
+        return B3Nmtx
     
 """
 Changes made in version "1.0.0":

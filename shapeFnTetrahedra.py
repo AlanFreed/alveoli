@@ -25,7 +25,7 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "09-18-2019"
-__update__ = "11-16-2020"
+__update__ = "12-06-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -164,46 +164,66 @@ inherited methods
                     \ dz/dX  dz/dY  dz/dZ /         Z = z0
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
-    BL = sf.BLinear(x1, x2, x3, x4)
+    BLmtx = sf.BL(x1, x2, x3, x4)
         x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
         x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
         x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
         x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
     returns
-        BL   is the linear strain displacement matrix
+        BLmtx   is the linear strain displacement matrix
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
-    Hmtx = sf.HmatrixF(x1, x2, x3, x4)
+    H1mtx = sf.H1(x1, x2, x3, x4)
         x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
         x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
         x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
         x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
     returns
-        Hmtx  is the first H matrix, which is a derivative of shape functions
-              from theta = H * D in the first contribution to nonlinear strain
+        H1mtx  is the first H1 matrix, which is a derivative of shape functions
+              from theta1 = H1 * D1 in the first contribution to nonlinear strain
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
-    Hmtx = sf.HmatrixS(x1, x2, x3, x4)
+    H2mtx = sf.H2(x1, x2, x3, x4)
         x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
         x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
         x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
         x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
     returns
-        Hmtx is the second H matrix, which is a derivative of shape functions
-             from theta = H * D in second contribution to nonlinear strain
+        H2mtx is the second H2 matrix, which is a derivative of shape functions
+             from theta2 = H2 * D2 in second contribution to nonlinear strain
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
-    Hmtx = sf.HmatrixT(x1, x2, x3, x4)
+    H3mtx = sf.H3(x1, x2, x3, x4)
         x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
         x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
         x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
         x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
     returns
-        Hmtx is the third H matrix, which is a derivative of shape functions
-             from theta = H * D in second contribution to nonlinear strain
+        H3mtx is the third H3 matrix, which is a derivative of shape functions
+             from theta3 = H3 * D3 in second contribution to nonlinear strain
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
 
-    BN = sf.firstBNonLinear(x1, x2, x3, x4, x01, x02, x03, x04)
+    H4mtx = sf.H4(x1, x2, x3, x4)
+        x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
+    returns
+        H4mtx is the fourth H4 matrix, which is a derivative of shape functions
+             from theta4 = H4 * D4 in second contribution to nonlinear strain
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    H5mtx = sf.H5(x1, x2, x3, x4)
+        x1   is a tuple of physical co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical co-ordinates (x, y) locating vertex 4
+    returns
+        H5mtx is the fifth H5 matrix, which is a derivative of shape functions
+             from theta5 = H5 * D5 in second contribution to nonlinear strain
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    A1mtx = sf.A1(x1, x2, x3, x4, x01, x02, x03, x04)
         x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
         x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
         x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
@@ -213,10 +233,10 @@ inherited methods
         x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
         x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
     returns
-        BN is first nonlinear contribution to the strain displacement matrix
-    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+        A1mtx is the displacement gradient matrix EN1 = 1/2 * A1 * Theta1
+    Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
 
-    BN = sf.secondBNonLinear(x1, x2, x3, x4, x01, x02, x03, x04)
+    A2mtx = sf.A2(x1, x2, x3, x4, x01, x02, x03, x04)
         x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
         x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
         x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
@@ -226,10 +246,10 @@ inherited methods
         x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
         x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
     returns
-        BN is second nonlinear contribution to the strain displacement matrix
-    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+        A2mtx is the displacement gradient matrix EN2 = 1/2 * A2 * Theta2
+    Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
 
-    BN = sf.thirdBNonLinear(x1, x2, x3, x4, x01, x02, x03, x04)
+    A3mtx = sf.A3(x1, x2, x3, x4, x01, x02, x03, x04)
         x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
         x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
         x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
@@ -239,8 +259,150 @@ inherited methods
         x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
         x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
     returns
-        BN is third nonlinear contribution to the strain displacement matrix
+        A3mtx is the displacement gradient matrix EN3 = 1/2 * A3 * Theta3
+    Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
+
+    A4mtx = sf.A4(x1, x2, x3, x4, x01, x02, x03, x04)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+    returns
+        A4mtx is the displacement gradient matrix EN4 = 1/2 * A4 * Theta4
+    Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
+
+    A5mtx = sf.A5(x1, x2, x3, x4, x01, x02, x03, x04)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+    returns
+        A5mtx is the displacement gradient matrix EN5 = 1/2 * A5 * Theta5
+    Inputs are co-ordinates evaluated in a global chordal co-ordinate system.
+
+    L1mtx = sf.L1(x1, x2, x3, x4)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+    returns
+    L1mtx is the derivative of shape functions from dA1 = L1 * D1 in 
+          contribution to nonlinear strain
     Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    L2mtx = sf.L2(x1, x2, x3, x4)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+    returns
+    L2mtx is the derivative of shape functions from dA2 = L2 * D2 in 
+          contribution to nonlinear strain
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    L3mtx = sf.L3(x1, x2, x3, x4)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+    returns
+    L3mtx is the derivative of shape functions from dA3 = L3 * D3 in 
+          contribution to nonlinear strain
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    L4mtx = sf.L4(x1, x2, x3, x4)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+    returns
+    L4mtx is the derivative of shape functions from dA4 = L4 * D4 in 
+          contribution to nonlinear strain
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    L5mtx = sf.L5(x1, x2, x3, x4)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+    returns
+    L5mtx is the derivative of shape functions from dA5 = L5 * D5 in 
+          contribution to nonlinear strain
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    BN1mtx = sf.BN1(x1, x2, x3, x4, x01, x02, x03, x04)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+    returns
+        BN1mtx is first nonlinear contribution to the strain displacement matrix
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    BN2mtx = sf.BN2(x1, x2, x3, x4, x01, x02, x03, x04)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+    returns
+        BN2mtx is second nonlinear contribution to the strain displacement matrix
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    BN3mtx = sf.BN3(x1, x2, x3, x4, x01, x02, x03, x04)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+    returns
+        BN3mtx is third nonlinear contribution to the strain displacement matrix
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    BN4mtx = sf.BN4(x1, x2, x3, x4, x01, x02, x03, x04)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+    returns
+        BN4mtx is fourth nonlinear contribution to the strain displacement matrix
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
+    BN5mtx = sf.BN5(x1, x2, x3, x4, x01, x02, x03, x04)
+        x1   is a tuple of physical  co-ordinates (x, y) locating vertex 1
+        x2   is a tuple of physical  co-ordinates (x, y) locating vertex 2
+        x3   is a tuple of physical  co-ordinates (x, y) locating vertex 3
+        x4   is a tuple of physical  co-ordinates (x, y) locating vertex 4
+        x01  is a tuple of reference co-ordinates (x, y) locating vertex 1
+        x02  is a tuple of reference co-ordinates (x, y) locating vertex 2
+        x03  is a tuple of reference co-ordinates (x, y) locating vertex 3
+        x04  is a tuple of reference co-ordinates (x, y) locating vertex 4
+    returns
+        BN5mtx is fifth nonlinear contribution to the strain displacement matrix
+    Inputs are tuples of co-ordinates evaluated in a global co-ordinate system.
+
 
 Reference
     1) Guido Dhondt, "The Finite Element Method for Three-dimensional
@@ -772,7 +934,7 @@ class ShapeFunction(ShapeFn):
         # create the A5 matrix from nonlinear part of strain
         A5mtx[3, 0] = - 2 * Gmtx[1, 0] 
         A5mtx[3, 1] = - 4 * Gmtx[2, 1] 
-        A5mtx[3, 2] = - 2 * Gmtx[1, 0] 
+        A5mtx[3, 2] = - 2 * Gmtx[0, 1] 
         
         return A5mtx
 
@@ -919,13 +1081,13 @@ class ShapeFunction(ShapeFn):
         L3[1, 9] = 2 * B[1, 9]
         L3[1, 11] = B[1, 9]
 
-        L3[2, 0] = - B[1, 0]
+        L3[2, 0] = -2 * B[1, 0]
         L3[2, 1] = 4 * B[2, 1]
-        L3[2, 3] = - B[1, 3]
+        L3[2, 3] = -2 * B[1, 3]
         L3[2, 4] = 4 * B[2, 4]
-        L3[2, 6] = - B[1, 6]
+        L3[2, 6] = -2 * B[1, 6]
         L3[2, 7] = 4 * B[2, 7]
-        L3[2, 9] = - B[1, 9]
+        L3[2, 9] = -2 * B[1, 9]
         L3[2, 10] = 4 * B[2, 10]
        
         return L3
@@ -979,16 +1141,16 @@ class ShapeFunction(ShapeFn):
 
         L5[3, 0] = - 2 * B[5, 1]
         L5[3, 1] = - 4 * B[5, 0]
-        L5[3, 2] = - 2 * B[5, 1]
+        L5[3, 2] = - 2 * B[5, 0]
         L5[3, 3] = - 2 * B[5, 4]
         L5[3, 4] = - 4 * B[5, 3]
-        L5[3, 5] = - 2 * B[5, 4]
+        L5[3, 5] = - 2 * B[5, 3]
         L5[3, 6] = - 2 * B[5, 7]
         L5[3, 7] = - 4 * B[5, 6]
-        L5[3, 8] = - 2 * B[5, 7]
+        L5[3, 8] = - 2 * B[5, 6]
         L5[3, 9] = - 2 * B[5, 10]
         L5[3, 10] = - 4 * B[5, 9]
-        L5[3, 11] = - 2 * B[5, 10]
+        L5[3, 11] = - 2 * B[5, 9]
        
         return L5
     

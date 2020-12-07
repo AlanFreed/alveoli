@@ -35,7 +35,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.3.0"
 __date__ = "09-25-2019"
-__update__ = "11-16-2020"
+__update__ = "12-06-2020"
 __author__ = "Alan D. Freed, Shahla Zamani"
 __author_email__ = "afreed@tamu.edu, Zamani.Shahla@tamu.edu"
 
@@ -142,11 +142,39 @@ methods
     [ax, ay, az] = t.centroidAcceleration(reindex, state)
         returns the acceleration at the centroid in configuration 'state'
 
-    Dmtx = sf.dDisplacement(reindex)
+    Dmtx1 = sf.dDisplacement1(reindex)
       input
         reindex is an instance of Pivot object from module pivotIncomingF      
       output
         Dmtx1 is change in displacement ( dA1 = L1 * D1 ) in the contribution to the 
+        nonlinear strain 
+
+    Dmtx2 = sf.dDisplacement2(reindex)
+      input
+        reindex is an instance of Pivot object from module pivotIncomingF      
+      output
+        Dmtx2 is change in displacement ( dA2 = L2 * D2 ) in the contribution to the 
+        nonlinear strain 
+
+    Dmtx3 = sf.dDisplacement3(reindex)
+      input
+        reindex is an instance of Pivot object from module pivotIncomingF      
+      output
+        Dmtx3 is change in displacement ( dA3 = L3 * D3 ) in the contribution to the 
+        nonlinear strain 
+        
+    Dmtx4 = sf.dDisplacement4(reindex)
+      input
+        reindex is an instance of Pivot object from module pivotIncomingF      
+      output
+        Dmtx4 is change in displacement ( dA4 = L4 * D4 ) in the contribution to the 
+        nonlinear strain         
+        
+    Dmtx5 = sf.dDisplacement5(reindex)
+      input
+        reindex is an instance of Pivot object from module pivotIncomingF      
+      output
+        Dmtx5 is change in displacement ( dA5 = L5 * D5 ) in the contribution to the 
         nonlinear strain 
             
     The fundamental fields of kinematics
@@ -614,7 +642,7 @@ class tetrahedron(object):
             Lmtx1 = tesfn.L1(xn1, xn2, xn3, xn4)
             BNmtx1 = tesfn.BN1(xn1, xn2, xn3, xn4, x01, x02, x03, x04)
             A1 = tesfn.A1(xn1, xn2, xn3, xn4, x01, x02, x03, x04)              
-            Dmtx1 = self.dDisplacement(reindex)       
+            Dmtx1 = self.dDisplacement1(reindex)       
             dA1 = np.dot(Lmtx1, np.transpose(Dmtx1))            
             dSt1 = A1.T.dot(Mt).dot(dA1)
             
@@ -622,7 +650,7 @@ class tetrahedron(object):
             Lmtx2 = tesfn.L2(xn1, xn2, xn3, xn4)
             BNmtx2 = tesfn.BN2(xn1, xn2, xn3, xn4, x01, x02, x03, x04)
             A2 = tesfn.A2(xn1, xn2, xn3, xn4, x01, x02, x03, x04)              
-            Dmtx2 = self.dDisplacement(reindex)        
+            Dmtx2 = self.dDisplacement2(reindex)        
             dA2 = np.dot(Lmtx2, np.transpose(Dmtx2))            
             dSt2 = A2.T.dot(Mt).dot(dA2)
 
@@ -630,7 +658,7 @@ class tetrahedron(object):
             Lmtx3 = tesfn.L3(xn1, xn2, xn3, xn4)
             BNmtx3 = tesfn.BN3(xn1, xn2, xn3, xn4, x01, x02, x03, x04)
             A3 = tesfn.A3(xn1, xn2, xn3, xn4, x01, x02, x03, x04)              
-            Dmtx3 = self.dDisplacement(reindex)        
+            Dmtx3 = self.dDisplacement3(reindex)        
             dA3 = np.dot(Lmtx3, np.transpose(Dmtx3))            
             dSt3 = A3.T.dot(Mt).dot(dA3)  
             
@@ -638,7 +666,7 @@ class tetrahedron(object):
             Lmtx4 = tesfn.L4(xn1, xn2, xn3, xn4)
             BNmtx4 = tesfn.BN4(xn1, xn2, xn3, xn4, x01, x02, x03, x04)
             A4 = tesfn.A4(xn1, xn2, xn3, xn4, x01, x02, x03, x04)              
-            Dmtx4 = self.dDisplacement(reindex)       
+            Dmtx4 = self.dDisplacement4(reindex)       
             dA4 = np.dot(Lmtx4, np.transpose(Dmtx4))            
             dSt4 = A4.T.dot(Mt).dot(dA4)
             
@@ -646,7 +674,7 @@ class tetrahedron(object):
             Lmtx5 = tesfn.L5(xn1, xn2, xn3, xn4)
             BNmtx5 = tesfn.BN5(xn1, xn2, xn3, xn4, x01, x02, x03, x04)
             A5 = tesfn.A5(xn1, xn2, xn3, xn4, x01, x02, x03, x04)              
-            Dmtx5 = self.dDisplacement(reindex)        
+            Dmtx5 = self.dDisplacement5(reindex)        
             dA5 = np.dot(Lmtx5, np.transpose(Dmtx5))            
             dSt5 = A5.T.dot(Mt).dot(dA5)            
             
@@ -1280,33 +1308,141 @@ class tetrahedron(object):
         return np.array([axr, ayr, azr])
 
     # change in displacementin contribution to the nonlinear strain
-    def dDisplacement(self, reindex):
+    def dDisplacement1(self, reindex):
         v1 = self._vertex[1].velocity(reindex, 'curr')
         v2 = self._vertex[2].velocity(reindex, 'curr')
         v3 = self._vertex[3].velocity(reindex, 'curr')
         v4 = self._vertex[4].velocity(reindex, 'curr')
 
         R = self.rotation('curr')        
-        Dmtx = np.zeros((3, 12), dtype=float)
-        Dmtx[0, 0] = R[0, 0] * v1[0] + R[1, 0] * v1[1] + R[2, 0] * v1[2]
-        Dmtx[0, 3] = R[0, 0] * v2[0] + R[1, 0] * v2[1] + R[2, 0] * v2[2]
-        Dmtx[0, 6] = R[0, 0] * v3[0] + R[1, 0] * v3[1] + R[2, 0] * v3[2]
-        Dmtx[0, 9] = R[0, 0] * v4[0] + R[1, 0] * v4[1] + R[2, 0] * v4[2]
+        Dmtx1 = np.zeros((3, 12), dtype=float)
+        Dmtx1[0, 0] = R[0, 0] * v1[0] + R[1, 0] * v1[1] + R[2, 0] * v1[2]
+        Dmtx1[0, 3] = R[0, 0] * v2[0] + R[1, 0] * v2[1] + R[2, 0] * v2[2]
+        Dmtx1[0, 6] = R[0, 0] * v3[0] + R[1, 0] * v3[1] + R[2, 0] * v3[2]
+        Dmtx1[0, 9] = R[0, 0] * v4[0] + R[1, 0] * v4[1] + R[2, 0] * v4[2]
 
 
-        Dmtx[1, 1] = R[0, 1] * v1[0] + R[1, 1] * v1[1] + R[2, 1] * v1[2]
-        Dmtx[1, 4] = R[0, 1] * v2[0] + R[1, 1] * v2[1] + R[2, 1] * v2[2]
-        Dmtx[1, 7] = R[0, 1] * v3[0] + R[1, 1] * v3[1] + R[2, 1] * v3[2]
-        Dmtx[1, 10] = R[0, 1] * v4[0] + R[1, 1] * v4[1] + R[2, 1] * v4[2]
+        Dmtx1[1, 1] = R[0, 1] * v1[0] + R[1, 1] * v1[1] + R[2, 1] * v1[2]
+        Dmtx1[1, 4] = R[0, 1] * v2[0] + R[1, 1] * v2[1] + R[2, 1] * v2[2]
+        Dmtx1[1, 7] = R[0, 1] * v3[0] + R[1, 1] * v3[1] + R[2, 1] * v3[2]
+        Dmtx1[1, 10] = R[0, 1] * v4[0] + R[1, 1] * v4[1] + R[2, 1] * v4[2]
  
         
-        Dmtx[2, 2] = R[0, 2] * v1[0] + R[1, 2] * v1[1] + R[2, 2] * v1[2]
-        Dmtx[2, 5] = R[0, 2] * v2[0] + R[1, 2] * v2[1] + R[2, 2] * v2[2]
-        Dmtx[2, 8] = R[0, 2] * v3[0] + R[1, 2] * v3[1] + R[2, 2] * v3[2]
-        Dmtx[2, 11] = R[0, 2] * v4[0] + R[1, 2] * v4[1] + R[2, 2] * v4[2]
+        Dmtx1[2, 2] = R[0, 2] * v1[0] + R[1, 2] * v1[1] + R[2, 2] * v1[2]
+        Dmtx1[2, 5] = R[0, 2] * v2[0] + R[1, 2] * v2[1] + R[2, 2] * v2[2]
+        Dmtx1[2, 8] = R[0, 2] * v3[0] + R[1, 2] * v3[1] + R[2, 2] * v3[2]
+        Dmtx1[2, 11] = R[0, 2] * v4[0] + R[1, 2] * v4[1] + R[2, 2] * v4[2]
      
-        return Dmtx
+        return Dmtx1
 
+    def dDisplacement2(self, reindex):
+        v1 = self._vertex[1].velocity(reindex, 'curr')
+        v2 = self._vertex[2].velocity(reindex, 'curr')
+        v3 = self._vertex[3].velocity(reindex, 'curr')
+        v4 = self._vertex[4].velocity(reindex, 'curr')
+
+        R = self.rotation('curr')        
+        Dmtx2 = np.zeros((3, 12), dtype=float)
+        Dmtx2[0, 0] = R[0, 0] * v1[0] + R[1, 0] * v1[1] + R[2, 0] * v1[2]
+        Dmtx2[0, 3] = R[0, 0] * v2[0] + R[1, 0] * v2[1] + R[2, 0] * v2[2]
+        Dmtx2[0, 6] = R[0, 0] * v3[0] + R[1, 0] * v3[1] + R[2, 0] * v3[2]
+        Dmtx2[0, 9] = R[0, 0] * v4[0] + R[1, 0] * v4[1] + R[2, 0] * v4[2]
+
+
+        Dmtx2[1, 1] = R[0, 1] * v1[0] + R[1, 1] * v1[1] + R[2, 1] * v1[2]
+        Dmtx2[1, 4] = R[0, 1] * v2[0] + R[1, 1] * v2[1] + R[2, 1] * v2[2]
+        Dmtx2[1, 7] = R[0, 1] * v3[0] + R[1, 1] * v3[1] + R[2, 1] * v3[2]
+        Dmtx2[1, 10] = R[0, 1] * v4[0] + R[1, 1] * v4[1] + R[2, 1] * v4[2]
+ 
+        
+        Dmtx2[2, 2] = R[0, 2] * v1[0] + R[1, 2] * v1[1] + R[2, 2] * v1[2]
+        Dmtx2[2, 5] = R[0, 2] * v2[0] + R[1, 2] * v2[1] + R[2, 2] * v2[2]
+        Dmtx2[2, 8] = R[0, 2] * v3[0] + R[1, 2] * v3[1] + R[2, 2] * v3[2]
+        Dmtx2[2, 11] = R[0, 2] * v4[0] + R[1, 2] * v4[1] + R[2, 2] * v4[2]
+     
+        return Dmtx2
+    
+    def dDisplacement3(self, reindex):
+        v1 = self._vertex[1].velocity(reindex, 'curr')
+        v2 = self._vertex[2].velocity(reindex, 'curr')
+        v3 = self._vertex[3].velocity(reindex, 'curr')
+        v4 = self._vertex[4].velocity(reindex, 'curr')
+
+        R = self.rotation('curr')        
+        Dmtx3 = np.zeros((3, 12), dtype=float)
+        Dmtx3[0, 0] = R[0, 1] * v1[0] + R[1, 1] * v1[1] + R[2, 1] * v1[2]
+        Dmtx3[0, 3] = R[0, 1] * v2[0] + R[1, 1] * v2[1] + R[2, 1] * v2[2]
+        Dmtx3[0, 6] = R[0, 1] * v3[0] + R[1, 1] * v3[1] + R[2, 1] * v3[2]
+        Dmtx3[0, 9] = R[0, 1] * v4[0] + R[1, 1] * v4[1] + R[2, 1] * v4[2]
+
+
+        Dmtx3[1, 1] = R[0, 2] * v1[0] + R[1, 2] * v1[1] + R[2, 2] * v1[2]
+        Dmtx3[1, 4] = R[0, 2] * v2[0] + R[1, 2] * v2[1] + R[2, 2] * v2[2]
+        Dmtx3[1, 7] = R[0, 2] * v3[0] + R[1, 2] * v3[1] + R[2, 2] * v3[2]
+        Dmtx3[1, 10] = R[0, 2] * v4[0] + R[1, 2] * v4[1] + R[2, 2] * v4[2]
+ 
+        
+        Dmtx3[2, 2] = R[0, 2] * v1[0] + R[1, 2] * v1[1] + R[2, 2] * v1[2]
+        Dmtx3[2, 5] = R[0, 2] * v2[0] + R[1, 2] * v2[1] + R[2, 2] * v2[2]
+        Dmtx3[2, 8] = R[0, 2] * v3[0] + R[1, 2] * v3[1] + R[2, 2] * v3[2]
+        Dmtx3[2, 11] = R[0, 2] * v4[0] + R[1, 2] * v4[1] + R[2, 2] * v4[2]
+     
+        return Dmtx3
+
+    def dDisplacement4(self, reindex):
+        v1 = self._vertex[1].velocity(reindex, 'curr')
+        v2 = self._vertex[2].velocity(reindex, 'curr')
+        v3 = self._vertex[3].velocity(reindex, 'curr')
+        v4 = self._vertex[4].velocity(reindex, 'curr')
+
+        R = self.rotation('curr')        
+        Dmtx4 = np.zeros((3, 12), dtype=float)
+        Dmtx4[0, 0] = R[0, 1] * v1[0] + R[1, 1] * v1[1] + R[2, 1] * v1[2]
+        Dmtx4[0, 3] = R[0, 1] * v2[0] + R[1, 1] * v2[1] + R[2, 1] * v2[2]
+        Dmtx4[0, 6] = R[0, 1] * v3[0] + R[1, 1] * v3[1] + R[2, 1] * v3[2]
+        Dmtx4[0, 9] = R[0, 1] * v4[0] + R[1, 1] * v4[1] + R[2, 1] * v4[2]
+
+
+        Dmtx4[1, 1] = R[0, 1] * v1[0] + R[1, 1] * v1[1] + R[2, 1] * v1[2]
+        Dmtx4[1, 4] = R[0, 1] * v2[0] + R[1, 1] * v2[1] + R[2, 1] * v2[2]
+        Dmtx4[1, 7] = R[0, 1] * v3[0] + R[1, 1] * v3[1] + R[2, 1] * v3[2]
+        Dmtx4[1, 10] = R[0, 1] * v4[0] + R[1, 1] * v4[1] + R[2, 1] * v4[2]
+ 
+        
+        Dmtx4[2, 2] = R[0, 0] * v1[0] + R[1, 0] * v1[1] + R[2, 0] * v1[2]
+        Dmtx4[2, 5] = R[0, 0] * v2[0] + R[1, 0] * v2[1] + R[2, 0] * v2[2]
+        Dmtx4[2, 8] = R[0, 0] * v3[0] + R[1, 0] * v3[1] + R[2, 0] * v3[2]
+        Dmtx4[2, 11] = R[0, 0] * v4[0] + R[1, 0] * v4[1] + R[2, 0] * v4[2]
+     
+        return Dmtx4
+
+    def dDisplacement5(self, reindex):
+        v1 = self._vertex[1].velocity(reindex, 'curr')
+        v2 = self._vertex[2].velocity(reindex, 'curr')
+        v3 = self._vertex[3].velocity(reindex, 'curr')
+        v4 = self._vertex[4].velocity(reindex, 'curr')
+
+        R = self.rotation('curr')        
+        Dmtx5 = np.zeros((3, 12), dtype=float)
+        Dmtx5[0, 0] = R[0, 1] * v1[0] + R[1, 1] * v1[1] + R[2, 1] * v1[2]
+        Dmtx5[0, 3] = R[0, 1] * v2[0] + R[1, 1] * v2[1] + R[2, 1] * v2[2]
+        Dmtx5[0, 6] = R[0, 1] * v3[0] + R[1, 1] * v3[1] + R[2, 1] * v3[2]
+        Dmtx5[0, 9] = R[0, 1] * v4[0] + R[1, 1] * v4[1] + R[2, 1] * v4[2]
+
+
+        Dmtx5[1, 1] = R[0, 2] * v1[0] + R[1, 2] * v1[1] + R[2, 2] * v1[2]
+        Dmtx5[1, 4] = R[0, 2] * v2[0] + R[1, 2] * v2[1] + R[2, 2] * v2[2]
+        Dmtx5[1, 7] = R[0, 2] * v3[0] + R[1, 2] * v3[1] + R[2, 2] * v3[2]
+        Dmtx5[1, 10] = R[0, 2] * v4[0] + R[1, 2] * v4[1] + R[2, 2] * v4[2]
+ 
+        
+        Dmtx5[2, 2] = R[0, 0] * v1[0] + R[1, 0] * v1[1] + R[2, 0] * v1[2]
+        Dmtx5[2, 5] = R[0, 0] * v2[0] + R[1, 0] * v2[1] + R[2, 0] * v2[2]
+        Dmtx5[2, 8] = R[0, 0] * v3[0] + R[1, 0] * v3[1] + R[2, 0] * v3[2]
+        Dmtx5[2, 11] = R[0, 0] * v4[0] + R[1, 0] * v4[1] + R[2, 0] * v4[2]
+     
+        return Dmtx5
+    
     def rotation(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
