@@ -22,7 +22,7 @@ Our problem of interest is the dynamic mechanical response of an alveolus, whose
 \begin{subequations}
     \begin{align}
     \mathbf{u}^{(v)}_i & = \Bigl\{ \begin{matrix} u^{(v)}_i & v^{(v)}_i & w^{(v)}_i \end{matrix} \Bigr\}^{\mathsf{T}} \\
-    \intertext{where at the beginning of a solution step $u^{(v)}_i \defeq x^{(v)}_i - x^{(v)}_0$, $v^{(v)}_i \defeq y^{(v)}_i - y^{(v)}_0$ and $w^{(v)}_i \defeq z^{(v)}_i - xz^{(v)}_0$, while at the end of that solution step $u^{(v)}_{i+1} = x^{(v)}_{i+1} - x^{(v)}_0$, $v^{(v)}_{i+1} = y^{(v)}_{i+1} - y^{(v)}_0$ and $w^{(v)}_{i+1} = z^{(v)}_{i+1} - xz^{(v)}_0$, with $(x^{(v)}, y^{(v)}, z^{(v)})$ denoting co-ordinates for vertex $v$ in the co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ of a dodecahedron, as established in \S\ref{reindexing3D}.  The velocities at these vertices are}
+    \intertext{where at the beginning of a solution step $u^{(v)}_i \defeq x^{(v)}_i - x^{(v)}_0$, $v^{(v)}_i \defeq y^{(v)}_i - y^{(v)}_0$ and $w^{(v)}_i \defeq z^{(v)}_i - z^{(v)}_0$, while at the end of that solution step $u^{(v)}_{i+1} = x^{(v)}_{i+1} - x^{(v)}_0$, $v^{(v)}_{i+1} = y^{(v)}_{i+1} - y^{(v)}_0$ and $w^{(v)}_{i+1} = z^{(v)}_{i+1} - z^{(v)}_0$, with $(x^{(v)}, y^{(v)}, z^{(v)})$ denoting co-ordinates for vertex $v$ in the co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ of a dodecahedron, as established in \S\ref{reindexing3D}.  The velocities at these vertices are}
     \dot{\mathbf{u}}^{(v)}_i & = \Bigl\{ \begin{matrix} \dot{u}^{(v)}_i & \dot{v}^{(v)}_i & \dot{w}^{(v)}_i \end{matrix} \Bigr\}^{\mathsf{T}} \\
     \intertext{where at the beginning of a solution step $\dot{\delta}_i = \tfrac{1}{2 \mathrm{d}t} (\delta_{i+1} - \delta_{i-1} )$, while at the end of that solution step $\dot{\delta}_{i+1} = \frac{1}{2\mathrm{d}t} ( 3 \delta_{i+1} - 4 \delta_i + \delta_{i-1} )$, with $\delta \in \{ u^{(v)} , v^{(v)} , w^{(v)} \}$. Likewise, their accelerations are}
     \ddot{\mathbf{u}}^{(v)}_i & = \Bigl\{ \begin{matrix} \ddot{u}^{(v)}_i & \ddot{v}^{(v)}_i & \ddot{w}^{(v)}_i \end{matrix} \Bigr\}^{\mathsf{T}}
@@ -92,7 +92,7 @@ Equation~(\ref{FEsolver}) is used to advance all solution steps from the third s
 
 As a modeling simplification, the alveolar chords, the alveolar membranes, and the alveolar sac are each considered to be described by their own finite element model.  It is assumed that there is no coupling occurring between these three structural groups.  This is an important simplification, because the mass and compliance of these three geometric structures are vastly different, and as such, if not decoupled, these differences in mass and compliance would become problematic sources out of which numerical difficulties would likely arise.
 
-From physics, we know that forces add, and therefore, the nodal forces coming from these three finite-element models can be summed.  \textcolor{red}{These summed forces, positioned at the dodecahedral vertices, are obtained by taking stresses integrated at the various Guass points throughout each geometric model and extrapolating them out to their respective common nodes, i.e., the set of dodecahedral vertices, using the formul\ae\ of \S\ref{sec:Gauss}.}  From these three sources for micro\-scopic alveolar force, one can construct a homo\-genized (averaged) state of macro\-scopic stress descriptive of the parenchymal response.
+From physics, we know that forces add, and therefore, the nodal forces coming from these three finite-element models can be summed. From these three sources for micro\-scopic alveolar force, one can construct a homo\-genized (averaged) state of macro\-scopic stress descriptive of the parenchymal response.
 
 Consequently, we construct three, individual, finite-element models governed by the following three systems of differential equations
 \begin{subequations}
@@ -339,7 +339,7 @@ From this example, following standard procedures, \cite{ClaytonChung18} it becom
 
 \subsection{Mass Matrix for a Triangle}
 
-Even though we need to know the shape functions and quadrature rule for triangles in our analysis \textcolor{red}{(they are used to extrapolate Gauss point forces out to the vertices of a dodecahedron in our analysis of alveolar sacs),} we do not need to construct their mass matrix for our specific application.
+Even though we need to know the shape functions and quadrature rule for triangles in our analysis, we do not need to construct their mass matrix for our specific application.
 
 \subsection{Mass Matrix for a Pentagon}
 
