@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d (TeX Live 2020/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: dodec.aux
+A level-1 auxiliary file: partIntroduction.aux
+A level-1 auxiliary file: partDodecahedron.aux
+A level-1 auxiliary file: partKinematics.aux
+A level-1 auxiliary file: partConstitutiveTheory.aux
+A level-1 auxiliary file: partNumericalIntegration.aux
+A level-1 auxiliary file: partVariationalFormulation.aux
+The style file: ARL.bst
+A level-1 auxiliary file: appImplicitElasticity.aux
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: dodec.bib
+You've used 109 entries,
+            2900 wiz_defined-function locations,
+            1501 strings with 23932 characters,
+and the built_in function-call counts, 19154 in all, are:
+= -- 857
+> -- 1145
+< -- 5
++ -- 358
+- -- 249
+* -- 2095
+:= -- 2439
+add.period$ -- 335
+call.type$ -- 109
+change.case$ -- 105
+chr.to.int$ -- 0
+cite$ -- 109
+duplicate$ -- 1382
+empty$ -- 2017
+format.name$ -- 360
+if$ -- 4025
+int.to.chr$ -- 0
+int.to.str$ -- 109
+missing$ -- 271
+newline$ -- 331
+num.names$ -- 113
+pop$ -- 494
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 695
+stack$ -- 0
+substring$ -- 91
+swap$ -- 385
+text.length$ -- 5
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 120
+width$ -- 112
+write$ -- 837

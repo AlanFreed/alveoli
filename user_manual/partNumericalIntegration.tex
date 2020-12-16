@@ -1,7 +1,7 @@
 \part{Numerical Integrators}
 \label{partNumericalMethods}
 
-This analysis tool, which models alveolar geometry as a dodecahedron, requires numerical methods for the temporal integration of its constitutive equations (systems of first-order ODEs) and their governing equations of motion (systems of second-order ODEs), and for the spatial integrations of: length of line, area of surface, and volume of space that pertain to the various finite-element geometries used.  Results obtained at the Guass points need to be mapped out to their nodal locations, so extrapolation procedures that are consistent with the shape (interpolation) functions are also derived for the various elements and quadrature rules selected.
+This analysis tool, which models alveolar geometry as a dodecahedron, requires numerical methods for the temporal integration of its constitutive equations (systems of first-order ODEs) and their governing equations of motion (systems of second-order ODEs), and for the spatial integrations of: length of line, area of surface, and volume of space that pertain to the various finite-element geometries used.  Some results obtained at the Guass points may need to be mapped out to their nodal locations, so extrapolation procedures that are consistent with the shape (interpolation) functions are also derived for the various elements and quadrature rules selected.
 
 \section{ODE Solvers}
 
@@ -74,7 +74,7 @@ whose corrector is the well-known BDF2 formula made popular by Gear, for which F
 
 Both the predictor and corrector of this PECE scheme have a solution $\mathbf{y}$ with a weight of 1, and a rate $\dot{\mathbf{y}}$ with a weight of $\tfrac{2}{3} \mathrm{d}t$; hence, this predictor\slash corrector pair is internally consistent, i.e., the predictor and corrector will produce the same result whenever they integrate over a constant $\dot{\mathbf{y}}$ field. 
 
-The evaluate\slash correct (EC) steps of a PECE method are often iterated over until a convergence criterion is satisfied.  Such methods are typically denoted as $\text{P}(\text{EC})^m \text{E}$, where $m$ specifies the number of iterations imposed.
+The evaluate\slash correct (EC) steps of a PECE method are often iterated over until a convergence criterion is satisfied.  Such methods are typically denoted as $\text{PE}(\text{CE})^m$, where $m$ specifies the number of iterations imposed.
 
 
 \subsection{A Relevant Example}
@@ -326,7 +326,7 @@ In a general finite element setting, information comes into an element via its n
 
 Particular to our application, a suite of nodes is common betwixt three, separate, finite-element models that share twenty common vertices.  These vertices establish the geometry of a dodecahedron used as the model for a micro\-scopic alveolus.  The resultant micro\-scopic force at each vertex arises from: \textit{i\/}) a finite element model of thirty 1D rods representing the alveolar chords, \textit{ii\/}) a finite element model of twelve 2D pentagons representing the alveolar membranes, and \textit{iii\/}) a finite element model of sixty 3D tetrahedra representing the alveolar sac.  The micro\-scopic forces coming from these three geometric models are summed at their twenty common vertices. These resultant micro\-scopic forces are then collectively homo\-genized to yield an averaged macro\-scopic state of stress at a chosen location in the parenchyma.  
 
-Feasibility of this solution strategy hinges upon one's ability to \textit{i\/}) extrapolate stresses integrated at the Gauss points out to their nodal positions, and \textit{ii\/}) the conversion of these nodal stresses into nodal forces.  We address the first of these two issues in this section, and the second of these two issues in the next section.  The former requires an intermingling between an element's shape functions used for interpolation and its quadrature rule used for integration.
+Feasibility of this solution strategy hinges upon one's ability to extrapolate information at the Gauss points out to their nodal positions.  This requires an intermingling between an element's shape functions used for interpolation with its quadrature rule used for integration.
 
 \subsection{Interpolations:\,\, Nodal Points $\mapsto$ Gauss Points \\ 
     \qquad\quad Extrapolations: Gauss Points $\mapsto$ Nodal Points}
@@ -340,7 +340,7 @@ Shape functions are introduced for interpolating within an element; specifically
     N_i ( \boldsymbol{\xi}_k ) f ( \boldsymbol{x}_i ) &
     k & = 1, 2, \ldots, m 
     \label{interpolation} \\
-    \intertext{where the $\boldsymbol{x}_i$ are co-ordinates that locate one of the $n$ nodes in an element of interest, and where the $\boldsymbol{\xi}_i$ are co-ordinates that locate one of its $m$ Gauss points, both being evaluated in the natural co-ordinate system of the element.  The transformation in Eqn.~(\ref{interpolation}) maps a point $\boldsymbol{x}$  in a typical element of the mesh to a point $\boldsymbol{\xi}$ in the natural element.	Functions $N_i$ are the so-called shape functions.  They obey $\sum_{i=1}^n N_i (\boldsymbol{\xi}) = 1$ $\forall$ $\boldsymbol{\xi}$.
+    \intertext{where the $\boldsymbol{x}_i$ are co-ordinates that locate one of the $n$ nodes in an element of interest, and where the $\boldsymbol{\xi}_i$ are co-ordinates that locate one of its $m$ Gauss points, both being evaluated in the natural co-ordinate system of the element.  The transformation in Eqn.~(\ref{interpolation}) maps a point $\boldsymbol{x}$ in an element of a mesh to a point $\boldsymbol{\xi}$ in its natural element.	 Functions $N_i$ are the so-called shape functions.  They obey $\sum_{i=1}^n N_i (\boldsymbol{\xi}) = 1$ $\forall$ $\boldsymbol{\xi}$.
     \bigskip\newline
     A corresponding extrapolation scheme can therefore be written down as}
     f ( \boldsymbol{x}_k ) & = \sum_{i=1}^m 
@@ -438,7 +438,7 @@ Considering a rod with two Gauss points, the interpolation of an arbitrary field
     f ( -1 ) \\ f ( 1 )
     \end{matrix} \right\} 
     \label{interpolateRod} \\
-    \intertext{that, upon applying the methodology put forward in Eqn.~(\ref{extrapolationProcedure}), leads to a straight\-forward extrapolation formula that maps values for the field from the element Gauss points out to its nodes via}
+    \intertext{that, upon applying the methodology put forward in Eqn.~(\ref{extrapolationProcedure}), leads to a straight\-forward extrapolation formula that maps values for a field of interest from the element Gauss points out to its nodes via}
     \left\{ \begin{matrix} 
     f ( -1 ) \\ f ( 1 )
     \end{matrix} \right\} & 
@@ -644,7 +644,7 @@ We now consider a tetrahedron with four Gauss points.  Here the interpolation of
     \label{extrapolateTet}
     \end{align}
 \end{subequations}
-where $a = 0.1381966011250105$ and $b = 0.5854101966249685$ from Table~\ref{tab:4nodedTet}.  As a check, each row in the above matrices sums to 1.  Unlike the interpolation\slash extrapolation formul\ae\ for rods and triangles, whose matrices of transformation are symmetric, the interpolation\slash extrapolation matrices for a tetrahedron are not symmetric.  Lack of symmetry in a quadrature rule is not uncommon, but in our application, such symmetries are advantageous, as we shall see below.  Nevertheless, for a tetrahedron, quadrature symmetry is not necessary.
+where $a = 0.1381966011250105$ and $b = 0.5854101966249685$ from Table~\ref{tab:4nodedTet}.  As a check, each row in the above matrices sums to 1.  Unlike the interpolation\slash extrapolation formul\ae\ for rods, triangles and pentagons, whose matrices of transformation are symmetric, the interpolation\slash extrapolation matrices for a tetrahedron are not symmetric.  Lack of symmetry in a quadrature rule is not uncommon, but in our application, such symmetries are advantageous.  Nevertheless, for a tetrahedron, quadrature symmetry is not necessary.
     
 \begin{table}
     \small

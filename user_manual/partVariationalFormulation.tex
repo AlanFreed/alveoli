@@ -6,17 +6,18 @@ The problem that we have set up to solve is cast in a Lagrangian setting and tak
 \begin{subequations}
     \label{FEsysOfEqns}
     \begin{gather}
-    \mathbf{M} \, \ddot{\boldsymbol{\Delta}} + 
+    \boldsymbol{F} =
+    \mathbf{K} \, \boldsymbol{\Delta} + 
     \mathbf{C} \, \dot{\boldsymbol{\Delta}} +
-    \mathbf{K} \, \boldsymbol{\Delta} = \boldsymbol{F} \\
+    \mathbf{M} \, \ddot{\boldsymbol{\Delta}} \\
     \intertext{that under conditions of equilibrium (i.e., whenever $\ddot{\boldsymbol{\Delta}} = \dot{\boldsymbol{\Delta}} = \mathbf{0}$) reduces to}
-    \mathbf{K} \, \boldsymbol{\Delta} = \boldsymbol{F}
+    \boldsymbol{F} = \mathbf{K} \, \boldsymbol{\Delta}
     \end{gather}
 \end{subequations}
-where $\mathbf{M}$ is a mass matrix, $\mathbf{C}$ is a tangent stiffness matrix\footnote{\footnotesize 
+where $\mathbf{K}$ is a secant stiffness matrix, $\mathbf{C}$ is a tangent stiffness matrix\footnote{\footnotesize 
     In the literature, matrix $\mathbf{C}$ is typically utilized as a damping matrix; however, there are presently no damping mechanisms in our alveolar model.  For example, visco\-elastic effects are often important when modeling biologic tissues.  Nevertheless, they can be neglected here, because the event of a shock wave passing over an alveolus happens so fast that visco\-elastic effects do not have a chance to manifest themselves.  Tissue response will be glassy elastic during such an event.  Here $\mathbf{C}$ provides for an elastic \textit{tangent\/} response, while $\mathbf{K}$ provides for an elastic \textit{secant\/} response. 
 },
-$\mathbf{K}$ is a secant stiffness matrix, and $\boldsymbol{F}$ is a force vector, while vector $\boldsymbol{\Delta}$ contains the assembled nodal displacements with $\dot{\boldsymbol{\Delta}}$ and $\ddot{\boldsymbol{\Delta}}$ denoting their velocities and accelerations.
+$\mathbf{M}$ is a mass matrix, and $\boldsymbol{F}$ is a force vector, while vector $\boldsymbol{\Delta}$ contains the assembled nodal displacements with $\dot{\boldsymbol{\Delta}}$ and $\ddot{\boldsymbol{\Delta}}$ denoting their velocities and accelerations.
 
 Our problem of interest is the dynamic mechanical response of an alveolus, whose geometry is modeled as a dodecahedron.  The shape of an irregular dodecahedron is described by a set of 20 vertices, each experiencing displacements of
 \begin{subequations}
@@ -32,7 +33,7 @@ where at the beginning of a solution step $\ddot{\delta}_i = \frac{1}{(\mathrm{d
 
 Symbol $\boldsymbol{\Delta}$ is used to denote an assemblage of all nodal displacements, while symbol $\mathbf{u}^{(v)}$ is used to denote the nodal displacement of an individual vertex (node) $v$ located within this model, of which there are twenty in our dodecahedral model.  These twenty vertices uniquely establish thirty alveolar chords, twelve alveolar membranes, and the alveolar sac enveloped by them, cf.\ \S\ref{sec:indexingDodecahedra}.
 
-Our problem is not cast as a typical finite element solution, in the sense that we know the nodal displacements $\boldsymbol{\Delta}$, velocities $\dot{\boldsymbol{\Delta}}$ and accelerations $\ddot{\boldsymbol{\Delta}}$ \textit{a~priori}, for which nodal forces $\boldsymbol{F}$ are to be found.  Typically, boundary conditions are known for which displacements are determined in a weak sense, which is the opposite of our situation. Inputs for our model are considered to come from a finite element model of a torso subjected to an impact caused by either a ballistic projectile or a blast wave.  Say, for example, that a location of interest in the lung has been selected.  What will serve as input to our dodecahedral model will be a history of the deformation gradient sequenced in time and taken from that element containing this location of interest.  For example, if 8-noded brick elements are used, then the deformation gradient will be constant over its volume.  An element of size $1~\text{mm}^3$, which is at the resolution capability of current lung imaging technologies, would have one to two hundred alveoli in it.  Consequently, taking a statistical average over many dodecahedral model runs ought to provide a reasonable representation for the parenchymal response at that lung location.  Predictions coming from our dodecahedral model can be compared with predictions coming from a continuum model used to represent the parenchyma of lung in a torso model.  This information from our micro\-scopic alveolar model will allow for refinement and parameterization of a macro\-scopic continuum model for parenchyma.  This is particularly relevant because the spongy nature of lung tissue makes it extremely difficult to perform experiments that are suitable for parameterizing such models.
+Our problem is not cast as a typical finite element solution, in the sense that we know the nodal displacements $\boldsymbol{\Delta}$, velocities $\dot{\boldsymbol{\Delta}}$ and accelerations $\ddot{\boldsymbol{\Delta}}$ \textit{a~priori}, for which nodal forces $\boldsymbol{F}$ are to be found.  Typically, boundary conditions are known for which displacements are determined in a weak sense, which is the opposite of our situation. Inputs for our model are considered to come from a finite element model of a torso subjected to an impact caused by either a ballistic projectile or a blast wave.  Say, for example, that a location of interest in the lung has been selected.  What will serve as input to our dodecahedral model will be a history of the deformation gradient sequenced in time and taken from that element containing this location of interest.  For example, if 8-noded brick elements are used, then the deformation gradient will be constant over its volume.  An element of size $1~\text{mm}^3$, which is at the resolution capability of current lung imaging technologies, would then have one to two hundred alveoli in it.  Consequently, taking a statistical average over many dodecahedral model runs ought to provide a reasonable representation for the parenchymal response at that lung location.  Predictions coming from our dodecahedral model can be compared with predictions coming from a continuum model used to represent the parenchyma of lung in a torso model.  This information from our micro\-scopic alveolar model will allow for refinement and parameterization of a macro\-scopic continuum model for parenchyma.  This is particularly relevant because the spongy nature of lung tissue makes it extremely difficult to perform experiments that are suitable for parameterizing such continuum models.
 
 The assembled nodal forces $\boldsymbol{F}(\boldsymbol{T})$, discussed in \S\ref{secForceVectors}, depend upon stresses $\boldsymbol{T}$ evaluated at the Gauss points, as do the tangent and secant stiffness matrices, i.e., $\mathbf{C}(\boldsymbol{T})$ and $\mathbf{K}(\boldsymbol{T})$, which thereby couples the system of equations that are to be solved. As such, an iterative solver is proposed.  The mass matrix $\mathbf{M}$ will vary between solution steps, too, but not because the mass matrix of a particular element changes, but rather, because rotations of the local co-ordinate systems for the elements about the global reference frame for the dodecahedron can become large, and as such, affect change in the assembled mass matrix.
 
@@ -114,7 +115,7 @@ Consequently, we construct three, individual, finite-element models governed by 
 \end{subequations}
 wherein the assembled nodal displacements $\boldsymbol{\Delta}$, velocities $\dot{\boldsymbol{\Delta}}$ and accelerations $\ddot{\boldsymbol{\Delta}}$ are common fields betwixt them, i.e., each problem is cast as a 3D analysis.  Subscript `$\mbox{}_{\mathrm{1D}}$' associates with alveolar chords that assemble into a 3D space truss, subscript `$\mbox{}_{\mathrm{2D}}$' associates with alveolar membranes that assemble into a 3D tiled balloon-like structure, and subscript `$\mbox{}_{\mathrm{3D}}$' associates with an alveolar sac.  Again, it is thought to be beneficial to split the overall problem space into these three sub-problems due to the vast differences in their structural mass and compliance.
 
-When assembled, vectors $\boldsymbol{F}$, $\boldsymbol{\Delta}$, $\dot{\boldsymbol{\Delta}}$ and $\ddot{\boldsymbol{\Delta}}$ have lengths of 60 for the alveolar chord and alveolar membrane models, and a length of 63 for the alveolar sac model, while matrices $\mathbf{M}$, $\mathbf{C}$ and $\mathbf{K}$ have dimensions of $60 \! \times \! 60$ for the alveolar chord and alveolar membrane models, and dimensions of $63 \! \times \! 63$ for the alveolar sac model.  The model for alveolar volume has an extra node located at the centroid of the dodecahedron, i.e., the co-ordinate origin, which is a node in common betwixt the 60 tetrahedra used to fill the volume of a dodecahedron in this alveolar model. 
+When assembled, vectors $\boldsymbol{F}$, $\boldsymbol{\Delta}$, $\dot{\boldsymbol{\Delta}}$ and $\ddot{\boldsymbol{\Delta}}$ have lengths of 60 for the alveolar chord and alveolar membrane models, and a length of 63 for the alveolar sac model, while matrices $\mathbf{K}$, $\mathbf{C}$ and $\mathbf{M}$ have dimensions of $60 \! \times \! 60$ for the alveolar chord and alveolar membrane models, and dimensions of $63 \! \times \! 63$ for the alveolar sac model.  The model for alveolar volume has an extra node located at the centroid of the dodecahedron, i.e., the co-ordinate origin, which is a node in common betwixt the 60 tetrahedra used to fill the volume of a dodecahedron in this alveolar model. 
 
 The objective of this chapter is to derive the elemental mass matrix, the two stiffness matrices (secant and tangent), plus the forcing functions and necessary boundary conditions, and to then assemble them for analysis. 
 
@@ -130,8 +131,8 @@ The consistent mass matrix of an element, \cite{Archer65} when quantified in the
     \label{consistentMassMatrix1D} \\
     \intertext{with $i,j = 1, 2, \ldots , n$ where $n$ is the number of nodal points. For 2D elements}
     \mathbf{M}_{\mathrm{C2D}} & = \int_{A} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,
-    h \, \mathrm{d} A & M^{\mathrm{C2D}}_{ij} & =
-    \int_A \rho \sum_{k=1}^2 N_{ki} N_{kj} \, h \, \mathrm{d} A
+    H \, \mathrm{d} A & M^{\mathrm{C2D}}_{ij} & =
+    \int_A \rho \sum_{k=1}^2 N_{ki} N_{kj} \, H \, \mathrm{d} A
     \label{consistentMassMatrix2D} \\
     \intertext{with $i,j = 1 , 2, \ldots , 2n$ where $n$ is the number of nodal points.  And for 3D elements}
     \mathbf{M}_{\mathrm{C3D}} & = \int_{V} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,
@@ -140,7 +141,7 @@ The consistent mass matrix of an element, \cite{Archer65} when quantified in the
     \label{consistentMassMatrix3D}
     \end{align}
 \end{subequations}
-with $i, j = 1, 2, \ldots , 3n$ where $n$ is the number of nodal points.  For a rod, $\mathbf{M}_{\mathrm{C1D}}$ is a $2 \! \times \! 2$ matrix; for a pentagon, $\mathbf{M}_{\mathrm{C2D}}$ is a $10 \! \times \! 10$ matrix; and for a tetrahedron, $\mathbf{M}_{\mathrm{C3D}}$ is a $12 \! \times \! 12$ matrix.  In each expression, $\rho$ is mass per unit volume, $\mathbf{N}$ is a matrix of shape functions for the element of interest, $L$ is length and $h$ is height, $A$ is area, and $V$ is volume.  
+with $i, j = 1, 2, \ldots , 3n$ where $n$ is the number of nodal points.  For a rod, $\mathbf{M}_{\mathrm{C1D}}$ is a $2 \! \times \! 2$ matrix; for a pentagon, $\mathbf{M}_{\mathrm{C2D}}$ is a $10 \! \times \! 10$ matrix; and for a tetrahedron, $\mathbf{M}_{\mathrm{C3D}}$ is a $12 \! \times \! 12$ matrix.  In each expression, $\rho$ is mass per unit volume, $\mathbf{N}$ is a matrix of shape functions for the element of interest, $L$ is length and $H$ is height, $A$ is area, and $V$ is volume.  
 
 These mass matrices are said to be consistent in that they are calculated with the same shape functions that are used to create their stiffness matrices.  Consistent mass matrices are symmetric, because $\mathbf{N}^{\mathsf{T}} \mathbf{N}$ is symmetric.  Unfortunately, for all of the elements that we employ, matrices $\mathbf{N}^{\mathsf{T}} \mathbf{N}$ are singular, which is not a desirable feature.
 
@@ -152,7 +153,7 @@ One form of a lumped mass matrix is where the entries from each row of a consist
     M^{\mathrm{L1D}}_{ij} & = 0 \quad i \neq j  
     \label{lumpedMassMatrix1D} \\
     \intertext{with $i = 1, 2, \ldots , n$ where $n$ is the number of nodal points. For 2D elements}
-    M^{\mathrm{L2D}}_{ii} & = \sum_{j=1}^{2n} M^{\mathrm{C2D}}_{ij} = \int_A \rho \sum_{k=1}^2 N_{ki} \sum_{j=1}^{2n} N_{kj} \, h \, \mathrm{d} A , & 
+    M^{\mathrm{L2D}}_{ii} & = \sum_{j=1}^{2n} M^{\mathrm{C2D}}_{ij} = \int_A \rho \sum_{k=1}^2 N_{ki} \sum_{j=1}^{2n} N_{kj} \, H \, \mathrm{d} A , & 
     M^{\mathrm{L2D}}_{ij} & = 0 \quad i \neq j  
     \label{lumpedMassMatrix2D} \\
     \intertext{with $i = 1 , 2, \ldots , 2n$ where $n$ is the number of nodal points. And for 3D elements}
@@ -316,7 +317,7 @@ To rotate this mass matrix for an element from its co-ordinate system for a chor
 \end{equation}
 so that, accordingly,
 \begin{equation}
-    \mathbf{M}^{(e)}_{\mathrm{1D}} = \bigl( \mathbf{R}^{(e)}_{\mathrm{1D}} \bigr)^{\mathsf{T}} 
+    \mathbf{M}^{(e)}_{\mathrm{1D}} = \bigl( \mathbf{R}^{(e)}_{\mathrm{1D}} \bigr)^{\mathsf{T}} \!
     \boldsymbol{M}^{(e)}_{\mathrm{1D}} \mathbf{R}^{(e)}_{\mathrm{1D}}
 \end{equation}
 where $\mathbf{M}^{(e)}_{\mathrm{1D}}$ becomes this mass matrix, transformed into a dodecahedral co-ordinate system $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ with $[ \{ \vec{\mathbfsf{e}}_1 \} \{ \vec{\mathbfsf{e}}_2 \} \{ \vec{\mathbfsf{e}}_3 \} ]^{(e)} = \bigl[ \{ \vec{\mathbfsf{E}}_1 \} \{ \vec{\mathbfsf{E}}_2 \} \{ \vec{\mathbfsf{E}}_3 \} \bigr] \bigl[ \mathbf{Q}^{(e)} ]$, cf.\ Fig.~\ref{figchord}.  Even though $\boldsymbol{M}^{(e)}_{\mathrm{1D}}$ is a constant mass matrix, $\mathbf{M}^{(e)}_{\mathrm{1D}}$ need not be, because $\mathbf{R}^{(e)}_{\mathrm{1D}}$ will typically vary over time in our analysis of alveoli subjected to shock waves.
@@ -381,12 +382,12 @@ wherein $\mathrm{N}_i$, $i = 1, \ldots, 5$, are the five shape functions that co
 
 A consistent mass matrix $\mathbf{M}_{\mathrm{C2D}}$ is constructed by substituting the above matrix of shape functions into the following expression
 \begin{equation}
-    \mathbf{M}_{\mathrm{C2D}} = \int_{\pentagon} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,|\mathbf{J}| \, h \, \mathrm{d} \xi \, \mathrm{d} \eta 
-    = | \mathbf{J} | \sum_{i=1}^m \rho_i h_i \, \mathbf{N}^{\mathsf{T}} \mathbf{N} 
+    \mathbf{M}_{\mathrm{C2D}} = \int_{\pentagon} \rho \, \mathbf{N}^{\mathsf{T}} \mathbf{N} \,|\mathbf{J}| \, H \, \mathrm{d} \xi \, \mathrm{d} \eta 
+    = | \mathbf{J} | \sum_{i=1}^m \rho_i H_i \, \mathbf{N}^{\mathsf{T}} \mathbf{N} 
     (\xi_i , \eta_i) \, w_i
     \label{massintegral2d}
 \end{equation}
-where $m$ is the number of Gauss points with $( \xi_i , \eta_i )$ and $w_i$ being their respective co-ordinates and weights of quadrature that, in our implementation, are provided by Eqns.~(\ref{pentagonCoordinates} \&\ \ref{pentagonQuadrature}).  As with alveolar chords, alveolar membranes have mass densities $\rho_i$ and heights $h_i$ (thicknesses) that are not uniform across a membrane; hence, they are treated as properties of the Gauss point, and as such, are not pulled out in front of the above summation, as is typically done.
+where $m$ is the number of Gauss points with $( \xi_i , \eta_i )$ and $w_i$ being their respective co-ordinates and weights of quadrature that, in our implementation, are provided by Eqns.~(\ref{pentagonCoordinates} \&\ \ref{pentagonQuadrature}).  As with alveolar chords, alveolar membranes have mass densities $\rho_i$ and heights $H_i$ (thicknesses) that are not uniform across a membrane; hence, they are treated as properties of the Gauss point, and as such, are not pulled out in front of the above summation, as is typically done.
 
 Here $|\mathbf{J}|$ is the Jacobian determinant of a $2 \! \times \! 2$ Jacobian matrix $\mathbf{J}$.  In areal derivations, the Jacobian of a two-dimensional transformation connects the physical ${x, y}$ to the natural ${\xi, \eta}$ co-ordinate systems involved.  Components of this Jacobian matrix are calculated using derivatives of shape functions taken with respect to the local co-ordinates via \cite[pg.~424]{Reddy93}
 \begin{equation}
@@ -449,14 +450,14 @@ whose components have values of
 \begin{subequations}
     \begin{align}
     M_{ii}^{\mathrm{2D}} & = 
-    \frac{| \mathbf{J}_0 |}{2} \sum_{k=1}^5 \rho_{0k} h_{0k} N_i ( 1 + 
+    \frac{| \mathbf{J}_0 |}{2} \sum_{k=1}^5 \rho_{0k} H_{0k} N_i ( 1 + 
     N_i ) ( \xi_k , \eta_k ) \, w_k & i & = 1,2,\ldots,5 \\
     M_{ij}^{\mathrm{2D}} = M_{ji}^{\mathrm{2D}} & =
-    \frac{| \mathbf{J}_0 |}{2} \sum_{k=1}^5 \rho_{0k} h_{0k}
+    \frac{| \mathbf{J}_0 |}{2} \sum_{k=1}^5 \rho_{0k} H_{0k}
     N_i N_j (\xi_k , \eta_k ) \, w_k & i & \neq j
     \end{align}
 \end{subequations}
-with co-ordinates $( \xi_i , \eta_i )$ and weights $w_i$ of quadrature being given in Eqns.~(\ref{pentagonCoordinates} \&\ \ref{pentagonQuadrature}), and whose shape functions are defined according to Eqn.~\eqref{shapeFunctions}.  Because the mass of an alveolar membrane is conserved when exposed to a traveling shock wave, it follows that $\rho h | \mathbf{J} | = \rho_0 h_0 | \mathbf{J}_0 |$, and as such, like the mass matrices $\boldsymbol{M}^{(e)}_{\mathrm{1D}}$ and $\boldsymbol{M}^{(e)}_{\mathrm{3D}}$ for chords and tetrahedra, the mass matrix $\boldsymbol{M}^{(e)}_{\mathrm{2D}}$ for each pentagon only needs to be evaluated once. 
+with co-ordinates $( \xi_i , \eta_i )$ and weights $w_i$ of quadrature being given in Eqns.~(\ref{pentagonCoordinates} \&\ \ref{pentagonQuadrature}), and whose shape functions are defined according to Eqn.~\eqref{shapeFunctions}.  Because the mass of an alveolar membrane is conserved when exposed to a traveling shock wave, it follows that $\rho H | \mathbf{J} | = \rho_0 H_0 | \mathbf{J}_0 |$, and as such, like the mass matrices $\boldsymbol{M}^{(e)}_{\mathrm{1D}}$ and $\boldsymbol{M}^{(e)}_{\mathrm{3D}}$ for chords and tetrahedra, the mass matrix $\boldsymbol{M}^{(e)}_{\mathrm{2D}}$ for each pentagon only needs to be evaluated once. 
 
 To rotate this mass matrix for element $e$, $e \in \{ 1, 2, \ldots, 12 \}$, from its elemental co-ordinate system for the pentagon $( \vec{\mathbfsf{e}}_1 , \vec{\mathbfsf{e}}_2 , \vec{\mathbfsf{e}}_3 )^{(e)}$ into a fixed co-ordinate system for the dodecahedron $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$, where it can be assembled with mass matrices from the other 11 elements, one must apply the orthogonal transformation
 \begin{subequations}
@@ -477,7 +478,7 @@ To rotate this mass matrix for element $e$, $e \in \{ 1, 2, \ldots, 12 \}$, from
     Q^{(e)}_{31} & Q^{(e)}_{32} & Q^{(e)}_{33}
     \end{bmatrix}
     \intertext{so that, accordingly,}
-    \mathbf{M}^{(e)}_{\mathrm{2D}} & = \bigl( \mathbf{R}^{(e)}_{\mathrm{2D}} \bigr)^{\mathsf{T}} 
+    \mathbf{M}^{(e)}_{\mathrm{2D}} & = \bigl( \mathbf{R}^{(e)}_{\mathrm{2D}} \bigr)^{\mathsf{T}} \!
     \boldsymbol{M}^{(e)}_{\mathrm{2D}} \mathbf{R}^{(e)}_{\mathrm{2D}}
     \end{align}
 \end{subequations}
@@ -640,7 +641,7 @@ To rotate this mass matrix for element $e$, $e \in \{ 1, 2, \ldots, 60 \}$, from
     Q^{(e)}_{31} & Q^{(e)}_{32} & Q^{(e)}_{33}
     \end{bmatrix}
     \intertext{so that, accordingly,}
-    \mathbf{M}^{(e)}_{\mathrm{3D}} & = \bigl( \mathbf{R}^{(e)}_{\mathrm{3D}} \bigr)^{\mathsf{T}} 
+    \mathbf{M}^{(e)}_{\mathrm{3D}} & = \bigl( \mathbf{R}^{(e)}_{\mathrm{3D}} \bigr)^{\mathsf{T}} \!
     \boldsymbol{M}^{(e)}_{\mathrm{3D}} \mathbf{R}^{(e)}_{\mathrm{3D}}
     \end{align}
 \end{subequations}
@@ -900,7 +901,7 @@ The solution strategy adopted here uses a secant modulus to determine the stress
 
 \subsection{Strain-Displacement Matrices}
 
-Finite elements introduces a matrix $\mathbf{B}$ that transforms nodal displacements $\boldsymbol{u}^{(e)}$ for an element $e$ into a vector of thermo\-dynamic strains $\boldsymbol{E}$ located at a Gauss point via the mapping
+Finite element techniques introduce a matrix $\mathbf{B}$ that transforms nodal displacements $\boldsymbol{u}^{(e)}$ for an element $e$ into a vector of thermo\-dynamic strains $\boldsymbol{E}$ located at a Gauss point via the mapping
 \begin{equation}
 \boldsymbol{E} = \mathbf{B} \, \boldsymbol{u}^{(e)}
 \label{strain} 
@@ -987,7 +988,7 @@ where $\mathbf{K}^s$ is a stiffness matrix built around the secant modulus $\bol
 
 \subsection{Tangent Stiffness Matrix}
 
-Motivated by a definition for the tangent stiffness matrix being $\mathbf{C} \defeq \mathrm{d}\boldsymbol{R} / \mathrm{d}\boldsymbol{u}$ that, e.g., would be appropriate for an updated-Lagrangian finite element formulation, \cite{Belytschkoetal00} we differentiate Eqn.~\eqref{residualVariation} to get $\mathrm{d} \delta R = \delta \mathrm{d} R = \mathrm{d} \boldsymbol{R} \cdot \delta \boldsymbol{u}^{(e)}$ where from one gets
+Motivated by a definition for the tangent stiffness matrix being $\mathbf{C} \defeq \mathrm{d}\boldsymbol{R} / \mathrm{d}\boldsymbol{u}$ that, e.g., would be appropriate for an updated-Lagrangian finite element formulation, \cite{Belytschkoetal00} we differentiate Eqn.~\eqref{residualVariation} to get $\mathrm{d} \delta R = \delta \mathrm{d} R = \mathrm{d} \boldsymbol{R} \cdot \delta \boldsymbol{u}^{(e)}$ from which one gets
 \begin{equation}
     \mathrm{d} \boldsymbol{R} = \int_{V} \, \mathrm{d} \mathbf{B}^{\mathsf{T}} \, \boldsymbol{T} \, \mathrm{d} V + \int_{V} \, \mathbf{B}^{\mathsf{T}} \, \mathrm{d} \boldsymbol{T} \, \mathrm{d} V \eqdef \mathbf{C} \, \mathrm{d} \boldsymbol{u}^{(e)} 
     \label{diffresidual}
@@ -1031,22 +1032,17 @@ Pulling everything together, the equations of motion~\eqref{FEsysOfEqns}, when w
 \begin{subequations}
     \label{EOM}
     \begin{align}
-    \mbox{} & \mathbf{M} \, \ddot{\boldsymbol{u}}^{(e)} + 
-    \mathbf{C} \, \dot{\boldsymbol{u}}^{(e)} + 
-    \mathbf{K} \, \boldsymbol{u}^{(e)} = \boldsymbol{F} & & & \\
-    \intertext{which has a tangent stiffness matrix of}
-    \mbox{} & \mathbf{C} = \mathbf{C}^s + \mathbf{C}^t & & & \\
-    \intertext{a secant stiffness matrix of}
+    \mbox{} & \boldsymbol{F} =
+    \mathbf{K} \, \boldsymbol{u}^{(e)} + 
+    \mathbf{C} \, \dot{\boldsymbol{u}}^{(e)} +
+    \mathbf{M} \, \ddot{\boldsymbol{u}}^{(e)} & & & \\
+    \intertext{which has a secant stiffness matrix of}
     \mbox{} & \mathbf{K} = \mathbf{K}^s + \mathbf{K}^t & & & \\
+    \intertext{a tangent stiffness matrix of}
+    \mbox{} & \mathbf{C} = \mathbf{C}^s + \mathbf{C}^t & & & \\
     \intertext{and a forcing function of}    
     \mbox{} & \boldsymbol{F} = \boldsymbol{F}_{BC} - \boldsymbol{F}_0 & & & \\
     \intertext{wherein} 
-    \mbox{} & \mathbf{C}^s = \int_V \mathbf{H}^{\mathsf{T}} \, 
-        \mathbf{S}^s \, \mathbf{H} \, \mathrm{d}V
-        & & \text{where} & \boldsymbol{T}_0 + 
-        \boldsymbol{\mathcal{M}}^s \boldsymbol{E} \mapsto \mathbf{S}^s \\
-    \mbox{} & \mathbf{C}^t = \int_V \mathbf{B}^{\mathsf{T}} \, 
-        \boldsymbol{\mathcal{M}}^t \, \mathbf{B} \, \mathrm{d}V & & & \\
     \mbox{} & \mathbf{K}^s = \int_V \mathbf{B}^{\mathsf{T}} \, 
         \boldsymbol{\mathcal{M}}^s \, \mathbf{B} \, \mathrm{d}V & & & \\
     \mbox{} & \mathbf{K}^t = \int_V \mathbf{H}^{\mathsf{T}} \, 
@@ -1054,35 +1050,41 @@ Pulling everything together, the equations of motion~\eqref{FEsysOfEqns}, when w
         & & \text{where} &
         \mathrm{d}\mathbf{S}^t = \mathbf{A}^{\mathsf{T}} \, 
         \boldsymbol{\mathcal{M}}^t \, \mathrm{d} \mathbf{A} \\
+        \mbox{} & \mathbf{C}^s = \int_V \mathbf{H}^{\mathsf{T}} \, 
+        \mathbf{S}^s \, \mathbf{H} \, \mathrm{d}V
+        & & \text{where} & \boldsymbol{T}_0 + 
+        \boldsymbol{\mathcal{M}}^s \boldsymbol{E} \mapsto \mathbf{S}^s \\
+        \mbox{} & \mathbf{C}^t = \int_V \mathbf{B}^{\mathsf{T}} \, 
+        \boldsymbol{\mathcal{M}}^t \, \mathbf{B} \, \mathrm{d}V & & & \\
     \mbox{} & \boldsymbol{F}_0 = \int_V \mathbf{B}^{\mathsf{T}} \, \boldsymbol{T}_0 \,
         \mathrm{d}V & & &
     \end{align} 
 \end{subequations}
-with $\boldsymbol{F}_{BC}$ being an external force associated with the boundary conditions evaluated at the end of a solution step.  All other fields are evaluated at the beginning of this solution step.  Superscript $\mbox{}^s$ implies that these matrices are evaluated using the secant modulus $\boldsymbol{\mathcal{M}}^s$, while superscript $\mbox{}^t$ implies that these matrices are evaluated using the tangent modulus $\boldsymbol{\mathcal{M}}^t$.  There are contributions from both moduli in both stiffness matrices.
+with $\boldsymbol{F}_{BC}$ being an external force associated with the boundary conditions evaluated at the end of a solution step.  All other fields are evaluated at the beginning of this solution step.  Superscript `$\mbox{}^s$' implies that these matrices are evaluated using the secant modulus $\boldsymbol{\mathcal{M}}^s$, while superscript `$\mbox{}^t$' implies that these matrices are evaluated using the tangent modulus $\boldsymbol{\mathcal{M}}^t$.  There are contributions from both moduli in both stiffness matrices.
 
 To minimize an accumulation of roundoff error, it is advantageous to compute $\mathbf{K}^s$ as four separate integrals, viz.,
 \begin{multline*}
 \mathbf{K}^s = \int_V \mathbf{B}_L^{\mathsf{T}} \, 
 \boldsymbol{\mathcal{M}}^s \, \mathbf{B}_L \, \mathrm{d}V + 
 \int_V \mathbf{B}_L^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^s \, 
-\mathbf{B}_N \, \mathrm{d}V + 
+\mathbf{B}_N \, \mathrm{d}V \\ + 
 \int_V \mathbf{B}_N^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^s \, 
 \mathbf{B}_L \, \mathrm{d}V + 
 \int_V \mathbf{B}_N^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^s \, 
 \mathbf{B}_N \, \mathrm{d}V
 \end{multline*}
-to compute $\mathbf{C}^t$ as four separate integrals, viz.,
+and to compute $\mathbf{C}^t$ as four separate integrals, too, viz.,
 \begin{multline*}
 \mathbf{C}^t = \int_V \mathbf{B}_L^{\mathsf{T}} \, 
 \boldsymbol{\mathcal{M}}^t \, \mathbf{B}_L \, \mathrm{d}V + 
 \int_V \mathbf{B}_L^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t \, 
-\mathbf{B}_N \, \mathrm{d}V + 
+\mathbf{B}_N \, \mathrm{d}V \\ + 
 \int_V \mathbf{B}_N^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t \, 
 \mathbf{B}_L \, \mathrm{d}V + 
 \int_V \mathbf{B}_N^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t \, 
 \mathbf{B}_N \, \mathrm{d}V
 \end{multline*}
-and to compute $\boldsymbol{F}_0$ as two separate integrals, viz.,
+while computing $\boldsymbol{F}_0$ as two separate integrals, viz.,
 \begin{equation*}
     \boldsymbol{F}_0 = \int_V \mathbf{B}_L^{\mathsf{T}} \, 
         \boldsymbol{T}_0 \, \mathrm{d}V + 
@@ -1096,11 +1098,11 @@ The vector and matrices established in Eqn.~\eqref{EOM} pertain to a single fini
 
 \section{Kinematic Matrices of Finite Elements}
 
-To implement our finite element discretization, it is necessary that we know the following matrices for a given element type: the linear strain-displacement matrix $\mathbf{B}_L$, the nonlinear strain-displacement matrix $\mathbf{B}_N$ and its decomposition $\mathbf{B}_N = \mathbf{AH}$, plus the differential rate $\mathrm{d}\mathbf{A}$.  These matrices are acquired in the following sections for a chord, a pentagon, and a dodecahedron where \textbf{QR} kinematics are adopted.
+To implement our finite element discretization, it is necessary that we know the following matrices for a given element type: the linear strain-displacement matrix $\mathbf{B}_L$, the nonlinear strain-displacement matrix $\mathbf{B}_N$ and its decomposition $\mathbf{B}_N = \mathbf{AH}$, plus the differential rate $\mathrm{d}\mathbf{A}$.  These matrices are acquired in the following sections for a chord, a pentagon, and a dodecahedron where \textbf{QR} kinematics have been adopted.
 
 \subsection{Kinematic Matrices for a Chord}
 
-The components of Laplace stretch $\boldsymbol{\mathcal{U}}$ can be obtained from a Cholesky factorization of the right, Cauchy-Green, deformation tensor $\mathbf{C} = \mathbf{F}^{\mathsf{T}} \mathbf{F} = \boldsymbol{\mathcal{U}}^{\mathsf{T}} \boldsymbol{\mathcal{U}}$, \cite{Srinivasa12} which is a symmetric second-order tensor. For a 1D chord, the only possible deformation is a stretch of the chord in its axial direction. Therefore, in this case, the deformation gradient, as-well-as the right Cauchy-Green tensor $\mathbf{C}$, have only one component.  Consequently, the Laplace stretch $\boldsymbol{\mathcal{U}}$ also consists of only one component, which is denoted by $a$. If $u$ is the axial displacement of a chord, then its axial elongation $a$ becomes
+The components of Laplace stretch $\boldsymbol{\mathcal{U}}$ can be obtained from a Cholesky factorization of the right, Cauchy-Green, deformation tensor $\mathbf{C} = \mathbf{F}^{\mathsf{T}} \mathbf{F} = \boldsymbol{\mathcal{U}}^{\mathsf{T}} \boldsymbol{\mathcal{U}}$, \cite{Srinivasa12} which is a symmetric tensor. For a 1D chord, the only possible deformation is a stretch of the chord in its axial direction. Therefore, in this case, the deformation gradient, as-well-as the right Cauchy-Green tensor $\mathbf{C}$, have only one component.  Consequently, the Laplace stretch $\boldsymbol{\mathcal{U}}$ also consists of only one component, which is denoted by $a$. If $u$ is the axial displacement of a chord, then its axial elongation $a$ becomes
 \begin{subequations}
     \begin{gather}
     a = {\mathcal{U}}_{11} = \sqrt{C_{11}} \\
@@ -1120,7 +1122,7 @@ as determined by a Taylor expansion of $e = \ln \sqrt{C_{11}}$, which gives
     \quad \text{and} \quad
     e_{N} = -\frac{1}{2} \, \mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} 
 \end{equation}
-where all contributions have been truncated beyond the quadratic term in this expansion.
+where all contributions have been truncated beyond the quadratic term in this series expansion.
 
 The linear strain-displacement matrix $\mathbf{B}_L$ can now be obtained by expressing the linear strain $e_L$ in terms of its nodal displacements, viz.,
 \begin{subequations}
@@ -1199,7 +1201,7 @@ The tangent stiffness matrix $\mathbf{C}^s$  associated with $\boldsymbol{T}_0 +
 \begin{equation}
 	\begin{aligned}
 		\mathbf{C}^s & = \int_{L} \mathbf{H}^{\mathsf{T}} \,  \mathbf{S}^s \, \mathbf{H} \, A \, \mathrm{d} L
-	     = | \mathbf{J}_0 |  \, \sum_{i=1}^{n} \mathbf{H}^{\mathsf{T}} \, \mathbf{S}^s (\xi_i) \, \mathbf{H} \, A_0 (\xi_i)  \, \mathrm{w}_i 
+	     = | \mathbf{J}_0 |  \, \sum_{i=1}^{n} \mathbf{H}^{\mathsf{T}} \, \mathbf{S}^s (\xi_i) \, \mathbf{H} \, A_0 (\xi_i)  \, w_i 
 	\end{aligned}
 \end{equation}
 where an isochoric response is assumed in that $A_0 | \mathbf{J}_0 | = A | \mathbf{J} |$. Here $\xi_i$ and $w_i$ are the co-ordinates and weights of quadrature for Gauss point $i$, and $A_0$ and $A$ are the initial and current cross-sectional areas of the chord with $A_0 (\xi_i)$ being the initial cross-sectional area at Gauss point~$\xi_i$.
@@ -1211,7 +1213,7 @@ The tangent stiffness matrix $\mathbf{C}^t$, as established in Eqn.~\eqref{tange
 \begin{subequations}
 	\begin{align}
 		\mathbf{C}^t & = \int_L \mathbf{B}^{\mathsf{T}} \,  \boldsymbol{\mathcal{M}}^t \, \mathbf{B}  \, A \,  \mathrm{d} L
-		= |\mathbf{J}_0| \sum_{i=1}^{n}   \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t (\xi_i) \, \mathbf{B} \, A_0 (\xi_i) \, \mathrm{w}_i 
+		= |\mathbf{J}_0| \sum_{i=1}^{n}   \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t (\xi_i) \, \mathbf{B} \, A_0 (\xi_i) \, w_i 
 	\end{align}
 \end{subequations} 
 where axial stress rate $\mathrm{d} s$ is described by a tangent modulus $\boldsymbol{\mathcal{M}}^t$ from Eqn.~(\ref{fiberTangentModulus}).
@@ -1223,10 +1225,10 @@ The secant stiffness matrix $\mathbf{K}^s$, as established in Eqn.~\eqref{secant
 \begin{subequations}
 	\begin{align}
 		\mathbf{K}^s & = \int_L \mathbf{B}^{\mathsf{T}} \,  \boldsymbol{\mathcal{M}}^s \, \mathbf{B}  \, A \,  \mathrm{d} L
-		= |\mathbf{J}_0| \sum_{i=1}^{n}  \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^s (\xi_i) \, \mathbf{B} \, A_0 (\xi_i) \, \mathrm{w}_i 
+		= |\mathbf{J}_0| \sum_{i=1}^{n}  \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^s (\xi_i) \, \mathbf{B} \, A_0 (\xi_i) \, w_i 
 	\end{align}
 \end{subequations} 
-where axial stress rate $\mathrm{d} s$ is described by a secant modulus $\boldsymbol{\mathcal{M}}^{s}$ from Eqn.~(\ref{elasticChordProperties}).
+where axial stress $s$ is described by a secant modulus $\boldsymbol{\mathcal{M}}^{s}$ from Eqn.~(\ref{elasticChordProperties}).
 
 
 \subsubsection{Secant Stiffness Matrix $\mathbf{K}^t$}
@@ -1235,10 +1237,10 @@ Likewise, a secant stiffness matrix $\mathbf{K}^t$, also established in Eqn.~\eq
 \begin{subequations}
 	\begin{align}
 		\mathbf{K}^t & = \int_L \mathbf{H}^{\mathsf{T}} \,  \mathrm{d} \mathbf{S}^t \, \mathbf{H}  \, A \,  \mathrm{d} L
-		= | \mathbf{J}_0 | \sum_{i=1}^{n}  \mathbf{H}^{\mathsf{T}} \,  \mathrm{d} \mathbf{S}^t (\xi_i) \, \mathbf{H} \, A_0 (\xi_i) \, \mathrm{w}_i
+		= | \mathbf{J}_0 | \sum_{i=1}^{n}  \mathbf{H}^{\mathsf{T}} \,  \mathrm{d} \mathbf{S}^t (\xi_i) \, \mathbf{H} \, A_0 (\xi_i) \, w_i
 	\end{align}
 \end{subequations}
-where $\mathrm{d} \mathbf{S}^t \defeq \mathbf{A}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t \, \mathrm{d} \mathbf{A}$.
+where its stress rate is given by $\mathrm{d} \mathbf{S}^t \defeq \mathbf{A}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t \, \mathrm{d} \mathbf{A}$.
 
 
 \subsection{Kinematic Matrices for a Pentagon}
@@ -1267,7 +1269,7 @@ where $a$ and $b$ are elongations (stretches) in the 1 and 2~directions, respect
     \end{bmatrix}
     \end{align}
 \end{subequations}
-where $u$ and $v$ are displacements associated with deformation of a planar membrane.
+where $u$ and $v$ are displacements associated with the deformation of a planar membrane.
 
 Gradients of shape functions are used to construct the above spatial gradients, viz.,
 \begin{displaymath}
@@ -1322,12 +1324,14 @@ The thermodynamic strain attributes that we use are defined in Eqn.~\eqref{therm
     \label{strainAttributesPentagon}
 \end{equation}
 Without loss of generality, we consider the membrane to be initially undeformed, which allows us to set $a_0$ and $b_0$ to one, while the initial shear $g_0$ is taken as zero.  To gain computational advantage, we decompose these strain attributes into linear and nonlinear components; specifically, we consider
-\begin{equation}
-    \xi = \xi_{L} + \xi_{N1} + \xi_{N2} + \xi_{N3} , \quad
-    \varepsilon = \varepsilon_{L} + \varepsilon_{N1} + \varepsilon_{N2} + \varepsilon_{N3} , \quad
-    \gamma = \gamma_{L} + \gamma_{N1} + \gamma_{N2} + \gamma_{N3}.
+\begin{subequations}
     \label{totalVirtualStrain}
-\end{equation}
+    \begin{align}
+    \xi & = \xi_{L} + \xi_{N1} + \xi_{N2} + \xi_{N3} \\
+    \varepsilon & = \varepsilon_{L} + \varepsilon_{N1} + \varepsilon_{N2} + \varepsilon_{N3} \\
+    \gamma & = \gamma_{L} + \gamma_{N1} + \gamma_{N2} + \gamma_{N3}.
+    \end{align}
+\end{subequations}
 Traditionally, finite element constructions decompose strain into a linear component and a non\-linear component.  However, in our case, a further decomposition of the non\-linear strain component into three separate components makes our computation much easier, as will be realized later. 
 
 Decomposition of strain attributes in Eqn.~\eqref{strainAttributesPentagon} is achieved via Taylor expansions that retain terms through second-order.  The linear and nonlinear components of these strain attributes, thus obtained, are given as
@@ -1344,7 +1348,7 @@ Decomposition of strain attributes in Eqn.~\eqref{strainAttributesPentagon} is a
 \end{subequations}
 where the linear components of these strain attributes consist only of first-order derivatives in the displacements, while the nonlinear components contain the second-order terms. (Recall that terms with third-order and higher derivatives in displacement have been truncated.) The nonlinear components of strain have been arranged in such a way that when represented in a set of base vectors, they can be written as the product of a matrix and a vector that contain these derivatives of displacement.  To achieve that, for the dilatation $\xi$ and squeeze $\varepsilon$ strains, the nonlinear components contain squares of derivatives and products between different derivatives of displacement. Note that the nonlinear part of the total shear strain contains only products of different derivatives of displacements, i.e., no square term is present in its expression. 
 
-In terms of the nodal displacements the vector containing the linear strain attributes, $\boldsymbol{E}_L$ can be written as
+In terms of the nodal displacements, the vector containing the linear strain attributes, i.e., $\boldsymbol{E}_L$, can be written as
 \begin{subequations}
 \begin{align}
     \boldsymbol{E}_L & = \begin{Bmatrix}
@@ -1465,24 +1469,22 @@ Therefore, the first nonlinear strain--displacement matrix $\mathbf{B}_{N1}$ can
 \end{subequations}
 
 In a similar manner, the second nonlinear strain terms can be written as
-\begin{equation}
-\begin{aligned}
-\mathbf{E}_{N2} & =  \begin{Bmatrix}
+\begin{multline}
+\mathbf{E}_{N2} =  \begin{Bmatrix}
 \mathrm \xi_{N2} \\
 \mathrm \varepsilon_{N2} \\
 \mathrm \gamma_{N2} \end{Bmatrix} =
 \begin{Bmatrix}
 -\tfrac{1}{2} \, u_{,y} \, v_{,x}  \\
 \tfrac{1}{2} \, u_{,y} \, v_{,x} \\
--2 \, u_{,x} \, v_{,x} \end{Bmatrix} = \frac{1}{2} \, \begin{bmatrix}
+-2 \, u_{,x} \, v_{,x} \end{Bmatrix} \\ = \frac{1}{2} \, \begin{bmatrix}
 - \partial v / \partial x &  0 \\
 \partial v / \partial x & 0 \\
 0 & -4 \, \partial u / \partial x  \end{bmatrix} \, \begin{Bmatrix}
 \partial u / \partial y\\
 \partial v / \partial x
 \end{Bmatrix} = \tfrac{1}{2} \, \mathbf{A}_2 \, \boldsymbol{\theta}_2
-\end{aligned}
-\end{equation}
+\end{multline}
 with  
 \begin{subequations}
 	\begin{align}
@@ -1547,25 +1549,23 @@ Hence, the second nonlinear strain--displacement matrix $\mathbf{B}_{N2}$ become
 \end{subequations}
 
 
-Also, the third nonlinear strain terms can be written as
-\begin{equation}
-	\begin{aligned}
-		\mathbf{E}_{N3} & =  \begin{Bmatrix}
+In like manner, the third nonlinear strain terms can be written as
+\begin{multline}
+		\mathbf{E}_{N3} =  \begin{Bmatrix}
 			\mathrm \xi_{N3} \\
 			\mathrm \varepsilon_{N3} \\
 			\mathrm \gamma_{N3} \end{Bmatrix} =
 		\begin{Bmatrix}
 			-\tfrac{1}{4} \, u_{,x}^2  \\
 			\tfrac{1}{2} \, v_{,x}^2  \\
-			-u_{,y} \, u_{,x}  \end{Bmatrix}  = \frac{1}{2} \, \begin{bmatrix}
+			-u_{,y} \, u_{,x}  \end{Bmatrix} \\ = \frac{1}{2} \, \begin{bmatrix}
 			-\tfrac{1}{2} \, \partial u / \partial x & 0  \\
 			0 & \partial v / \partial x \\
 			-2 \, \partial u / \partial y  & 0  \end{bmatrix} \, \begin{Bmatrix}
 			\partial u / \partial x\\
 			\partial v / \partial x
 		\end{Bmatrix} = \tfrac{1}{2} \, \mathbf{A}_3 \, \boldsymbol{\theta}_3
-	\end{aligned}
-\end{equation}
+\end{multline}
 with 
 \begin{subequations}
 	\begin{align}
@@ -1639,42 +1639,48 @@ To obtain the stiffness matrix for a planar membrane, we need to compute the fou
 The tangent stiffness matrix $\mathbf{C}^s$, as established in Eqn.~\eqref{secantStiffness}, becomes 
 \begin{subequations}
 	\begin{gather}
-		\mathbf{C}^s = \int_{\pentagon} \mathbf{H}^{\mathsf{T}} \,  \mathbf{S}^s \, \mathbf{H} \, h \, \mathrm{d} A
-		=  | \mathbf{J}_0 |  \, \sum_{i=1}^{n} \mathbf{H}^{\mathsf{T}} \, \mathbf{S}^s (\xi_i , \eta_i) \, \mathbf{H} \, h_{0\,i} \, \mathrm{w}_i \\
+		\mathbf{C}^s = \int_{\pentagon} \mathbf{H}^{\mathsf{T}} \,  \mathbf{S}^s \, \mathbf{H} \, H \, \mathrm{d} A
+		=  | \mathbf{J}_0 |  \, \sum_{i=1}^{n} \mathbf{H}^{\mathsf{T}} \, \mathbf{S}^s (\xi_i , \eta_i) \, \mathbf{H} \, H_{0\,i} \, w_i \\
         \intertext{wherein}
         \mathbf{S}^s = \begin{bmatrix}
         	\mathcal{S}_{11} & \mathcal{S}_{12} \\
         	\mathcal{S}_{21} & \mathcal{S}_{22}
-        \end{bmatrix}
+        \end{bmatrix} 
     \label{stressMtx2D}
 	\end{gather}
 \end{subequations}
+where an isochoric response is assumed in that $H_0 | \mathbf{J}_0 | = H | \mathbf{J} |$. Here $H_0$ and $H$ are the initial and current height or thickness of the septal membrane, and $\xi_i$, $\eta_i$ and $w_i$ are the co-ordinates and weights of quadrature for Gauss point~$i$ whereat the membrane has an initial thickness of $H_{0\,i}$. 
 
-The stress vector $\boldsymbol{T} = \{ s^{\pi}, s^{\sigma}, s^{\tau} \}^{\mathsf{T}}$ conjugate to strain vector $\boldsymbol{E} = \{ \xi, \varepsilon, \gamma \}^{\mathsf{T}}$ has elements of a surface tension $s^{\pi} = \mathcal{S}_{11} + \mathcal{S}_{22}$, a normal-stress difference $s^{\sigma} = \mathcal{S}_{11} - \mathcal{S}_{22}$, and a shear stress $s^{\tau} = \tfrac{a}{b} \, \mathcal{S}_{12}$.  Only surface tension is considered to have a residual state of stress $s^{\pi}_0$, which is necessary for alveolar stability, and is caused, in part, by the presence of surfactant.  In a reciprocal sense, the stress components are assigned via $\mathcal{S}_{11} = \frac{1}{2} ( s^{\pi} + s^{\sigma} )$, $\mathcal{S}_{22} = \frac{1}{2} ( s^{\pi} - s^{\sigma} )$ and $\mathcal{S}_{12} = \mathcal{S}_{21} = \frac{b}{a} s^{\tau}$ such that $\mathbf{S} = \mathbf{P} \, \boldsymbol{\mathcal{U}}^{-1} \boldsymbol{\mathcal{S}} \, \boldsymbol{\mathcal{U}}^{-\mathsf{T}} \mathbf{P}^{\mathsf{T}}$ with $\mathbf{S}$ being the second Piola-Kirchhoff stress evaluated in the co-ordinate system of a pentagon, while $\boldsymbol{\mathcal{U}}$ is the Laplace stretch, and $\mathbf{P}$ is a re-indexer of co-ordinate labeling needed to ensure invariance under a transformation of Laplace stretch.
+The stress vector $\boldsymbol{T} = \{ s^{\pi}, s^{\sigma}, s^{\tau} \}^{\mathsf{T}}$ conjugate to strain vector $\boldsymbol{E} = \{ \xi, \varepsilon, \gamma \}^{\mathsf{T}}$ has elements of a surface tension $s^{\pi} = \mathcal{S}_{11} + \mathcal{S}_{22}$, a normal-stress difference $s^{\sigma} = \mathcal{S}_{11} - \mathcal{S}_{22}$, and a shear stress $s^{\tau} = \tfrac{a}{b} \, \mathcal{S}_{12}$.  Only surface tension is considered to have a residual state of stress $s^{\pi}_0$, which is necessary for alveolar stability, and is caused, in part, by the presence of surfactant.  In a reciprocal sense, the stress components are assigned via 
+\begin{equation}
+    \mathcal{S}_{11} = \frac{1}{2} ( s^{\pi} + s^{\sigma} ), \quad \mathcal{S}_{22} = \frac{1}{2} ( s^{\pi} - s^{\sigma} ) 
+    \quad \text{and} \quad
+    \mathcal{S}_{12} = \mathcal{S}_{21} = \frac{b}{a} s^{\tau}
+\end{equation} 
+such that $\mathbf{S} = \mathbf{P} \, \boldsymbol{\mathcal{U}}^{-1} \boldsymbol{\mathcal{S}} \, \boldsymbol{\mathcal{U}}^{-\mathsf{T}} \mathbf{P}^{\mathsf{T}}$ with $\mathbf{S}$ being the second Piola-Kirchhoff stress evaluated in the co-ordinate system of a pentagon, while $\boldsymbol{\mathcal{U}}$ is the Laplace stretch, and $\mathbf{P}$ is a re-indexer of co-ordinate labeling needed to ensure invariance under a transformation of Laplace stretch.
 
-where an isochoric response is assumed in that $h_0 | \mathbf{J}_0 | = h | \mathbf{J} |$. Here $h_0$ and $h$ are the initial and current height or thickness of the septal membrane, and $\xi_i$, $\eta_i$ and $w_i$ are the co-ordinates and weights of quadrature for Gauss point~$i$ whereat the membrane has an initial thickness of $h_{0\,i}$. 
 
 \subsubsection{Tangent Stiffness Matrix $\mathbf{C}^t$}
 
 The tangent stiffness matrix $\mathbf{C}^t$, as established in Eqn.~\eqref{tangentStiffness}, becomes 
 \begin{equation}
 	\begin{aligned}
-		\mathbf{C}^t & =\int_{\pentagon} \mathbf{B}^{\mathsf{T}} \,  \boldsymbol{\mathcal{M}}^t \, \mathbf{B} \, |\mathbf{J}|  \, h \,  \mathrm{d} A
-		= |\mathbf{J}_0| \sum_{i=1}^{n}   \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t (\xi_i, \eta_i) \, \mathbf{B} \, h_{0\,i} \, \mathrm{w}_i 
+		\mathbf{C}^t & =\int_{\pentagon} \mathbf{B}^{\mathsf{T}} \,  \boldsymbol{\mathcal{M}}^t \, \mathbf{B} \, |\mathbf{J}|  \, H \,  \mathrm{d} A
+		= |\mathbf{J}_0| \sum_{i=1}^{n}   \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t (\xi_i, \eta_i) \, \mathbf{B} \, H_{0\,i} \, w_i 
 	\end{aligned}
 \end{equation} 
-where its associated axial stress rate $\mathrm{d} s$ is described by a tangent modulus $\boldsymbol{\mathcal{M}}^{t}$ that for biologic membranes is described by Eqn.~(\ref{pentagonTangentModulus}).
+where its associated stress rate is described by a tangent modulus $\boldsymbol{\mathcal{M}}^{t}$ that, for biologic membranes, is described by Eqn.~(\ref{pentagonTangentModulus}).
 
 \subsubsection{Secant Stiffness Matrix $\mathbf{K}^s$}
 
 The secant stiffness matrix $\mathbf{K}^s$, as established in Eqn.~\eqref{secantStiffnessMatrix}, becomes
 \begin{equation}
 	\begin{aligned}
-		\mathbf{K}^s & =\int_{\pentagon} \mathbf{B}^{\mathsf{T}} \,  \boldsymbol{\mathcal{M}}^s \, \mathbf{B}  \, h \,  \mathrm{d} A
-		= |\mathbf{J}_0| \sum_{i=1}^{n}  \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^s (\xi_i, \eta_i) \, \mathbf{B} \, h_{0\,i} \, \mathrm{w}_i 
+		\mathbf{K}^s & =\int_{\pentagon} \mathbf{B}^{\mathsf{T}} \,  \boldsymbol{\mathcal{M}}^s \, \mathbf{B}  \, H \,  \mathrm{d} A
+		= |\mathbf{J}_0| \sum_{i=1}^{n}  \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^s (\xi_i, \eta_i) \, \mathbf{B} \, H_{0\,i} \, w_i 
 	\end{aligned}
 \end{equation} 
-where its associated axial stress rate $\mathrm{d} s$ is described by a secant modulus $\boldsymbol{\mathcal{M}}^{s}$ that for biologic membranes is described by Eqn.~(\ref{pentagonSecantModulus}).
+where its associated stress is described by a secant modulus $\boldsymbol{\mathcal{M}}^{s}$ that, for biologic membranes, is described by Eqn.~(\ref{pentagonSecantModulus}).
 
 
 \subsubsection{Secant Stiffness Matrix $\mathbf{K}^t$}
@@ -1682,15 +1688,15 @@ where its associated axial stress rate $\mathrm{d} s$ is described by a secant m
 Likewise, a secant stiffness matrix $\mathbf{K}^t$, also established in Eqn.~\eqref{tangentStiffness}, becomes 
 \begin{equation}
 	\begin{aligned}
-		\mathbf{K}^t & = \int_{\pentagon} \mathbf{H}^{\mathsf{T}} \,  \mathrm{d} \mathbf{S}^t \, \mathbf{H}  \, h \,  \mathrm{d} A
-		= | \mathbf{J}_0 | \sum_{i=1}^{n}  \mathbf{H}^{\mathsf{T}} \,  \mathrm{d} \mathbf{S}^t (\xi_i, \eta_i) \, \mathbf{H} \, h_{0\,i} \, \mathrm{w}_i
+		\mathbf{K}^t & = \int_{\pentagon} \mathbf{H}^{\mathsf{T}} \,  \mathrm{d} \mathbf{S}^t \, \mathbf{H}  \, H \,  \mathrm{d} A
+		= | \mathbf{J}_0 | \sum_{i=1}^{n}  \mathbf{H}^{\mathsf{T}} \,  \mathrm{d} \mathbf{S}^t (\xi_i, \eta_i) \, \mathbf{H} \, H_{0\,i} \, w_i
 	\end{aligned}
 \end{equation}
-where $\mathrm{d} \mathbf{S}^t \defeq \mathbf{A}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t \, \mathrm{d} \mathbf{A}$.
+where its associated stress rate is given by $\mathrm{d} \mathbf{S}^t \defeq \mathbf{A}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t \, \mathrm{d} \mathbf{A}$.
 
 \subsection{Kinematic Matrices for a Tetrahedron}
 
-Let us consider a tetrahedron subjected to the displacements $u$, $v$ and $w$ in three spatial directions respectively. In terms of the displacement gradient, the elements of the deformation gradient can be written as
+Let us consider a tetrahedron subjected to displacements of $u$, $v$ and $w$ in its three spatial directions, respectively. In terms of these displacements, elements of the deformation gradient can be written as
 \begin{equation}
 \mathbf{F} =  
 \begin{bmatrix}
@@ -1718,7 +1724,7 @@ The Laplace stretch associated with an alveolar volume is a $3\times3$ upper-tri
     0 & b & b \alpha \\
     0 & 0 & c \end{bmatrix} .
 \end{equation}
-It is possible to express the components of Laplace stretch $\boldsymbol{\mathcal{U}}$ in terms of the displacement gradient through a Cholesky factorization of the right Cauchy-Green tensor $\mathbf{C} = \boldsymbol{\mathcal{U}}^{\mathsf{T}} \boldsymbol{\mathcal{U}}$. Specifically, the elements of Laplace stretch are obtained as \cite{Srinivasa12}
+It is possible to express the components of Laplace stretch $\boldsymbol{\mathcal{U}}$ in terms of displacement gradients through a Cholesky factorization of the right Cauchy-Green tensor $\mathbf{C} = \boldsymbol{\mathcal{U}}^{\mathsf{T}} \boldsymbol{\mathcal{U}}$. Specifically, the elements of Laplace stretch are obtained as \cite{Srinivasa12}
 \begin{equation}
 \begin{aligned}
 \mathcal{U}_{11} & = \sqrt{C_{11}} & 
@@ -1735,9 +1741,9 @@ It is possible to express the components of Laplace stretch $\boldsymbol{\mathca
 \end{equation}
 where ${C_{11}}$, ${C_{12}}$, ${C_{13}}$, $C_{22}$, $C_{23}$ and ${C_{33}}$ are components of the right Cauchy--Green tensor $\mathbf{C}$.
 
-Now in order to obtain the stiffness matrix for an alveolar volume, first we need to derive the strain attributes and express them in terms of the nodal displacements. The strain attributes are defined in terms of the derived elements of Laplace stretch, as mentioned earlier.
+Now, in order to obtain the stiffness matrix for an alveolar volume, first we need to derive the strain attributes and express them in terms of the nodal displacements. The strain attributes are defined in terms of the derived elements of Laplace stretch, as mentioned earlier.
 
-The dilatation $\delta$ for an alveolar volume is
+The dilatation $\xi$ for an alveolar volume is
 \begin{subequations}
     \begin{align}
     \mathrm  \xi & \defeq \ln \sqrt[3]{\frac{a}{a_0}
@@ -1765,9 +1771,9 @@ where their linear and nonlinear components can be expressed in terms of element
 \begin{subequations}
 	\begin{align}
 	\mathrm \xi_{L} & = \frac{1}{3} \, \left(\mathrm{\frac{\partial u}{\partial x}} + \mathrm{\frac{\partial v}{\partial y}} + \mathrm{\frac{\partial w}{\partial z}}\right)\\
-	\mathrm \xi_{N} & = \frac{1}{6} \, \Big(-\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} + \mathrm{\frac{\partial u}{\partial z}}\, \mathrm{\frac{\partial u}{\partial z}}  - \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} - \mathrm{\frac{\partial v}{\partial z}}\, \mathrm{\frac{\partial v}{\partial z}} + \mathrm{\frac{\partial w}{\partial x}}\, \mathrm{\frac{\partial w}{\partial x}} - \mathrm{\frac{\partial w}{\partial y}}\, \mathrm{\frac{\partial w}{\partial y}} - \mathrm{\frac{\partial w}{\partial z}}\, \mathrm{\frac{\partial w}{\partial z}} 
-	\notag \\
-	\mbox{} & \qquad - 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}} - 4 \, \mathrm{\frac{\partial v}{\partial z}}\, \mathrm{\frac{\partial w}{\partial y}} \Big)\\
+	\mathrm \xi_{N} & = \frac{1}{6} \, \Big(-\mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} + \mathrm{\frac{\partial u}{\partial z}}\, \mathrm{\frac{\partial u}{\partial z}}  - \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} - \mathrm{\frac{\partial v}{\partial z}}\, \mathrm{\frac{\partial v}{\partial z}} \notag \\
+    \mbox{} & \qquad + 
+    \mathrm{\frac{\partial w}{\partial x}}\, \mathrm{\frac{\partial w}{\partial x}} - \mathrm{\frac{\partial w}{\partial y}}\, \mathrm{\frac{\partial w}{\partial y}} - \mathrm{\frac{\partial w}{\partial z}}\, \mathrm{\frac{\partial w}{\partial z}} - 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}} - 4 \, \mathrm{\frac{\partial v}{\partial z}}\, \mathrm{\frac{\partial w}{\partial y}} \Big)\\
 	\mathrm \varepsilon_{1L} & = \frac{1}{3} \, \left(\mathrm{\frac{\partial u}{\partial x}} - \mathrm{\frac{\partial v}{\partial y}}\right)\\
 	\mathrm \varepsilon_{1N} & = \frac{1}{6} \, \left(2 \, \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial x}} + \mathrm{\frac{ \partial v}{\partial y}}\, \mathrm{\frac{ \partial v}{\partial y}} - \mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial x}} +  \mathrm{\frac{\partial w}{\partial x}}\, \mathrm{\frac{\partial w}{\partial x}} -  \mathrm{\frac{\partial w}{\partial y}}\, \mathrm{\frac{\partial w}{\partial y}} + 2 \, \mathrm{\frac{\partial u}{\partial y}}\, \mathrm{\frac{\partial v}{\partial x}}\right)\\
 	\mathrm \varepsilon_{2L} & = \frac{1}{3} \, \left(\mathrm{\frac{\partial v}{\partial y}} - \mathrm{\frac{\partial w}{\partial z}}\right)\\
@@ -1782,7 +1788,7 @@ where their linear and nonlinear components can be expressed in terms of element
 	\mathrm \gamma_{3N} & = - \mathrm{\frac{\partial u}{\partial x}}\, \mathrm{\frac{\partial u}{\partial y}} - 2 \, \mathrm{\frac{ \partial u}{\partial x}}\, \mathrm{\frac{ \partial v}{\partial x}} + \mathrm{\frac{\partial v}{\partial x}}\, \mathrm{\frac{\partial v}{\partial y}} + \mathrm{\frac{\partial w}{\partial x}}\, \mathrm{\frac{\partial w}{\partial y}} 
 	\end{align}
 \end{subequations}
-The total stiffness matrix can be obtained as a sum of the linear and five nonlinear stiffness matrices. Therefore, we first have to evaluate these components of the stiffness matrices by using the associated strain-displacement matrices. For all these cases, the strain-displacement matrices are obtained by expressing the strains in terms of the nodal displacements with the help of shape functions and their derivatives.
+The total stiffness matrix can be obtained as a sum of the linear and five non\-linear stiffness matrices. Therefore, we first have to evaluate these components of the stiffness matrices by using the associated strain-displacement matrices. For all these cases, the strain-displacement matrices are obtained by expressing the strains in terms of the nodal displacements with the help of shape functions and their derivatives.
 
 First, the linear strain-displacement matrix $\mathbf{B}_L$ is obtained by expressing the strain attributes in terms of the nodal displacements through derivatives of the shape functions. Specifically, the linear strain-displacement matrix takes the form of
 \begin{equation}
@@ -1830,12 +1836,12 @@ wherein each component of $\mathbf{B}_L$ is given by
     \intertext{and the nodal displacement vector for element $e$ is given as}
     \mathbf{u}^{(e)} & = \bigl\{ \begin{matrix}
     u_1 & v_1 & w_1 & u_2 & v_2 & w_2 & u_3 & v_3 & w_3 & u_4 & v_4 & w_4 
-    \end{matrix} \bigr\}^{\mathsf{T}}
+    \end{matrix} \bigr\}^{\mathsf{T}} .
     \end{align}
 \end{subequations}
 Note that the linear-strain displacement matrix $\mathbf{B_L}$ consists only of derivatives for the shape functions, and thus, remains the same throughout a deformation process.
 
-Now we derive the nonlinear strain-displacement matrices that will be used to obtain the nonlinear stiffness matrix. The nonlinear components of each strain attribute have been additively decomposed into five components to make our computation easier. Components of each strain attribute are placed into an associated vector resulting in an additive decomposition of the total nonlinear strain $\mathbf{E}_N$. To obtain the nonlinear stiffness matrix corresponding to these nonlinear strain components, the nonlinear strains are written as a product of two quantities: a matrix $\mathbf{A}$ containing various components of the displacement gradient, and a vector $\boldsymbol{\theta}$ that contains the derivatives of displacement with respect to spatial location. The vector $\boldsymbol{\theta}$ essentially represents the slope of the body resulting from the deformation process. The components of the displacement gradient are placed in the matrix $\mathbf{A}$ in such a way so that its product with the slope vector yields the corresponding contribution to the nonlinear strain.
+Now we establish the nonlinear strain-displacement matrices that will be used to obtain the nonlinear stiffness matrix. The nonlinear components of each strain attribute have been additively decomposed into five components to make our computation easier. Components of each strain attribute are placed into an associated vector resulting in an additive decomposition of the total nonlinear strain $\mathbf{E}_N$. To obtain the nonlinear stiffness matrix corresponding to these nonlinear strain components, the nonlinear strains are written as a product of two quantities: a matrix $\mathbf{A}$ containing various components of the displacement gradient, and a vector $\boldsymbol{\theta}$ that contains the derivatives of displacement with respect to spatial location. The vector $\boldsymbol{\theta}$ essentially represents the slope of the body resulting from the deformation process. The components of the displacement gradient are placed in the matrix $\mathbf{A}$ in such a way so that its product with the slope vector yields the corresponding contribution to the nonlinear strain.
 
 The slope vector $\boldsymbol{\theta}$ can further be expressed in terms of the corresponding nodal displacements by using the derivatives of the shape functions. Thus, the nonlinear strain components $\mathbf{E}_{Ni}, i=1, 2, 3, 4$, can be expressed in terms of the nodal displacements, with the nonlinear strain-displacement matrix $\mathbf{B}_{Ni}$ corresponding to these strain components. These strain-displacement matrices are used to obtain the corresponding nonlinear stiffness matrices in a way described earlier.  Note that, unlike its linear counterpart, the nonlinear strain-displacement matrix varies with the deformation of a body, and hence, the matrices corresponding to it must be updated at each step along a solution path.
 
@@ -2412,21 +2418,33 @@ The tangent stiffness matrix $\mathbf{C}^s$, as established in Eqn.~\eqref{secan
 \begin{subequations}
 	\begin{gather}
 		\mathbf{C}^s = \int_{V} \mathbf{H}^{\mathsf{T}} \,  \mathbf{S}^s \, \mathbf{H} \, \mathrm{d} V
-		=  | \mathbf{J} |  \, \sum_{i=1}^{n}  \mathbf{H}^{\mathsf{T}} \, \mathbf{S}^s (\xi_i , \eta_i, \zeta_i) \, \mathbf{H} \, \mathrm{w}_i \\
+		=  | \mathbf{J} |  \, \sum_{i=1}^{n}  \mathbf{H}^{\mathsf{T}} \, \mathbf{S}^s (\xi_i , \eta_i, \zeta_i) \, \mathbf{H} \, w_i \\
         \intertext{wherein $\xi_i, \eta_i, \zeta_i$ and $w_i$ are the co-ordinates and weights of quadrature at the $i^{\mathrm{th}}$ Gauss point, and 
         }
         \mathbf{S}^s = \begin{bmatrix}
         	\mathcal{S}_{11} & \mathcal{S}_{12} & \mathcal{S}_{13} \\
         	\mathcal{S}_{21} & \mathcal{S}_{22} & \mathcal{S}_{23} \\
         	\mathcal{S}_{31} & \mathcal{S}_{32} & \mathcal{S}_{33}
-        	\end{bmatrix}
+        	\end{bmatrix} .
         \label{stressmtx3D}
 	\end{gather}
 \end{subequations}
-
-
-The stress vector $\boldsymbol{T} = \{ \Pi, \sigma_1, \sigma_2, \tau_1, \tau_2, \tau_3 \}^{\mathsf{T}}$ conjugate to strain $\boldsymbol{E}$ has elements that comprise a pressure $\Pi = \mathcal{S}_{11} + \mathcal{S}_{22} + \mathcal{S}_{33} = -3P$ where $P$ denotes the common definition for pressure, two separate normal-stress differences $\sigma_1 = \mathcal{S}_{11} - \mathcal{S}_{22}$ and $\sigma_2 = \mathcal{S}_{22} - \mathcal{S}_{33}$, and three separate shear stresses $\tau_1 = \frac{b}{c} \mathcal{S}_{32}$, $\tau_2 = \frac{a}{c} \mathcal{S}_{31}$ and $\tau_3 = \frac{a}{b} \mathcal{S}_{21} - \alpha \tau_2$.  Of these, only pressure has an initial value, viz., $\Pi_0$, which represents atmospheric pressure. 
-In a reciprocal sense, the stress components are assigned via $\mathcal{S}_{11} = \frac{1}{3} ( \pi + 2 \sigma_1 + \sigma_2 )$, $\mathcal{S}_{22} = \frac{1}{3} ( \pi - \sigma_1 + \sigma_2 )$, $\mathcal{S}_{33} = \frac{1}{3} ( \pi - \sigma_1 - 2 \sigma_2 )$, $\mathcal{S}_{12} = \mathcal{S}_{21} = \frac{b}{a} (\tau_3 + \alpha \, \tau_2)$, $\mathcal{S}_{13} = \mathcal{S}_{31} = \frac{c}{a} \, \tau_2$ and $\mathcal{S}_{32} = \mathcal{S}_{23} = \frac{c}{a} \tau_1$ such that $\mathbf{S} = \mathbf{P} \, \boldsymbol{\mathcal{U}}^{-1} \boldsymbol{\mathcal{S}} \, \boldsymbol{\mathcal{U}}^{-\mathsf{T}} \mathbf{P}^{\mathsf{T}}$ with $\mathbf{S}$ being the second Piola-Kirchhoff stress, while $\boldsymbol{\mathcal{U}}$ is the Laplace stretch, and $\mathbf{P}$ is a re-indexer of co-ordinate labeling needed to ensure invariance under a transformation of Laplace stretch.
+The stress vector $\boldsymbol{T} = \{ \pi, \sigma_1, \sigma_2, \tau_1, \tau_2, \tau_3 \}^{\mathsf{T}}$ conjugate to strain $\boldsymbol{E}$ has elements that comprise a pressure $\pi = \mathcal{S}_{11} + \mathcal{S}_{22} + \mathcal{S}_{33} = -3P$ where $P$ denotes the common definition for pressure, two separate normal-stress differences $\sigma_1 = \mathcal{S}_{11} - \mathcal{S}_{22}$ and $\sigma_2 = \mathcal{S}_{22} - \mathcal{S}_{33}$, and three separate shear stresses $\tau_1 = \frac{b}{c} \mathcal{S}_{32}$, $\tau_2 = \frac{a}{c} \mathcal{S}_{31}$ and $\tau_3 = \frac{a}{b} \mathcal{S}_{21} - \alpha \tau_2$.  Of these, only pressure has an initial value, viz., $\Pi_0$, which represents atmospheric pressure. 
+In a reciprocal sense, the stress components are assigned via
+\begin{equation} 
+    \mathbf{S}^s = \begin{bmatrix}
+    \frac{1}{3} ( \pi + 2 \sigma_1 + \sigma_2 ) &
+    \frac{b}{a} (\tau_3 + \alpha \, \tau_2) &
+    \frac{c}{a} \, \tau_2 \\
+    \frac{b}{a} (\tau_3 + \alpha \, \tau_2) &
+    \frac{1}{3} ( \pi - \sigma_1 + \sigma_2 ) &
+    \frac{c}{a} \tau_1 \\
+    \frac{c}{a} \, \tau_2 &
+    \frac{c}{a} \tau_1 &
+    \frac{1}{3} ( \pi - \sigma_1 - 2 \sigma_2 )
+    \end{bmatrix}
+\end{equation}    
+such that $\mathbf{S} = \mathbf{P} \, \boldsymbol{\mathcal{U}}^{-1} \boldsymbol{\mathcal{S}} \, \boldsymbol{\mathcal{U}}^{-\mathsf{T}} \mathbf{P}^{\mathsf{T}}$ with $\mathbf{S}$ being the second Piola-Kirchhoff stress, while $\boldsymbol{\mathcal{U}}$ is the Laplace stretch, and $\mathbf{P}$ is a re-indexer of co-ordinate labeling needed to ensure invariance under a transformation of Laplace stretch.
 
 \subsubsection{Tangent Stiffness Matrix $\mathbf{C}^t$}
 
@@ -2434,10 +2452,10 @@ The tangent stiffness matrix $\mathbf{C}^t$, as established in Eqn.~\eqref{tange
 \begin{equation}
 	\begin{aligned}
 		\mathbf{C}^t & =\int_{V} \mathbf{B}^{\mathsf{T}} \,  \boldsymbol{\mathcal{M}}^t \, \mathbf{B}  \,  \mathrm{d} V
-		= |\mathbf{J}| \sum_{i=1}^{n} \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t (\xi_i, \eta_i, \zeta_i) \, \mathbf{B} \, \mathrm{w}_i
+		= |\mathbf{J}| \sum_{i=1}^{n} \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t (\xi_i, \eta_i, \zeta_i) \, \mathbf{B} \, w_i
 	\end{aligned}
 \end{equation} 
-where axial stress rate $\mathrm{d} s$ is described by a tangent modulus $\boldsymbol{\mathcal{M}}^{t}$.
+where the stress rate is described by its tangent modulus $\boldsymbol{\mathcal{M}}^{t}$.
 
 \subsubsection{Secant Stiffness Matrix $\mathbf{K}^s$}
 
@@ -2445,10 +2463,10 @@ The secant stiffness matrix $\mathbf{K}^s$, as established in Eqn.~\eqref{secant
 \begin{equation}
 	\begin{aligned}
 		\mathbf{K}^s & =\int_{V} \mathbf{B}^{\mathsf{T}} \,  \boldsymbol{\mathcal{M}}^s \, \mathbf{B}  \, \mathrm{d} V
-		= |\mathbf{J}| \sum_{i=1}^{n}  \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^s (\xi_i, \eta_i, \zeta_i) \, \mathbf{B} \, \mathrm{w}_i 
+		= |\mathbf{J}| \sum_{i=1}^{n}  \mathbf{B}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^s (\xi_i, \eta_i, \zeta_i) \, \mathbf{B} \, w_i 
 	\end{aligned}
 \end{equation} 
-where axial stress rate $\mathrm{d} s$ is described by a tangent modulus $\boldsymbol{\mathcal{M}}^{s}$.
+where the stress is described by its secant modulus $\boldsymbol{\mathcal{M}}^{s}$.
 
 
 \subsubsection{Secant Stiffness Matrix $\mathbf{K}^t$}
@@ -2457,10 +2475,10 @@ Likewise, a secant stiffness matrix $\mathbf{K}^t$, also established in Eqn.~\eq
 \begin{equation} 
 	\begin{aligned}
 		\mathbf{K}^t & = \int_{V} \mathbf{H}^{\mathsf{T}} \,  \mathrm{d} \mathbf{S}^t \, \mathbf{H}  \,  \mathrm{d} V
-		= | \mathbf{J} | \sum_{i=1}^{n}  \mathbf{H}^{\mathsf{T}} \,  \mathrm{d} \mathbf{S}^t (\xi_i, \eta_i, \zeta_i) \, \mathbf{H} \, \mathrm{w}_i 
+		= | \mathbf{J} | \sum_{i=1}^{n}  \mathbf{H}^{\mathsf{T}} \,  \mathrm{d} \mathbf{S}^t (\xi_i, \eta_i, \zeta_i) \, \mathbf{H} \, w_i 
 	\end{aligned}
 \end{equation}
-where $\mathrm{d} \mathbf{S}^t \defeq \mathbf{A}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t \, \mathrm{d} \mathbf{A}$.
+where its stress rate is given by $\mathrm{d} \mathbf{S}^t \defeq \mathbf{A}^{\mathsf{T}} \, \boldsymbol{\mathcal{M}}^t \, \mathrm{d} \mathbf{A}$.
 
 
 
@@ -2484,72 +2502,76 @@ The virtual work done by external forces $\delta{W}$ in Eq.~(\ref{principle}) ca
 \begin{align}
 \delta{W} & = \int_{S} \, \mathbf{t} \, \delta \mathbf{u} \, \mathrm{d} S
 = \int_{S} \, \mathbf{t} \, \mathbf{N} \, \mathrm{d} \boldsymbol{\Delta} \, \mathrm{d} S = \left( \int_{S} \, \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} S \right) \, \mathrm{d} \boldsymbol{\Delta} 
-\intertext{where $\mathrm{d} S$ denotes the surface element and $\mathbf{t}$ is the surface traction vector (per unit surface area) at current time. Hence, the external  $\mathbf{F}_{BC}$ force vectors are}
-\mathbf{F}_{BC} & = \int_{S} \, \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} S 
+\intertext{where $\mathrm{d} S$ denotes a surface element with $\mathbf{t}$ being its surface traction vector (per unit surface area) at current time. Hence, the external  $\mathbf{F}_{BC}$ force vectors are}
+\mathbf{F}_{BC} & = \int_{S} \, \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} S .
 \end{align}
 \end{subequations}
 
-To compute $\boldsymbol{F}_0$ as two separate integrals, viz.,
+The force needed to balance the residual stresses, i.e., $\boldsymbol{F}_0$, is evaluated as two separate integrals, viz.,
 \begin{equation}
 	\boldsymbol{F}_0 = \int_V \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, 
 	\mathrm{d}V + 	\int_V \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, \mathrm{d}V
 \end{equation}
-
-where the first integral only needs to be evaluated once, as the argument is constant valued.
+where the first integral only needs to be evaluated once, as its argument is constant valued.
 
 
 \subsection{Force Vector for a Chord}
 
-Following the procedure described above,the force vector of the 1-D alveolar chord is evaluated numerically in its natural co-ordinate system as
+Following the procedure described above, the force vector of a 1D alveolar chord is evaluated numerically in its natural co-ordinate system as
 \begin{equation}
-\mathbf{F}_{BC} = \int_L \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} L  =  \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, | \mathbf{J} | \, \mathrm{w}_i
+\mathbf{F}_{BC} = \int_L \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} L  =  \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, | \mathbf{J} | \, w_i
 \end{equation}
-where $\mathrm{w}_i$ are the  weighting coefficients of the Gauss integration rule, $\mathbf{N}$ is the shape function matrix for chord, and $\mathbf{t}$ is the traction on the septal chord that is selected so that the traction can be additively decomposed into that carried by the collagen and elastin fibers, i.e., $\mathbf{t} = \mathbf{t}^c + \mathbf{t}^e $.
+where $w_i$ are the  weighting coefficients of the Gauss integration rule, $\mathbf{N}$ is the shape function matrix for chord, and $\mathbf{t}$ is the traction on the septal chord that is selected so that the traction can be additively decomposed into that carried by the collagen and elastin fibers, i.e., $\mathbf{t} = \mathbf{t}^c + \mathbf{t}^e $.
 
-The internal force $\boldsymbol{F}_0$ accounting for an initial residual stress of $\boldsymbol{T}_0$ as two separate integrals can be computed as
-
+The internal force $\boldsymbol{F}_0$ accounting for an initial residual stress of $\boldsymbol{T}_0$, expressed as two separate integrals, can be computed as
 \begin{subequations}
 	\begin{align}
-		\boldsymbol{F}_0 & = \int_L \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, \mathrm{d} L + \int_L \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, \mathrm{d} L \\
-		& =  \sum_{i=1}^{2} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, | \mathbf{J} | \, \mathrm{w}_i +  \sum_{i=1}^{2} \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, | \mathbf{J} | \, \mathrm{w}_i
-		\intertext{where the first integral will only need to be evaluated once, as the argument is constant valued.
-		Here the initial stress $\mathbf{T}_0 = [s_0] \mapsto \mathbf{S}_0 = [s_0]$  contains the initial stress $s_0$ carried by the collagen and elastin fibers; specifically, from the rule of mixtures}
+		\boldsymbol{F}_0 & = \int_L \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A \, \mathrm{d} L + \int_L \mathbf{B}_N^{\mathsf{T}} \, \boldsymbol{T}_0 \, A \, \mathrm{d} L \\
+		& = | \mathbf{J} | \sum_{i=1}^{2} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, A_i \, w_i + | \mathbf{J} | \sum_{i=1}^{2} \mathbf{B}_N^{\mathsf{T}} \, \boldsymbol{T}_0 \, A_i  \, w_i
+		\intertext{where the first integral will only need to be evaluated once, as the argument is constant valued.  The cross-sectional areas of biologic chords need not be the same at both Gauss points; hence, it cannot be pulled outside the sum (integration).  Here the initial stress $\mathbf{T}_0 = [s_0] \mapsto \mathbf{S}_0 = [s_0]$  contains the initial stress $s_0$ carried by the collagen and elastin fibers; specifically, from the rule of mixtures}
 		s_0 & = \bigl( \phi s_0^c + (1-\phi) s_0^e \bigr) 
 		\quad \text{where} \quad
 		\phi \defeq A^c_0 / ( A^c_0 + A^e_0 ) = A^c_0 / A_0
 	\end{align}
 \end{subequations}
-where $A_0$ and $A$ are the initial and current cross-sectional areas of the chord.
-The superscripts $c$ and $e$ designating collagen and elastin.  
+where $A_0$ and $A$ are the initial and current cross-sectional areas of the chord.  The superscripts `$\mbox{}^c$' and `$\mbox{}^e$' designate collagen and elastin.  
 
 \subsection{Force Vector for a Pentagon}
 
-The boundary of a two dimensional pentagon consists of line segments, which can be considered as one-dimensional chords. Hence, the evaluation of the boundary integrals on pentagon amounts to evaluating the line integrals on these boundary lines. Once the interpolation function for a pentagon are evaluated on the boundary of pentagon, we can obtain the corresponding chordal interpolation functions \cite{Reddy93}.
-Thus, the force vector $\mathbf{F}_{BC}$  for a pentagon can be obtained by integrating the traction vectors multiplied by appropriate shape functions over all sides of pentagon. Specifically, the force on the boundary of the membrane can be obtained as
+The boundary of a two dimensional pentagon consists of line segments, which can be considered as one-dimensional chords. Hence, an evaluation of the boundary integrals of a pentagon amounts to evaluating the line integrals along these boundary lines.  Once the interpolation function for a pentagon are evaluated on the boundary of a pentagon, we can obtain the corresponding chordal interpolation functions \cite{Reddy93}.  Thus, the force vector $\mathbf{F}_{BC}$ for a pentagon can be obtained by integrating the traction vectors multiplied by appropriate shape functions over all sides of pentagon.  Specifically, force along the boundary of a membrane can be obtained as
 \begin{equation}
 \begin{aligned}
 \mathbf{F}_{BC}  = \oint_L \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} L & = \int_{L_{12}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{12} \,|\mathbf{J}| \, \mathrm{d} L + \int_{L_{23}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{23} \,|\mathbf{J}| \, \mathrm{d} L + \int_{L_{34}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{34} \,|\mathbf{J}| \, \mathrm{d} L \\
 & + \int_{L_{45}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{45} \, \,|\mathbf{J}| \, \mathrm{d} L + \int_{L_{51}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{51} \,|\mathbf{J}| \, \mathrm{d} L \\
-& = \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{12} \,|\mathbf{J}| \, \mathrm{w}_i + \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{23} \,|\mathbf{J}| \, \mathrm{w}_i + \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{34} \,|\mathbf{J}| \, \mathrm{w}_i \\
-& + \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{45} \, \,|\mathbf{J}| \, \mathrm{w}_i + \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{51} \,|\mathbf{J}| \, \mathrm{w}_i
+& = |\mathbf{J}| \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{12}  \, w_i + |\mathbf{J}| \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{23}  \, w_i + |\mathbf{J}| \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{34} \, w_i \\
+& + |\mathbf{J}| \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{45} \, w_i + |\mathbf{J}| \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{51} \, w_i
 \end{aligned}
 \end{equation}
-where $\mathbf{N}$ represents the shape function matrix of a chord, but with the matrix dimension of a pentagon, $|\mathbf{J}|$ is the determinant of the Jacobian for a 1-D chord, $\mathrm{w}_i$ denotes the natural weight of the chord, $\mathrm{d} S$ is the arc-length of an infinitesimal line element along the boundary, and $\mathbf{t}$ is the traction vector on each edge of the pentagon defined as
+where $\mathbf{N}$ represents the shape function matrix of a chord, but with the matrix dimension of a pentagon, $|\mathbf{J}|$ is the determinant of the Jacobian for a 1-D chord, $w_i$ denotes the natural weight of the chord, $\mathrm{d} S$ is the arc-length of an infinitesimal line element along the boundary, and $\mathbf{t}$ is the traction vector on each edge of the pentagon defined as
 \begin{equation}
 \mathbf{t} = \mathbf{S}^{s\mathsf{T}} \cdot \mathbf{n} 
 \end{equation}
 where $ \mathbf{n} $ is the normal vector to each sides of pentagon on which the traction acts, and $\mathbf{S}^s $ are established in Eqn.~\eqref{stressMtx2D}.
 
 The internal force $\boldsymbol{F}_0$ accounting for an initial residual stress of $\boldsymbol{T}_0$ becomes
-
 \begin{equation}
 	\begin{aligned}
 		\boldsymbol{F}_0 &= \int_V \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, 
 		\mathrm{d}V + 	\int_V \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, \mathrm{d}V \\
-		& =  \sum_{i=1}^{5} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, h \, | \mathbf{J} | \, \mathrm{w}_i +  \sum_{i=1}^{5} \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, h \, | \mathbf{J} | \, \mathrm{w}_i
+		& =  | \mathbf{J} | \sum_{i=1}^{5} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, H_i \, w_i + | \mathbf{J} | \sum_{i=1}^{5} \mathbf{B}_N^{\mathsf{T}} \, \boldsymbol{T}_0 \, H_i \, w_i
 	\end{aligned}
 \end{equation}
-where $\mathbf{B}$ and $\mathbf{J}$ are the strain displacement and Jacobian matrix of pentagon, respectively. Here the initial stress $\mathbf{T}_0 = [s_0] \mapsto \mathbf{S}_0 = [s_0]$  contains the initial stress $s_0$ carried by the septal membrane.
+where $\mathbf{B}$ and $\mathbf{J}$ are the strain displacement and Jacobian matrix of pentagon, respectively, whose thickness or height $H_i$ can vary over the surface of the membrane, and as such, cannot be pulled outside the summation. Here the initial stress
+\begin{equation} 
+    \mathbf{T}_0 = \left\{ \begin{matrix} 
+        s^{\pi}_0 \\ s^{\sigma}_0 \! = \! 0 \\ s^{\tau}_0 \! = \! 0
+    \end{matrix} \right\} \mapsto 
+    \mathbf{S}_0 = \begin{bmatrix}
+    \tfrac{1}{2} s^{\pi}_0 & 0 \\
+    0 & \tfrac{1}{2} s^{\pi}_0
+    \end{bmatrix}
+\end{equation}
+contains the initial surface tension $s^{\pi}_0$ carried by the septal membrane.
 
 \subsection{Force Vector for a Tetrahedron}
 
@@ -2558,16 +2580,15 @@ The force vector on the alveolar volume is computed by integrating the traction 
 \begin{aligned}
 \mathbf{F}_{BC} &= \oint_{A} \mathbf{N}^{\mathsf{T}} \, \mathbf{t} \, \mathrm{d} A = \int_{\triangle_{1}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{1}} \, \mathrm{d} A  + \int_{\triangle_{2}}  \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{2}}  \, \mathrm{d} A \\
 & + \int_{\triangle_{3}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{3}} \, \mathrm{d} A + \int_{\triangle_{4}} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{4}} \, \mathrm{d} A \\
-& = \sum_{i=1}^{3} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{1}} \,|\mathbf{J}| \, \mathrm{w}_i  + \sum_{i=1}^{3}  \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{2}} \,|\mathbf{J}| \, \mathrm{w}_i  \\
-& + \sum_{i=1}^{3} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{3}} \,|\mathbf{J}| \, \mathrm{w}_i  + \sum_{i=1}^{3}  \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{4}} \,|\mathbf{J}| \, \mathrm{w}_i 
+& = |\mathbf{J}| \sum_{i=1}^{3} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{1}} \, w_i  + |\mathbf{J}| \sum_{i=1}^{3}  \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{2}} \, w_i  \\
+& + |\mathbf{J}| \sum_{i=1}^{3} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{3}} \, w_i  + |\mathbf{J}| \sum_{i=1}^{3}  \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{4}} \, w_i 
 \end{aligned}
 \end{equation}
-where $\Delta_i, i=1, 2, 3, 4$ represents the triangular boundary surface of the tetrahedron. Here $ \mathbf{N}$ represents the shape function matrix for these associated triangular boundaries.   $|\mathbf{J}|$ is the determinant of the Jacobian for triangle, $n$ denotes the number of Gauss points, $\mathrm{w}_i$ is the natural weight of the triangle from Table~\ref{tab:3nodeTriangle}, and $\mathbf{t}$ is the surface traction on the triangle surface. $\oint$ denotes the integral over the surface boundary of the tetrahedron.
+where $\Delta_i, i=1, 2, 3, 4$ represent the triangular boundary surfaces of a tetrahedron.  Here $ \mathbf{N}$ represents the shape function matrix for these associated triangular boundaries.   $|\mathbf{J}|$ is the determinant of the Jacobian for triangle, $n$ denotes the number of Gauss points, $w_i$ is the natural weight of the triangle from Table~\ref{tab:3nodeTriangle}, and $\mathbf{t}$ is the surface traction on the triangle surface.  Integral $\oint$ denotes an integration over the surface boundary of a tetrahedron.
 
-Note that except for the base of the tetrahedron, the tractions on its other sides have equal and opposite contributions to the total force vector. Therefore, contributions from opposite boundary surfaces of the tetrahedron nullify each other. Hence, in order to obtain the total force vector for a tetrahedron, it is sufficient to only consider the contributions due to the traction on its base. Therefore, the total force vector takes the form of
-
+\textbf{Note}:  Except for the base of the tetrahedron, the tractions on its other sides have equal and opposite contributions to the total force vector. Therefore, contributions from opposite boundary surfaces of the tetrahedron nullify each other. Hence, in order to obtain the total force vector for a tetrahedron, it is sufficient to only consider the contributions due to the traction on its base. Therefore, the total force vector takes the form of
 \begin{equation}
-\mathbf{F}_{BC} = \sum_{i=1}^{3} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{1}} \,|\mathbf{J}| \, \mathrm{w}_i 
+\mathbf{F}_{BC} = |\mathbf{J}| \sum_{i=1}^{3} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{\triangle_{1}} \, w_i 
 \end{equation}
 where $\mathbf{t}_{\triangle_{1}}$ is the traction vector on the surface of triangle defined as
 \begin{equation}
@@ -2576,14 +2597,23 @@ where $\mathbf{t}_{\triangle_{1}}$ is the traction vector on the surface of tria
 wherein $ \mathbf{n} $ is the normal vector to each sides of tetrahedron on which the traction acts, and $ \mathbf{S}^s $ has been defined in Eqn.~\eqref{stressmtx3D}.
 
 The internal force $\boldsymbol{F}_0$ accounting for an initial residual stress of $\boldsymbol{T}_0$ becomes
-
 \begin{subequations}
 	\begin{align}
 		\boldsymbol{F}_0 & = \int_{V} \mathbf{B}^{\mathsf{T}} \,	\boldsymbol{T}_0 \, 
 		\mathrm{d} V \\
-		& =  \sum_{i=1}^{4} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, | \mathbf{J} | \, \mathrm{w}_i +  \sum_{i=1}^{4} \mathbf{B}_N^{\mathsf{T}} \,	\boldsymbol{T}_0 \, | \mathbf{J} | \, \mathrm{w}_i
+		& =  | \mathbf{J} | \sum_{i=1}^{4} \mathbf{B}_L^{\mathsf{T}} \,	\boldsymbol{T}_0 \, w_i + | \mathbf{J} | \sum_{i=1}^{4} \mathbf{B}_N^{\mathsf{T}} \, \boldsymbol{T}_0 \, w_i
 	\end{align}
 \end{subequations}
-where $\mathbf{B}$ and $\mathbf{J}$ are the strain displacement and Jacobian matrix of tetrahedron, respectively. 
-Here the stress vector $\boldsymbol{T}_0 = \{ \Pi, \sigma_1, \sigma_2, \tau_1, \tau_2, \tau_3 \}^{\mathsf{T}}$ conjugate to strain $\boldsymbol{E}$, where $\mathbf{T}_0 = [s_0] \mapsto \mathbf{S}_0 = [s_0]$  contains the pressure $s_0$ inside the tetrahedron.
-
+where $\mathbf{B}$ and $\mathbf{J}$ are the strain displacement and Jacobian matrices of a tetrahedron, respectively. 
+Here the stress vector $\boldsymbol{T}_0 = \{ \pi, \sigma_1, \sigma_2, \tau_1, \tau_2, \tau_3 \}^{\mathsf{T}}$ is conjugate to strain $\boldsymbol{E} = \{ \xi, \varepsilon_1, \varepsilon_2, \gamma_1, \gamma_2, \gamma_3 \}^{\mathsf{T}}$, where 
+\begin{equation}
+\mathbf{T}_0 = \left\{ \begin{matrix}
+    \pi_0 \\ \sigma_{1\,0} \! = \! 0 \\ \sigma_{2\,0} \! = \! 0 \\
+    \tau_{1\,0} \! = \! 0 \\ \tau_{2\,0} \! = \! 0 \\ \tau_{3\,0} \! = \! 0
+\end{matrix} \right\} \mapsto \mathbf{S}_0 = \begin{bmatrix}
+    \frac{1}{3} \pi_0 & 0 & 0 \\
+    0 & \frac{1}{3} \pi_0 & 0 \\
+    0 & 0 & \frac{1}{3} \pi_0
+\end{bmatrix}
+\end{equation}
+contains the residual pressure $\pi_0$ inside a tetrahedron.

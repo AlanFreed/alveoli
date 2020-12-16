@@ -193,8 +193,9 @@ Freed~AD,\ Zamani~S.\,~  On the use of convected coordinate systems in the
   \textrm{2018};127:145--161.
 
 \bibitem{Pauletal20}
-Paul~S,\ Freed~AD.\,~  On coordinate indexing when using {L}aplace stretch.
-  \textrm{2020};;  In review.
+Paul~S,\ Freed~AD,\ Clayton~JD.\,~  Coordinate indexing: On the use of
+  {E}ulerian and {L}agrangian {L}aplace stretches.  \textrm{Applications in
+  Engineering Science}. \textrm{2020};;  In press.
 
 \bibitem{Sobinetal88}
 Sobin~SS,\ Fung~YC,\ Tremer~HM.\,~  Collagen and elastin fibers in human
@@ -389,6 +390,11 @@ Urry~DW.\,  Physicochemical properties of elastin and constituent peptides.
   In:  \textrm{Physicochemical properties of elastin and constituent peptides};
   Vol.~1; Boca Raton:  CRC Press;  1989. Chapter~10, p. 141--173.
 
+\bibitem{FreedRajagopal16}
+Freed~AD,\ Rajagopal~KR.\,~  A promising approach for modeling biological
+  fibers.  \textrm{ACTA Mechanica}. \textrm{2016};227:1609--1619;  Errata:
+  \textbf{229} (2018), pg.\ 3573.
+
 \bibitem{Fels64}
 Fels~IG.\,~  Hydration and density of collagen and gelatin.  \textrm{Journal of
   Applied Polymer Science}. \textrm{1964};8:1813--1824.
@@ -428,11 +434,6 @@ H\"{o}rmann~H,\ Schlebusch~H.\,~  Reversible and irreversible denaturation of
 Svensson~RB,\ Hassenkam~T,\ Grant~CA,\ Magnusson~SP.\,~  Tensile properties of
   human collagen fibrils and fascicles are insensitive to environmental salts.
   \textrm{Biophysical Journal}. \textrm{2010};99:4020--4027.
-
-\bibitem{FreedRajagopal16}
-Freed~AD,\ Rajagopal~KR.\,~  A promising approach for modeling biological
-  fibers.  \textrm{ACTA Mechanica}. \textrm{2016};227:1609--1619;  Errata:
-  \textbf{229} (2018), pg.\ 3573.
 
 \bibitem{Davison08}
 Davison~L.\,\,  Fundamentals of shock wave propagation in solids.~ Berlin:
@@ -491,7 +492,7 @@ Reddy~JN.\,\,  An introduction to the finite element method. 2nd ed.~
 
 \bibitem{ClaytonChung18}
 Clayton~JD,\ Chung~PW.\,\,  Applied finite element methods: Lecture notes on
-  principles and procedures.~ CreateSpace;  2018.
+  principles and procedures.~ Coppell, TX: CreateSpace;  2018.
 
 \bibitem{Yangetal10}
 Y.~Xiu-ying~GJ~Z. Jin-ch.\,~  Stiffness matrix derivation of space beam element

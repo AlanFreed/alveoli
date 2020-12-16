@@ -652,7 +652,10 @@ We seek an energetic construction that is consistent with the Freed \& Rajagopal
 \mathcal{G}_n ( \varepsilon , \gamma , \sigma , \tau ) = \mathcal{G}_1 ( \varepsilon_1 , \sigma ) + \mathcal{G}_2 ( \sigma ) + \mathcal{G}_3 ( \gamma_1 , \tau ) + \mathcal{G}_4 ( \tau )
 \label{nonuniformEnergy}
 \end{equation}
-which depend upon three squeeze strains $\varepsilon \defeq \ln \sqrt{\Gamma \! / \Gamma_0}$, $\varepsilon_1 \defeq \ln \sqrt{ \Gamma_1 / \Gamma_0}$ and $\varepsilon_2 \defeq \ln \sqrt{ \Gamma \! / \Gamma_1}$, and three shear strains $\gamma \defeq g - g_0$, $\gamma_1 \defeq g_1 - g_0$ and $\gamma_2 \defeq g - g_1$, both of which are additive in the sense that $\varepsilon = \varepsilon_1 + \varepsilon_2$ and $\gamma = \gamma_1 + \gamma_2$, and as such, so are their differential rates of change $\mathrm{d} \varepsilon = \mathrm{d} \varepsilon_1 + \mathrm{d} \varepsilon_2$ and $\mathrm{d} \gamma = \mathrm{d} \gamma_1 + \mathrm{d} \gamma_2$.  Strains $\varepsilon_1$ and $\gamma_1$ may be thought of as describing an unraveling of molecular configuration, analogous to $e_1$ in the fiber model of Eqn.~(\ref{RajagopaleanFiber}), and $\xi_1$ in the uniform membrane model of Eqn.~(\ref{uniformMembrane}).  No coupling between squeeze and shear is assumed in this energy function.  Energies $\mathcal{G}_1$ and $\mathcal{G}_3$ are Rajagopal elastic (they have implicit dependencies upon state), while energies $\mathcal{G}_2$ and $\mathcal{G}_4$ are Green elastic (they have explicit dependencies upon state).
+which depend upon three squeeze strains $\varepsilon \defeq \ln \sqrt{\Gamma \! / \Gamma_0}$, $\varepsilon_1 \defeq \ln \sqrt{ \Gamma_1 / \Gamma_0}$ and $\varepsilon_2 \defeq \ln \sqrt{ \Gamma \! / \Gamma_1}$, and three shear strains $\gamma \defeq g - g_0$, $\gamma_1 \defeq g_1 - g_0$ and $\gamma_2 \defeq g - g_1$, both of which are additive in the sense that $\varepsilon = \varepsilon_1 + \varepsilon_2$ and $\gamma = \gamma_1 + \gamma_2$, and as such, so are their differential rates of change $\mathrm{d} \varepsilon = \mathrm{d} \varepsilon_1 + \mathrm{d} \varepsilon_2$ and $\mathrm{d} \gamma = \mathrm{d} \gamma_1 + \mathrm{d} \gamma_2$.  Strains $\varepsilon_1$ and $\gamma_1$ may be thought of as describing an unraveling of molecular configuration, analogous to $e_1$ in the fiber model of Eqn.~(\ref{RajagopaleanFiber}), and $\xi_1$ in the uniform membrane model of Eqn.~(\ref{uniformMembrane}).  No coupling between squeeze and shear is assumed in this energy function.\footnote{
+    The Poynting effect is a consequence of a coupling between squeeze and shear. \cite{FreedZamani19}  This is a second-order effect that can be neglected when modeling biologic tissues.
+}  
+Energies $\mathcal{G}_1$ and $\mathcal{G}_3$ are Rajagopal elastic (they have implicit dependencies upon state), while energies $\mathcal{G}_2$ and $\mathcal{G}_4$ are Green elastic (they have explicit dependencies upon state).
 
 From the thermo\-dynamic expression $-\rho \, \mathrm{d} \mathcal{G}_n = \varepsilon \, \mathrm{d} \sigma + \gamma \, \mathrm{d} \tau$, the non-uniform Gibbs free energy $\mathcal{G}_n$, when expressed in the form of Eqn.~(\ref{nonuniformEnergy}), and given the definitions for squeeze $1/N$ and shear $1/G$ compliances put forward in Eqns.~(\ref{squeezeModulus} \& \ref{shearModulus}), one determines that the tangent squeeze compliance is described by
 \begin{subequations}
@@ -723,7 +726,7 @@ In soft biological tissues, the shear moduli $G_1$ and $G_2$ will be several ord
 
 \paragraph{Uniform Response}
 
-Integrating by parts the tangent compliance governing dilation found in Eqn.~(\ref{membraneCompliance}) results in a secant compliance of
+Through a separation of variables, the tangent compliance governing dilation found in Eqn.~(\ref{membraneCompliance}) can be integrated to produce a secant compliance of
 \begin{equation}
     \frac{1}{4M_s (\pi)} = \frac{\xi_{1_{\max}}}{\pi - \pi_0} \left( 
     1 - \frac{\sqrt{M_1 \xi_{1_{\max}}}}
@@ -734,7 +737,7 @@ where $M_s (\pi \! \leq \! \pi_0) = M_1 M_2 / ( M_1 + M_2 )$.  This compliance a
 
 \paragraph{Non-Uniform Response}
 
-Integrating by parts the tangent compliance governing squeeze in Eqn.~(\ref{squeezeCompliance2D}) provides its secant compliance of
+Integrating by separating variables, the tangent compliance governing squeeze in Eqn.~(\ref{squeezeCompliance2D}) integrates to a secant compliance of
 \begin{equation}
 \frac{1}{2N_s (\sigma)} = 
 \frac{\varepsilon_{1_{\max}}}{|\sigma|} \left(
@@ -743,7 +746,7 @@ Integrating by parts the tangent compliance governing squeeze in Eqn.~(\ref{sque
 \frac{1}{2N_2}
 \end{equation}
 where $N_s (\sigma \! = \! 0) = N_1 N_2 / (N_1 + N_2)$, while
-integrating by parts the tangent compliance governing shear in Eqn.~(\ref{shearCompliance2D}) results in its secant compliance of
+integrating the tangent compliance governing shear in Eqn.~(\ref{shearCompliance2D}) results in its secant compliance of
 \begin{equation}
     \frac{1}{G_s (\tau)} = 
     \frac{\gamma_{1_{\max}}}{|\tau|} \left(

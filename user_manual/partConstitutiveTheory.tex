@@ -7,7 +7,7 @@ A dodecahedron is used here as a geometric model for an alveolus \cite{FrankusLe
 
 We recall from our kinematic study of a dodecahedron that the geometric strains (i.e., $e \defeq \ln ( L / L_0 )$ for the elongation of septal chords, $\xi \defeq \ln \sqrt{A / A_0}$ for the dilation of septal membranes, and $\Xi \defeq \ln \sqrt[3]{V / V_0}$ for the dilatation of alveolar volume) are equivalent to one another under motions of uniform expansion\slash compression.  These three, geometric, strain measures also exist as thermo\-dynamic strains, each associating with a distinct and unique conjugate stress. \cite{Freed17,FreedZamani19}
 
-Constitutive equations are a derived consequence from physical laws governing thermo\-dynamic processes.  Here we derive constitutive equations applicable for modeling 1D thermo\-elastic fibers (alveolar chords), 2D thermo\-elastic membranes (alveolar septa), and 3D thermo\-elastic volumes (alveolar sacs).  In \S\ref{secUniformCE}, we assume that the motions are uniform in their spatial dimension.  Later, in Sections~\ref{secNonuniform2D} \& \ref{secNonuniform3D}, the non-uniform motions of squeeze and shear are included into our thermo\-dynamic framework for membranes and volumes, respectively.  Section~\ref{secAlveolus} pulls these results together, sufficient for the intended purpose of modeling the three structural facets that comprise an alveolous.  Specifically, all geometric entities (alveolar chords, alveolar septa, and alveolar sacs) are now described in terms of stresses ($\text{dyne/cm}^2$) instead of their intensive thermo\-dynamic forces (force, surface tension, or stress).  This is done to facilitate implementation of these models into code, and to facilitate interpretations of their results by engineers and scientists.  The chapter closes with a discussion of their implementation into finite elements in \S\ref{secFE_CE} along with a set of examples created to verify our code in \S\ref{secCE_verifyCode}.  The biologic constitutive equations presented in this part are derived in Appendix~\ref{appImplicitElasticity} from an implicit theory of elasticity.
+Constitutive equations are a derived consequence from physical laws governing thermo\-dynamic processes.  Here we derive constitutive equations applicable for modeling 1D thermo\-elastic fibers (alveolar chords), 2D thermo\-elastic membranes (alveolar septa), and 3D thermo\-elastic volumes (alveolar sacs).  In \S\ref{secUniformCE}, we assume that the motions are uniform in their spatial dimension.  Later, in Sections~\ref{secNonuniform2D} \& \ref{secNonuniform3D}, the non-uniform motions of squeeze and shear are included into our thermo\-dynamic framework for membranes and volumes, respectively.  Section~\ref{secAlveolus} pulls these results together, sufficient for the intended purpose of modeling the three structural facets that comprise an alveolous.  Specifically, all geometric entities (alveolar chords, alveolar septa, and alveolar sacs) are now described in terms of stresses ($\text{dyne/cm}^2$) instead of their intensive thermo\-dynamic forces (force, surface tension, or stress).  This is done to facilitate implementation of these models into code, and to facilitate interpretations of their results by engineers and scientists.  The chapter closes with a discussion of their implementation into finite elements in \S\ref{secCE_verifyCode} along with a set of examples created to verify our code, also in \S\ref{secCE_verifyCode}.  The biologic constitutive equations presented in this part are derived in Appendix~\ref{appImplicitElasticity} from an implicit theory of elasticity.
 
 \section{Green Thermoelastic Solids: Uniform Motions in 1D, 2D \& 3D}
 \label{secUniformCE}
@@ -49,7 +49,7 @@ Because the internal energy density $U$ is a state function, its differential ra
     -P & = \rho_{3D} \, \partial_{\ln (V \! / V_0)} U ( \eta , \ln (V \! / V_0) )
     \end{align}
 \end{subequations}
-where strains are logarithms of dimension-appropriate stretches.  As a matter of convenience, we adopt the notation $\partial_{\eta} U \defeq \partial U / \partial \eta$, etc.  Employing the geometric strains of Part~\ref{partKinematics}, viz., $e \defeq \ln ( L / L_0 )$, $\xi \defeq \ln \sqrt{ A / \! A_0 }$ and $\Xi \defeq \ln \sqrt[3]{V \! / V_0}$ with differential rates of $\mathrm{d} e = L^{-1} \, \mathrm{d}L$, $\mathrm{d} \xi = \tfrac{1}{2} A^{-1} \, \mathrm{d}A$ and $\mathrm{d} \Xi = \tfrac{1}{3} V^{-1} \, \mathrm{d}V$, these constitutive equations take on the following simpler form
+where strains are logarithms of dimension-appropriate stretches.  As a matter of convenience, we adopt the notation $\partial_{\eta} U \defeq \partial U / \partial \eta$, etc.  Employing the geometric strains of Part~\ref{partKinematics}, viz., $e \defeq \ln ( L / L_0 )$, $\xi \defeq \ln \sqrt{ A / \! A_0 }$ and $\Xi \defeq \ln \sqrt[3]{V \! / V_0}$ with differential rates of $\mathrm{d} e = L^{-1} \, \mathrm{d}L$, $\mathrm{d} \xi = \tfrac{1}{2} A^{-1} \, \mathrm{d}A$ and $\mathrm{d} \Xi = \tfrac{1}{3} V^{-1} \, \mathrm{d}V$, these constitutive equations take on the simpler form of
 \begin{subequations}
     \label{uniformCEs}
     \begin{align}
@@ -160,7 +160,7 @@ In 1D:
     {V^{-1} \, \mathrm{d}V} \right|_{\mathrm{d}\theta=0} 
     \end{align}
 \end{subequations}
-whose analogs as secant functions are defined in Appendix~\ref{appImplicitElasticity}.
+whose analogs, as secant functions, are defined in Appendix~\ref{appImplicitElasticity}.
 
 The various thermal strain coefficients $\alpha_F$, $\alpha_T$, $\alpha_P$ are, however, distinct from one another.  Even though each is dimensionless, each is defined with respect to its own physical dimension.  Nevertheless, because $\ln(L / L_0) = \tfrac{1}{2} \ln (A / \! A_0) = \tfrac{1}{3} \ln (V \! / V_0)$, it follows that $\alpha_T = 2 \alpha_F$ and $\alpha_P = 3 \alpha_F$, so there is really just one thermal strain coefficient, i.e., $\alpha_F$, that, hereafter, is denoted as $\alpha_t$ where the subscript `$t$' denotes \textit{tangent}.\footnote{
     In Appendix~\ref{appImplicitElasticity}, sub\slash super-script `$t$' is used to denote \textit{tangent\/}; whereas, sub\slash super-script `$s$' is used to denote \textit{secant}, e.g., $\mathrm{d}F = E_t \, \mathrm{d} e$ whereas $F = E_s \, e$.  Here, the defined material properties are tangent properties.  Secant properties, and their definitions, can be found in Appendix~\ref{appImplicitElasticity}.  Both secant and tangent moduli are used in the variational formulation put forward in Part~\ref{partVariational}.
@@ -373,7 +373,7 @@ For our application, it is reasonable to assume that the presence of a non-unifo
 \end{matrix} \right\} 
 \end{displaymath}
 with $\partial_{\varepsilon\eta} U = \partial_{\gamma\eta} U = \partial_{\varepsilon\xi} U = \partial_{\gamma\xi} U = 0$ following because of Maxwell's relationships.  Furthermore, it is considered that the pure and simple shear responses act independently, too, so that $\partial_{\gamma\varepsilon} U = \partial_{\varepsilon\gamma} U = 0$.\footnote{
-    There is a second-order coupling that can exist between the modes of squeeze and shear in a 3D solid.  It is the Poynting effect \cite{FreedZamani19}, but this effect is thought not to arise to a level of significance in a 2D membrane.
+    There is a second-order coupling that can exist between the modes of squeeze and shear in a 3D solid.  It is the Poynting effect \cite{FreedZamani19}, but this effect is thought not to arise to a level of significance in a 2D biologic membrane.
 }
 Converting the above internal energy formulation into its Helmholtz equivalent produces two uncoupled matrix equations; they are,
 \begin{subequations}
@@ -441,14 +441,14 @@ The material model put forward here for a thermo\-elastic membrane has a mass de
     {\mathrm{d} \xi} \right|_{\theta}
     \label{arealCompliance2D} \\
     \intertext{which is the 2D version of a 3D bulk modulus.  A new modulus introduced by Freed \textit{et~al}., \cite{Freedetal17} which they call the in-plane squeeze modulus $N_t$, is defined as}
-    N_t & \defeq \left. \frac{\mathrm{d}\nu_1}
+    N_t & \defeq \left. \frac{\mathrm{d} N_1}
     {\Gamma^{-1} \, \mathrm{d}\Gamma} \right|_g = 
     \left. \frac{\mathrm{d}(\mathcal{S}_{11} - \mathcal{S}_{22})}{\Gamma^{-1} \, \mathrm{d}\Gamma}
     \right|_g =
     \frac{1}{2} \left. \frac{\mathrm{d}\sigma}
     {\mathrm{d}\varepsilon} \right|_{\gamma}
     \label{arealSqueezeCompliance2D} \\
-    \intertext{where $\sigma = \mathcal{S}_{11} - \mathcal{S}_{22}$ is a normal-stress difference, often denoted as $\nu_1$ in the polymers literature, and where $\Gamma = a/b$ is the stretch of squeeze with $\varepsilon = \ln \sqrt{\Gamma \! / \Gamma_0}$ being the strain of squeeze, while $\gamma = g - g_0$ determines the shear strain.  Finally, an in-plane shear modulus $G_t$ is defined as}
+    \intertext{where $\sigma = \mathcal{S}_{11} - \mathcal{S}_{22}$ is a normal-stress difference, often denoted as $N_1$ in the polymers literature, and where $\Gamma = a/b$ is the stretch of squeeze with $\varepsilon = \ln \sqrt{\Gamma \! / \Gamma_0}$ being the strain of squeeze, while $\gamma = g - g_0$ determines the shear strain.  Finally, an in-plane shear modulus $G_t$ is defined as}
     G_t & \defeq \frac{1}{\Gamma} \left. 
     \frac{\mathrm{d} \mathcal{S}_{21}}{\mathrm{d}g} 
     \right|_{\Gamma} = \left. \frac{\mathrm{d} \tau}
@@ -1047,7 +1047,7 @@ The actual force and entropy of an individual septal chord in our alveolar model
 \end{equation}  
 where $F^f$ (dyne) is a third of the fiber's force carried by a septal chord, and $S^f$ (erg/K) is a third of the fiber's entropy.
 
-Collagen is a fiber comprised of numerous, long, slender, wavy filaments whose waviness, known as crimp, straightens under sufficient deformation \cite{Kastelicetal'78,FreedDoehring05}.  Elastin is a linked fiber network, much like an elastomer, whose filaments between crosslinks rotate to align with an axis of loading under sufficient deformation \cite{AaronGosline81,Urry89}.  Consequently, collagen and elastin both recruit constituent filaments with increasing deformation into an overall, load-bearing, fiber response.  The internal energies of collagen and elastin may therefore be thought of as being comprised of a molecular configuration energy and a mechanical strain energy.  As such, both collagen and elastin are modeled as Freed-Rajagopal biologic fibers, which are described in terms of two such internal energies.  Their model is derived from the theory of implicit elasticity, cf.\ Appendix~\ref{appImplicitElasticity}.  According to their model, Eqn.~(\ref{RajagopaleanFiber}), tangent compliances for collagen and elastin, pertinent to the hypo-elastic constitutive formulation of Eqn.~(\ref{alveolarChord}), are described by
+Collagen is a fiber comprised of numerous, long, slender, wavy filaments whose waviness, known as crimp, straightens under sufficient deformation \cite{Kastelicetal'78,FreedDoehring05}.  Elastin is a linked fiber network, much like an elastomer, whose filaments between crosslinks rotate to align with an axis of loading under sufficient deformation \cite{AaronGosline81,Urry89}.  Consequently, collagen and elastin both recruit constituent filaments with increasing deformation into an overall, load-bearing, fiber response.  The internal energies of collagen and elastin may therefore be thought of as being comprised of a molecular configuration energy and a mechanical strain energy.  As such, both collagen and elastin are modeled as Freed-Rajagopal \cite{FreedRajagopal16} biologic fibers, which are described in terms of two such internal energies.  Their model is derived from the theory of implicit elasticity, cf.\ Appendix~\ref{appImplicitElasticity}.  According to their model, Eqn.~(\ref{RajagopaleanFiber}), tangent compliances for collagen and elastin, pertinent to the hypo-elastic constitutive formulation of Eqn.~(\ref{alveolarChord}), are described by
 \begin{subequations}
     \label{septalChordModuli}
     \begin{align}
@@ -1160,7 +1160,7 @@ It is not known how much of the mechanical load is actually carried by the cells
     \label{tableVisceralPleura}
 \end{table}
 
-Collagen and elastin appear as thin filaments randomly oriented and somewhat uniformly dispersed throughout a basement membrane, unlike the strongly aligned fibers that appear in septal chords.  Furthermore, there are large numbers of proteins dispersed throughout these septa.  Consequently, for our purposes, we model this collective ensemble of tissue and structure types as a homo\-geneous isotropic membrane modeled after the Freed-Rajagopal biologic fiber \cite{FreedRajagopal16} that we have extended to membranes in App.~\ref{appImplicitElasticity}, specifically
+Collagen and elastin appear as thin filaments randomly oriented and somewhat uniformly dispersed throughout a basement membrane, unlike the strongly aligned fibers that appear in septal chords.  Furthermore, there are large numbers of proteins dispersed throughout these septa.  Consequently, for our purposes, we model this collective ensemble of tissue and structure types as a homo\-geneous isotropic membrane modeled after the Freed-Rajagopal biologic fiber \cite{FreedRajagopal16} that we have extended to membranes \cite{Freedetal17} in App.~\ref{appImplicitElasticity}, specifically
 \begin{subequations}
     \label{septalCompliances}
     \begin{align}
