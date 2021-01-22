@@ -1,6 +1,6 @@
 %
 % ARL.bst, highly modified from ACS style "achemso".
-% 2019/05/21, V43
+% 2020/11/30, V46
 % Maintained by Steven B. Segletes of ARL/WMRD
 %
 % V24 was the initial release attempting to conform to the new
@@ -355,6 +355,13 @@ FUNCTION {format.authors}
   if$
 }
 
+FUNCTION {format.authors.perscomm}
+{ author empty$
+    { "" }
+    { author format.names "," * }
+  if$
+}
+
 FUNCTION {format.editors_clean}
 { editor empty$
     { "" }
@@ -410,9 +417,10 @@ FUNCTION {format.type}
 FUNCTION {format.address}
 { address empty$
     { "" }
-    { address ": " * }
+    { "" }
   if$
 }
+
 
 FUNCTION {format.publisher}
 { publisher empty$
@@ -595,7 +603,7 @@ FUNCTION {format.yr.pages}
     'skip$
     { duplicate$ empty$
    { pop$ format.pages }
-   { "; " * format.pages * }
+   { ". " * format.pages * }
       if$
     }
   if$
@@ -720,7 +728,7 @@ FUNCTION {in.book}
   booktitle roman
   edition empty$
     { skip$ }
-    {";" * output
+    {"." * output
      edition " ed." * }
   if$
   volume empty$
@@ -728,8 +736,8 @@ FUNCTION {in.book}
     {"; Vol.~" * volume *}
   if$
   editor missing$
-    {";" * output}
-    {";" * output format.editors output }
+    {"." * output}
+    {"." * output format.editors output }
   if$
   format.number.series output
   new.sentence
@@ -782,7 +790,7 @@ FUNCTION {book.vol.ed}
 FUNCTION {thesis.affilation}
 { address empty$
   'skip$
-  { "[" address *  "]:" * "address" output.check }
+  'skip$
   if$
   institution empty$
     {school empty$
@@ -871,7 +879,6 @@ FUNCTION {book}
   format.edition output
   crossref missing$
     { new.sentence
-      address ":" * "address" output.check
       publisher "; " * "publisher" output.check
     }
     { format.book.crossref output.nonnull }
@@ -981,7 +988,7 @@ FUNCTION {manual}
   title "t" change.case$ roman ".~ " * "title" output.check
   address empty$
     'skip$
-    { address ":" * output }
+    'skip$
   if$
   institution empty$
     'skip$
@@ -1030,6 +1037,34 @@ FUNCTION {misc}
     {howpublished ";" * output }
   if$
   format.date output
+  note output
+  add.period$
+  format.referenceclass output
+  fin.entry.noperiod
+  empty.misc.check
+}
+
+FUNCTION {personalcommunication}
+{ output.bibitem
+  format.titleclass output
+  format.authors.perscomm "~" * "author" output.check
+  institution empty$
+    { 
+      address empty$
+        'skip$
+        { address output add.period$}
+      if$
+    }
+    { institution output
+      address empty$
+        { add.period$ }
+        { add.period$ }
+      if$
+    }
+  if$
+  "Personal communication, " output
+  format.date output
+  format.month output
   note output
   add.period$
   format.referenceclass output
@@ -1324,7 +1359,8 @@ FUNCTION {begin.bib}
   if$
   "\providecommand{\refin}[1]{\\ \textbf{Referenced in:} #1}"
   write$ newline$
-  "\begin{thebibliography}{"  longest.label  * "}" * write$ newline$
+  "\begin{thebibliography}{"  longest.label  * 
+    "}\vspace{9pt}" * write$ newline$
 }
 
 EXECUTE {begin.bib}

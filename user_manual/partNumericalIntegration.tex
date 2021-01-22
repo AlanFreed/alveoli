@@ -1,24 +1,24 @@
-\part{Numerical Integrators}
+\section{Numerical Integrators}
 \label{partNumericalMethods}
 
-This analysis tool, which models alveolar geometry as a dodecahedron, requires numerical methods for the temporal integration of its constitutive equations (systems of first-order ODEs) and their governing equations of motion (systems of second-order ODEs), and for the spatial integrations of: length of line, area of surface, and volume of space that pertain to the various finite-element geometries used.  Some results obtained at the Guass points may need to be mapped out to their nodal locations, so extrapolation procedures that are consistent with the shape (interpolation) functions are also derived for the various elements and quadrature rules selected.
+This analysis tool, which models alveolar geometry as a dodecahedron, requires numerical methods for the temporal integration of its constitutive equations (systems of first-order ODEs) and their governing equations of motion (systems of second-order ODEs), and for the spatial integrations of: length of line, area of surface, and volume of space that pertain to the various finite-element geometries used.  Some results obtained at the Gauss points may need to be mapped out to their nodal locations, so extrapolation procedures that are consistent with the shape (interpolation) functions are also derived for the various elements and quadrature rules selected.
 
-\section{ODE Solvers}
+\subsection{$\,$ODE Solvers}
 
-The constitutive equations used to describe our alveolar model present themselves as ordinary differential equations that need to be integrated, cf.\ \S\ref{secAlveolus}.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} suitable for solving stiff systems of first- and second-order differential equations.  These methods are based upon Gear's well-known, second-order, backward, difference formula (BDF2) that appears in Eqns.~(\ref{1stOrderCorrector} \& \ref{velocityCorrector}) below.
+The constitutive equations used to describe our alveolar model present themselves as ordinary differential equations that need to be integrated, cf.\ \S\ref{secAlveolus}.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} suitable for solving stiff systems of first- and second-order differential equations.  These methods are based upon Gear's well-known, second-order, backward, difference formula (BDF2) that appears in Eqs.~\ref{1stOrderCorrector} and \ref{velocityCorrector}.
 
 Time $t$ is considered to be the independent variable, discretized over an interval in time $[t_0, t_I]$ for which $I$ solutions are to be extracted at nodes $i=1, 2, \ldots, I$ spaced at uniform intervals in time with a common step size of $\mathrm{d}t = (t_I - t_0)/I$ separating them, where time $t_0$ associates with the initial condition.
 
-\subsection{PECE Solver for First-Order ODEs}
+\subsubsection{PECE Solver for First-Order ODEs}
 \label{sec:1stOrderPECE}
 
-Let $\mathbf{x}(t)$ be a vector of independent control variables described in terms of time $t$, and let $\mathbf{y} (\mathbf{x})$ be a vector of dependent response variables obeying a differential equation of evolution $\dot{\mathbf{y}} = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \dot{\mathbf{x}}$, or equivalently $\mathrm{d} \mathbf{y} = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \dot{\mathbf{x}} \, \mathrm{d} t = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \mathrm{d}\mathbf{x}$, subject to an initial condition $\mathbf{y}_0 = \mathbf{y}(\mathbf{x}_0)$ where $\mathbf{x}_0 = \mathbf{x} (t_0)$ with matrix $\mathbf{f} (\mathbf{x}, \mathbf{y})$ establishing the constitutive response for the system.
+Let $\mathbf{x}(t)$ be a vector of independent control variables described in terms of time $t$, and let $\mathbf{y} (\mathbf{x})$ be a vector of dependent response variables obeying a differential equation of evolution $\dot{\mathbf{y}} = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \dot{\mathbf{x}}$, or equivalently $\mathrm{d} \mathbf{y} = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \dot{\mathbf{x}} \, \mathrm{d} t = \mathbf{f} (\mathbf{x}, \mathbf{y}) \, \mathrm{d}\mathbf{x}$, subject to an initial condition $\mathbf{y}_0 = \mathbf{y}(\mathbf{x}_0)$ where $\mathbf{x}_0 = \mathbf{x} (t_0)$, with matrix $\mathbf{f} (\mathbf{x}, \mathbf{y})$ establishing the constitutive response for the system.
 
 The two-step method put forward here incrementally solves such an ODE, returning solutions associated with the next moment in time $t_{i+1}$, i.e., it acquires $\mathbf{y}_{i+1}$, given knowledge of the  previous $\mathbf{y}_{i-1}$ and current $\mathbf{y}_i$ solutions plus their rates $\dot{\mathbf{y}}_{i-1}$ and $\dot{\mathbf{y}}_i$, with the corrector also depending upon $\dot{\mathbf{y}}_{i+1}$; consequently, the corrector is an implicit method, which is the source of the method's stability properties.
 
-\subsubsection{Start-Up Algorithm}
+\paragraph{Start-Up Algorithm}
 
-Multi-step methods are not self starting.  As such, Heun's method (a forward-Euler predictor with a trapezoidal corrector) is used to start this integrator; specifically,
+Multi-step methods are not self-starting.  As such, Heun's method (a forward-Euler predictor with a trapezoidal corrector) is used to start this integrator; specifically,
 \begin{subequations}
     \label{startUp1stOrderODEs}
     \begin{align}
@@ -35,7 +35,7 @@ Multi-step methods are not self starting.  As such, Heun's method (a forward-Eul
     \bigl( \dot{\mathbf{y}}_1^p + \dot{\mathbf{y}}_0 \bigr) \mathrm{d}t + 
     \mathcal{O} \bigl( (\mathrm{d}t)^3 \bigr)
     \label{startUp1stOrderCorrector} \\
-    \mbox{} & \text{re-Evaluate} & 
+    \mbox{} & \text{Re-Evaluate} & 
     \dot{\mathbf{y}}_1 & = \mathbf{f} (\mathbf{x}_1 , \mathbf{y}_1) \,
     \dot{\mathbf{x}}_1 
     \label{startUp1stReEvaluate}
@@ -43,7 +43,7 @@ Multi-step methods are not self starting.  As such, Heun's method (a forward-Eul
 \end{subequations}
 wherein $\dot{\mathbf{y}}_0 = \mathbf{f}(\mathbf{x}_0, \mathbf{y}_0) \, \dot{\mathbf{x}}_0$.  Its predictor is the forward Euler method, while its corrector is the trapezoidal rule.  The order of accuracy for a method (the exponent on $\mathrm{d}t$ in $\mathcal{O}$), as they appear in the above big~oh operators, $\mathcal{O}$, pertains to a single step of integration.  The overall order of the integrator, when integrated over a sequence of steps, is one less than the exponent inside the $\mathcal{O}$ operator.  Therefore, Euler's method is first-order accurate, and the trapezoidal method is second-order accurate.
 
-\subsubsection{Two-Step ODE Solver}
+\paragraph{Two-Step ODE Solver}
 
 The two-step method of Freed \cite{Freed17a} for solving first-order ODEs is
 \begin{subequations}
@@ -64,7 +64,7 @@ The two-step method of Freed \cite{Freed17a} for solving first-order ODEs is
     \tfrac{2}{3} \dot{\mathbf{y}}^{p}_{i+1} \mathrm{d}t + 
     \mathcal{O} \bigl( (\mathrm{d}t)^3 \bigr)
     \label{1stOrderCorrector} \\
-    \mbox{} & \text{re-Evaluate} & 
+    \mbox{} & \text{Re-Evaluate} & 
     \dot{\mathbf{y}}_{i+1} & = \mathbf{f} (\mathbf{x}_{i+1} , \mathbf{y}_{i+1}) \, 
     \dot{\mathbf{x}}_{i+1}
     \label{1stOrderReEvaluate}
@@ -77,29 +77,29 @@ Both the predictor and corrector of this PECE scheme have a solution $\mathbf{y}
 The evaluate\slash correct (EC) steps of a PECE method are often iterated over until a convergence criterion is satisfied.  Such methods are typically denoted as $\text{PE}(\text{CE})^m$, where $m$ specifies the number of iterations imposed.
 
 
-\subsection{A Relevant Example}
+\subsubsection{A Relevant Example}
 
 In our finite element implementation, a hypo-elastic material model \cite{Truesdell55} is introduced to describe the constitutive response of an alveolus whereby
 \begin{displaymath}
     \dot{\boldsymbol{\sigma}} = \mathbf{M} ( \boldsymbol{\epsilon} , \boldsymbol{\sigma} ) \, \dot{\boldsymbol{\epsilon}} 
     \quad \text{or equivalently \cite{Noll55}} \quad
-    \mathrm{d} \boldsymbol{\sigma} = \mathbf{M} ( \boldsymbol{\epsilon} , \boldsymbol{\sigma} ) \, \mathrm{d} \boldsymbol{\epsilon}
+    \mathrm{d} \boldsymbol{\sigma} = \mathbf{M} ( \boldsymbol{\epsilon} , \boldsymbol{\sigma} ) \, \mathrm{d} \boldsymbol{\epsilon},
 \end{displaymath} 
 where $\boldsymbol{\epsilon}$ is a vector of thermo\-dynamic strains, $\boldsymbol{\sigma}$ is a vector of thermo\-dynamic stresses, and $\mathbf{M}$ is a square matrix comprised of their tangent moduli, which can depend upon both stress and strain in our application; specifically, the response is
 \begin{displaymath}
    \boldsymbol{\sigma}_{1D} = \{ \eta , s \}^{\mathsf{T}} , \quad
    \boldsymbol{\sigma}_{2D} = \{ \eta , s^{\pi} , s^{\sigma} , s^{\tau} \}^{\mathsf{T}} , \quad
-   \boldsymbol{\sigma}_{3D} = \{ \eta , \Pi , \sigma_1 , \sigma_2 , \tau_1 , \tau_2 , \tau_3 \}^{\mathsf{T}}
+   \boldsymbol{\sigma}_{3D} = \{ \eta , \Pi , \sigma_1 , \sigma_2 , \tau_1 , \tau_2 , \tau_3 \}^{\mathsf{T}},
 \end{displaymath}
 where $\eta$ is entropy and the rest of its constituents are stress attributes.  Their thermo\-dynamic conjugates are the control variables
 \begin{displaymath}
 \boldsymbol{\epsilon}_{1D} = \{ \theta , e \}^{\mathsf{T}} , \quad
 \boldsymbol{\epsilon}_{2D} = \{ \theta , \xi , \varepsilon , \gamma \}^{\mathsf{T}} , \quad
-\boldsymbol{\epsilon}_{3D} = \{ \theta , \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 \}^{\mathsf{T}}
+\boldsymbol{\epsilon}_{3D} = \{ \theta , \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 \}^{\mathsf{T}},
 \end{displaymath}
-where $\theta$ is temperature and the rest of its constituents are strain attributes.  In the 2- and 3-D cases, these stress\slash strain attributes arise from Gram-Schmidt decompositions of their respective deformation gradients (cf.\ Sections~\ref{secQR2D} \& \ref{secConjugatePairs}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\epsilon} , \boldsymbol{\sigma} )$ is the topic of Part~\ref{partConstitutive}.  Both strain $\boldsymbol{\epsilon}$ and stress $\boldsymbol{\sigma}$ appear as arguments in our tangent moduli.
+where $\theta$ is temperature and the rest of its constituents are strain attributes.  In the 2- and 3-D cases, these stress\slash strain attributes arise from Gram--Schmidt decompositions of their respective deformation gradients (cf.\ Sections~\ref{secQR2D} and \ref{secConjugatePairs}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\epsilon} , \boldsymbol{\sigma} )$ is the topic of \S\ref{partConstitutive}.  Both strain $\boldsymbol{\epsilon}$ and stress $\boldsymbol{\sigma}$ appear as arguments in our tangent moduli, i.e., the model is implicit.
 
-Equation (\ref{startUp1stOrderODEs}) is used to take the first step of integration; specifcally, 
+Equation \ref{startUp1stOrderODEs} is used to take the first step of integration; specifically, 
 \begin{subequations}
     \notag
     \begin{align}
@@ -111,11 +111,11 @@ Equation (\ref{startUp1stOrderODEs}) is used to take the first step of integrati
     \boldsymbol{\sigma}_1 & = \boldsymbol{\sigma}_0 + \tfrac{1}{2} 
     \bigl( \dot{\boldsymbol{\sigma}}_1^p + 
     \dot{\boldsymbol{\sigma}}_0 \bigr) \mathrm{d} t \\
-    \mbox{} & \text{re-Evaluate} & 
+    \mbox{} & \text{Re-Evaluate} & 
     \dot{\boldsymbol{\sigma}}_1 & = \mathbf{M} ( \boldsymbol{\epsilon}_1 , \boldsymbol{\sigma}_1 ) \, \dot{\boldsymbol{\epsilon}}_1
     \end{align}
 \end{subequations}
-where $\dot{\boldsymbol{\sigma}}_0 = \mathbf{M} ( \boldsymbol{\epsilon}_0 , \boldsymbol{\sigma}_0 ) \, \dot{\boldsymbol{\epsilon}}_0$.  The remaining steps of integration follow according to Eqn.~(\ref{1stOrderODEs}); specifically,
+where $\dot{\boldsymbol{\sigma}}_0 = \mathbf{M} ( \boldsymbol{\epsilon}_0 , \boldsymbol{\sigma}_0 ) \, \dot{\boldsymbol{\epsilon}}_0$.  The remaining steps of integration follow according to Eq.~\ref{1stOrderODEs}; specifically,
 \begin{subequations}
     \notag
     \begin{align}
@@ -130,7 +130,7 @@ where $\dot{\boldsymbol{\sigma}}_0 = \mathbf{M} ( \boldsymbol{\epsilon}_0 , \bol
     \boldsymbol{\sigma}_{i+1} & = \tfrac{1}{3} 
     \bigl( 4 \boldsymbol{\sigma}_i - \boldsymbol{\sigma}_{i-1} \bigr) + 
     \tfrac{2}{3} \, \dot{\boldsymbol{\sigma}}^{p}_{i+1} \, \mathrm{d}t \\
-    \mbox{} & \text{re-Evaluate} & 
+    \mbox{} & \text{Re-Evaluate} & 
     \dot{\boldsymbol{\sigma}}_{i+1} & = \mathbf{M} ( \boldsymbol{\epsilon}_{i+1} , 
     \boldsymbol{\sigma}_{i+1} ) \, \dot{\boldsymbol{\epsilon}}_{i+1}
     \end{align}
@@ -138,16 +138,16 @@ where $\dot{\boldsymbol{\sigma}}_0 = \mathbf{M} ( \boldsymbol{\epsilon}_0 , \bol
 whose strain rates $\dot{\boldsymbol{\epsilon}}$ are computed according to \S\ref{strainsAndStrainRates3D}.
 
 
-\subsection{PECE Solver for Second-Order ODEs}
+\subsubsection{PECE Solver for Second-Order ODEs}
 \label{sec:2ndOrderPECE}
 
 Now let $\mathbf{u}$ denote a vector of dependent variables obeying a differential equation of evolution $\mathrm{d}^2 \mathbf{u}(t) / \mathrm{d} t^2 = \ddot{\mathbf{u}} = \mathbf{f} (t, \mathbf{u}, \dot{\mathbf{u}})$ subjected to the pair of initial conditions $\mathbf{u}_0 = \mathbf{u}(t_0)$ and $\dot{\mathbf{u}}_0 = \dot{\mathbf{u}}(t_0)$.  One may think of $\mathbf{u}$ as being displacements whose rates $\dot{\mathbf{u}}$ are their velocities $\mathbf{v}$, with $\ddot{\mathbf{u}} = \dot{\mathbf{v}}$ representing their accelerations $\mathbf{a}$. 
 
-The two-step method put forward here incrementally solves such an ODE, returning solutions associated with the next moment in time $t_{i+1}$ for both displacement $\mathbf{u}_{i+1}$ and velocity $\dot{\mathbf{u}}_{i+1}$.  To update displacement to $\mathbf{u}_{i+1}$, the predictor requires knowledge of the previous fields $\mathbf{u}_{i-1}$, $\dot{\mathbf{u}}_{i-1}$ and $\ddot{\mathbf{u}}_{i-1}$ plus the current fields $\mathbf{u}_i$, $\dot{\mathbf{u}}_i$ and $\ddot{\mathbf{u}}_i$, with the corrector also requiring knowledge of $\dot{\mathbf{u}}_{i+1}$ and $\ddot{\mathbf{u}}_{i+1}$.  Likewise, to update the velocity to $\dot{\mathbf{u}}_{i+1}$, the predictor requires knowledge of the previous fields $\dot{\mathbf{u}}_{i-1}$ and $\ddot{\mathbf{u}}_{i-1}$ plus the current fields $\dot{\mathbf{u}}_i$ and $\ddot{\mathbf{u}}_i$, with the corrector also requiring knowledge of $\ddot{\mathbf{u}}_{i+1}$.  Both predictors are explicit, and both correctors are implicit.  It is this implicit quality that provides numeric stability for the integrator.
+The two-step method put forward here incrementally solves such an ODE, returning solutions associated with the next moment in time $t_{i+1}$ for both displacement $\mathbf{u}_{i+1}$ and velocity $\dot{\mathbf{u}}_{i+1}$.  To update displacement to $\mathbf{u}_{i+1}$, the predictor requires knowledge of the previous fields $\mathbf{u}_{i-1}$, $\dot{\mathbf{u}}_{i-1}$, and $\ddot{\mathbf{u}}_{i-1}$ plus the current fields $\mathbf{u}_i$, $\dot{\mathbf{u}}_i$, and $\ddot{\mathbf{u}}_i$, with the corrector also requiring knowledge of $\dot{\mathbf{u}}_{i+1}$ and $\ddot{\mathbf{u}}_{i+1}$.  Likewise, to update the velocity to $\dot{\mathbf{u}}_{i+1}$, the predictor requires knowledge of the previous fields $\dot{\mathbf{u}}_{i-1}$ and $\ddot{\mathbf{u}}_{i-1}$ plus the current fields $\dot{\mathbf{u}}_i$ and $\ddot{\mathbf{u}}_i$, with the corrector also requiring knowledge of $\ddot{\mathbf{u}}_{i+1}$.  Both predictors are explicit, and both correctors are implicit.  It is this implicit quality that provides numeric stability for the integrator.
 
-\subsubsection{Start-Up Algorithm}
+\paragraph{Start-Up Algorithm}
 
-Again, multi-step methods are not self starting, so a one-step method is needed to take the first step of integration; specifically, we employ
+Again, multi-step methods are not self-starting, so a one-step method is needed to take the first step of integration; specifically, we employ
 \begin{subequations}
     \label{pairedStartUp}
     \begin{align}
@@ -174,7 +174,7 @@ Again, multi-step methods are not self starting, so a one-step method is needed 
     ( \ddot{\mathbf{u}}_1^p + \ddot{\mathbf{u}}_0 ) \mathrm{d}t + 
     \mathcal{O} \bigl( (\mathrm{d}t)^3 \bigr)
     \label{startUpVelocityCorrector} \\
-    \mbox{} & \text{re-Evaluate} &
+    \mbox{} & \text{Re-Evaluate} &
     \ddot{\mathbf{u}}_1 & = \mathbf{f} (t_1, \mathbf{u}_1, \dot{\mathbf{u}}_1) 
     \label{startUpReEvaluate}
     \end{align}
@@ -182,7 +182,7 @@ Again, multi-step methods are not self starting, so a one-step method is needed 
 wherein $\ddot{\mathbf{u}}_0 = \mathbf{f}(t_0, \mathbf{u}_0, \dot{\mathbf{u}}_0)$ and $t_1 = t_0 + \mathrm{d}t$. 
 
 
-\subsubsection{Two-Step ODE Solver}
+\paragraph{Two-Step ODE Solver}
 
 The two-step method of Freed \cite{Freed17a} for solving second-order ODEs is
 \begin{subequations}
@@ -224,25 +224,25 @@ The two-step method of Freed \cite{Freed17a} for solving second-order ODEs is
     \tfrac{2}{3} \ddot{\mathbf{u}}^p_{i+1} \, \mathrm{d}t + 
     \mathcal{O} \bigl( (\mathrm{d}t)^3 \bigr)
     \label{velocityCorrector} \\
-    \mbox{} & \text{re-Evaluate} & 
+    \mbox{} & \text{Re-Evaluate} & 
     \ddot{\mathbf{u}}_{i+1} & = \mathbf{f} (t_{i+1}, \mathbf{u}_{i+1}, \dot{\mathbf{u}}_{i+1})
     \label{2ndReEvaluate}
     \end{align}
 \end{subequations}
 which is a second-order method for integrating velocities $\dot{\mathbf{u}}$, and a third-order method for integrating displacements $\mathbf{u}$.  
 
-This PECE solver for velocity $\dot{\mathbf{u}}$ has a predictor and a corrector, i.e., Eqns.~(\ref{velocityPredictor} \& \ref{velocityCorrector}), that are the same as those of method~(\ref{1stOrderPredictor} \& \ref{1stOrderCorrector}), and as such, this predictor\slash corrector pair for integrating velocity is consistent.  Likewise, in both the predictor and corrector for integrating displacement $\mathbf{u}$, contributions from the solution $\mathbf{u}$ have a weight of 1, contributions from the velocities $\dot{\mathbf{u}}$ have a weight of $\tfrac{2}{3} \mathrm{d}t$, and contributions from the accelerations $\ddot{\mathbf{u}}$ have a weight of $\tfrac{5}{6} (\mathrm{d}t)^2$; hence, this predictor\slash corrector pair is internally consistent, too.
+This PECE solver for velocity $\dot{\mathbf{u}}$ has a predictor and a corrector, i.e., Eqs.~\ref{velocityPredictor} and \ref{velocityCorrector}, that are the same as those of method~(i.e., \ref{1stOrderPredictor} and \ref{1stOrderCorrector}), and as such, this predictor\slash corrector pair for integrating velocity is consistent.  Likewise, in both the predictor and corrector for integrating displacement $\mathbf{u}$, contributions from the solution $\mathbf{u}$ have a weight of 1, contributions from the velocities $\dot{\mathbf{u}}$ have a weight of $\tfrac{2}{3} \mathrm{d}t$, and contributions from the accelerations $\ddot{\mathbf{u}}$ have a weight of $\tfrac{5}{6} (\mathrm{d}t)^2$; hence, this predictor\slash corrector pair is internally consistent, too.
 
-\subsection{A Relevant Example}
+\subsubsection{A Relevant Example}
 \label{sec:solve2ndOrderODE}
 
 The finite element problem that we consider here requires solutions for the second-order ODE
 \begin{displaymath}
     \mathbf{M} \ddot{\mathbf{u}} + \mathbf{C} \dot{\mathbf{u}} + \mathbf{K}\mathbf{u} = \mathbf{f}( t , \mathbf{u} , \dot{\mathbf{u}} )
 \end{displaymath}
-where $\mathbf{u}$, $\dot{\mathbf{u}}$ and $\ddot{\mathbf{u}}$ are the displacement, velocity and acceleration vectors, $\mathbf{M}$ is a mass matrix, $\mathbf{C}$ and $\mathbf{K}$ are tangent and secant stiffness matrices, while $\mathbf{f}( t , \mathbf{u} , \dot{\mathbf{u}} )$ is a forcing function.  In our application, matrices $\mathbf{M}$, $\mathbf{C}$ and $\mathbf{K}$ vary with deformation.
+where $\mathbf{u}$, $\dot{\mathbf{u}}$, and $\ddot{\mathbf{u}}$ are the displacement, velocity, and acceleration vectors, $\mathbf{M}$ is a mass matrix, $\mathbf{C}$ and $\mathbf{K}$ are tangent and secant stiffness matrices, while $\mathbf{f}( t , \mathbf{u} , \dot{\mathbf{u}} )$ is a forcing function.  In our application, matrices $\mathbf{M}$, $\mathbf{C}$, and $\mathbf{K}$ vary with deformation.
 
-Given initial conditions $\mathbf{u}_0$ and $\dot{\mathbf{u}}_0$, establish initial matrices $\mathbf{M}_0 = \mathbf{M} ( \mathbf{u}_0 )$ and $\mathbf{C}_0 = \mathbf{C} ( \mathbf{u}_0 )$, noting that $\mathbf{K}_0 \mathbf{u}_0 = \mathbf{0}$ because $\mathbf{u}_0 = \mathbf{0}$.  For this system of ODEs, the first step to be taken follows algorithm (\ref{pairedStartUp}) and is implemented as
+Given initial conditions $\mathbf{u}_0$ and $\dot{\mathbf{u}}_0$, establish initial matrices $\mathbf{M}_0 = \mathbf{M} ( \mathbf{u}_0 )$ and $\mathbf{C}_0 = \mathbf{C} ( \mathbf{u}_0 )$, noting that $\mathbf{K}_0 \mathbf{u}_0 = \mathbf{0}$ because $\mathbf{u}_0 = \mathbf{0}$.  For this system of ODEs, the first step to be taken follows algorithm (Eq.~\ref{pairedStartUp}) and is implemented as
 \begin{subequations}
     \notag
     \begin{align}
@@ -263,7 +263,7 @@ Given initial conditions $\mathbf{u}_0$ and $\dot{\mathbf{u}}_0$, establish init
     \mbox{} & &
     \dot{\mathbf{u}}_1 & = \dot{\mathbf{u}}_0 + \tfrac{1}{2}  
     ( \ddot{\mathbf{u}}_1^p + \ddot{\mathbf{u}}_0 ) \mathrm{d}t \\
-    \mbox{} & \text{re-Evaluate} &
+    \mbox{} & \text{Re-Evaluate} &
     \ddot{\mathbf{u}}_1 & = \mathbf{M}^{-1}_0 \bigl( 
     \mathbf{f}( t_1 , \mathbf{u}_1 , \dot{\mathbf{u}}_1 ) - 
     \mathbf{C}_0 \dot{\mathbf{u}}_0 \bigr) \\
@@ -273,7 +273,7 @@ Given initial conditions $\mathbf{u}_0$ and $\dot{\mathbf{u}}_0$, establish init
     \mathbf{K}_1 = \mathbf{K} ( \mathbf{u}_1 )
     \end{align}
 \end{subequations}
-with continued steps being governed by algorithm (\ref{pairedMethods}), which takes on the form of
+with continued steps being governed by algorithm (Eq.~\ref{pairedMethods}), which takes on the form of
 \begin{subequations}
     \notag
     \begin{align}
@@ -304,7 +304,7 @@ with continued steps being governed by algorithm (\ref{pairedMethods}), which ta
     \dot{\mathbf{u}}_{i+1} & = \tfrac{1}{3} 
     ( 4 \dot{\mathbf{u}}_i - \dot{\mathbf{u}}_{i-1} ) + 
     \tfrac{2}{3} \ddot{\mathbf{u}}^p_{i+1} \, \mathrm{d}t \\
-    \mbox{} & \text{re-Evaluate} & 
+    \mbox{} & \text{Re-Evaluate} & 
     \ddot{\mathbf{u}}_{i+1} & = \mathbf{M}^{-1}_i \bigl( 
     \mathbf{f}( t_{i+1} , \mathbf{u}_{i+1} , \dot{\mathbf{u}}_{i+1} ) - 
     \mathbf{C}_i \dot{\mathbf{u}}_i - \mathbf{K}_i \mathbf{u}_i \bigr) \\
@@ -319,17 +319,17 @@ where $\mathbf{K}_i \mathbf{u}_i$ returns an internal force due to stress that h
 We observe that the mass matrix must not be ill conditioned in order for this algorithm to work as intended.  In those cases where the mass matrix does not change with time, it will only need to be evaluated and inverted once.  This is an advantage over using the popular Newmark \cite{Newmark59} integrator, where matrix evaluation and inversion are required at every step along a solution path.
 
 
-\section{Quadrature Rules for Spatial Integration}
+\subsection{$\,$Quadrature Rules for Spatial Integration}
 \label{sec:Gauss}
 
-In a general finite element setting, information comes into an element via its nodes.  Once there, it gets interpolated into its interior Gauss points, where the constitutive equations are solved and spatial integrations occur.  In some applications, and in particular, in ours, one also needs to be able to take fields (in our case stress) whose constitutive equations have been integrated at the Gauss points of an element, and extrapolate this information back out to the exterior nodes of the element.
+In a general finite element setting, information comes into an element via its nodes.  Once there, it gets interpolated into its interior Gauss points, where the constitutive equations are solved and spatial integrations occur.  In some applications, and in particular, in ours, one also needs to be able to take fields (e.g., a damage parameter) whose constitutive equations have been integrated at the Gauss points of an element, and extrapolate this information back out to the exterior nodes of the element.
 
-Particular to our application, a suite of nodes is common betwixt three, separate, finite-element models that share twenty common vertices.  These vertices establish the geometry of a dodecahedron used as the model for a micro\-scopic alveolus.  The resultant micro\-scopic force at each vertex arises from: \textit{i\/}) a finite element model of thirty 1D rods representing the alveolar chords, \textit{ii\/}) a finite element model of twelve 2D pentagons representing the alveolar membranes, and \textit{iii\/}) a finite element model of sixty 3D tetrahedra representing the alveolar sac.  The micro\-scopic forces coming from these three geometric models are summed at their twenty common vertices. These resultant micro\-scopic forces are then collectively homo\-genized to yield an averaged macro\-scopic state of stress at a chosen location in the parenchyma.  
+Particular to our application, a suite of nodes is common betwixt three, separate, finite-element models that share 20 common vertices.  These vertices establish the geometry of a dodecahedron used as the model for a micro\-scopic alveolus.  The resultant micro\-scopic force at each vertex arises from: \textit{i\/}) a finite element model of 30 1D rods representing the alveolar chords, \textit{ii\/}) a finite element model of 12 2D pentagons representing the alveolar membranes, and \textit{iii\/}) a finite element model of 60 3D tetrahedra representing the alveolar sac.  The micro\-scopic forces coming from these three geometric models are summed at their 20 common vertices. These resultant micro\-scopic forces are then collectively homo\-genized to yield an averaged macro\-scopic state of stress at a chosen location in the parenchyma.  
 
 Feasibility of this solution strategy hinges upon one's ability to extrapolate information at the Gauss points out to their nodal positions.  This requires an intermingling between an element's shape functions used for interpolation with its quadrature rule used for integration.
 
-\subsection{Interpolations:\,\, Nodal Points $\mapsto$ Gauss Points \\ 
-    \qquad\quad Extrapolations: Gauss Points $\mapsto$ Nodal Points}
+\subsubsection{Interpolations: \hspace{3pt} Nodal Points $\mapsto$ Gauss Points \\ 
+    \qquad\quad Extrapolations: \hspace{1pt} Gauss Points $\mapsto$ Nodal Points}
 \label{sec:extrapolation}
 
 Shape functions are introduced for interpolating within an element; specifically, consider an arbitrary field, say $f$, whose values are known at the nodes, then
@@ -340,14 +340,14 @@ Shape functions are introduced for interpolating within an element; specifically
     N_i ( \boldsymbol{\xi}_k ) f ( \boldsymbol{x}_i ) &
     k & = 1, 2, \ldots, m 
     \label{interpolation} \\
-    \intertext{where the $\boldsymbol{x}_i$ are co-ordinates that locate one of the $n$ nodes in an element of interest, and where the $\boldsymbol{\xi}_i$ are co-ordinates that locate one of its $m$ Gauss points, both being evaluated in the natural co-ordinate system of the element.  The transformation in Eqn.~(\ref{interpolation}) maps a point $\boldsymbol{x}$ in an element of a mesh to a point $\boldsymbol{\xi}$ in its natural element.	 Functions $N_i$ are the so-called shape functions.  They obey $\sum_{i=1}^n N_i (\boldsymbol{\xi}) = 1$ $\forall$ $\boldsymbol{\xi}$.
+    \intertext{where the $\boldsymbol{x}_i$ are co-ordinates that locate one of the $n$ nodes in an element of interest, and where the $\boldsymbol{\xi}_i$ are co-ordinates that locate one of its $m$ Gauss points, both being evaluated in the natural co-ordinate system of the element.  The transformation in Eq.~\ref{interpolation} maps a point $\boldsymbol{x}$ in an element of a mesh to a point $\boldsymbol{\xi}$ in its natural element.	 Functions $N_i$ are the so-called shape functions.  They obey $\sum_{i=1}^n N_i (\boldsymbol{\xi}) = 1$ $\forall$ $\boldsymbol{\xi}$.
     \bigskip\newline
     A corresponding extrapolation scheme can therefore be written down as}
     f ( \boldsymbol{x}_k ) & = \sum_{i=1}^m 
     M_i ( \boldsymbol{x}_k ) f ( \boldsymbol{\xi}_i ) &
     k & = 1, 2, \ldots, n 
     \label{extrapolation} \\
-    \intertext{where the $M_i$ denote extrapolation functions, i.e., they take values of function $f$, now assumed to be known at all Gauss points $\boldsymbol{\xi}_i$, $i=1,2,\ldots,m$, and extrapolate them out to their individual nodal points $\boldsymbol{x}_k$, $k \in \{ 1, 2, \ldots , n \}$. They obey $\sum_{i=1}^m M_i (\boldsymbol{x}) = 1$ $\forall$ $\boldsymbol{x}$.
+    \intertext{where the $M_i$ denote extrapolation functions, i.e., they take values of function $f$, now assumed to be known at all Gauss points $\boldsymbol{\xi}_i$, $i = 1, 2, \ldots , m$, and extrapolate them out to their individual nodal points $\boldsymbol{x}_k$, $k \in \{ 1, 2, \ldots , n \}$. They obey $\sum_{i=1}^m M_i (\boldsymbol{x}) = 1$ $\forall$ $\boldsymbol{x}$.
     \bigskip\newline
     The interpolation\slash extrapolation functions of interest here also obey the following constraints: either}
     1 & = \sum_{i=1}^n N_i ( \boldsymbol{\xi}_j )  
@@ -367,9 +367,9 @@ Shape functions are introduced for interpolating within an element; specifically
     \label{extrapolationConstraint4}
     \end{align}
 \end{subequations}
-which follow from substituting Eqn.~(\ref{extrapolation}) into Eqn.~(\ref{interpolation}), or vice versa.  In this regard, such a pair of interpolation\slash extrapolation functions are said to be self consistent. In other words, if a field whose values are known at the nodal points is interpolated down to the Gauss points, and then extrapolated back out to the nodal points, then the outgoing values located at the nodes will equal their incoming values at these nodes. The overall process is therefore self consistent.  As straight\-forward as this procedure is, we found no satisfactory explanation of it in a finite element text.
+which follow from substituting Eq.~\ref{extrapolation} into Eq.~\ref{interpolation}, or vice versa.  In this regard, such a pair of interpolation\slash extrapolation functions are said to be self-consistent. In other words, if a field whose values are known at the nodal points is interpolated down to the Gauss points, and then extrapolated back out to the nodal points, then the outgoing values located at the nodes will equal their incoming values at these nodes. The overall process is therefore self-consistent.  As straight\-forward as this procedure is, we found no satisfactory explanation of it in a finite element text.
 
-Whenever $m=n$, the matrices that come about from the interpolation and extrapolation coefficients are reciprocal to one another, with the 0's and 1's of Eqns.~(\ref{extrapolationConstraint1} \& \ref{extrapolationConstraint3} or \ref{extrapolationConstraint2} \& \ref{extrapolationConstraint4}) associating with the individual components of an identity matrix.  Consequently, our need to extrapolate information as-well-as interpolate it strongly suggests that the number of Gauss points selected ought to equal the number of nodal points associated with a given element geometry, albeit this is not a strict requirement for self consistency.
+Whenever $m=n$, the matrices that come about from the interpolation and extrapolation coefficients are reciprocal to one another, with the 0's and 1's of Eqs.~\ref{extrapolationConstraint1} and \ref{extrapolationConstraint3} or \ref{extrapolationConstraint2} and \ref{extrapolationConstraint4} associating with the individual components of an identity matrix.  Consequently, our need to extrapolate information, as-well-as interpolate it, strongly suggests that the number of Gauss points selected ought to equal the number of nodal points associated with a given element geometry, albeit this is not a strict requirement for self-consistency.
 
 As an example, a self-consistent strategy for a tetrahedron interpolates via
 \begin{subequations}
@@ -419,12 +419,12 @@ As an example, a self-consistent strategy for a tetrahedron interpolates via
     \notag
     \end{align}
 \end{subequations}
-where vectors $\boldsymbol{x}_1$, $\boldsymbol{x}_2$, $\boldsymbol{x}_3$ and $\boldsymbol{x}_4$ hold the co-ordinates for its four nodal points, and where vectors $\boldsymbol{\xi}_1$, $\boldsymbol{\xi}_2$, $\boldsymbol{\xi}_3$ and $\boldsymbol{\xi}_4$ hold the co-ordinates of their Gauss points, all evaluated in the natural co-ordinate system of the element.  The matrices in the above mappings will be inverses of one another in a self-consistent construction.
+where vectors $\boldsymbol{x}_1$, $\boldsymbol{x}_2$, $\boldsymbol{x}_3$, and $\boldsymbol{x}_4$ hold the co-ordinates for its four nodal points, and where vectors $\boldsymbol{\xi}_1$, $\boldsymbol{\xi}_2$, $\boldsymbol{\xi}_3$, and $\boldsymbol{\xi}_4$ hold the co-ordinates of their Gauss points, all evaluated in the natural co-ordinate system of the element.  The matrices in the above mappings will be inverses of one another in a self-consistent construction.
 \addtocounter{equation}{-1}
 
-Our three-model, finite-element modeling of an alveolus requires the use of rods with two nodes, triangles with three nodes, tetrahedra with four nodes, and pentagons with five nodes.  We now provide consistent interpolation\slash extrapolation procedures for these four geometries.  This requires the selection of a two-point quadrature rule for rods, a three-point quadrature rule for triangles, a four-point quadrature rule for tetrahedra, and a five-point quadrature rule for pentagons.  Our selections for quadrature, and their associated interpolation\slash extrapolation maps, are presented in the following sections.
+Our three-model, finite-element modeling of an alveolus requires the use of rods with two nodes, triangles with three nodes, tetrahedra with four nodes, and pentagons with five nodes.  We now provide consistent interpolation\slash extrapolation procedures for these four geometries.  This requires the selection of a two-point quadrature rule for rods, a three-point quadrature rule for triangles, a four-point quadrature rule for tetrahedra, and a five-point quadrature rule for pentagons.  Our selections for quadrature, and their associated interpolation\slash extrapolation maps, are presented in the following subsections.
 
-\subsubsection{Self-Consistent Interpolation\slash Extrapolation Procedures for Rods}
+\paragraph{Self-Consistent Interpolation\slash Extrapolation Procedures for Rods}
 
 Considering a rod with two Gauss points, the interpolation of an arbitrary field (say $f$, whose values are known at nodal points $x_i$, $i=1,2$) into approximated values located at Gauss points $\xi_i$, assigned according to Table~\ref{tab:2nodeRod}, while selecting shape (interpolation) functions $N_1 = \tfrac{1}{2} ( 1 - \xi )$ and $N_2 = \tfrac{1}{2} ( 1 + \xi )$, where $-1 \leq \xi \leq 1$, results in an interpolation map that sends values for a field known at the element nodes down to its Gauss points via
 \begin{subequations}
@@ -438,7 +438,7 @@ Considering a rod with two Gauss points, the interpolation of an arbitrary field
     f ( -1 ) \\ f ( 1 )
     \end{matrix} \right\} 
     \label{interpolateRod} \\
-    \intertext{that, upon applying the methodology put forward in Eqn.~(\ref{extrapolationProcedure}), leads to a straight\-forward extrapolation formula that maps values for a field of interest from the element Gauss points out to its nodes via}
+    \intertext{that, upon applying the methodology put forward in Eq.~\ref{extrapolationProcedure}, leads to a straight\-forward extrapolation formula that maps values for a field of interest from the element Gauss points out to its nodes via}
     \left\{ \begin{matrix} 
     f ( -1 ) \\ f ( 1 )
     \end{matrix} \right\} & 
@@ -451,23 +451,25 @@ Considering a rod with two Gauss points, the interpolation of an arbitrary field
     \label{extrapolateRod}
     \end{align}
 \end{subequations}
-This extrapolation matrix can be found in O{\~n}ate \cite[pg.~332]{Onate09}.  As a check, each row in this matrix sums to 1.  Furthermore, the matrices in Eqns.~(\ref{interpolateRod} \& \ref{extrapolateRod}) are reciprocals to one another, as they must be.
+This extrapolation matrix can be found in O{\~n}ate \cite{Onate09} (p.~332).  As a check, each row in this matrix sums to 1.  Furthermore, the matrices in Eqs.~\ref{interpolateRod} and \ref{extrapolateRod} are reciprocals to one another, as they must be.
 
-\begin{table}
+\begin{table}[htp]
     \begin{center}
-        \begin{tabular}{|c|cc|}
+    \caption{A quadrature rule for integrating functions over a length of line.  This quadrature rule approximates $\int_{-1}^1 f(\xi) \, \mathrm{d}\xi$ using two Gauss points, i.e., $\int_{-1}^1 f(\xi) \, \mathrm{d}\xi \approx \sum_{i=1}^2 w_i f(\xi_i)$.  The weights of quadrature $w_i$ sum to its length, because $L = \int_{-1}^1 \mathrm{d} \xi = 2$.  This quadrature rule is due to Christoffel.  It integrates polynomials along a line exactly up through second order.}
+    \label{tab:2nodeRod}
+    \footnotesize
+        \begin{tabular}{ccc}
             \hline
-            node & $\xi$ co-ordinate & weight \\ \hline        
+            \textbf{node} & $\boldsymbol{\xi}$ \textbf{co-ordinate} & 
+            \textbf{weight} \\ \hline        
             1 & $-\sqrt{3} / 3^{\vphantom{|^|}}$ & 1 \\ 
             2 & $\phantom{-}\sqrt{3} / 3$ & 1 \\ 
             \hline
         \end{tabular}
     \end{center}
-    \caption{A quadrature rule for integrating functions over a length of line.  This quadrature rule approximates $\int_{-1}^1 f(\xi) \, \mathrm{d}\xi$ using two Gauss points, i.e., $\int_{-1}^1 f(\xi) \, \mathrm{d}\xi \approx \sum_{i=1}^2 w_i f(\xi_i)$.  The weights of quadrature $w_i$ sum to its length, because $L = \int_{-1}^1 \mathrm{d} \xi = 2$.  This quadrature rule is due to Christoffel.  It integrates polynomials along a line exactly up through second order.}
-    \label{tab:2nodeRod}
 \end{table}
 
-\subsubsection{Self-Consistent Interpolation\slash Extrapolation Procedures for Triangles}
+\paragraph{Self-Consistent Interpolation\slash Extrapolation Procedures for Triangles}
 
 Now, considering a triangle with three Gauss points, the interpolation of an arbitrary field $f$ whose values are known at nodal points $\boldsymbol{x}_i$, $i=1,2,3$, into approximated values located at Gauss points $\boldsymbol{\xi}$, assigned according to Table~\ref{tab:3nodeTriangle}, while selecting shape (interpolation) functions $N_1 = 1 - \xi - \eta$, $N_2 = \xi$, and $N_3 = \eta$, where $0 \leq \xi \leq 1$ and $0 \leq \eta \leq 1 - \xi$, results in an interpolation that maps according to
 \begin{subequations}
@@ -484,7 +486,7 @@ Now, considering a triangle with three Gauss points, the interpolation of an arb
     f ( 0, 0 ) \\ f ( 1, 0 ) \\ f ( 0, 1 )
     \end{matrix} \right\}
     \label{interpolateTriangle} \\
-    \intertext{that, upon applying the methodology put forward in Eqn.~(\ref{extrapolationProcedure}), which requires some algebra, leads to a simple extrapolation formula applicable for triangles when evaluated in their natural co-ordinate system, viz.,}
+    \intertext{that, upon applying the methodology put forward in Eq.~\ref{extrapolationProcedure}, which requires some algebra, leads to a simple extrapolation formula applicable for triangles when evaluated in their natural co-ordinate system, viz.,}
     \left\{ \begin{matrix} 
     f ( 0, 0 ) \\ f ( 1, 0 ) \\ f ( 0, 1 )
     \end{matrix} \right\} & 
@@ -504,25 +506,27 @@ As a check, each row in both matrices sums to 1 and, as expected, these matrices
 
 \begin{table}
     \begin{center}
-    \begin{tabular}{|c|ccc|}
+    \caption{A simple quadrature rule for integrating functions over the area of a triangle.  This quadrature rule approximates $\int_0^1 \int_0^{1-\xi} f(\xi , \eta) \, \mathrm{d} \eta \, \mathrm{d} \xi$  using three Gauss points, i.e., $\int_0^1 \int_0^{1-\xi} f(\xi , \eta) \, \mathrm{d} \eta \, \mathrm{d} \xi \approx \sum_{i=1}^3 w_i f(\xi_i , \eta_i )$.  The weights of quadrature $w_i$ sum to its area, because $A = \int_0^1 \int_0^{1-\xi} \mathrm{d}\eta \, \mathrm{d} \xi = \textfrac{1}{2}$.  This quadrature rule is due to Strang.  It integrates polynomials over a triangular region exactly up through second order. As a point of reference, its centroid has co-ordinates (\textfrac{1}{3}, \textfrac{1}{3}).}
+    \label{tab:3nodeTriangle}
+    \footnotesize
+    \begin{tabular}{cccc}
         \hline
-        node & $\xi$ co-ordinate & $\eta$ co-ordinate  & weight \\ \hline        
+        \textbf{node} & $\boldsymbol{\xi}$ \textbf{co-ordinate} & 
+        $\boldsymbol{\eta}$ \textbf{co-ordinate}  & \textbf{weight} \\ \hline        
         1 & 1/6 & 1/6 & 1/6 \\ 
         2 & 2/3 & 1/6 & 1/6 \\ 
         3 & 1/6 & 2/3 & 1/6 \\ 
         \hline
     \end{tabular}
     \end{center}
-    \caption{A simple quadrature rule for integrating functions over the area of a triangle.  This quadrature rule approximates $\int_0^1 \int_0^{1-\xi} f(\xi , \eta) \, \mathrm{d} \eta \, \mathrm{d} \xi$  using three Gauss points, i.e., $\int_0^1 \int_0^{1-\xi} f(\xi , \eta) \, \mathrm{d} \eta \, \mathrm{d} \xi \approx \sum_{i=1}^3 w_i f(\xi_i , \eta_i )$.  The weights of quadrature $w_i$ sum to its area, because $A = \int_0^1 \int_0^{1-\xi} \mathrm{d}\eta \, \mathrm{d} \xi = \textfrac{1}{2}$.  This quadrature rule is due to Strang.  It integrates polynomials over a triangular region exactly up through second order. As a point of reference, its centroid has co-ordinates (\textfrac{1}{3}, \textfrac{1}{3}).}
-    \label{tab:3nodeTriangle}
 \end{table}
     
-\subsubsection{Self-Consistent Interpolation\slash Extrapolation Procedures for Pentagons}
+\paragraph{Self-Consistent Interpolation\slash Extrapolation Procedures for Pentagons}
     \label{secPentagonGaussPts}
     
     We only know of two papers where quadrature formul\ae\ have been derived for integrating over the area of a pentagon. \cite{Mousavietal10,Chakrabortyetal18}  Neither presents tables for their nodes and weights of quadrature.  Only mathematical methodologies are provided, from which one can numerically construct such tables.  More importantly, for our application, neither of their strategies exploits the symmetry properties of a pentagon.  Their formul\ae, which can be highly accurate, unfortunately do not meet our needs. 
     
-    Because we seek a quadrature rule for regular pentagons that employs five Gauss points, and pentagons posses five radial lines of symmetry, it is reasonable to consider that the five nodes of quadrature that we seek lie along these five radial lines.  Specifically, we seek a quadrature rule for a pentagon whose nodes are located at $\boldsymbol{x}_i$, $i=1,2,\ldots,5$, and whose Gauss points are located at $\boldsymbol{\xi}_i$, $i=1,2,\ldots,5$, with
+    Because we seek a quadrature rule for regular pentagons that employs five Gauss points, and pentagons possess five radial lines of symmetry, it is reasonable to consider that the five nodes of quadrature that we seek lie along these five radial lines.  Specifically, we seek a quadrature rule for a pentagon whose nodes are located at $\boldsymbol{x}_i$, $i=1,2,\ldots,5$, and whose Gauss points are located at $\boldsymbol{\xi}_i$, $i=1,2,\ldots,5$, with
     \begin{subequations}
         \label{pentagonCoordinates}
         \begin{align}
@@ -545,15 +549,15 @@ As a check, each row in both matrices sums to 1 and, as expected, these matrices
         \label{pentagonQuadrature}
         \begin{align}
         \ell & = \frac{1 + \sin ( \textfrac{3\pi}{10} )}
-        {3 \sin ( \textfrac{3\pi}{10} ) } \approx 0.7454 \\
+        {3 \sin ( \textfrac{3\pi}{10} ) } \approx 0.7454, \\
         \intertext{whose area becomes the associated weight of quadrature, it being}
         w & = \sin ( \textfrac{3\pi}{10} ) \cos ( \textfrac{3\pi}{10} ) 
-        \approx 0.4755 
+        \approx 0.4755,
         \end{align}
     \end{subequations}
-    which is one-fifth the area of a regular pentagon, cf.\ Eqn.~(\ref{regPentagonArea}).  To the best of our knowledge, the quadrature rule put forward in Eqns.~(\ref{pentagonCoordinates} \& \ref{pentagonQuadrature}) for pentagons is new to the literature. 
+    which is one-fifth the area of a regular pentagon, cf.\ Eq.~\ref{regPentagonArea}.  To the best of our knowledge, the quadrature rule put forward in Eqs.~\ref{pentagonCoordinates} and \ref{pentagonQuadrature} for pentagons is new to the literature. 
     
-    Interpolation is described through shape functions.  Adopting the shape functions of Wachspress, which are constructed in \S\ref{secShapeFns} for a pentagon, while using the quadrature rule of Eqns.~(\ref{pentagonCoordinates} \& \ref{pentagonQuadrature}), results in a symmetric interpolation map of
+    Interpolation is described through shape functions.  Adopting the shape functions of Wachspress, which are constructed in Section~\ref{secShapeFns} for a pentagon, while using the quadrature rule of Eqs.~\ref{pentagonCoordinates} and \ref{pentagonQuadrature}, results in a symmetric interpolation map of
     \begin{subequations}
         \label{extrapolationPentagon}
         \begin{align} 
@@ -598,17 +602,17 @@ As a check, each row in both matrices sums to 1 and, as expected, these matrices
         f ( \boldsymbol{\xi}_5 )
         \end{matrix} \right\}  \\
         \intertext{wherein}
-        x & = a^2 + (a-b)(b+c) - c^2 \\
-        y & = (b+c)c - (a+b)b \\
-        z & = b^2 - (a-b)c - c^2 \\
-        \Delta & = a^2 - (a+b)b - (a-3b)c - c^2
+        x & = a^2 + (a-b)(b+c) - c^2, \\
+        y & = (b+c)c - (a+b)b, \\
+        z & = b^2 - (a-b)c - c^2, \\
+        \Delta & = a^2 - (a+b)b - (a-3b)c - c^2,
         \end{align}
     \end{subequations}
     where, as a check, $\sum_{i=1}^5 N_i (\boldsymbol{\xi}_j) = 1$ and $\sum_{i=1}^5 M_i (\boldsymbol{x}_j) = 1$ for $j=1,2,\ldots,5$, and therefore, $a + 2(b + c) = 1$ and $x + 2(y + z) = \Delta$.  Furthermore, these coefficient matrices for interpolation and extrapolation are inverses to one another.  
     
-\subsubsection{Self-Consistent Interpolation\slash Extrapolation Procedures for Tetrahedra}
+\paragraph {Self-Consistent Interpolation\slash Extrapolation Procedures for Tetrahedra}
     
-We now consider a tetrahedron with four Gauss points.  Here the interpolation of an arbitrary field $f$ whose values are known at nodal points $\boldsymbol{x}_i$, $i=1,2,3,4$, into approximated values located at Gauss points $\boldsymbol{\xi}_i$, assigned according to Table~\ref{tab:4nodedTet}, while selecting shape functions $N_1 = 1 - \xi - \eta - \zeta$, $N_2 = \xi$, $N_3 = \eta$, and $N_4 = \zeta$, bounded by $0 \leq \xi \leq 1$, $0 \leq \eta \leq 1 - \xi$ and $0 \leq \zeta \leq 1 - \xi - \eta$, leads to the following interpolation formula
+We now consider a tetrahedron with four Gauss points.  Here the interpolation of an arbitrary field $f$ whose values are known at nodal points $\boldsymbol{x}_i$, $i=1,2,3,4$, into approximated values located at Gauss points $\boldsymbol{\xi}_i$, assigned according to Table~\ref{tab:4nodedTet}, while selecting shape functions $N_1 = 1 - \xi - \eta - \zeta$, $N_2 = \xi$, $N_3 = \eta$, and $N_4 = \zeta$, bounded by $0 \leq \xi \leq 1$, $0 \leq \eta \leq 1 - \xi$, and $0 \leq \zeta \leq 1 - \xi - \eta$, leads to the following interpolation formula
 \begin{subequations}
     \label{extrapolationTetrahedron}
     \begin{align}
@@ -626,7 +630,7 @@ We now consider a tetrahedron with four Gauss points.  Here the interpolation of
         f ( 0, 0, 0) \\ f ( 1, 0, 0 ) \\ f ( 0, 1, 0 ) \\ f ( 0, 0, 1 )
         \end{matrix} \right\} 
         \label{interpolateTet} \\
-    \intertext{that, upon applying the methodology put forward in Eqn.~(\ref{extrapolationProcedure}), which now requires a good deal of algebra, results in the following extrapolation formula for tetrahedra}
+    \intertext{that, upon applying the methodology put forward in Eq.~\ref{extrapolationProcedure}, which now requires a good deal of algebra, results in the following extrapolation formula for tetrahedra}
     \left\{ \begin{matrix} 
         f ( 0, 0, 0) \\ f ( 1, 0, 0 ) \\ f ( 0, 1, 0 ) \\ f ( 0, 0, 1 )
         \end{matrix} \right\} & 
@@ -644,14 +648,19 @@ We now consider a tetrahedron with four Gauss points.  Here the interpolation of
     \label{extrapolateTet}
     \end{align}
 \end{subequations}
-where $a = 0.1381966011250105$ and $b = 0.5854101966249685$ from Table~\ref{tab:4nodedTet}.  As a check, each row in the above matrices sums to 1.  Unlike the interpolation\slash extrapolation formul\ae\ for rods, triangles and pentagons, whose matrices of transformation are symmetric, the interpolation\slash extrapolation matrices for a tetrahedron are not symmetric.  Lack of symmetry in a quadrature rule is not uncommon, but in our application, such symmetries are advantageous.  Nevertheless, for a tetrahedron, quadrature symmetry is not necessary.
+where $a = 0.1381966011250105$ and $b = 0.5854101966249685$ from Table~\ref{tab:4nodedTet}.  As a check, each row in the above matrices sums to 1.  Unlike the interpolation\slash extrapolation formul\ae\ for rods, triangles, and pentagons, whose matrices of transformation are symmetric, the interpolation\slash extrapolation matrices for a tetrahedron are not symmetric.  Lack of symmetry in a quadrature rule is not uncommon, but in our application, such symmetries are advantageous.  Nevertheless, for a tetrahedron, quadrature symmetry is not necessary.
     
 \begin{table}
-    \small
-    \begin{tabular}{|c|cccc|}
+\centering
+\caption{A simple quadrature rule for integrating functions over the volume of a tetrahedron.  This quadrature rule approximates $\int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} f(\xi, \eta, \zeta) \, \mathrm{d}\zeta \, \mathrm{d}\eta \, \mathrm{d}\xi$ using four Gauss points, i.e., $\int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} f(\xi, \eta, \zeta) \, \mathrm{d}\zeta \, \mathrm{d}\eta \, \mathrm{d}\xi \approx \sum_{i=1}^4 w_i f( \xi_i , \eta_i , \zeta_i )$.  The weights of quadrature $w_i$ sum to its volume, because $V = \int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} \mathrm{d}\zeta \, \mathrm{d}\eta \, \mathrm{d}\xi = \textfrac{1}{6}$.  This quadrature rule is due to Keast.  It integrates polynomials over a tetrahedral region exactly up through second order.  As a point of reference, its centroid has co-ordinates (\textfrac{1}{4}, \textfrac{1}{4}, \textfrac{1}{4}).}
+\label{tab:4nodedTet}
+    \footnotesize
+    \begin{tabular}{ccccc}
         \hline
-        node & $\xi$ co-ordinate & $\eta$ co-ordinate & 
-        $\zeta$ co-ordinate & weight \\ \hline        
+        \textbf{node} & $\boldsymbol{\xi}$ \textbf{co-ordinate} & 
+        $\boldsymbol{\eta}$ \textbf{co-ordinate} & 
+        $\boldsymbol{\zeta}$ \textbf{co-ordinate} & 
+        \textbf{weight} \\ \hline        
         1 & 0.1381966011250105 & 0.1381966011250105 & 0.1381966011250105 & 1/24 \\
         2 & 0.5854101966249685 & 0.1381966011250105 & 0.1381966011250105 & 1/24 \\
         3 & 0.1381966011250105 & 0.5854101966249685 & 0.1381966011250105 & 1/24 \\
@@ -659,8 +668,6 @@ where $a = 0.1381966011250105$ and $b = 0.5854101966249685$ from Table~\ref{tab:
         \hline
     \end{tabular}
     \normalsize
-    \caption{A simple quadrature rule for integrating functions over the volume of a tetrahedron.  This quadrature rule approximates $\int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} f(\xi, \eta, \zeta) \, \mathrm{d}\zeta \, \mathrm{d}\eta \, \mathrm{d}\xi$ using four Gauss points, i.e., $\int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} f(\xi, \eta, \zeta) \, \mathrm{d}\zeta \, \mathrm{d}\eta \, \mathrm{d}\xi \approx \sum_{i=1}^4 w_i f( \xi_i , \eta_i , \zeta_i )$.  The weights of quadrature $w_i$ sum to its volume, because $V = \int_0^1 \int_0^{1-\xi} \int_0^{1-\xi-\eta} \mathrm{d}\zeta \, \mathrm{d}\eta \, \mathrm{d}\xi = \textfrac{1}{6}$.  This quadrature rule is due to Keast.  It integrates polynomials over a tetrahedral region exactly up through second order.  As a point of reference, its centroid has co-ordinates (\textfrac{1}{4}, \textfrac{1}{4}, \textfrac{1}{4}).}
-    \label{tab:4nodedTet}
 \end{table}
 
 

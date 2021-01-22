@@ -1,25 +1,76 @@
 \providecommand{\refin}[1]{\\ \textbf{Referenced in:} #1}
-\begin{thebibliography}{100}
+\begin{thebibliography}{100}\vspace{9pt}
+
+\bibitem{Cannon01}
+Cannon~LB.\,~  Behind armour blunt trauma---an emerging problem.
+  \textrm{Journal of the Royal Army Medical Corps}. \textrm{2001};147:87--96.
+
+\bibitem{grimal2004}
+Grimal~Q,\ Gama~B,\ Naili~S,\ Watzky~A,\ Gillespie~J.\,~  Finite element study
+  of high-speed blunt impact on thorax: linear elastic considerations.
+  \textrm{International Journal of Impact Engineering}.
+  \textrm{2004};30:665--683.
+
+\bibitem{cronin2015}
+Cronin~D.\,  Investigation of lung response resulting from behind armor blunt
+  trauma impact scenarios.   In:  \textrm{Proceedings of the 2015 International
+  Research Council on Biomechanics of Injury (IRCOBI) Conference};.
+
+\bibitem{HanlonGillich2012}
+Hanlon~E,\ Gillich~P.\,~  Origin of the 44-mm behind-armor blunt trauma
+  standard.  \textrm{Military Medicine}. \textrm{2012};177:333--339.
+
+\bibitem{gibbons2015}
+Gibbons~M,\ Dang~X,\ Adkins~M,\ Powell~B,\ Chan~P.\,~  Finite element modeling
+  of blast lung injury in sheep.  \textrm{Journal of Biomechanical
+  Engineering}. \textrm{2015};137:041002.
+
+\bibitem{zhou2010}
+Zhou~H,\ Ma~G.\,~  Stress amplification effect of lung.  \textrm{Medical
+  Hypotheses}. \textrm{2010};74:37--38.
+
+\bibitem{Clayton2019TRL}
+Clayton~J,\ Freed~A.\, \textrm{A continuum mechanical model of the lung}.
+  DEVCOM Army Research Laboratory;  2019 November. Report No.:  ARL-TR-8859.
 
 \bibitem{ClaytonFreed19}
-Clayton~JD,\ Freed~AD.\, \textrm{Viscoelastic-damage theory based on a {QR}
-  decomposition of deformation gradient}.  Aberdeen, MD:  Army Research
-  Laboratory;  2019 October. Report No.:  ARL-TR-8840.
+Clayton~J,\ Freed~A.\, \textrm{Viscoelastic-damage theory based on a {QR}
+  decomposition of deformation gradient}.  DEVCOM Army Research Laboratory;
+  2019 October. Report No.:  ARL-TR-8840.
 
 \bibitem{ClaytonFreed20}
 Clayton~JD,\ Freed~AD.\,~  A constitutive model for lung mechanics and injury
   applicable to static, dynamic, and shock loading.  \textrm{Mechanics of Soft
   Materials}. \textrm{2020};2:3.
 
+\bibitem{ClaytonFreed20a}
+Clayton~J,\ Freed~A.\,~  A constitutive framework for finite viscoelasticity
+  and damage based on the {G}ram-{S}chmidt decomposition.  \textrm{Acta
+  Mechanica}. \textrm{2020};231:3319--3362.
+
+\bibitem{Clayton2019AIP}
+Clayton~J,\ Banton~R,\ Freed~A.\,  A nonlinear thermoelastic-viscoelastic
+  continuum model of lung mechanics for shock wave analysis.   In:
+  \textrm{{Shock compression of condensed matter}}; Vol.~2272. Lane~J,\
+  editor.~ AIP Conference Proceedings;  2020. p. 040001.
+
+\bibitem{claytonBM20}
+Clayton~J.\,~  Modeling lung tissue dynamics and injury under pressure and
+  impact loading.  \textrm{Biomechanics and Modeling in Mechanobiology}.
+  \textrm{2020};19:2603--2626.
+
+\bibitem{clayton2020TRL}
+Clayton~J,\ Banton~R,\ Goertz~A.\, \textrm{A continuum model of the human lung:
+  implementation and parameterization}.  DEVCOM Army Research Laboratory;  2021
+  January. Report No.:  ARL-TR-9138.
+
 \bibitem{Josey10}
-Josey~T.\, Investigation of Blast Load Characteristics on Lung Injury [master's
-  thesis]. [Waterloo, Ontario, Canada]: University of Waterloo; 2010.
+Josey~T.\, Investigation of blast load characteristics on lung i njury
+  [master's thesis]. University of Waterloo; 2010.
 
 \bibitem{Stuhmiller08}
 Stuhmiller~JH.\,\,  Blast injury: Translating research into operational
-  medicine.~ Borden Institute, Walter Reed Army Medical Center, U.S.\ Army
-  Medical Department Center \& School: TMM Publications;  2008. (Borden
-  Institute Monograph Series).
+  medicine.~ TMM Publications;  2008. (Borden Institute Monograph Series).
 
 \bibitem{Stitzeletal05}
 Stitzel~JD,\ Gayzik~FS,\ Hoth~JJ,\ Mercier~J,\ Gage~HD,\ Morton~KA,\ Duma~SM,\
@@ -34,9 +85,8 @@ Stuhmiller~JH,\ Chuong~CJ,\ Phillips~YY,\ Dodd~KT.\,~  Computer modeling of
 
 \bibitem{VlessisTrunkey97}
 Vlessis~AA,\ Trunkey~DD.\,  Non-penetrating injury of the thorax.   In:
-  \textrm{Scientific Foundations of Trauma}; Cooper~GJ,\ Dudley~HAF,\ Gann~DS,\
-  Little~RA,\ Maynard~RL,\ editors.~ Oxford, UK:  Butterworth Heinemann;  1997;
-  p. 127--143.
+  \textrm{Scientific Foundations of Trauma}. Cooper~GJ,\ Dudley~HAF,\ Gann~DS,\
+  Little~RA,\ Maynard~RL,\ editors.~ Butterworth Heinemann;  1997. p. 127--143.
 
 \bibitem{Fungetal78}
 Fung~YC,\ Patitucci~P,\ Tong~P.\,~  Stress and strain in the lung.
@@ -70,8 +120,8 @@ Yuen~K,\ Cronin~DS,\ Deng~YC.\,  Lung response and injury in side impact
 \bibitem{Freedetal12}
 Freed~AD,\ Einstein~DR,\ Carson~JP,\ Jacob~RE.\, \textrm{Viscoelastic model for
   lung parenchyma for multi-scale modeling of respiratory system, {P}hase {II}:
-  {D}odecahedral micro-model}.  Richland, WA:  Pacific Northwest National
-  Laboratory;  2012 March. Report No.:  PNNL-21287.
+  {D}odecahedral micro-model}.  Pacific Northwest National Laboratory;  2012
+  March. Report No.:  PNNL-21287.
 
 \bibitem{Tsokosetal03}
 Tsokos~M,\ Paulsen~F,\ Petri~S,\ Madea~B,\ P\"uschel~K,\ T\"urk~EE.\,~
@@ -84,14 +134,21 @@ Butler~JP,\ Miki~H,\ Squarcia~S,\ Rogers~RA,\ Lehr~JL.\,~  Effect of
   macroscopic deformation on lung microstructure.  \textrm{Journal of Applied
   Physiology}. \textrm{1996};81:1792--1799.
 
+\bibitem{nemat1999}
+Nemat-Nasser~S,\ Hori~M.\,\,  Micromechanics: overall properties of
+  heterogeneous materials.~ Elsevier;  1999.
+
+\bibitem{clayton2011}
+Clayton~J.\,\,  Nonlinear mechanics of crystals.~ Springer;  2011.
+
 \bibitem{RoanWaters11}
 Roan~E,\ Waters~CM.\,~  What do we know about mechanical strain in lung
   alveoli?.  \textrm{American Journal of Physiology--Lung Cellular and
   Molecular Physiology}. \textrm{2011};301:L625--L635.
 
 \bibitem{Fung90}
-Fung~YC.\,\,  Biomechanics: Motion, flow, stress, and growth.~ New York:
-  Springer-Verlag;  1990.
+Fung~YC.\,\,  Biomechanics: Motion, flow, stress, and growth.~ Springer-Verlag;
+   1990.
 
 \bibitem{Fung75}
 Fung~YC.\,~  Stress, deformation, and atelectasis of the lung.
@@ -103,8 +160,8 @@ Fung~YC.\,~  A model of the lung structure and its validation.  \textrm{Journal
 
 \bibitem{HoppinHildebrandt77}
 {Hoppin, Jr.}~FG,\ Hildebrandt~J.\,  Mechanical properties of the lung.   In:
-  \textrm{Bioengineering Aspects of the Lung}; Vol.~3; West~JB,\ editor.~ New
-  York:  Marcel Dekker;  1977; p. 83--162.
+  \textrm{Bioengineering Aspects of the Lung}; Vol.~3. West~JB,\ editor.~
+  Marcel Dekker;  1977. p. 83--162.
 
 \bibitem{FrankusLee74}
 Frankus~A,\ Lee~GC.\,~  A theory for distortion studies of lung parenchyma
@@ -174,8 +231,8 @@ Mead~J.\,~  Respiration: pulmonary mechanics.  \textrm{Annual Review of
   Physiology}. \textrm{1973};35:169--192.
 
 \bibitem{West07}
-West~JB.\,\,  Respiratory physiology: The essentials. eighth ed.~ Philadelphia:
-  Lippincott Williams \& Wilkins;  2007.
+West~JB.\,\,  Respiratory physiology: The essentials. eighth ed.~ Lippincott
+  Williams \& Wilkins;  2007.
 
 \bibitem{DennySchroter06}
 Denny~E,\ Schroter~RC.\,~  A model of non-uniform lung parenchyma distortion.
@@ -183,8 +240,7 @@ Denny~E,\ Schroter~RC.\,~  A model of non-uniform lung parenchyma distortion.
 
 \bibitem{McLellan80}
 Mc{L}ellan~AG.\,\,  The classical thermodynamics of deformable materials.~
-  Cambridge: Cambridge University Press;  1980. (Cambridge Monographs in
-  Physics).
+  Cambridge University Press;  1980. (Cambridge Monographs in Physics).
 
 \bibitem{FreedZamani18}
 Freed~AD,\ Zamani~S.\,~  On the use of convected coordinate systems in the
@@ -195,7 +251,7 @@ Freed~AD,\ Zamani~S.\,~  On the use of convected coordinate systems in the
 \bibitem{Pauletal20}
 Paul~S,\ Freed~AD,\ Clayton~JD.\,~  Coordinate indexing: On the use of
   {E}ulerian and {L}agrangian {L}aplace stretches.  \textrm{Applications in
-  Engineering Science}. \textrm{2020};;  In press.
+  Engineering Science}. \textrm{2021};5:100029.
 
 \bibitem{Sobinetal88}
 Sobin~SS,\ Fung~YC,\ Tremer~HM.\,~  Collagen and elastin fibers in human
@@ -213,16 +269,15 @@ Freed~AD,\ le~{G}raverend~JB,\ Rajagopal~KR.\,~  A decomposition of {L}aplace
   \textrm{2019};230:3423--3429.
 
 \bibitem{Wachspress75}
-Wachspress~EL.\,\,  A rational finite element basis.~ New York: Academic Press;
-   1975.
+Wachspress~EL.\,\,  A rational finite element basis.~ Academic Press;  1975.
 
 \bibitem{Wachspress16}
 Wachspress~E.\,\,  Rational bases and generalized barycentrics: Applications to
-  finite elements and graphics.~ Cham: Springer;  2016.
+  finite elements and graphics.~ Springer;  2016.
 
 \bibitem{Hughes87}
 Hughes~TJR.\,\,  The finite element method: Linear static and dynamic finite
-  element analysis.~ Englewood Cliffs, N.J.: Prentice-Hall;  1987.
+  element analysis.~ Prentice-Hall;  1987.
 
 \bibitem{SukumarMalsch06}
 Sukumar~N,\ Malsch~EA.\,~  Recent advances in the construction of polygonal
@@ -234,8 +289,8 @@ Dasgupta~G.\,~  Interpolants within convex polygons: {W}achspress’ shape
   functions.  \textrm{Journal of Aerospace Engineering}. \textrm{2003};16:1--8.
 
 \bibitem{Clayton15}
-Clayton~JD.\,\,  Differential geometry and kinematics of continua.~ New York:
-  World Scientific;  2015.
+Clayton~JD.\,\,  Differential geometry and kinematics of continua.~ World
+  Scientific;  2014.
 
 \bibitem{Srinivasa12}
 R.~A~Srinivasa.\,~  On the use of the upper triangle (or \textbf{QR})
@@ -245,7 +300,7 @@ R.~A~Srinivasa.\,~  On the use of the upper triangle (or \textbf{QR})
 
 \bibitem{FreedSrinivasa15}
 Freed~AD,\ R.~A~Srinivasa.\,~  Logarithmic strain and its material derivative
-  for a \textbf{QR} decomposition of the deformation gradient.  \textrm{ACTA
+  for a \textbf{QR} decomposition of the deformation gradient.  \textrm{Acta
   Mechanica}. \textrm{2015};226:2645--2670.
 
 \bibitem{Freedetal17}
@@ -279,6 +334,16 @@ Leon~SJ,\ Bj{\"o}rck~{\AA},\ Gander~W.\,~  Gram-{S}chmidt orthogonalization:
   100 years and more.  \textrm{Numerical Linear Algebra with Applications}.
   \textrm{2013};20:492--532.
 
+\bibitem{claytonMRC20}
+Clayton~J.\,~  Compatibility conditions from a {Gram-Schmidt} decomposition of
+  deformation gradient in two dimensions.  \textrm{Mechanics Research
+  Communications}. \textrm{2020};104:103498.
+
+\bibitem{PaulFreed20}
+Paul~S,\ Freed~AD.\,~  A simple and practical representation of compatibility
+  condition derived using a \textbf{QR} decomposition of the deformation
+  gradient.  \textrm{Acta Mechanica}. \textrm{2020};231:3289-3304.
+
 \bibitem{Freed17}
 Freed~AD.\,~  A note on stress/strain conjugate pairs: explicit and implicit
   theories of thermoelasticity for anisotropic materials.
@@ -297,8 +362,8 @@ Perlman~CE,\ Bhattacharya~J.\,~  Alveolar expansion imaged by optical
   \textrm{2007};103:1037--1044.
 
 \bibitem{Treloar75}
-Treloar~LRG.\,\,  The physics of rubber elasticity. third ed.~ Oxford:
-  Clarendon Press;  1975.
+Treloar~LRG.\,\,  The physics of rubber elasticity. third ed.~ Clarendon Press;
+   1975.
 
 \bibitem{Sukietal05}
 Suki~B,\ Ito~S,\ Stamenovi{\'c}~D,\ Lutchen~KR,\ Ingenito~EP.\,~  Biomechanics
@@ -347,7 +412,7 @@ Hajji~MA,\ Wilson~TA,\ {Lai-F}ook~SJ.\,~  Improved measurements of shear
 Hildebrandt~J.\,~  Comparison of mathematical models for cat lung and
   viscoelastic balloon derived by {L}aplace transform methods from
   pressure-volume data.  \textrm{Bulletin of Mathematical Biophysics}.
-  \textrm{1969};31(651-667).
+  \textrm{1969};31:651-667.
 
 \bibitem{AmesStaff53}
 {Ames Research Staff}.\, \textrm{Equations, tables, and charts for compressible
@@ -388,11 +453,11 @@ Aaron~BB,\ Gosline~JM.\,~  Elastin as a random-network elastomer: a mechanical
 \bibitem{Urry89}
 Urry~DW.\,  Physicochemical properties of elastin and constituent peptides.
   In:  \textrm{Physicochemical properties of elastin and constituent peptides};
-  Vol.~1; Boca Raton:  CRC Press;  1989. Chapter~10, p. 141--173.
+  Vol.~1; CRC Press;  1989. Chapter~10, p. 141--173.
 
 \bibitem{FreedRajagopal16}
 Freed~AD,\ Rajagopal~KR.\,~  A promising approach for modeling biological
-  fibers.  \textrm{ACTA Mechanica}. \textrm{2016};227:1609--1619;  Errata:
+  fibers.  \textrm{Acta Mechanica}. \textrm{2016};227:1609--1619;  Errata:
   \textbf{229} (2018), pg.\ 3573.
 
 \bibitem{Fels64}
@@ -436,8 +501,8 @@ Svensson~RB,\ Hassenkam~T,\ Grant~CA,\ Magnusson~SP.\,~  Tensile properties of
   \textrm{Biophysical Journal}. \textrm{2010};99:4020--4027.
 
 \bibitem{Davison08}
-Davison~L.\,\,  Fundamentals of shock wave propagation in solids.~ Berlin:
-  Springer;  2008. (Shock Wave and High Pressure Phenomena).
+Davison~L.\,\,  Fundamentals of shock wave propagation in solids.~ Springer;
+  2008. (Shock Wave and High Pressure Phenomena).
 
 \bibitem{Birzleetal19}
 Birzle~AM,\ Hobrack~SMK,\ Martin~C,\ Uhlig~S,\ Wall~WA.\,~
@@ -462,8 +527,8 @@ Newmark~NM.\,~  A method of computation for structural dynamics.
 
 \bibitem{Onate09}
 O{\~n}ate~E.\,\,  Structural analysis with the finite element method. linear
-  statics.~ Barcelona: Springer;  2009. (Lecture Notes on Numerical Methods in
-  Engineering and Sciences;  vol. 1. Basis and Solids).
+  statics.~ Springer;  2009. (Lecture Notes on Numerical Methods in Engineering
+  and Sciences;  vol. 1. Basis and Solids).
 
 \bibitem{Mousavietal10}
 Mousavi~SE,\ Xiao~H,\ Sukumar~N.\,~  Generalized {G}aussian quadrature rules on
@@ -477,9 +542,19 @@ Chakraborty~S,\ Natarajan~S,\ Singh~S,\ Mahapatra~DR,\ Bordas~SPA.\,~  Optimal
   Computational Methods in Engineering Science and Mechanics}.
   \textrm{2018};19:283--304.
 
+\bibitem{saraf2007}
+Saraf~H,\ Ramesh~K,\ Lennon~A,\ Merkle~A,\ Roberts~J.\,~  Mechanical properties
+  of soft human tissues under dynamic loading.  \textrm{Journal of
+  Biomechanics}. \textrm{2007};40:1960--1967.
+
+\bibitem{sanborn2013}
+Sanborn~B,\ Nie~X,\ Chen~W,\ Weerasooriya~T.\,~  High strain rate pure shear
+  and axial compressive response of porcine lung tissue.  \textrm{Journal of
+  Applied Mechanics}. \textrm{2013};80:011029.
+
 \bibitem{Belytschkoetal00}
 Belytschko~T,\ Liu~WK,\ Moran~B.\,\,  Nonlinear {F}inite {E}lements for
-  {C}ontinua and {S}tructures.~ Chichester: Wiley;  2000.
+  {C}ontinua and {S}tructures.~ Wiley;  2000.
 
 \bibitem{Archer65}
 Archer~JS.\,~  Consistent matrix formulations for structural analysis using
@@ -488,11 +563,16 @@ Archer~JS.\,~  Consistent matrix formulations for structural analysis using
 
 \bibitem{Reddy93}
 Reddy~JN.\,\,  An introduction to the finite element method. 2nd ed.~
-  McGraw-Hill, Inc.: McGraw.Hill series in mechanical engineering;  1993.
+  McGraw-Hill Series in Mechanical Engineering;  1993.
 
 \bibitem{ClaytonChung18}
 Clayton~JD,\ Chung~PW.\,\,  Applied finite element methods: Lecture notes on
-  principles and procedures.~ Coppell, TX: CreateSpace;  2018.
+  principles and procedures.~ CreateSpace;  2018.
+
+\bibitem{Freed14}
+Freed~AD.\,\,  Soft solids: A primer to the theoretical mechanics of
+  materials.~ Birkh{\"a}user;  2014. (Modeling and Simulation in Science,
+  Engineering and Technology).
 
 \bibitem{Yangetal10}
 Y.~Xiu-ying~GJ~Z. Jin-ch.\,~  Stiffness matrix derivation of space beam element
@@ -527,6 +607,6 @@ Robbins~AB,\ Freed~AD,\ Moreno~MR.\,~  Characterizing the non-linear mechanical
 
 \bibitem{FreedRajagopal16a}
 Freed~AD,\ Rajagopal~KR.\,~  A viscoelastic model for describing the response
-  of biological fibers.  \textrm{ACTA Mechanica}. \textrm{2016};227:3367--3380.
+  of biological fibers.  \textrm{Acta Mechanica}. \textrm{2016};227:3367--3380.
 
 \end{thebibliography}

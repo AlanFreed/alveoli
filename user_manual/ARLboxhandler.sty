@@ -1,0 +1,162 @@
+\ProvidesPackage{ARLboxhandler}
+[2019/02/05 v3.20]
+
+% V2.20 -Upgrade to ARL report style of 7/1/14
+% V2.21 -Remove dot at end of figure caption and table header.
+% V2.22 -Default caption justification to raggedright
+% V3.00 -New ARL Report format 2015/1/1
+% V3.01 -adjsted abovecaptionskipterm and belowcaptionskipterm
+% V3.02 -accomodates caption change when \Single@Figure or \Single@Table
+%        are set to {T}.
+% V3.03 -made \footnotesize the standard \TableFontSize for \bxtable
+% V3.04 -fixed stray \strut which prevented argument parsing of caption
+%        for optional argument.
+% V3.05 -Redefined \WrapperTextStyle, adjusted wrapper to current Classified format
+% V3.10 -Removed reliance on stringstrings \isnextbyte.  Used arlticle native
+%        routine \IS@nextbyte
+% V3.20 -Updated \Wrapper style to \footnotesize\bfseries\sffamily
+%        and returned to upper-left/lower-right marking style
+
+\usepackage{boxhandler}[2012/10/18]
+\RequirePackage{etoolbox}
+
+\def\CaptionFontSize{\bfseries\footnotesize}
+\let\TableFontSize\footnotesize
+\renewcommand\WrapperTextStyle{\footnotesize\bfseries\sffamily}
+\setcounter{abovecaptionskipterm}{12}
+\setcounter{belowcaptionskipterm}{11}
+\constrainCaptionWidth[\textwidth]{\textwidth}
+
+% THE FOLLOWING CODE IMPLEMENTS OPTIONAL [LOF CAPTION] WITHIN CAPTION ARGUMENT
+
+\renewcommand\bx@caption[1]{%
+\expandafter\optcaption\expandafter[\romannumeral-`x#1]\relax%
+}
+
+\def\optcaption[#1]#2\relax{%
+\ifstrempty{#2}{\caption{\strut#1}}{\caption[\strut\@gobble#1]{%
+  \strut\striptrailingbracket#2}}}
+
+\def\striptrailingbracket#1]{#1}
+
+% THE FOLLOWING ROUTINES CHANGE CAPTION FORMAT TO REMOVE DOT AFTER
+% "FIGURE 1", etc.
+%
+% IT ALSO CHANGES THE CAPTION FORMAT IF ONLY A SINGLE FIGURE OR TABLE IS 
+% EMPLOYED.  IT ASSUMES \Single@Table AND \Single@Figure ARE DEFINED
+% AND SET TO EITHER {T} OR {F} (DONE IN arlticle.cls)
+
+\long\def\new@makecaption#1#2{%
+  \def\multi@caption{#1}%
+  \IS@nextbyte[q]{T}{#1}% LOOK FOR "T" OF "Table"
+  \if T\theresult\if T\Single@Table\relax\def\multi@caption{Table}\fi\fi%
+  \IS@nextbyte[q]{F}{#1}% LOOK FOR "F" OF "Figure"
+  \if T\theresult\if T\Single@Figure\relax\def\multi@caption{Figure}\fi\fi%
+  \vskip\abovecaptionskip%
+  \sbox\@tempboxa{\CaptionFontSize\multi@caption\rule{\captionGap}{0in}#2}%
+  \ifdim \wd\@tempboxa >\hsize%
+    \long@caption{\multi@caption}{#2}%
+  \else
+    \short@caption{\multi@caption}{#2}%
+  \fi
+  \vskip\belowcaptionskip%
+}
+
+\long\def\offset@caption#1#2{%
+  \setlength\@captionIDwidth{\widthofpbox{\CaptionFontSize{#1}}}%
+  \addtolength\@captionIDwidth\captionGap%
+  \setlength\@captionWidth\CaptionBoxWidth%
+  \addtolength\@captionWidth{-\@captionIDwidth}%
+  \CaptionFontSize{#1}\hfill\parbox[t]{\@captionWidth}%
+                  {\CaptionJustification\CaptionFontSize{#2}}%
+}
+
+\long\def\nooffset@caption#1#2{%
+  \CaptionJustification\CaptionFontSize #1\rule{\captionGap}{0in}#2%
+}
+
+\long\def\shortleft@caption#1#2{%
+  \raggedright\CaptionFontSize #1\rule{\captionGap}{0in}#2%
+}
+
+\long\def\shortcenter@caption#1#2{%
+  \centering\CaptionFontSize #1\rule{\captionGap}{0in}#2%
+}
+
+\long\def\shortright@caption#1#2{%
+  \raggedleft\CaptionFontSize #1\rule{\captionGap}{0in}#2%
+}
+
+\renewcommand\ReciteFigure[6][ht]{%
+  \begin{figure}[#1]%
+    \begin{\LRFigurePlacement}%
+      \let\@makecaption\new@makecaption%
+      \setlength\abovecaptionskip{\arabic{abovecaptionskipterm}\p@}%
+      \setlength\belowcaptionskip{\arabic{belowcaptionskipterm}\p@}%
+        \set@DataBoxWidth{#3}%
+        \setlength\CaptionBoxWidth{#4}%
+        \set@BoxOffsets%
+        \if T#6%
+          \rule{\@DataBoxOffset}{0in}%
+          \makebox[\@DataBoxWidth][l]{#5}%
+          \rule{\@DataBoxOffset}{0in}\\%
+        \fi
+        \rule{\@DataBoxOffset}{0in}%
+        \usebox{#3}%
+        \rule{\@DataBoxOffset}{0in}%
+        \\[3pt]%
+        \if T#6%
+          \rule{\@DataBoxOffset}{0in}%
+          \makebox[\@DataBoxWidth][r]{#5}%
+          \rule{\@DataBoxOffset}{0in}\\%
+        \fi
+        \rule{\@CaptionBoxOffset}{0em}%
+        \parbox[b]{\CaptionBoxWidth}{\bx@caption{#2}}%
+        \rule{\@CaptionBoxOffset}{0em}%
+      \let\@makecaption\old@makecaption%
+      \setlength\abovecaptionskip\oldabovecaptionskip%
+      \setlength\belowcaptionskip\oldbelowcaptionskip%
+    \end{\LRFigurePlacement}%
+  \end{figure}%
+}
+
+\renewcommand\ReciteTable[6][ht]{%
+  \begin{table}[#1]%
+    \begin{\LRTablePlacement}%
+      \let\@makecaption\new@makecaption%
+      \setlength\abovecaptionskip{\arabic{abovecaptionskipterm}\p@}%
+      \setlength\belowcaptionskip{\arabic{belowcaptionskipterm}\p@}%
+        \set@DataBoxWidth{#3}%
+        \setlength\CaptionBoxWidth{#4}%
+        \set@BoxOffsets%
+        \rule{\@CaptionBoxOffset}{0em}%
+        \parbox[b]{\CaptionBoxWidth}{\bx@caption{#2}}%
+        \rule{\@CaptionBoxOffset}{0em}%
+        \par%
+        \if T#6%
+          \rule{\@DataBoxOffset}{0in}%
+          \makebox[\@DataBoxWidth][l]{#5}%
+        \rule{\@DataBoxOffset}{0in}%
+        \smallskip\par
+        \fi
+        \rule{\@DataBoxOffset}{0in}%
+        \usebox{#3}%
+        \rule{\@DataBoxOffset}{0in}\\[5pt]%
+        \if T#6%
+          \rule{\@DataBoxOffset}{0in}%
+          \makebox[\@DataBoxWidth][r]{#5}%
+        \rule{\@DataBoxOffset}{0in}%
+        \fi
+      \let\@makecaption\old@makecaption%
+      \setlength\abovecaptionskip \oldabovecaptionskip%
+      \setlength\belowcaptionskip \oldbelowcaptionskip%
+    \end{\LRTablePlacement}%
+  \end{table}%
+}
+
+% OFFSET-LONG, CENTERED-SHORT CAPTIONS
+
+\captionStyle{n}{c}
+\limitCaptionWidth[5.5in]
+\endinput
+

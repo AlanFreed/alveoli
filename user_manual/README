@@ -1,0 +1,38 @@
+The two ZIP files in this directory contain the latest files that
+support the arlticle document class and associated stencil.  They
+comprise the principle files that are necessary to execute the format.
+The subdirectories themselves contain these and other supporting files
+which may be of additional use to you.
+
+Once you have access to a LaTeX 2e installation (MikTeX works great for
+Windows PCs), you will find that the stencil compiles, as is.  Now all
+you have to do is replace the stencil placeholders with your
+information, and start typing in your report.
+
+The file arlticle.pdf, contained in the arlticle directory, is the
+documentation on the features available for use with the ARL document
+class (arlticle.cls).
+
+The files for ARL/DAC LaTeX documentclass and stencil may be placed in
+your local installation following the pattern descrived in the file
+FileLocations.txt, or you may use the batch file autoload.bat (executed
+from the target location, where you want the files to go).
+
+For a comparison of how to set up a DAC profile, in preference to an ARL
+profile, see the file ARLversusDAC.tex (only 2 small changes in your
+input are needed).  A comparison of these profiles may be seen in the
+two output files, ARL(C3).pdf and DAC(C3).pdf.
+
+This directory is brought to you by Steven Segletes of the Impact Physics
+Branch in WMRD's Protection Division.  My number is 410-278-6010, and I 
+would be happy to provide whatever support I can to make your LaTeX 
+venture a successful one.
+
+*****IMPORTANT*****
+
+The arlticle.cls ARL class file is considered limited distribution to
+ARL employees and on-site ARL contractors.  If you desire to collaborate
+on a LaTeX document, with an outside collaborator, which will eventually
+become an ARL tech report, please contact me at
+steven.b.segletes.civ@mail.mil, so that I can provide you with an
+approved way to accomplish this.

@@ -1,36 +1,108 @@
-\documentclass{arlticle}
-% \usepackage{ARLboxhandler}
-\usepackage{notoccite}
-\usepackage{totpages}
-\def\MandatoryDL{ARL-02-28-19(Unlimited).dls}
-\def\LocalMandatoryDL{blank.dls}
-\def\UserDL{ARLstencil.dls}
-\addtolength{\cftfignumwidth}{0.0ex}
-\addtolength{\cfttabnumwidth}{0.0ex}
-\sectspace
+\documentclass{arlticle}% ARL REPORT CLASS FILE, 12pt IS ARL STYLE
+\usepackage{ARLboxhandler}% OPTIONAL PACKAGE FOR ARL FIG/TBL CAPTIONS & PLACEMENT
+\usepackage{notoccite}% PREVENTS CITES IN CAPTIONS FROM MISNUMBERING YOUR REFERENCES
+% THANKS TO ADAM SOKOLOW FOR THESE CONVENIENT USES OF totpages AND changepage PACKAGES
+\usepackage{totpages}% FOR ITEM 18 OF THE SF298
+%%%%%
+% CHECK WITH ORGANIZATION TO SEE IF WHAT FOLLOWS IS LATEST MANDATORY DISTRIBUTION LIST
+\def\DEVCOMorg{DEVCOM Army Research Laboratory}
+  \def\MandatoryDL{ARL-09-02-20.dls}% MANDATORY DISTRIBUTION LIST FILE
+  \def\LocalMandatoryDL{blank.dls}% USED FOR DIRECTORATE LEVEL MANDATORY DISTRIBUTIONS
+  \def\UserDL{ARLstencil.dls}%      USER DISTRIBUTION LIST FILE
+  \addtolength{\cftfignumwidth}{0.0ex}%  EXTEND WIDTH OF LOF LABEL IF USING
+%                                        APPENDIX FIGURES .OR. > 99 FIGURES
+  \addtolength{\cfttabnumwidth}{0.0ex}%  EXTEND WIDTH OF LOT LABEL IF USING
+%                                        APPENDIX TABLES .OR. > 99 TABLES
+%% IN ADDITION TO THE DEFAULT (COMPUTER-MODERN) MATH FONT, THE FOLLOWING
+%% ALTERNATIVES ARE APPROVED FOR USE IN ARL REPORTS (OPTIONALLY CHOOSE ONE LINE)
+%  \usepackage{eulervm,eufrak}
+%  \usepackage{newtxmath}
+%  \usepackage{mathptmx}
+%% YOU CAN USE A NEWER VERSION OF THE TIMES DOCUMENT TEXT; HOWEVER, IF YOU DO,
+%% YOU MUST, IN ADDITION, REINSTATE THE PROPER SANS-SERIF FONT FAMILY:
+%  \usepackage{txfonts}
+%  \renewcommand\sfdefault{\opensansfamily}%
+%%
+%\nosectspace% THE DEFAULT, TURNS OFF \spaceout{} FOR SPREADING OUT SECTION HEAD TEXT
+\sectspace% MAY NEED TO TURN THIS SETTING OFF IF YOU HAVE STUFF OTHER THAN 
+%           TEXT, \color, OR \label IN YOUR SECTION TITLES
+
+%%%%% USER'S OWN MACRO DEFINITIONS ARE INSERTED IN THE PREAMBLE %%%%%%%%%%%%%%%
 \usepackage{fgcite}\FgTypeJ % PACKAGE FOR REFERENCING FIGURES
-%\usepackage{tbcite}\TbTypeB % PACKAGE FOR REFERENCING TABLES
+\usepackage{tbcite}\TbTypeB % PACKAGE FOR REFERENCING TABLES
 \usepackage{eqcite}\EqTypeH % PACKAGE FOR REFERENCING EQUATIONS
-\usepackage{enumitem, stackengine, verbatim}
+\usepackage{enumitem, lipsum, stackengine, verbatim}
 \usepackage{amssymb, amsmath}
 
 % IF CITATIONS ARE NEEDED IN APPENDICES, SET THE FOLLOWING TWO LINES
 \usepackage{bibentry}
 \nobibliography*
 
+\def\Ccj{C_\mathrm{CJ}}
+\def\Pcj{P_\mathrm{CJ}}
+\def\rhohe{\rho_\mathrm{HE}}
+\def\rhoheo{\rho_\mathrm{HE0}}
+\def\armo{\mathcal{I}}
+\def\Vbar{\bar{V}}
+\def\Vbarhe{\Vbar_\mathrm{H}}
+\def\Aex{A_\mathrm{bl}}
+\def\dAex{dA_\mathrm{bl}}
+\def\Mhe{M_\mathrm{H}}
+\def\DelCG{\Delta_\mathrm{CG}}
+\def\Rdbare{\dot{R}_\mathrm{b}}
+\newcommand\vfilescript[1]{\vspace{-1em}\scriptsize\verbatiminput{#1}
+                     \normalsize\vspace{-1em}}
+\def\smallsf#1{\textsf{\small#1}}
+\let\svlipsum\lipsum
+\renewcommand\lipsum[1][]{\color{black!40}\svlipsum[#1]\color{black}}
+\makeatletter
+\newcommand\singlelipsum[1]{\color{black!40}%
+  \begingroup\let\lips@par\relax\csname lipsum@\@roman{#1}\endcsname
+\endgroup \color{black}}
+\makeatother
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em\TeX}}
-
+% IN LIEU OF \usepackage{url}, THE FOLLOWING DEFINITION HANDLES URL LINEBREAKING BETTER.
+% THIS WILL LINEBREAK IN URL'S AT SLASHES AND DOTS.
 \newcommand{\url}[1]{%
-    \begingroup
-    \begingroup\lccode`~=`/\lowercase{\endgroup\def~}{/\penalty0 }%
-    \begingroup\lccode`~=`.\lowercase{\endgroup\def~}{.\penalty0 }%
-    \catcode`/=\active\catcode`.=\active
-    \scantokens{#1\noexpand}%
-    \endgroup
+  \begingroup
+  \begingroup\lccode`~=`/\lowercase{\endgroup\def~}{/\penalty0 }%
+  \begingroup\lccode`~=`.\lowercase{\endgroup\def~}{.\penalty0 }%
+  \catcode`/=\active\catcode`.=\active
+  \scantokens{#1\noexpand}%
+  \endgroup
 }
+% OR THIS WILL LINEBREAK AT ANY CHARACTER AS AN ALTERNATIVE TO PRIOR DEFINITION
 \renewcommand\url[1]{\urlhelp#1\relax\relax\relax}
 \def\urlhelp#1#2\relax{%
-    {#1}\penalty0\ifx\relax#2\else\urlhelp#2\relax\fi}
+  {#1}\penalty0\ifx\relax#2\else\urlhelp#2\relax\fi}
+% OR HERE IS A HYPERREF VERSION OF THE ABOVE (MUST USE \usepackage{hyperref})
+%\renewcommand\url[1]{\href{#1}{\urlhelp#1\relax\relax\relax}}
+%\def\urlhelp#1#2\relax{%
+%  {#1}\penalty0\ifx\relax#2\else\urlhelp#2\relax\fi}
+%
+%       BEGIN EQUATION MODE
+\newcommand{\beq}{\begin{equation}}
+%       BEGIN EQUATION MODE WITH LABEL
+\newcommand{\beql}[1]{\begin{equation}\label{#1}}
+%       END EQUATION MODE
+\newcommand{\eeq}{\end{equation}}
+%       END EQUATION MODE WITH A PERIOD
+\newcommand{\eeqp}{\;\;\;.\end{equation}}
+%       END EQUATION MODE WITH A COMMA
+\newcommand{\eeqc}{\;\;\;,\end{equation}}
+%       COMPOSE ARGUMENT AS IT'S OWN IN-LINE EQUATION
+\newcommand{\ds}[1]{\displaystyle{#1}}
+%       ITALICIZED i.e.,
+\newcommand{\ie}{{i.e.},~}
+%       ITALICIZED e.g.,
+\newcommand{\eg}{{e.g.},~}
+% Clayton customizations
+%\renewcommand{\vec}[1]{\textbf{\textit{#1}}}
+%\renewcommand{\eqref}[1]{\text{eq.}~{\eqref}}
+%\renewcommand{\d}{\text{d}}
+\renewcommand{\S}{Section~}
+%\renewcommand{\eqref}[1]{Eq.~\ref{#1}}
+\graphicspath{{./figures/}}
 
 %% The amssymb package provides various useful mathematical symbols
 \usepackage{amssymb}
@@ -41,48 +113,20 @@
 \newtheorem*{conj}{Conjecture}
 % \newtheorem*{algorithm}[theorem]{Algorithm}
 
-\renewcommand{\S}{Section~}
-
-\renewcommand{\thepart}{\arabic{part}}
-\renewcommand{\thesection}{\thepart.\arabic{section}}
-\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
-\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+%\renewcommand{\thepart}{\arabic{part}}
+%\renewcommand{\thesection}{\thepart.\arabic{section}}
+%\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+%\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
 
 \renewcommand{\theequation}{\arabic{equation}}
 \renewcommand{\thefigure}{\arabic{figure}}
 \renewcommand{\thetable}{\arabic{table}}
 
-%% The lineno packages adds line numbers. Start line numbering with
-%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
-%% for the whole article with \linenumbers after \end{frontmatter}.
 \usepackage{lineno}
-
-%% natbib.sty is loaded by default. However, natbib options can be
-%% provided with \biboptions{...} command. Following options are
-%% valid:
-
-%%   round  -  round parentheses are used (default)
-%%   square -  square brackets are used   [option]
-%%   curly  -  curly braces are used      {option}
-%%   angle  -  angle brackets are used    <option>
-%%   semicolon  -  multiple citations separated by semi-colon
-%%   colon  - same as semicolon, an earlier confusion
-%%   comma  -  separated by comma
-%%   numbers-  selects numerical citations
-%%   super  -  numerical citations as superscripts
-%%   sort   -  sorts multiple citations according to order in ref. list
-%%   sort&compress   -  like sort, but also compresses numerical citations
-%%   compress - compresses without sorting
-%%
-%% \biboptions{comma,round}
-
-% \biboptions{sort&compress}
-
 
 %%%%% BEGIN USER DEFINED MACROS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usepackage{subfigure}
-
 \usepackage{amsmath}
 \usepackage{stmaryrd}    % source of \mapsfrom
 \usepackage{mathtools}
@@ -93,19 +137,6 @@
 \newcommand{\mathbfsf}[1]{\boldsymbol{\mathsf{#1}}}
 %
 \usepackage[ruled,vlined]{algorithm2e}
-% \usepackage{algorithm}
-% \usepackage{algpseudocode}
-%
-% \newdefinition{defn}{Definition}
-% \newdefinition{rmk}{Remark}
-% \newdefinition{conjecture}{Conjecture}
-% \newtheorem{thm}{Theorem}
-% \newtheorem{cor}{Corollary}
-% \newproof{pf}{Proof}
-%
-%  Macros for creating nice text and script fractions.
-%  Do not break these long lines into multiple lines.
-%  Spaces CANNOT be present; it can introduce unwanted `rubber' spacing.
 %
 \newcommand{\textfrac}[2]
    {\mbox{\leavevmode \kern.05em\raise.5ex\hbox{\ensuremath{\scriptstyle{#1}}}\kern-.1em\hspace{.05em}/\hspace{0em}\kern-.05em\lower.25ex\hbox{\ensuremath{\scriptstyle{#2}}}\kern.05em
@@ -167,26 +198,6 @@
 \usepackage{scrextend}
 \addtokomafont{labelinglabel}{\sffamily}
 %
-% Use the following lines to output the various parts as separate pdf files.
-%
-% \includeonly{partIntroduction}
-% \includeonly{partDodecahedron}
-% \includeonly{partKinematics}
-% \includeonly{partConstitutiveTheory}
-% \includeonly{partNumericalIntegration}
-% \includeonly{partVariationalFormulation}
-% \includeonly{appImplicitElasticity}
-% \includeonly{appOverview}
-% \includeonly{appDodecahedron}
-% \includeonly{appVertices}
-% \includeonly{appChords}
-% \includeonly{appPentagons}
-% \includeonly{appModels}
-% \includeonly{appSolvers}
-
-%%
-% \usepackage{wasysym}
-
 % Extracted out the font for a pentagon directly to avoid 'too many math alphabets'
 \def\wasyfamily{\fontencoding{U}\fontfamily{wasy}\selectfont}
 \def\pentagon{\mbox{\wasyfamily\char68}}
@@ -196,6 +207,19 @@
 
 % font for writing large matrices
 \usepackage{amsmath,scalefnt}
+%
+% Macro used for creating nomenclatures, etc.
+%
+\newcommand{\namelistlabel}[1]{\mbox{#1}\hfil}
+\newenvironment{namelist}[1]
+{\begin{list}{}%
+        {\let\makelabel\namelistlabel%
+            \settowidth{\labelwidth}{#1}%
+            \setlength{\leftmargin}{1.1\labelwidth}%
+            \setlength{\itemsep}{-7pt}%
+        }%
+    }{\end{list}%
+}
 
 %%%%% END OF USER DEFINED MACROS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -204,62 +228,49 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % If desired, can use the following command to put a
 % "DRAFT" stamp on each page; Can also use optional argument for
-% page classification markings, as in 
-\PageStamp[DRAFT: UNCLASSIFIED]
-% You can turn off with \StopPageStamp.  See arlticle documentation for 
+% page classification markings, as in \PageStamp[UNCLASSIFIED].  Can
+% turn off with \StopPageStamp.  See arlticle documentation for 
 % further details.
 %
 % Default PageStamp is "DRAFT".  Can be used for class. markings
 \def\PageStampColor{red}% THIS LINE IS ONLY NEEDED TO CHANGE THE PAGE STAMP COLOR
-%\PageStamp[NOT SECRET]%  <---COMMENT THIS LINE IF NO PAGE STAMP DESIRED
+%\PageStamp[ARL \LaTeX{} STENCIL (\today)]%  <---COMMENT THIS LINE IF NO PAGE STAMP DESIRED
 %\UseClassMarkings
 %\downgrading
 %  {Steven B Segletes}
-% {Mechanical Engineer}
+%  {Mechanical Engineer}
 %  {Multiple Sources}
-% {20YYMMDD}
-% {20YYMMDD}
-% \newcommand\ClassLabelStyle{\normalsize\bfseries}
+%  {20YYMMDD}
+%  {20YYMMDD}
+%\newcommand\ClassLabelStyle{\normalsize\bfseries}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % COVER & TITLE PAGE INPUTS SPECIFIED IN THE FOLLOWING COMMANDS:
-%\arlzipcode{}%	               	For use, if other than 21005-5066, i.e., 5069
-%\arlrptno  {ARL-TR-8859}%		Uncomment and use, when needed
-%\pubdate   {November 2019}%	Uncomment and use, when needed
-\arltitle  {A Dodecahedral Model for Alveoli: \\ Interim Report}
-\allauthors{Alan D.\ Freed, Shahla Zamani, Sandipan Paul and John D. Clayton}
-\authorsA  {A.D.\ Freed, S.\ Zamani, S.\ Pual and J.D. Clayton}
+%\arlzipcode	{}%		For use, if other than 21005-5066, i.e., 5069
+\arlrptno  {ARL-TR-XXXX}%		Uncomment and use, when needed
+\pubdate   {January 2021}%	Uncomment and use, when needed
+\arltitle  {A Dodecahedral Model for Alveoli. \\ Part I. Theory and Numerical Methods}
+\allauthors{by Alan D Freed, Shahla Zamani, Sandipan Paul, \\ and John D Clayton}
+\authorsA  {Alan D Freed and John D Clayton}
 \organizationA	{Weapons and Materials Research Directorate, 
-    \myCCDCorg}% <-----THIS MACRO CAN BE REPLACED WITH APPROPRIATE WORDS, IF NEEDED
+  \DEVCOMorg}% <-----THIS MACRO CAN BE REPLACED WITH APPROPRIATE WORDS, IF NEEDED
 %% NOTE THAT FOR CONTRACT REPORTS, THE ADDRESS IS INCLUDED IN \organizationA, etc.,
 %% AS IN THE FOLLOWING LINE
-% \organizationA{SURVICE Engineering Company\\4695 Millenium Dr.\\Belcamp, MD 21017-7722}
-\distcodes[FCDD-RLW-PC]{A}{}{}    % DISTRIBUTION STATEMENT A
-%\distcodes[FCDD-RLW-PC]{C}{3}{X} %	FOR DISTRIBUTION C3, WITH EXPORT CONTROL
-%\distcodes[FCDD-RLW-PC]{F}{}{}   %	FOR DISTRIBUTION F, WITHOUT EXPORT CONTROL
-%\UnderContract{W91CRB-09-D-0027} % FOR CONTRACT REPORTS, ARL-CR SERIES
-%\FOUOPageStamp                   % FOR FOUO DOCUMENTS
-%\FOIAexemptions{3}               % FOR ADDING FOIA EXEMPTIONS
-%\AddDistributionReason{4}        % FOR ADDING REASON TO DISTRIBUTION STATEMENT 
-%\AddDistributionReason{X}        % FOR ADDING EXPORT CONTROLLED TO DISTRIBUTION STATEMENT
-
-%%%%%% HERE IS AN ALTERNATE WAY TO DO FIGS, IF YOU USE boxhandler TO DEFINE FIGS.
-%% ISSUE \holdFigures AND THEN DEFINE ALL THE FIGURES IN THE PREAMBLE
-%% TO USE THE FIGURES IN THE DOCUMENT, ISSUE \nextFigure[ht]
-%\holdFigures
-%\WrapperOn[UNCLASSIFIED]% DEFAULT MARKING LABEL FOR PORTION-MARKED FIGURES/TABLES
-
-% \bxfigure{ Configurations, deformations, and coordinate frames 
-% \cite{clayton2019,clayton2019acta} \label{fig1}}
-% $ { \includegraphics[scale=0.5]{fig1} } 
+\authorsB {Shahla Zamani and Sandipan Paul }
+\organizationB{Texas A\&M University}%\\4695 Millenium Dr.\\Belcamp, MD 21017-7722}
+\distcodes[FCDD-RLW-PC]{A}{}{}  % DISTRIBUTION STATEMENT A
+%\distcodes[FCDD-RLW-PC]{C}{3}{X}%	FOR DISTRIBUTION C3, WITH EXPORT CONTROL
+%\distcodes[FCDD-RLW-PC]{F}{}{}  % FOR DISTRIBUTION F, WITHOUT EXPORT CONTROL
+%\UnderContract{W91CRB-09-D-0027}% FOR CONTRACT REPORTS, ARL-CR SERIES
+%\FOUOPageStamp                  % FOR FOUO DOCUMENTS
+%\FOIAexemptions{3}              % FOR ADDING FOIA EXEMPTIONS
+%\AddDistributionReason{4}       % FOR ADDING REASON TO DISTRIBUTION STATEMENT 
+%\AddDistributionReason{X}       % FOR ADDING EXPORT CONTROLLED TO DISTRIBUTION STATEMENT
 
 
-
-
+%%%%%%%%
 \begin {document}
-
-
-\ARLcover{A}%   AN A (OR A BLANK) MANDATORY ARGUMENT GIVES AN ARL DOC PROFILE
+\ARLcover[]{A}% AN A (OR A BLANK) MANDATORY ARGUMENT GIVES AN ARL DOC PROFILE
 %               AN S AS THE MANDATORY ARGUMENT GIVES SLAD DOCUMENT PROFILE
 %               A ZERO AS THE OPTIONAL ARGUMENT WILL USE A LO-INK COVER: \ARLcover[0]{}
 %               OTHERWISE OPTIONAL TEXT PRINTED ON COVER
@@ -268,101 +279,116 @@
 
 %% OPTION I: CREATE YOUR OWN SF298 in LaTeX:
 \begin{createSFtwoNINEeight}
-    % SFitemONE AUTOMATICALLY FILLED IN (\pubdate)
-    % SFitemTWO AUTOMATICALLY FILLED IN (Final)
-    \SFitemTHREE{June 2019--June 2020}
-    % SFitemFOUR AUTO-FILLED WITH \arltitle DATA
-    % SFitemFIVEa AUTO-FILLED WITH \UnderContract DATA
-    % \SFitemFIVEb{[Grant Number here]}
-    % \SFitemFIVEc{[PE Number here]}
-    \SFitemFIVEd{}
-    % \SFitemFIVEe{[Task No. here]}
-    % \SFitemFIVEf{[WU Number here]}
-    % SFitemSIX{} AUTO-FILLED WITH \allauthors DATA
-    \SFitemSEVEN{\myCCDCorgLONG\\ATTN: % <- USES DEFAULT, OR TYPE IT DIRECTLY
-        \OfficeSymbol\\% <-USES \distcodes OPTIONAL ARG, OR TYPE IT DIRECTLY
-        Aberdeen Proving Ground, MD 21005-5066}
-    % SFitemEIGHT AUTOMATICALLY FILLED IN (\arlrptno)
-    % \SFitemNINE{[Sponsor here]}
-    % \SFitemTEN{[Sponsor Acronym]}
-    % \SFitemELEVEN{[Sponsor Rpt. No.]}
-    % SFitemTWELVE AUTOMATICALLY FILLED IN WITH \distcodes DATA
-    \SFitemTHIRTEEN{primary authors' emails: 
-        $<$afreed$@$tamu.edu$>$ and
-        $<$john.d.clayton1.civ$@$mail.mil$>$.}
-    \SFitemFOURTEEN{% PLACE ABSTRACT HERE
-        Write abstract here.
-    }
-    \SFitemFIFTEEN{% PLACE KEYWORDS HERE, COMMA SEPARATED
-    }
-    % \SFitemSIXTEENa{}% defaults to UNCLASSIFIED
-    % \SFitemSIXTEENb    defaults to UNCLASSIFIED
-    % \SFitemSIXTEENc    defaults to UNCLASSIFIED
-    % SFitemSEVENTEEN AUTOMATICALLY FILLED IN WITH "SAR" or "UU"
-    % ITEM 18 CAN BE AUTOMATICALLY OBTAINED WITH \ref{TotPages}, USING THE totpages PACKAGE
-    \SFitemEIGHTEEN{\ref{TotPages}}% = FRONT MATTER PP.+REPORT PP.+2 (OR +4 IF CLASSIFIED)
-    \SFitemNINETEENa{% COMMUNICATIN AUTHOR
-    }
-    \SFitemNINETEENb{% PHONE NUMBER OF COMMUNICATING AUTHOR
-    }
+% SFitemONE AUTOMATICALLY FILLED IN (\pubdate)
+% SFitemTWO AUTOMATICALLY FILLED IN (Final)
+  \SFitemTHREE{June 2019--January 2021}
+% SFitemFOUR AUTO-FILLED WITH \arltitle DATA
+% SFitemFIVEa AUTO-FILLED WITH \UnderContract DATA
+% \SFitemFIVEb{[Grant Number here]}
+% \SFitemFIVEc{[PE Number here]}
+  \SFitemFIVEd{}
+% \SFitemFIVEe{[Task No. here]}
+% \SFitemFIVEf{[WU Number here]}
+%\SFitemSIX{} %AUTO-FILLED WITH \allauthors DATA: JDC need to edit arlticle.cls for this one.
+  \SFitemSEVEN{\DEVCOMorg\\ATTN: % <- USES DEFAULT, OR TYPE IT DIRECTLY
+               \OfficeSymbol \\% <-USES \distcodes OPTIONAL ARG, OR TYPE IT DIRECTLY
+               Aberdeen Proving Ground, MD 21005-5066}
+% SFitemEIGHT AUTOMATICALLY FILLED IN (\arlrptno)
+% \SFitemNINE{[Sponsor here]}
+% \SFitemTEN{[Sponsor Acronym]}
+% \SFitemELEVEN{[Sponsor Rpt. No.]}
+% SFitemTWELVE AUTOMATICALLY FILLED IN WITH \distcodes DATA
+  \SFitemTHIRTEEN{primary authors' email:
+$<$afreed$@$tamu.edu$>$ and $<$john.d.clayton1.civ$@$mail.mil$>$. 
+ORCID accounts: 0000-0002-3492-0628 (ADF), 0000-0002-9477-9136 (SZ), 0000-0003-1445-6896 (SP), and 0000-0003-4107-6282 (JDC).}
+  \SFitemFOURTEEN{
+The dodecahedron is introduced as a model for alveoli.  Its geometric properties are derived in detail with regard to its three geometric features: 1D septal chords, 2D septal membranes, and the 3D alveolar sac.  The kinematics are derived for us to model a deforming dodecahedron, including the shape functions needed for interpolating each geometry.  Constitutive models are derived that are suitable for describing the thermo\-mechanical response for the structural constituents of an alveolus: its septal chords, its permeable membranes, and its volume.  Numerical methods are advanced for solving first- and second-order ordinary differential equations (ODEs) and spatial integrations along a bar, across a pentagon, and throughout a tetrahedron using Gaussian quadrature schemes designed for each geometry.  A variational formulation is used to create our structural modeling of an alveolus.  Constitutive equations suitable for modeling biological tissues are derived from thermo\-dynamics using the theory of implicit elasticity, presented in an appendix. 
+  }
+  \SFitemFIFTEEN{nonlinear elasticity, structural mechanics, soft tissue mechanics, biomechanics, lung, dodecahedron, finite elements}
+% \SFitemSIXTEENa defaults to UNCLASSIFIED
+% \SFitemSIXTEENb defaults to UNCLASSIFIED
+% \SFitemSIXTEENc defaults to UNCLASSIFIED
+% SFitemSEVENTEEN AUTOMATICALLY FILLED IN WITH "SAR" or "UU"
+% ITEM 18 CAN BE AUTOMATICALLY OBTAINED WITH \ref{TotPages}, USING THE totpages PACKAGE
+  \SFitemEIGHTEEN{\ref{TotPages}}%	= FRONT MATTER PP.+REPORT PP.+2 (OR +4 IF CLASSIFIED)
+  \SFitemNINETEENa{John D Clayton}
+  \SFitemNINETEENb{410-278-6146}
 \end{createSFtwoNINEeight}
 %
+%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+%% FOR CLASSIFIED REPORTS, THE MEMO PAGE TO BE USED IN THE CASE OF
+%% MULTIPLE SOURCES
+%\begin{MultipleSourcesMemo}{5}
+%\item (U) Standard Classification Guide \#1 for Subject, dated YYYYMMDD.
+%  Declassify on YYYYMMDD (U//FOUO).
+%
+%\item (U) Standard Classification Guide \#2 for Subject, dated YYYYMMDD.
+%  Declassify on YYYYMMDD (U//FOUO).
+%
+%\item (U) Standard Classification Guide \#3 for Subject, dated YYYYMMDD.
+%  Declassify on YYYYMMDD (U//FOUO).
+%
+%\item (U) Standard Classification Guide \#4 for Subject, dated YYYYMMDD.
+%  Declassify on YYYYMMDD (U//FOUO).
+%\end{MultipleSourcesMemo}
+%\signMultipleSourcesMemo{Steven B Segletes}{Impact Physics Branch}
+%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 \tableofcontents%		p. iii
 \listoffigures%			Comment out, if not needed
 \pagebreak
 \listoftables*%			Comment out, if not needed
 \acknowledgments
-Prof.\ Alan D. Freed acknowledges support of a Joint Faculty Appointment with the U.S.\ Army Combat Capabilities Development Command (CCDC) Army Research Laboratory.  Shahla Zamani and Sandipan Pual acknowledge support from a grant funded by the CCDC Army Research Laboratory.  John D.\ Clayton acknowledges support of the CCDC Army Research Laboratory.  Prof.\ J.N.\ Reddy was the Program Manager for that part of this project performed at Texas A\&M University by Shahla Zamani and Sandipan Paul.  Dr.\ M.\ Kleinberger was the Cooperative Agreement Manager (CAM) and Dr.\ John D.\ Clayton was the Technical Manager (TM) for this contract at the CCDC Army Research Laboratory.
+Prof Alan D Freed acknowledges support of a Joint Faculty Appointment with the US Army Combat Capabilities Development (DEVCOM) Army Research Laboratory (ARL).  Shahla Zamani and Sandipan Paul acknowledge support from a Cooperative Agreement funded by the DEVCOM Army Research Laboratory.  John D Clayton acknowledges support of ARL. Prof JN Reddy is the Program Manager for research performed at Texas A\&M University by Shahla Zamani and Sandipan Paul.  Dr Michael Kleinberger is the Cooperative Agreement Manager, and Dr John Clayton is the Technical Manager for this contract.  Insightful conversations from a clinical perspective regarding behind armor blunt trauma (BABT) with Dr David G Mohler MD at Stanford Health Care are gratefully acknowledged.
 
 \clearpage
 
 \pagenumbering{arabic}%		p. 1
-
-%% main text
 
 %\setcounter{part}{0}
 \include{partIntroduction}
 
 %\setcounter{equation}{0}
 %\setcounter{figure}{0}
-\setcounter{section}{0}
+%\setcounter{section}{0}
 %\setcounter{table}{0}
 \include{partDodecahedron}
 
 %\setcounter{equation}{0}
 %\setcounter{figure}{0}
-\setcounter{section}{0}
+%\setcounter{section}{0}
 %\setcounter{table}{0}
 \include{partKinematics}
 
 %\setcounter{equation}{0}
 %\setcounter{figure}{0}
-\setcounter{section}{0}
+%\setcounter{section}{0}
 %\setcounter{table}{0}
 \include{partConstitutiveTheory}
 
 %\setcounter{equation}{0}
 %\setcounter{figure}{0}
-\setcounter{section}{0}
+%\setcounter{section}{0}
 %\setcounter{table}{0}
 \include{partNumericalIntegration}
 
 %\setcounter{equation}{0}
 %\setcounter{figure}{0}
-\setcounter{section}{0}
+%\setcounter{section}{0}
 %\setcounter{table}{0}
 \include{partVariationalFormulation}
 
-\clearpage
+%\setcounter{equation}{0}
+%\setcounter{figure}{0}
+%\setcounter{section}{0}
+%\setcounter{table}{0}
+\include{partConclusions}
 
-\small
-\setcounter{part}{7}
-\setcounter{section}{0}
-\bibliographystyle{ARL}
-\bibliography{dodec}
-% \arlbibliography[f]{dodec}% Provide name of .bib file as argument
-\normalsize
+%\setcounter{part}{6}
+%\setcounter{section}{6}
+%\renewcommand{\thesection}{\arabic{section}}
+
+\arlbibliography[f]{dodec}%	Provide name of .bib file as argument
 
 % Appendices
 
@@ -372,30 +398,19 @@ Prof.\ Alan D. Freed acknowledges support of a Joint Faculty Appointment with th
 \setcounter{table}{0}
 \include{appImplicitElasticity}
 
-% \include{appOverview}
+\clearpage
+\include{partAcronyms}
 
-% \include{appDodecahedron}
+\clearpage
+\clearpage
 
-% \include{appVertices}
-
-% \include{appChords}
-
-% \include{appPentagons}
-
-% \include{appModels}
-
-% \include{appSolvers}
-
-% Include (uncomment) the following distribution lists when they become available.
-
-%\distlistsetup%         Set up page parameters for DL printing.
-%\begin{distributionlist}
-%    \input{\MandatoryDL}%     Mandatory DL, Ensure you have current version
-%    \input{\UserDL}%          Your DL for this report.
-%\end{distributionlist}
-%\distlistcleanup%	Cleans up and restores pre-DL settings
+\distlistsetup%             Set up page parameters for DL printing.
+\begin{distributionlist}
+  \input{\MandatoryDL}%     Mandatory DL, Ensure you have current version
+  \input{\UserDL}%          Your DL for this report.
+\end{distributionlist}
+\distlistcleanup%           Cleans up and restores pre-DL settings
 
 %%%%%%% USE BACK COVER IF DOCUMENT HAS OVERALL MARKING
 %\backcover%   Report's back cover, showing overall marking, as appropriate
-
 \end {document}

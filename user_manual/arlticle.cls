@@ -38,7 +38,7 @@
 %% Steven may be reached at 278-6010 for questions comments and updates.
 %%
 \ProvidesClass{arlticle}
-[2019/08/22 v2.56
+[2020/11/30 v2.70
        ARL Technical Report Document Class File]
 \NeedsTeXFormat{LaTeX2e}
 
@@ -138,6 +138,7 @@
 
 %% Do \cite command on line.
 %%
+\renewcommand\CiteMoveChars{.,?!}
 \def\@citexp[#1]#2{\@citep{\@cite@n{#2}}{#1}}
 
 \def\@citep#1#2{\leavevmode \cite@adjust
@@ -927,7 +928,7 @@
 \def\@arltitle{Report Title:\\ Multiple Lines if Needed}
 \def\@allauthors{Author1, Author2, ..., and Authorx}
 \def\@authorsA{Author(s) from lead organization (e.g., directorate)}
-\def\@organizationA{\DirectoratePlaceholder\myCCDCorg}
+\def\@organizationA{\DirectoratePlaceholder\DEVCOMorg}
 \def\@authorsB{}
 \def\@organizationB{}
 \def\@authorsC{}
@@ -952,7 +953,7 @@
   of contents or reconstruction of the document.}
 \def\@destructionnotice{\@destructionnoticeA}
 \newcommand\@otherrequests[1]{Other requests for this document shall be
-                             referred to Director, \myCCDCorgLONG,
+                             referred to Director, \DEVCOMorg,
                              ATTN: #1, \@ARLaddress.}
 \def\@otherreasons{}
 \def\@primaryreason{}
@@ -1103,10 +1104,10 @@
   \fi
   \if F#2
     \distribution{Further dissemination only as directed by Director,
-                  \myCCDCorgLONG, ATTN: #1, \@ARLaddress{}
+                  \DEVCOMorg, ATTN: #1, \@ARLaddress{}
                   (\@pubdate) or higher DOD authority.}
     \abbrevdistribution{Further dissemination only as directed by Director,
-                  \myCCDCorgLONG.}
+                  \DEVCOMorg.}
   \fi
   \if X#2
     \distribution{**Distcode ``X'' IS NO LONGER A VALID CHOICE**}
@@ -1176,10 +1177,13 @@
 }
 
 %% ARL DEFAULT VALUES
-\gdef\myCCDCorgSHORT{CCDC ARL}
-\gdef\myCCDCorg{CCDC Army Research Laboratory}
-\gdef\myCCDCorgLONG{US Army Combat Capabilities Development Command
+\gdef\DEVCOMorgSHORT{DEVCOM ARL}
+\gdef\DEVCOMorg{DEVCOM Army Research Laboratory}
+\gdef\DEVCOMorgLONG{US Army Combat Capabilities Development Command
                     Army Research Laboratory}
+\gdef\myCCDCorgSHORT{\DEVCOMorgSHORT}
+\gdef\myCCDCorg{\DEVCOMorg}
+\gdef\myCCDCorgLONG{\DEVCOMorgLONG}
 \gdef\DirectoratePlaceholder{Directorate Name, }
 \gdef\LogoImage{"CCDC_ARL only_RGB_Positive"}
 \gdef\CoverImage{"Green Cover-2019-02-ARL"}
@@ -1187,9 +1191,9 @@
 \newcommand\ARLcover[2][]%
 {%
   \ifx S#2\relax% SLAD VALUES
-     \gdef\myCCDCorgSHORT{CCDC DAC}
-     \gdef\myCCDCorg{CCDC Data \& Analysis Center}
-     \gdef\myCCDCorgLONG{US Army Combat Capabilities Development Command
+     \gdef\DEVCOMorgSHORT{DEVCOM DAC}
+     \gdef\DEVCOMorg{DEVCOM Data \& Analysis Center}
+     \gdef\DEVCOMorgLONG{US Army Combat Capabilities Development Command
                          Data \& Analysis Center}
      \gdef\DirectoratePlaceholder{}
      \gdef\LogoImage{"CCDC_DAC only_RGB_Positive"}
@@ -1261,8 +1265,8 @@
 \def\PageTopMargin{1in}
 \def\PageLeftMargin{1in}
 \newcommand\atxy[3]{%
- \AddThispageHook{\smash{\hspace*{\dimexpr-\PageLeftMargin-\hoffset+#1\relax}%
-  \raisebox{\dimexpr\PageTopMargin+\voffset-#2\relax}{#3}}\\}}
+ \AddThispageHook{\hbox{\smash{\hspace*{\dimexpr-\PageLeftMargin-\hoffset+#1\relax}%
+  \raisebox{\dimexpr\PageTopMargin+\voffset-#2\relax}{#3}}}}}
 
 \newcommand\@disclaimerpage{%
   \clearpage%
@@ -1290,7 +1294,7 @@
   \end{normalsize}%
 }
 
-\newcommand\Author@Attribution{by}
+\newcommand\Author@Attribution{}
 
 \def\@CRflag{F}
 \let\Contract@Number\relax
@@ -1402,7 +1406,8 @@
       \@SFitemTWO{\@reporttype}
       \@SFitemFOUR{\@arltitle}
       \@SFitemFIVEa{\Contract@Number}
-      \@SFitemSIX{\@allauthors}
+    %  \@SFitemSIX{\@allauthors}  
+     \@SFitemSIX{Alan D Freed, Shahla Zamani, Sandipan Paul, and John D Clayton}
       \@SFitemEIGHT{\@arlrptno}
       \@SFitemTWELVE{\raggedright\@distribution}
       \def\SFitemSIXTEENaVALUE{Unclassified}
@@ -1554,8 +1559,7 @@
 
 \newcommand\ruledsection[1]{\sectionprelude\origsection{%
   \spaceouthelpAcopy#1 \relax\relax%
-  }\sectionpostlude
-  \par%
+  }\sectionpostlude\par\nobreak\@afterheading\ignorespaces%
 }
 
 \newcommand\ruledsubsection[1]{\bgroup\onehalfspacing%
@@ -1576,8 +1580,7 @@
 \newcommand\ruledheading[1]{\bgroup\onehalfspacing%
   \sectionprelude\origsection*{%
   \spaceouthelpAcopy#1 \relax\relax%
-  }\sectionpostlude
-  \par\egroup%
+  }\sectionpostlude\par\egroup\nobreak\@afterheading\ignorespaces%
 }
 
 \newcommand\ruledsubheading[1]{\subsectionprelude%
@@ -1630,7 +1633,7 @@
 \newlength\defaultsectionspace
 \setlength\defaultsectionspace{5\baselineskip}
 \newlength\defaultsubsectionspace
-\setlength\defaultsubsectionspace{1\baselineskip}
+\setlength\defaultsubsectionspace{2\baselineskip}
 \def\sectionSpaceMultiplier{1}
 \newcommand\allocateSpaceOnce[1]{\def\sectionSpaceMultiplier{#1}}
 
@@ -2052,7 +2055,9 @@
 \def\listoffigures{}
 \def\listoftables{}
 \def\sec@star{\section*}
-\AtBeginDocument{%
+\providecommand\IfFormatAtLeastTF{\@ifl@t@r\fmtversion}
+
+\IfFormatAtLeastTF{2020-10-01}{\DeclareHookRule{begindocument}{./tocloft-patch}{after}{tocloft}\AtBeginDocument[./tocloft-patch]}{\AtBeginDocument}{%
   \let\svnumberline\numberline%
   %%MODIFY TABLE OF CONTENTS TO INCLUDE RULE LINES
   %% ALSO, SCREEN OUT FREE FOOTNOTES IN SECTION TITLES FROM TOC

@@ -1,0 +1,35 @@
+\documentclass{arlticle}
+\def\MandatoryDL{ARL-02-28-19(Limited).dls}% MANDATORY DISTRIBUTION LIST FILE
+\def\UserDL{ARLstencil.dls}
+\pubdate{March 2019}
+%%%%% CHANGE THE FIRST BRACED ARGUMENT TO A, C, OR F, TO BRING ABOUT DISTRIBUTION-FORMAT
+%     USE PROPER OFFICE SYMBOL IN BRACKETED ARGUMENT
+\distcodes[FCDD-RLW-PC]{C}{3}{}% ARL
+%\distcodes[FCDD-DAS-LA]{C}{3}{}% DAC (SLAD)
+%%%%%
+\pagenumbering{roman}
+\begin{document}
+%%%%% CHANGE BRACED ARGUMENT FROM A TO S TO GO FROM ARL TO SLAD FORMAT
+\ARLcover[]{A}% ARL
+%\ARLcover[]{S}% DAC (SLAD)
+%%%%%
+\arltitlepage
+\begin{createSFtwoNINEeight}
+  \SFitemSEVEN{\myCCDCorgLONG\\%      <- USE THIS, OR TYPE ORG DIRECTLY
+               ATTN: \OfficeSymbol\\% <- USE THIS, OR TYPE OFC-SYM DIRECTLY
+               Aberdeen Proving Ground, MD 21005-5066}
+\end{createSFtwoNINEeight}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+\clearpage
+\section{Typical Page}
+See if abbreviated footer is OK.
+\clearpage
+\distlistsetup%         Set up page parameters for DL printing.
+\begin{distributionlist}
+  \input{\MandatoryDL}%     Mandatory DL, Ensure you have current version
+  \input{\UserDL}%          Your DL for this report.
+\end{distributionlist}
+\distlistcleanup%	Cleans up and restores pre-DL settings
+\end{document}

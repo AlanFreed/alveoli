@@ -1,0 +1,211 @@
+\ProvidesPackage {tbcite} [2014/07/02 v1.10]
+%
+% by Steven B. Segletes, for the public domain.
+%
+% 'tbcite prints out the preferred reference format for table
+% citations, e.g., table 1 as opposed to Tbl. (1), tbl.(1), etc. 
+%
+% Advantages of using 'tbcite:
+% 1) Ability to quickly change from `table x' to `Tbl(x)' through
+%    whole document, with a single line change (\TbTypeC).  This is 
+%    useful when converting from tech report to manuscript formats;
+% 2) Saves typing:
+%    With the 'tbcite package, type        `\tbcite{tbl:mytbl}'
+%    vs. the traditional LaTeX approach of `table~\ref{tbl:mytbl}'  .
+%
+%
+% A number of format types are predefined:
+%
+% TbTypeA : table x  , tables x and y	(old ARL report standard)
+% TbTypeB : Table x  , Tables x and y	(ARL report standard)
+% TbTypeC : tbl. (x) , tbls. (x) and (y)
+% TbTypeD : Tbl. (x) , Tbls. (x) and (y)
+% TbTypeE : tbl.(x)  , tbls.(x) and (y)
+% TbTypeF : Tbl.(x)  , Tbls.(x) and (y)
+% TbTypeG : table (x), tables (x) and (y)
+% TbTypeH : Table (x), Tables (x) and (y)
+% TbTypeI : Tbl. x    , Tbls. x and y
+% TbTypeJ : Table x and Tbl. y, Tbls. x and y
+%
+% Other format types are easily added.
+%
+% Usage:
+%
+% % In Preamble:
+% \usepackage{tbcite}
+% \TbTypex	% where `x' is A, B, etc.  defaults to TbTypeA
+%
+% % In Document:
+% \Tbcite{ref} ...
+% ... \tblcite{ref} ...
+% \Tbcites{ref1}, \andtbcite{ref2}, and \andtbcite{ref3} ...
+% ... \tbcites{ref1}, \andtbcite{ref2}, and \andtbcite{ref3}...
+%
+% where ref is the LaTeX reference, for example, tbl:mytbl  .
+%
+% A literal option [l] is available to use the the argument as the
+% actual table number, rather than as an table reference:
+%
+% \tbcite[l]{13}
+%
+% This literal option can be used with the following calls:
+% \Tbcite, \tbcite, \Tbcites, \tbcites and \andtbcite.
+%
+%
+% TbTypeA : table x  , tables x and y
+\newcommand\TbTypeA{
+  \def\Tbname{Table}
+  \def\tbname{table}
+  \def\Tbsname{Tables}
+  \def\tbsname{tables}
+  \def\tbsep{~}
+  \def\tbssep{~}
+  \def\tbldelimit{}
+  \def\tbrdelimit{}
+}
+% TbTypeB : Table x  , Tables x and y
+\newcommand\TbTypeB{
+  \def\Tbname{Table}
+  \def\tbname{Table}
+  \def\Tbsname{Tables}
+  \def\tbsname{Tables}
+  \def\tbsep{~}
+  \def\tbssep{~}
+  \def\tbldelimit{}
+  \def\tbrdelimit{}
+}
+% TbTypeC : tbl. (x)  , tbls. (x) and (y)
+\newcommand\TbTypeC{
+  \def\Tbname{Tbl.}
+  \def\tbname{tbl.}
+  \def\Tbsname{Tbls.}
+  \def\tbsname{tbls.}
+  \def\tbsep{~}
+  \def\tbssep{~}
+  \def\tbldelimit{(}
+  \def\tbrdelimit{)}
+}
+% TbTypeD : Tbl. (x)  , Tbls. (x) and (y)
+\newcommand\TbTypeD{
+  \def\Tbname{Tbl.}
+  \def\tbname{Tbl.}
+  \def\Tbsname{Tbls.}
+  \def\tbsname{Tbls.}
+  \def\tbsep{~}
+  \def\tbssep{~}
+  \def\tbldelimit{(}
+  \def\tbrdelimit{)}
+}
+% TbTypeE : tbl.(x)  , tbls.(x) and (y)
+\newcommand\TbTypeE{
+  \def\Tbname{Tbl.}
+  \def\tbname{tbl.}
+  \def\Tbsname{Tbls.}
+  \def\tbsname{tbls.}
+  \def\tbsep{}
+  \def\tbssep{}
+  \def\tbldelimit{(}
+  \def\tbrdelimit{)}
+}
+% TbTypeF : Tbl.(x)  , Tbls.(x) and (y)
+\newcommand\TbTypeF{
+  \def\Tbname{Tbl.}
+  \def\tbname{Tbl.}
+  \def\Tbsname{Tbls.}
+  \def\tbsname{Tbls.}
+  \def\tbsep{}
+  \def\tbssep{}
+  \def\tbldelimit{(}
+  \def\tbrdelimit{)}
+}
+% TbTypeG : table (x)  , tables (x) and (y)
+\newcommand\TbTypeG{
+  \def\Tbname{Table}
+  \def\tbname{table}
+  \def\Tbsname{Table}
+  \def\tbsname{table}
+  \def\tbsep{~}
+  \def\tbssep{~}
+  \def\tbldelimit{(}
+  \def\tbrdelimit{)}
+}
+% TbTypeH : Table (x)  , Tables (x) and (y)
+\newcommand\TbTypeH{
+  \def\Tbname{Table}
+  \def\tbname{Table}
+  \def\Tbsname{Tables}
+  \def\tbsname{Tables}
+  \def\tbsep{~}
+  \def\tbssep{~}
+  \def\tbldelimit{(}
+  \def\tbrdelimit{)}
+}
+% TbTypeI : Tbl. x  , Tbls. x and y
+\newcommand\TbTypeI{%
+  \def\Tbname{Tbl.}%
+  \def\tbname{Tbl.}%
+  \def\Tbsname{Tbls.}%
+  \def\tbsname{Tbls.}%
+  \def\tbsep{~}%
+  \def\tbssep{~}%
+  \def\tbldelimit{}%
+  \def\tbrdelimit{}%
+}
+% TbTypeJ : Figure x and Tbl. y  , Tbls. x and y
+\newcommand\TbTypeJ{%
+  \def\Tbname{Figure}%
+  \def\tbname{Tbl.}%
+  \def\Tbsname{Tables}%
+  \def\tbsname{Tbls.}%
+  \def\tbsep{~}%
+  \def\tbssep{~}%
+  \def\tbldelimit{}%
+  \def\tbrdelimit{}%
+}
+
+% Default to Table Type B format
+\TbTypeB
+%
+% For citing a table at the beginning of a sentence
+\newcommand\Tbcite[2][]{%
+  \if l#1%
+    \Tbname\tbsep\tbldelimit#2\tbrdelimit
+  \else%
+    \Tbname\tbsep\tbldelimit\ref{#2}\tbrdelimit
+  \fi
+}
+% For citing a table in the middle of a sentence
+\newcommand\tbcite[2][]{%
+  \if l#1%
+    \tbname\tbsep\tbldelimit#2\tbrdelimit
+  \else%
+    \tbname\tbsep\tbldelimit\ref{#2}\tbrdelimit
+  \fi
+}
+% For citing the first of multiple tables at the beginning of a sentence
+\newcommand\Tbcites[2][]{%
+  \if l#1%
+    \Tbsname\tbssep\tbldelimit#2\tbrdelimit
+  \else%
+    \Tbsname\tbssep\tbldelimit\ref{#2}\tbrdelimit
+  \fi
+}
+% For citing the first of multiple tables in the middle of a sentence
+\newcommand\tbcites[2][]{%
+  \if l#1%
+    \tbsname\tbssep\tbldelimit#2\tbrdelimit
+  \else%
+    \tbsname\tbssep\tbldelimit\ref{#2}\tbrdelimit
+  \fi
+}
+% For citing a table number without the leading word table, tbl, etc.
+% Used in conjuction with \Tbcites and \tbcites
+\newcommand\andtbcite[2][]{%
+  \if l#1%
+    \tbldelimit#2\tbrdelimit
+  \else%
+    \tbldelimit\ref{#2}\tbrdelimit
+  \fi
+}
+%
+\endinput

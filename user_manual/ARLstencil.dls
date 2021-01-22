@@ -1,29 +1,53 @@
+\pdlitem{2}
+MEDCOM USAMRMC\\
+\dlt R GUPTA \\
+\dlt C STEELE 
+\pdlitem{1}
+DEVCOM DAC\\
+FCDD DAD OP\\
+\dlt N EBERIUS
+\pdlitem{1}
+US ARMY ITC-CANADA\\
+\dlt D SCOOLER
+\pdlitem{1}
+CARLETON UNIV\\
+\dlt O PETEL 
+\pdlitem{1}
+TEXAS A\&M UNIV\\
+ \dlt A FREED
+ \pdlitem{1}
+UNIV COLORADO\\
+\dlt R REGUEIRO \\
+\newpage
 \apg
-\pdlitem{33}
-DIR CCDC ARL\\
+\pdlitem{36}
+DEVCOM ARL\\
 FCDD RLC HC\\
 \dlt J KNAP\\
 FCDD RLW \\
+\dlt S KARNA\\
 \dlt A RAWLETT\\
 \dlt S SCHOENFELD\\
 \dlt J ZABINSKI\\
 FCDD RLW MB\\
 \dlt G GAZONAS\\
 FCDD RLW PB\\
+\dlt R BANTON\\
 \dlt T BAUMER\\
 \dlt A BROWN\\
 \dlt A DAGRO\\
 \dlt A EIDESMORE\\
+\dlt A GOERTZ\\
 \dlt C HOPPEL\\
 \dlt M KLEINBERGER\\
 \dlt K RAFAELS\\
 \dlt S SATAPATHY\\
 \dlt M SCHEIDLER\\
 \dlt S WOZNIAK\\
-\newpage
 FCDD RLW PC\\
 \dlt R BECKER\\
 \dlt J BERRY\\
+\dlt D CASEM\\
 \dlt J CAZAMIAS\\
 \dlt J CLAYTON\\
 \dlt M FERMEN-COKER\\
@@ -40,6 +64,5 @@ FCDD RLW PC\\
 \dlt C WILLIAMS\\
 FCDD RLW PE\\
 \dlt P GILLICH \\
-FCDD RLW PG\\
-\dlt R BANTON
+
 
