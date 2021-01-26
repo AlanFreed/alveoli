@@ -11,7 +11,6 @@ from shapeFnChords import ShapeFunction
 import spin as spinMtx
 from vertices import Vertex
 import math as m
-from decimal import *
 import meanProperties as mp
 
 
@@ -275,11 +274,15 @@ methods
         uniform over the length of the chord. This mass matrix is constant and
         therefore independent of state.
 
-    kMtx = c.stiffnessMatrix(reindex)
+    cMtx = c.tangentStiffnessMtxC()
         reindex is an instance of Pivot object from module pivotIncomingF
         returns a tangent stiffness matrix for the chosen number of Gauss
-        points belonging to the current state.  An updated Lagrangian
-        formulation is implemented.
+        points belonging to the current state.  
+        
+    kMtx = c.secantStiffnessMtxK(reindex)
+        reindex is an instance of Pivot object from module pivotIncomingF
+        returns a secant stiffness matrix for the chosen number of Gauss
+        points belonging to the current state. 
 
     fVec = c.forcingFunction()
         returns a vector describing the forcing function on the right-hand side
@@ -618,8 +621,8 @@ class Chord(object):
 
         return mMtx
 
-    def _stiffnessMatrix(self, reindex):
-        kMtx = np.zeros((2, 2), dtype=float)
+    def _tangentStiffnessMtxC(self):
+        cMtx = np.zeros((2, 2), dtype=float)
 
         # current vertex coordinates in pentagonal frame of reference
         xn1 = (self._v1x, self._v1y)
@@ -634,6 +637,57 @@ class Chord(object):
         
         cs1 = np.zeros((2, 2), dtype=float)
         ct1 = np.zeros((2, 2), dtype=float)
+            
+        for i in range(1, self._gq.gaussPoints()+1):
+            sfn = self._shapeFns[i]
+            wgt = self._gq.weight(i)
+            Mt = self._Mt[i]
+            Ss = self._trac[i]
+
+            Hmtx = sfn.H(xn1, xn2)
+            BLmtx = sfn.BL(xn1, xn2)
+            BNmtx = sfn.BN(xn1, xn2, x01, x02)
+                    
+            
+            cs1 += wgt * Hmtx.T.dot(Ss).dot(Hmtx)
+            
+            ct1 += wgt * (BLmtx.T.dot(Mt[1, 1]).dot(BLmtx) 
+                        + BLmtx.T.dot(Mt[1, 1]).dot(BNmtx)
+                        + BNmtx.T.dot(Mt[1, 1]).dot(BLmtx) 
+                        + BNmtx.T.dot(Mt[1, 1]).dot(BNmtx) )
+            
+        # determinant of jacobian matrix
+        Jdet = sfn.jacobianDeterminant(x01, x02)
+        
+        Cs = np.zeros((2, 2), dtype=float)
+        Ct = np.zeros((2, 2), dtype=float)
+    
+        # the tangent stiffness matrix Cs
+        Cs = area * Jdet * cs1
+
+        # the tangent stiffness matrix Ct
+        Ct = area * Jdet * ct1
+
+        # determine the total tangent stiffness matrix
+        cMtx = Cs + Ct
+
+        return cMtx
+    
+    
+    def _secantStiffnessMtxK(self, reindex):
+        kMtx = np.zeros((2, 2), dtype=float)
+
+        # current vertex coordinates in pentagonal frame of reference
+        xn1 = (self._v1x, self._v1y)
+        xn2 = (self._v2x, self._v2y)
+
+        # assign coordinates at the vertices in the reference configuration
+        x01 = (self._v1x0, self._v1y0)
+        x02 = (self._v2x0, self._v2y0)
+        
+        # cross-sectional area of the chord (both collagen and elastin fibers)
+        area = self.area()
+        
         ks1 = np.zeros((2, 2), dtype=float)
         kt1 = np.zeros((2, 2), dtype=float)
             
@@ -642,7 +696,6 @@ class Chord(object):
             wgt = self._gq.weight(i)
             Ms = self._Ms[i]
             Mt = self._Mt[i]
-            Ss = self._trac[i]
 
             Hmtx = sfn.H(xn1, xn2)
             Lmtx = sfn.L(xn1, xn2)
@@ -654,12 +707,6 @@ class Chord(object):
             dA = np.dot(Lmtx, np.transpose(Dmtx))            
             dSt = A.T.dot(Mt[1, 1]).dot(dA)
             
-            cs1 += wgt * Hmtx.T.dot(Ss).dot(Hmtx)
-            
-            ct1 += wgt * (BLmtx.T.dot(Mt[1, 1]).dot(BLmtx) 
-                        + BLmtx.T.dot(Mt[1, 1]).dot(BNmtx)
-                        + BNmtx.T.dot(Mt[1, 1]).dot(BLmtx) 
-                        + BNmtx.T.dot(Mt[1, 1]).dot(BNmtx) )
             
             ks1 += wgt * (BLmtx.T.dot(Ms[1, 1]).dot(BLmtx) 
                         + BLmtx.T.dot(Ms[1, 1]).dot(BNmtx) 
@@ -671,16 +718,8 @@ class Chord(object):
         # determinant of jacobian matrix
         Jdet = sfn.jacobianDeterminant(x01, x02)
         
-        Cs = np.zeros((2, 2), dtype=float)
-        Ct = np.zeros((2, 2), dtype=float)
         Ks = np.zeros((2, 2), dtype=float)
         Kt = np.zeros((2, 2), dtype=float)
-    
-        # the tangent stiffness matrix Cs
-        Cs = area * Jdet * cs1
-
-        # the tangent stiffness matrix Ct
-        Ct = area * Jdet * ct1
 
         # the secant stiffness matrix Ks
         Ks = area * Jdet * ks1
@@ -688,8 +727,8 @@ class Chord(object):
         # the stress stiffness matrix for 1 Gauss point
         Kt = area * Jdet * kt1
 
-        # determine the total tangent stiffness matrix
-        kMtx = Cs + Ct + Ks + Kt
+        # determine the total secant stiffness matrix
+        kMtx = Ks + Kt
 
         return kMtx
 
@@ -917,7 +956,8 @@ class Chord(object):
 
         # compute the FE arrays needed for the next interval of integration
         self.mMtx = self._massMatrix()
-        self.kMtx = self._stiffnessMatrix(reindex)
+        self.cMtx = self._tangentStiffnessMtxC()
+        self.kMtx = self._secantStiffnessMtxK(reindex)
         self.fVec = self._forcingFunction()
         return  # nothing, the data structure has been advanced
 
@@ -1136,7 +1176,7 @@ class Chord(object):
     def G(self, gaussPt, state):
         if gaussPt != self._gq.gaussPoints():
             raise RuntimeError("gaussPt can only be {} in a " +
-                               "call to " .format(self._gq.gaussPoints()) +
+                               "{} in call to " .format(self._gq.gaussPoints()) +
                                    "chord.G and you sent " +
                                    "{}.".format(gaussPt))
         if isinstance(state, str):
@@ -1159,7 +1199,7 @@ class Chord(object):
     def F(self, gaussPt, state):
         if gaussPt != self._gq.gaussPoints():
             raise RuntimeError("gaussPt can only be {} in a " +
-                               "call to " .format(self._gq.gaussPoints()) +
+                               "{} in call to " .format(self._gq.gaussPoints()) +
                                    "chord.G and you sent " +
                                    "{}.".format(gaussPt))
         if isinstance(state, str):
@@ -1182,7 +1222,7 @@ class Chord(object):
     def L(self, gaussPt, state):
         if gaussPt != self._gq.gaussPoints():
             raise RuntimeError("gaussPt can only be {} in a " +
-                               "call to " .format(self._gq.gaussPoints()) +
+                               "{} in call to " .format(self._gq.gaussPoints()) +
                                    "chord.G and you sent " +
                                    "{}.".format(gaussPt))
         if isinstance(state, str):
@@ -1215,7 +1255,7 @@ class Chord(object):
     def shapeFunction(self, gaussPt):
         if gaussPt != self._gq.gaussPoints():
             raise RuntimeError("gaussPt can only be {} in a " +
-                               " call to " .format(self._gq.gaussPoints()) +
+                               "{} in call to " .format(self._gq.gaussPoints()) +
                                    "chord.G and you sent " +
                                    "{}.".format(gaussPt))
         sf = self._shapeFns[gaussPt]
@@ -1228,8 +1268,12 @@ class Chord(object):
         mMtx = np.copy(self._massMatrix())
         return mMtx
 
-    def stiffnessMatrix(self, reindex):
-        kMtx = np.copy(self._stiffnessMatrix(reindex))
+    def tangentStiffnessMtxC(self):
+        cMtx = np.copy(self._tangentStiffnessMtxC())
+        return cMtx
+    
+    def secantStiffnessMtxK(self, reindex):
+        kMtx = np.copy(self._secantStiffnessMtxK(reindex))
         return kMtx
 
     def forcingFunction(self):

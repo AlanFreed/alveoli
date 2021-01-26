@@ -367,9 +367,14 @@ methods
         for a pentagon whose mass density, rho, and whose thickness, width, are
         specified.
 
-    kMtx = p.stiffnessMatrix(reindex)
+    cMtx = p.tangentStiffnessMtxC()
         reindex is an instance of Pivot object from module pivotIncomingF
         returns a tangent stiffness matrix for the chosen number of Gauss
+        points.
+        
+    kMtx = p.secantStiffnessMtxK(reindex)
+        reindex is an instance of Pivot object from module pivotIncomingF
+        returns a secant stiffness matrix for the chosen number of Gauss
         points.
 
     fFn = p.forcingFunction()
@@ -1418,9 +1423,10 @@ class pentagon(object):
 
         return mMtx
 
-    def _stiffnessMatrix(self, reindex):
+
+    def _tangentStiffnessMtxC(self):
         
-        kMtx = np.zeros((10, 10), dtype=float)      
+        CMtx = np.zeros((10, 10), dtype=float)      
         # current vertex coordinates in pentagonal frame of reference
         xn1 = (self._v1x, self._v1y)
         xn2 = (self._v2x, self._v2y)
@@ -1437,6 +1443,70 @@ class pentagon(object):
         
         Cs1 = np.zeros((10, 10), dtype=float)
         Ct1 = np.zeros((10, 10), dtype=float)
+            
+        for i in range(1, self._pgq.gaussPoints()+1):
+            psfn = self._pentShapeFns[i]
+            wgt = self._pgq.weight(i) 
+            Mt = self._Mt[i]
+            Ss = self.Ss[i]
+            
+            # determinant of jacobian matrix
+            Jdet = psfn.jacobianDeterminant(x01, x02, x03, x04, x05)
+
+            BLmtx = psfn.BL(xn1, xn2, xn3, xn4, xn5)
+
+            Hmtx1 = psfn.H1(xn1, xn2, xn3, xn4, xn5)
+            BNmtx1 = psfn.BN1(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
+            
+            Hmtx2 = psfn.H2(xn1, xn2, xn3, xn4, xn5)
+            BNmtx2 = psfn.BN2(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
+
+            Hmtx3 = psfn.H3(xn1, xn2, xn3, xn4, xn5)
+            BNmtx3 = psfn.BN3(xn1, xn2, xn3, xn4, xn5, x01, x02, x03, x04, x05)
+            
+            # total nonlinear Bmatrix
+            BNmtx = BNmtx1 + BNmtx2 + BNmtx3
+            
+            # the tangent stiffness matrix Cs1
+            Cs1 += (self._width * Jdet * wgt * ( Hmtx1.T.dot(Ss).dot(Hmtx1) 
+                                               + Hmtx2.T.dot(Ss).dot(Hmtx2)
+                                               + Hmtx3.T.dot(Ss).dot(Hmtx3)))
+            # the tangent stiffness matrix Ct1
+            Ct1 += (self._width * Jdet * wgt * ( BLmtx.T.dot(Mt).dot(BLmtx) 
+                                               + BLmtx.T.dot(Mt).dot(BNmtx)
+                                               + BNmtx.T.dot(Mt).dot(BLmtx) 
+                                               + BNmtx.T.dot(Mt).dot(BNmtx) ))
+
+
+        Cs = np.zeros((10, 10), dtype=float)
+        Ct = np.zeros((10, 10), dtype=float)
+        
+        Cs[:, :] = Cs1[:, :]
+        Ct[:, :] = Ct1[:, :]
+              
+        # determine the total tangent stiffness matrix
+        CMtx = Cs + Ct
+
+        return CMtx
+    
+    
+    def _secantStiffnessMtxK(self, reindex):
+        
+        kMtx = np.zeros((10, 10), dtype=float)      
+        # current vertex coordinates in pentagonal frame of reference
+        xn1 = (self._v1x, self._v1y)
+        xn2 = (self._v2x, self._v2y)
+        xn3 = (self._v3x, self._v3y)
+        xn4 = (self._v4x, self._v4y)
+        xn5 = (self._v5x, self._v5y)
+
+        # assign coordinates at the vertices in the reference configuration
+        x01 = (self._v1x0, self._v1y0)
+        x02 = (self._v2x0, self._v2y0)
+        x03 = (self._v3x0, self._v3y0)
+        x04 = (self._v4x0, self._v4y0)
+        x05 = (self._v5x0, self._v5y0)
+        
         Ks1 = np.zeros((10, 10), dtype=float)
         Kt1 = np.zeros((10, 10), dtype=float)
             
@@ -1445,7 +1515,6 @@ class pentagon(object):
             wgt = self._pgq.weight(i) 
             Ms = self._Ms[i]
             Mt = self._Mt[i]
-            Ss = self.Ss[i]
             
             # determinant of jacobian matrix
             Jdet = psfn.jacobianDeterminant(x01, x02, x03, x04, x05)
@@ -1479,15 +1548,6 @@ class pentagon(object):
             # total nonlinear Bmatrix
             BNmtx = BNmtx1 + BNmtx2 + BNmtx3
             
-            # the tangent stiffness matrix Cs1
-            Cs1 += (self._width * Jdet * wgt * ( Hmtx1.T.dot(Ss).dot(Hmtx1) 
-                                               + Hmtx2.T.dot(Ss).dot(Hmtx2)
-                                               + Hmtx3.T.dot(Ss).dot(Hmtx3)))
-            # the tangent stiffness matrix Ct1
-            Ct1 += (self._width * Jdet * wgt * ( BLmtx.T.dot(Mt).dot(BLmtx) 
-                                               + BLmtx.T.dot(Mt).dot(BNmtx)
-                                               + BNmtx.T.dot(Mt).dot(BLmtx) 
-                                               + BNmtx.T.dot(Mt).dot(BNmtx) ))
             # the secant stiffness matrix Ks1
             Ks1 += (self._width * Jdet * wgt * ( BLmtx.T.dot(Ms).dot(BLmtx) 
                                                + BLmtx.T.dot(Ms).dot(BNmtx) 
@@ -1498,18 +1558,16 @@ class pentagon(object):
                                                + Hmtx2.T.dot(dSt2).dot(Hmtx2)
                                                + Hmtx3.T.dot(dSt3).dot(Hmtx3)))
 
-        Cs = np.zeros((10, 10), dtype=float)
-        Ct = np.zeros((10, 10), dtype=float)
+
         Ks = np.zeros((10, 10), dtype=float)
         Kt = np.zeros((10, 10), dtype=float)
         
-        Cs[:, :] = Cs1[:, :]
-        Ct[:, :] = Ct1[:, :]
+
         Ks[:, :] = Ks1[:, :]
         Kt[:, :] = Kt1[:, :]
               
-        # determine the total tangent stiffness matrix
-        kMtx = Cs + Ct + Ks + Kt
+        # determine the total secant stiffness matrix
+        kMtx = Ks + Kt
 
         return kMtx
 
@@ -2307,7 +2365,8 @@ class pentagon(object):
 
         # compute the FE arrays needed for the next interval of integration
         self.mMtx = self._massMatrix()
-        self.kMtx = self._stiffnessMatrix(reindex)
+        self.cMtx = self._tangentStiffnessMtxC()
+        self.kMtx = self._secantStiffnessMtxK(reindex)
         self.fVec = self._forcingFunction()
 
            
@@ -2606,6 +2665,75 @@ class pentagon(object):
 
         return np.array([vxr, vyr, vzr])
 
+   
+    def centeroidCompInjCri(self, reindex, state):
+        # verify the input
+        if not isinstance(reindex, Pivot):
+            raise RuntimeError("The 'reindex' variable sent to " +
+                               "pentagon.centroidVelocity must be of type Pivot.")
+        # calculate the velocity in the specified configuration
+        h = 2.0 * self._h
+        if isinstance(state, str):
+            xp, yp, zp = self.centroid('prev')
+            xc, yc, zc = self.centroid('curr')
+            xn, yn, zn = self.centroid('next')
+            if state == 'c' or state == 'curr' or state == 'current':
+                toCase = reindex.pivotCase('curr')
+                # map vectors into co-ordinate system of current configuration
+                xPrev = np.array([xp, yp, zp])
+                fromCase = reindex.pivotCase('prev')
+                xP = reindex.reindexVector(xPrev, fromCase, toCase)
+                xNext = np.array([xn, yn, zn])
+                fromCase = reindex.pivotCase('next')
+                xN = reindex.reindexVector(xNext, fromCase, toCase)
+                
+                # use second-order central difference formula
+                c = (xP - xN) / h
+                
+            elif state == 'n' or state == 'next':
+                toCase = reindex.pivotCase('next')
+                # map vectors into co-ordinate system of next configuration
+                xPrev = np.array([xp, yp, zp])
+                fromCase = reindex.pivotCase('prev')
+                xP = reindex.reindexVector(xPrev, fromCase, toCase)
+                xCurr = np.array([xc, yc, zc])
+                fromCase = reindex.pivotCase('curr')
+                xC = reindex.reindexVector(xCurr, fromCase, toCase)
+                xN = np.array([xn, yn, zn])
+                # use second-order backward difference formula
+                c = (3.0 * xN - 4.0 * xC + xP) / h
+
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                toCase = reindex.pivotCase('prev')
+                # map vector into co-ordinate system of previous configuration
+                xP = np.array([xp, yp, zp])
+                xCurr = np.array([xc, yc, zc])
+                fromCase = reindex.pivotCase('curr')
+                xC = reindex.reindexVector(xCurr, fromCase, toCase)
+                xNext = np.array([xn, yn, zn])
+                fromCase = reindex.pivotCase('next')
+                xN = reindex.reindexVector(xNext, fromCase, toCase)
+                # use second-order forward difference formula
+                c = (-xN + 4.0 * xC - 3.0 * xP) / h
+                
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                # velocity is zero
+                pass
+            else:
+                raise RuntimeError("Unknown state {} ".format(state) +
+                                   "in a call to pentagon.centroidVelocity.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to pentagon.centroidVelocity.")
+
+        R = self.rotation(state)
+        cxr = R[0, 0] * c[0] + R[1, 0] * c[1] + R[2, 0] * c[2]
+        cyr = R[0, 1] * c[0] + R[1, 1] * c[1] + R[2, 1] * c[2]
+        czr = R[0, 2] * c[0] + R[1, 2] * c[1] + R[2, 2] * c[2]
+
+        return np.array([cxr, cyr, czr])
+    
+    
     def centeroidAcceleration(self, reindex, state):
         # verify the input
         if not isinstance(reindex, Pivot):
@@ -3007,8 +3135,12 @@ class pentagon(object):
         mMtx = np.copy(self._massMatrix())
         return mMtx
 
-    def stiffnessMatrix(self, reindex):
-        kMtx = np.copy(self._stiffnessMatrix(reindex))
+    def tangentStiffnessMtxC(self):
+        cMtx = np.copy(self._tangentStiffnessMtxC())
+        return cMtx
+    
+    def secantStiffnessMtxK(self, reindex):
+        kMtx = np.copy(self._secantStiffnessMtxK(reindex))
         return kMtx
 
     def forcingFunction(self):

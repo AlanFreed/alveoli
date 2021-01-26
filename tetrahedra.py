@@ -208,8 +208,12 @@ methods
         number of Gauss points for a tetrahedron whose mass density, rho,
         is specified.
 
-    kMtx = t.stiffnessMatrix(reindex)
+    cMtx = t.tangentStiffnessMtxC()
         returns a tangent stiffness matrix for the chosen number of Gauss
+        points.
+        
+    kMtx = t.secantStiffnessMtxK(reindex)
+        returns a secant stiffness matrix for the chosen number of Gauss
         points.
 
     fFn = t.forcingFunction()
@@ -605,9 +609,9 @@ class tetrahedron(object):
 
         return mMtx  
 
-    def _stiffnessMatrix(self, reindex):
+    def _tangentStiffnessMtxC(self, ):
         
-        kMtx = np.zeros((12, 12), dtype=float)
+        cMtx = np.zeros((12, 12), dtype=float)
         
         # assign coordinates at the vertices in the reference configuration
         xn1 = (self._v1x, self._v1y, self._v1z)
@@ -623,6 +627,75 @@ class tetrahedron(object):
 
         Cs1 = np.zeros((12, 12), dtype=float)
         Ct1 = np.zeros((12, 12), dtype=float)
+
+        for i in range(1, self._tegq.gaussPoints()+1):
+            tesfn = self._tetShapeFns[i]
+            wgt = self._tegq.weight(i)  
+            Mt = self._Mt[i]
+            Ss = self.Ss[i]
+            
+            # determinant of jacobian matrix
+            Jdet = tesfn.jacobianDeterminant(x01, x02, x03, x04)
+
+            BLmtx = tesfn.BL(xn1, xn2, xn3, xn4)
+
+            Hmtx1 = tesfn.H1(xn1, xn2, xn3, xn4)
+            BNmtx1 = tesfn.BN1(xn1, xn2, xn3, xn4, x01, x02, x03, x04)
+            
+            Hmtx2 = tesfn.H2(xn1, xn2, xn3, xn4)
+            BNmtx2 = tesfn.BN2(xn1, xn2, xn3, xn4, x01, x02, x03, x04)
+
+            Hmtx3 = tesfn.H3(xn1, xn2, xn3, xn4)
+            BNmtx3 = tesfn.BN3(xn1, xn2, xn3, xn4, x01, x02, x03, x04)
+            
+            Hmtx4 = tesfn.H4(xn1, xn2, xn3, xn4)
+            BNmtx4 = tesfn.BN4(xn1, xn2, xn3, xn4, x01, x02, x03, x04)
+            
+            Hmtx5 = tesfn.H5(xn1, xn2, xn3, xn4)
+            BNmtx5 = tesfn.BN5(xn1, xn2, xn3, xn4, x01, x02, x03, x04)
+            
+            # total nonlinear Bmatrix
+            BNmtx = BNmtx1 + BNmtx2 + BNmtx3 + BNmtx4 + BNmtx5
+            
+            # the tangent stiffness matrix Cs1
+            Cs1 += (Jdet * wgt * ( Hmtx1.T.dot(Ss).dot(Hmtx1) 
+                                 + Hmtx2.T.dot(Ss).dot(Hmtx2)  
+                                 + Hmtx3.T.dot(Ss).dot(Hmtx3)
+                                 + Hmtx4.T.dot(Ss).dot(Hmtx4)
+                                 + Hmtx5.T.dot(Ss).dot(Hmtx5) ))
+            # the tangent stiffness matrix Ct1
+            Ct1 += (Jdet * wgt * ( BLmtx.T.dot(Mt).dot(BLmtx) 
+                                 + BLmtx.T.dot(Mt).dot(BNmtx)
+                                 + BNmtx.T.dot(Mt).dot(BLmtx) 
+                                 + BNmtx.T.dot(Mt).dot(BNmtx) ))
+
+        Cs = np.zeros((12, 12), dtype=float)
+        Ct = np.zeros((12, 12), dtype=float)
+        
+        Cs[:, :] = Cs1[:, :]
+        Ct[:, :] = Ct1[:, :]
+              
+        # determine the total tangent stiffness matrix
+        cMtx = Cs + Ct
+
+        return cMtx
+    
+    def _secantStiffnessMtxK(self, reindex):
+        
+        kMtx = np.zeros((12, 12), dtype=float)
+        
+        # assign coordinates at the vertices in the reference configuration
+        xn1 = (self._v1x, self._v1y, self._v1z)
+        xn2 = (self._v2x, self._v2y, self._v2z)
+        xn3 = (self._v3x, self._v3y, self._v3z)
+        xn4 = (self._v4x, self._v4y, self._v4z)
+
+        # coordinates for the reference vertices as tuples
+        x01 = (self._v1x0, self._v1y0, self._v1z0)
+        x02 = (self._v2x0, self._v2y0, self._v2z0)
+        x03 = (self._v3x0, self._v3y0, self._v3z0)
+        x04 = (self._v4x0, self._v4y0, self._v4z0)
+
         Ks1 = np.zeros((12, 12), dtype=float)
         Kt1 = np.zeros((12, 12), dtype=float)
 
@@ -631,7 +704,6 @@ class tetrahedron(object):
             wgt = self._tegq.weight(i)  
             Ms = self._Ms[i]
             Mt = self._Mt[i]
-            Ss = self.Ss[i]
             
             # determinant of jacobian matrix
             Jdet = tesfn.jacobianDeterminant(x01, x02, x03, x04)
@@ -681,17 +753,6 @@ class tetrahedron(object):
             # total nonlinear Bmatrix
             BNmtx = BNmtx1 + BNmtx2 + BNmtx3 + BNmtx4 + BNmtx5
             
-            # the tangent stiffness matrix Cs1
-            Cs1 += (Jdet * wgt * ( Hmtx1.T.dot(Ss).dot(Hmtx1) 
-                                 + Hmtx2.T.dot(Ss).dot(Hmtx2)  
-                                 + Hmtx3.T.dot(Ss).dot(Hmtx3)
-                                 + Hmtx4.T.dot(Ss).dot(Hmtx4)
-                                 + Hmtx5.T.dot(Ss).dot(Hmtx5) ))
-            # the tangent stiffness matrix Ct1
-            Ct1 += (Jdet * wgt * ( BLmtx.T.dot(Mt).dot(BLmtx) 
-                                 + BLmtx.T.dot(Mt).dot(BNmtx)
-                                 + BNmtx.T.dot(Mt).dot(BLmtx) 
-                                 + BNmtx.T.dot(Mt).dot(BNmtx) ))
             # the secant stiffness matrix Ks1
             Ks1 += (Jdet * wgt * ( BLmtx.T.dot(Ms).dot(BLmtx) 
                                  + BLmtx.T.dot(Ms).dot(BNmtx) 
@@ -704,18 +765,14 @@ class tetrahedron(object):
                                  + Hmtx4.T.dot(dSt4).dot(Hmtx4)
                                  + Hmtx5.T.dot(dSt5).dot(Hmtx5) ))
 
-        Cs = np.zeros((12, 12), dtype=float)
-        Ct = np.zeros((12, 12), dtype=float)
         Ks = np.zeros((12, 12), dtype=float)
         Kt = np.zeros((12, 12), dtype=float)
         
-        Cs[:, :] = Cs1[:, :]
-        Ct[:, :] = Ct1[:, :]
         Ks[:, :] = Ks1[:, :]
         Kt[:, :] = Kt1[:, :]
               
-        # determine the total tangent stiffness matrix
-        kMtx = Cs + Ct + Ks + Kt
+        # determine the total secant stiffness matrix
+        kMtx = Ks + Kt
 
         return kMtx
     
@@ -992,7 +1049,8 @@ class tetrahedron(object):
 
         # compute the FE arrays needed for the next interval of integration
         self.mMtx = self._massMatrix()
-        self.kMtx = self._stiffnessMatrix(reindex)
+        self.cMtx = self._tangentStiffnessMtxC()
+        self.kMtx = self._secantStiffnessMtxK(reindex)
         self.fVec = self._forcingFunction()
         
         return  # nothing
@@ -1559,8 +1617,12 @@ class tetrahedron(object):
         mMtx = np.copy(self._massMatrix())
         return mMtx
 
-    def stiffnessMatrix(self, reindex):
-        kMtx = np.copy(self._stiffnessMatrix(reindex))
+    def tangentStiffnessMtxC(self):
+        cMtx = np.copy(self._tangentStiffnessMtxC())
+        return cMtx
+    
+    def secantStiffnessMtxK(self, reindex):
+        kMtx = np.copy(self._secantStiffnessMtxK(reindex))
         return kMtx
 
     def forcingFunction(self):
