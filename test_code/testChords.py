@@ -117,9 +117,14 @@ def run():
     print("and whose inverse is ")
     print(np.linalg.inv(mass))
 
-    print("\nThe stiffness matrix for this chord is:")
-    stiff = c.stiffnessMatrix(p)
-    print(stiff)
+    
+    print("\nThe tangent stiffness matrix (C) for this chord is:")
+    C = c.tangentStiffnessMtxC()
+    print(C)
+    
+    print("\nThe secant stiffness matrix (K) for this chord is:")
+    K = c.secantStiffnessMtxK(p)
+    print(K)
 
     print("\nThe force vector for this chord is:")
     force = c.forcingFunction()

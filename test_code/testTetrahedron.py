@@ -172,10 +172,14 @@ def run():
     print("and whose inverse is ")
     print(np.linalg.inv(mass))
     
-    print("\nThe stiffness matrix for this tetrahedron is:")
-    stiff = t.stiffnessMatrix(pi)
-    print(stiff)
+    print("\nThe tangent stiffness matrix (C) for this tetrahedron is:")
+    C = t.tangentStiffnessMtxC()
+    print(C)
 
+    print("\nThe secant stiffness matrix (K) for this tetrahedron is:")
+    K = t.secantStiffnessMtxK(pi)
+    print(K)
+    
     print("\nThe force vector for this tetrahedron is:")
     force = t.forcingFunction()
     print(force)

@@ -227,13 +227,17 @@ def run():
     print("whose determinant is {:8.5e}".format(np.linalg.det(mass)))
     print("and whose inverse is ")
     print(np.linalg.inv(mass))
+
+    print("\nThe tangent stiffness matrix (C) for this pentagon is:")
+    C = p.tangentStiffnessMtxC()
+    print(C)
     
-    print("\nThe stiffness matrix for this pentagon is:")
-    stiff = p.stiffnessMatrix(pi)
-    print(stiff)
+    print("\nThe secant stiffness matrix (K) for this pentagon is:")
+    K = p.secantStiffnessMtxK(pi)
+    print(K)
 
     print("\nThe force vector for this pentagon is:")
-    force = p.forcingFunction()
-    print(force)
+    F = p.forcingFunction()
+    print(F)
 
 run()
