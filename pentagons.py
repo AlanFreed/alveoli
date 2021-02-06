@@ -1858,28 +1858,17 @@ class pentagon(object):
         self._Pn3D[2, 2] = n3z
 
         # determine vertice coordinates in the pentagonal frame of reference
-        self._v1x0 = n1x * x1[0] + n1y * x1[1] + n1z * x1[2]
-        self._v1y0 = n2x * x1[0] + n2y * x1[1] + n2z * x1[2]
-        self._v2x0 = n1x * x2[0] + n1y * x2[1] + n1z * x2[2]
-        self._v2y0 = n2x * x2[0] + n2y * x2[1] + n2z * x2[2]
-        self._v3x0 = n1x * x3[0] + n1y * x3[1] + n1z * x3[2]
-        self._v3y0 = n2x * x3[0] + n2y * x3[1] + n2z * x3[2]
-        self._v4x0 = n1x * x4[0] + n1y * x4[1] + n1z * x4[2]
-        self._v4y0 = n2x * x4[0] + n2y * x4[1] + n2z * x4[2]
-        self._v5x0 = n1x * x5[0] + n1y * x5[1] + n1z * x5[2]
-        self._v5y0 = n2x * x5[0] + n2y * x5[1] + n2z * x5[2]
+        self._v1x = n1x * x1[0] + n1y * x1[1] + n1z * x1[2]
+        self._v1y = n2x * x1[0] + n2y * x1[1] + n2z * x1[2]
+        self._v2x = n1x * x2[0] + n1y * x2[1] + n1z * x2[2]
+        self._v2y = n2x * x2[0] + n2y * x2[1] + n2z * x2[2]
+        self._v3x = n1x * x3[0] + n1y * x3[1] + n1z * x3[2]
+        self._v3y = n2x * x3[0] + n2y * x3[1] + n2z * x3[2]
+        self._v4x = n1x * x4[0] + n1y * x4[1] + n1z * x4[2]
+        self._v4y = n2x * x4[0] + n2y * x4[1] + n2z * x4[2]
+        self._v5x = n1x * x5[0] + n1y * x5[1] + n1z * x5[2]
+        self._v5y = n2x * x5[0] + n2y * x5[1] + n2z * x5[2]
 
-        # initialize current vertice coordinates in pentagonal frame of reference
-        self._v1x = self._v1x0
-        self._v1y = self._v1y0
-        self._v2x = self._v2x0
-        self._v2y = self._v2y0
-        self._v3x = self._v3x0
-        self._v3y = self._v3y0
-        self._v4x = self._v4x0
-        self._v4y = self._v4y0
-        self._v5x = self._v5x0
-        self._v5y = self._v5y0
         
         # z offsets for the pentagonal plane (which should all be the same)
         self._v1z = n3x * x1[0] + n3y * x1[1] + n3z * x1[2]
@@ -3080,6 +3069,25 @@ class pentagon(object):
                                "{}.".format(PentGaussPt))
         return self._septum[PentGaussPt].shear(state)
 
+
+    def dilationSingleComp(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.dilationSingleComp and you sent " +
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].dilationSingleComp(state)
+
+    def squeezeSingleComp(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.squeezeSingleComp and you sent " +
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].squeezeSingleComp(state)
+    
+    
+    
     def dDilation(self, PentGaussPt, state):
         if PentGaussPt != self._pgq.gaussPoints():
             raise RuntimeError("The pentGaussPt must be " +
@@ -3103,6 +3111,27 @@ class pentagon(object):
                                "pentagon.dShear and you sent " +
                                "{}.".format(PentGaussPt))
         return self._septum[PentGaussPt].dShear(state)
+
+
+
+    def dDilationSingleComp(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pentGaussPts) +
+                               "pentagon.dDilationSingleComp and you sent " +
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].dDilationSingleComp(state)
+
+    def dSqueezeSingleComp(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.dSqueezeSingleComp and you sent " +
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].dSqueezeSingleComp(state)
+
+
+
 
     # properties used in finite elements
 
