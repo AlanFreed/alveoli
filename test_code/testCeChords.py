@@ -13,11 +13,11 @@ from pylab import rcParams
 
 """
 Created on Thr Nov 07 2019
-Updated on Fri Jul 10 2020
+Updated on Fri Feb 07 2021
 
 A test file for the chordal constitutive response in file ceChords.py.
 
-author: Prof. Alan Freed
+author: Prof. Alan Freed, Shahla Zamani
 """
 
 # assign the number of CE iterations in PE(CE)^m, with m = 0 -> PE method
@@ -60,11 +60,12 @@ def run():
         xVec0 = np.zeros((ctrlVars,), dtype=float)
         xVec0[0] = T0
         xVec0[1] = L0
-        yVec0 = np.zeros((respVars,), dtype=float)
         # create the control object
         ctrl = ControlFiber(eVec0, xVec0, dt)
+        
+        
         # create the response object
-        resp = SeptalChord(eVec0, xVec0, yVec0)
+        resp = SeptalChord()
         # create the integrator
         solver = PECE(ctrl, resp, m)
         # provide the initial conditions for their relative states, viz. zeros
@@ -72,8 +73,10 @@ def run():
         stress[0, j] = resp.relativeStress()
         strain[0, j] = resp.relativeStrain()
         entropy[0, j] = resp.relativeEntropy()
-        # integrate the constitutive equation for this boundary value problem
+        
         xVec = np.zeros((ctrlVars,), dtype=float)
+        # integrate the constitutive equation for this boundary value problem
+        # xVec = np.zeros((ctrlVars,), dtype=float)
         for i in range(1, N+1):
             # xVec[0] = T0 + (TN - T0) * math.sin(i * math.pi / (2.0 * N))
             # xVec[1] = L0 + (LN - L0) * math.sin(i * math.pi / (2.0 * N))
