@@ -27,8 +27,8 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "09-24-2019"
-__update__ = "07-17-2020"
-__author__ = "Alan D. Freed"
+__update__ = "02-07-2021"
+__author__ = "Alan D. Freed", "Shahla Zamani"
 __author_email__ = "afreed@tamu.edu"
 
 r"""

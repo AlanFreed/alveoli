@@ -26,8 +26,8 @@ this program. If not, see <https://www.gnu.org/licenses/>.
 # Module metadata
 __version__ = "1.0.0"
 __date__ = "07-16-2017"
-__update__ = "07-10-2020"
-__author__ = "Alan D. Freed"
+__update__ = "02-07-2021"
+__author__ = "Alan D. Freed", "Shahla Zamani"
 __author_email__ = "afreed@tamu.edu"
 
 """
@@ -513,7 +513,7 @@ class Control(object):
 
 class Response(object):
 
-    def __init__(self, eVec0, xVec0, yVec0):
+    def __init__(self, yVec0):
         # verify input
         self.firstCall = True
 
@@ -525,37 +525,7 @@ class Response(object):
         else:
             raise RuntimeError("Initial condition yVec0 must be a NumPy "
                                + "array.")
-        
-        if isinstance(eVec0, np.ndarray):
-            (controls,) = np.shape(eVec0)
-            if self.firstCall:
-                self.controls = controls
-                if self.responses % self.controls != 0:
-                    raise RuntimeError("The number of response variables "
-                                       + "must be an integer mulitplier to "
-                                       + "the number of control variables.")
-                self.eR = np.zeros((self.controls,), dtype=float)
-                self.eR[:] = eVec0[:]
-            else:
-                if controls != self.controls:
-                    raise RuntimeError("The eVec0 sent had a length of "
-                                       + "{}, but it must ".format(controls)
-                                       + "have length "
-                                       + "{}.".format(self.controls))
-        else:
-            raise RuntimeError("Argument eVec0 must be a NumPy array.")
-        if isinstance(xVec0, np.ndarray):
-            (controls,) = np.shape(xVec0)
-            if self.firstCall:
-                self.xR = np.zeros((self.controls,), dtype=float)
-                self.xR[:] = xVec0[:]
-            if controls != self.controls:
-                raise RuntimeError("The xVec0 sent had a length of "
-                                   + "{}, but it must have ".format(controls)
-                                   + "a length of {}.".format(self.controls))
-        else:
-            raise RuntimeError("Argument xVec0 must be a NumPy array.")        
-        
+    
         
         return  # a new instance of this base type
 
