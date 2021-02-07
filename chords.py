@@ -935,7 +935,6 @@ class Chord(object):
         self._centroidXc = self._centroidXn
         self._centroidYc = self._centroidYn
         self._centroidZc = self._centroidZn
-        self._L0 = self._Lc
         self._Lc = self._Ln
         self._Pp3D[:, :] = self._Pc3D[:, :]
         self._Pc3D[:, :] = self._Pn3D[:, :]
