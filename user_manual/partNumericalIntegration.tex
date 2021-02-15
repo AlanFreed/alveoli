@@ -1,11 +1,11 @@
 \section{Numerical Integrators}
 \label{partNumericalMethods}
 
-This analysis tool, which models alveolar geometry as a dodecahedron, requires numerical methods for the temporal integration of its constitutive equations (systems of first-order ODEs) and their governing equations of motion (systems of second-order ODEs), and for the spatial integrations of: length of line, area of surface, and volume of space that pertain to the various finite-element geometries used.  Some results obtained at the Gauss points may need to be mapped out to their nodal locations, so extrapolation procedures that are consistent with the shape (interpolation) functions are also derived for the various elements and quadrature rules selected.
+This analysis tool, which models alveolar geometry as a dodecahedron, requires numerical methods for the temporal integration of its constitutive equations (systems of first-order ODEs) and their governing equations of motion (systems of second-order ODEs), and for the spatial integrations of length of line, area of surface, and volume of space that pertain to the various finite-element geometries used.  Some results obtained at the Gauss points may need to be mapped out to their nodal locations, so extrapolation procedures that are consistent with the shape (interpolation) functions are also derived for the various elements and quadrature rules selected.
 
 \subsection{$\,$ODE Solvers}
 
-The constitutive equations used to describe our alveolar model present themselves as ordinary differential equations that need to be integrated, cf.\ \S\ref{secAlveolus}.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} suitable for solving stiff systems of first- and second-order differential equations.  These methods are based upon Gear's well-known, second-order, backward, difference formula (BDF2) that appears in Eqs.~\ref{1stOrderCorrector} and \ref{velocityCorrector}.
+The constitutive equations used to describe our alveolar model present themselves as ODEs that need to be integrated, cf.\ \S\ref{secAlveolus}.  To this end, we employ the PECE (Predict, Evaluate, Correct, re-Evaluate) algorithms of Freed \cite{Freed17a} suitable for solving stiff systems of first- and second-order differential equations.  These methods are based upon Gear's well-known, second-order, backward, difference formula (BDF2) that appears in Eqs.~\ref{1stOrderCorrector} and \ref{velocityCorrector}.
 
 Time $t$ is considered to be the independent variable, discretized over an interval in time $[t_0, t_I]$ for which $I$ solutions are to be extracted at nodes $i=1, 2, \ldots, I$ spaced at uniform intervals in time with a common step size of $\mathrm{d}t = (t_I - t_0)/I$ separating them, where time $t_0$ associates with the initial condition.
 
@@ -85,7 +85,7 @@ In our finite element implementation, a hypo-elastic material model \cite{Truesd
     \quad \text{or equivalently \cite{Noll55}} \quad
     \mathrm{d} \boldsymbol{\sigma} = \mathbf{M} ( \boldsymbol{\epsilon} , \boldsymbol{\sigma} ) \, \mathrm{d} \boldsymbol{\epsilon},
 \end{displaymath} 
-where $\boldsymbol{\epsilon}$ is a vector of thermo\-dynamic strains, $\boldsymbol{\sigma}$ is a vector of thermo\-dynamic stresses, and $\mathbf{M}$ is a square matrix comprised of their tangent moduli, which can depend upon both stress and strain in our application; specifically, the response is
+where $\boldsymbol{\epsilon}$ is a vector of thermo\-dynamic strains, $\boldsymbol{\sigma}$ is a vector of thermo\-dynamic stresses, and $\mathbf{M}$ is a square matrix comprising their tangent moduli, which can depend upon both stress and strain in our application; specifically, the response is
 \begin{displaymath}
    \boldsymbol{\sigma}_{1D} = \{ \eta , s \}^{\mathsf{T}} , \quad
    \boldsymbol{\sigma}_{2D} = \{ \eta , s^{\pi} , s^{\sigma} , s^{\tau} \}^{\mathsf{T}} , \quad
@@ -97,7 +97,7 @@ where $\eta$ is entropy and the rest of its constituents are stress attributes. 
 \boldsymbol{\epsilon}_{2D} = \{ \theta , \xi , \varepsilon , \gamma \}^{\mathsf{T}} , \quad
 \boldsymbol{\epsilon}_{3D} = \{ \theta , \Xi , \varepsilon_1 , \varepsilon_2 , \gamma_1 , \gamma_2 , \gamma_3 \}^{\mathsf{T}},
 \end{displaymath}
-where $\theta$ is temperature and the rest of its constituents are strain attributes.  In the 2- and 3-D cases, these stress\slash strain attributes arise from Gram--Schmidt decompositions of their respective deformation gradients (cf.\ Sections~\ref{secQR2D} and \ref{secConjugatePairs}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\epsilon} , \boldsymbol{\sigma} )$ is the topic of \S\ref{partConstitutive}.  Both strain $\boldsymbol{\epsilon}$ and stress $\boldsymbol{\sigma}$ appear as arguments in our tangent moduli, i.e., the model is implicit.
+where $\theta$ is temperature and the rest of its constituents are strain attributes.  In the 2D and 3D cases, these stress\slash strain attributes arise from Gram--Schmidt decompositions of their respective deformation gradients (cf.\ Sections~\ref{secQR2D} and \ref{secConjugatePairs}).  Constructing tangent moduli $\mathbf{M} ( \boldsymbol{\epsilon} , \boldsymbol{\sigma} )$ is the topic of \S\ref{partConstitutive}.  Both strain $\boldsymbol{\epsilon}$ and stress $\boldsymbol{\sigma}$ appear as arguments in our tangent moduli, i.e., the model is implicit.
 
 Equation \ref{startUp1stOrderODEs} is used to take the first step of integration; specifically, 
 \begin{subequations}
@@ -324,7 +324,7 @@ We observe that the mass matrix must not be ill conditioned in order for this al
 
 In a general finite element setting, information comes into an element via its nodes.  Once there, it gets interpolated into its interior Gauss points, where the constitutive equations are solved and spatial integrations occur.  In some applications, and in particular, in ours, one also needs to be able to take fields (e.g., a damage parameter) whose constitutive equations have been integrated at the Gauss points of an element, and extrapolate this information back out to the exterior nodes of the element.
 
-Particular to our application, a suite of nodes is common betwixt three, separate, finite-element models that share 20 common vertices.  These vertices establish the geometry of a dodecahedron used as the model for a micro\-scopic alveolus.  The resultant micro\-scopic force at each vertex arises from: \textit{i\/}) a finite element model of 30 1D rods representing the alveolar chords, \textit{ii\/}) a finite element model of 12 2D pentagons representing the alveolar membranes, and \textit{iii\/}) a finite element model of 60 3D tetrahedra representing the alveolar sac.  The micro\-scopic forces coming from these three geometric models are summed at their 20 common vertices. These resultant micro\-scopic forces are then collectively homo\-genized to yield an averaged macro\-scopic state of stress at a chosen location in the parenchyma.  
+Particular to our application, a suite of nodes is common betwixt three, separate, finite-element models that share 20 common vertices.  These vertices establish the geometry of a dodecahedron used as the model for a micro\-scopic alveolus.  The resultant micro\-scopic force at each vertex arises from \textit{i\/}) a finite element model of 30 1D rods representing the alveolar chords, \textit{ii\/}) a finite element model of 12 2D pentagons representing the alveolar membranes, and \textit{iii\/}) a finite element model of 60 3D tetrahedra representing the alveolar sac.  The micro\-scopic forces coming from these three geometric models are summed at their 20 common vertices. These resultant micro\-scopic forces are then collectively homo\-genized to yield an averaged macro\-scopic state of stress at a chosen location in the parenchyma.  
 
 Feasibility of this solution strategy hinges upon one's ability to extrapolate information at the Gauss points out to their nodal positions.  This requires an intermingling between an element's shape functions used for interpolation with its quadrature rule used for integration.
 
@@ -369,7 +369,7 @@ Shape functions are introduced for interpolating within an element; specifically
 \end{subequations}
 which follow from substituting Eq.~\ref{extrapolation} into Eq.~\ref{interpolation}, or vice versa.  In this regard, such a pair of interpolation\slash extrapolation functions are said to be self-consistent. In other words, if a field whose values are known at the nodal points is interpolated down to the Gauss points, and then extrapolated back out to the nodal points, then the outgoing values located at the nodes will equal their incoming values at these nodes. The overall process is therefore self-consistent.  As straight\-forward as this procedure is, we found no satisfactory explanation of it in a finite element text.
 
-Whenever $m=n$, the matrices that come about from the interpolation and extrapolation coefficients are reciprocal to one another, with the 0's and 1's of Eqs.~\ref{extrapolationConstraint1} and \ref{extrapolationConstraint3} or \ref{extrapolationConstraint2} and \ref{extrapolationConstraint4} associating with the individual components of an identity matrix.  Consequently, our need to extrapolate information, as-well-as interpolate it, strongly suggests that the number of Gauss points selected ought to equal the number of nodal points associated with a given element geometry, albeit this is not a strict requirement for self-consistency.
+Whenever $m=n$, the matrices that come about from the interpolation and extrapolation coefficients are reciprocal to one another, with the 0's and 1's of Eqs.~\ref{extrapolationConstraint1} and \ref{extrapolationConstraint3} or \ref{extrapolationConstraint2} and \ref{extrapolationConstraint4} associating with the individual components of an identity matrix.  Consequently, our need to extrapolate information, as well as interpolate it, strongly suggests that the number of Gauss points selected ought to equal the number of nodal points associated with a given element geometry, albeit this is not a strict requirement for self-consistency.
 
 As an example, a self-consistent strategy for a tetrahedron interpolates via
 \begin{subequations}
@@ -581,7 +581,7 @@ As a check, each row in both matrices sums to 1 and, as expected, these matrices
         f ( \boldsymbol{x}_4 ) \\
         f ( \boldsymbol{x}_5 )
         \end{matrix} \right\} \\
-        \intertext{whose matrix elements are $a = 0.6901471673508344$, $b = 0.1367959452017669$ and $c = 0.0181304711228159$, and whose paired extrapolation map is}
+        \intertext{whose matrix elements are $a = 0.6901471673508344$, $b = 0.1367959452017669$, and $c = 0.0181304711228159$, and whose paired extrapolation map is}
         \left\{ \begin{matrix} 
         f ( \boldsymbol{x}_1 ) \\ 
         f ( \boldsymbol{x}_2 ) \\ 

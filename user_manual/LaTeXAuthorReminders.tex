@@ -1,0 +1,131 @@
+\documentclass{arlticle}
+\usepackage{verbatimbox}
+\def\arlticle{\textsf{\small arlticle}}
+\def\boxhandler{\textsf{\small ARLboxhandler}}
+\def\subfig{\textsf{\footnotesize subfig}}
+\def\subcaption{\textsf{\footnotesize subcaption}}
+\begin{document}
+\baresection{\large Common Mistakes in Formatting Your Technical Reports Using
+  the \textsf{arlticle} Document Class}
+Here are tips that authors should keep in mind when using the \arlticle{}
+  document class.
+ARL TechPubs has noted that the following formatting mistakes arise again and
+  again among the ARL user base.
+It would make your life and their life easier if you reminded yourself of these
+  guidelines when formulating your document draft.
+
+\section{No Report Title Hyphenation}
+Left to itself, hyphenation will naturally occur in long report titles, on both the 
+  cover and the title page.
+The standard is to avoid hyphenation here and page 3 of the \arlticle {} documentation
+  tells you how.
+Manually introduce \verb|\\|\, line breaks, as needed, when specifying the
+  argument to \verb|\arltitle|.\,
+The document class is smart enough to remove these manual breaks when regurgitating 
+  the title as item~4 on the SF-298.
+
+\section{``List of Symbols, Acronyms, and Abbreviations''}
+
+\subsubsection*{Location in Document}
+This is the official name of the list containing such things, and \textit{it is
+  to appear immediately before the Distribution List} at the \textit{end} of the
+  report, not in the report's front matter.
+The proper invocation to provide such an \textit{unnumbered} section, as
+  described on pp.~9,\,11 of the \arlticle{} documentation, is 
+
+\begin{verbbox}[\footnotesize]
+\baresection{List of Symbols, Acronyms, and Abbreviations}
+\end{verbbox}
+\theverbbox
+
+\subsubsection*{Format}
+The \arlticle{} class does not provide a list making environment for creating
+  such a list, so use the standard \LaTeX{} list-making tools as you see fit.
+However, note that all such entries in the list should be provided in medium-%
+  weight, roman, upright-shape font (no bold, italic, etc.)
+
+\section{Figure and Table Caption Format}
+
+\subsubsection*{Case}
+
+Table and figure captions are to be in \textit{sentence case}, meaning only the
+  first letter of caption sentences should be capitalized.  
+Exceptions, to also be capitalized, would include proper nouns.
+
+\subsubsection*{Periods}
+
+Captions do not end in periods; however, periods are used 
+  when the caption requires more than one sentence.
+
+\subsubsection*{Text Format}
+
+Captions should be bold, centered, and in \verb|\footnotesize|.
+The \arlticle{} document class provides the tools to automatically
+  get things right, \textit{if you use them}.
+In particular the class provides, as described on pp.~9,\,11 of the documentation,
+  the \verb|ARLfigure| and \verb|ARLtable| environments, that properly preset
+  the formatting of captions and figure/table font sizes/formats.%
+\begin{verbbox}[\footnotesize]
+\captionsetup{font={bf,footnotesize}}
+\end{verbbox}
+\footnote{ARL user James Ramsey noted that use of the \subfig{} package can 
+  interfere with this caption style.  The solution is to invoke \theverbbox{} 
+  in the preamble.  Alternately, consider using the \subcaption{} package.}
+Alternately, if you use the \boxhandler{} package, with its \verb|\bxfigure|
+  and \verb|\bxtable| macros, pp.~8--11 of the \arlticle{} documentation shows
+  how that will likewise produce correctly formatted captions.
+
+\section{List of Figures/Tables Caption Indent}
+
+The Lists of Figures and Tables are set up to provide proper indent of the caption
+  when the number of figures/tables is 99 or less \textit{and} when no 
+  figures/tables appear in appendices.
+If either of these conditions is violated, extra left margin needs to be added to
+  the caption indent of theses lists.
+
+\begin{sloppypar}
+The ARL report stencil provides the placeholders, which are the lengths
+\verb|\cftfignumwidth| and \verb|\cfttabnumwidth|.
+In particular, those placeholders are
+\end{sloppypar}
+\begin{verbbox}[\footnotesize]
+  \addtolength{\cftfignumwidth}{0.0ex}
+  \addtolength{\cfttabnumwidth}{0.0ex}
+\end{verbbox}
+\theverbbox\\
+which can be modified to increase the space allocated for the figure and table
+  numbers in the lists.
+A supplement of \texttt{1ex} should be sufficient.
+
+\section{Up to Date Mandatory Distribution List(s)}
+
+We all know that the lab (and some directorates) require mandatory distribution
+  lists to be included at the end of a report, in addition to the distribution
+  desired by the author.
+The stencil has been set up so that these lists are stored externally in
+  separate files and \verb|\input| into your document.
+The author is responsible for pointing to these \texttt{dls} files at the
+  beginning of the report stencil, in the manner of
+
+\begin{verbbox}[\footnotesize]
+  \def\MandatoryDL{ARL-02-01-19(Unlimited).dls}
+  \def\LocalMandatoryDL{blank.dls}
+  \def\UserDL{ARLstencil.dls}
+\end{verbbox}
+\theverbbox\\
+Note here that \texttt{blank.dls} applies when there is no directorate-specific
+  distribution to be applied. 
+Also, the \texttt{Unlimited} version of the mandatory ARL list applies to
+  distribution A reports; there is a comparable version for limited-distribution
+  documents.
+
+The issue that occasionally arises is that the authors are pointing to 
+  out-of-date mandatory lists.
+These lists are occasionally updated, and the authors must ensure that
+  their mandatory list definitions point to the current versions of these
+  lists.
+The most up-to-date list files are provided in Steven's \LaTeX{} share drive
+  location.
+
+\hfill -Steven B Segletes (\today)
+\end{document}

@@ -28,11 +28,11 @@ Our problem of interest is the dynamic mechanical response of an alveolus, whose
     \ddot{\mathbf{u}}^{(v)}_i & = \Bigl\{ \begin{matrix} \ddot{u}^{(v)}_i & \ddot{v}^{(v)}_i & \ddot{w}^{(v)}_i \end{matrix} \Bigr\}^{\mathsf{T}},
     \end{align}
 \end{subequations}
-where at the beginning of a solution step $\ddot{\delta}_i = \frac{1}{(\mathrm{d}t)^2} ( \delta_{i+1} - 2 \delta_i + \delta_{i-1} )$, while at the end of that solution step $\ddot{\delta}_{i+1} = \frac{1}{(\mathrm{d}t)^2} ( 2 \delta_{i+1} - 5 \delta_i + 4 \delta_{i-1} - \delta_{i-2} )$.  An evaluation of these nodal fields requires knowledge of the co-ordinates for each vertex at states $i+1$, $i$, $i-1$ and $i-2$.  All finite difference equations listed above are second-order formul\ae.
+where at the beginning of a solution step $\ddot{\delta}_i = \frac{1}{(\mathrm{d}t)^2} ( \delta_{i+1} - 2 \delta_i + \delta_{i-1} )$, while at the end of that solution step $\ddot{\delta}_{i+1} = \frac{1}{(\mathrm{d}t)^2} ( 2 \delta_{i+1} - 5 \delta_i + 4 \delta_{i-1} - \delta_{i-2} )$.  An evaluation of these nodal fields requires knowledge of the co-ordinates for each vertex at states $i+1$, $i$, $i-1$, and $i-2$.  All finite difference equations listed above are second-order formul\ae.
 
 Symbol $\boldsymbol{\Delta}$ is used to denote an assemblage of all nodal displacements, while symbol $\mathbf{u}^{(v)}$ is used to denote the nodal displacement of an individual vertex (node) $v$ located within this model, of which there are 20 in our dodecahedral model.  These 20 vertices uniquely establish 30 alveolar chords, 12 alveolar membranes, and the alveolar sac enveloped by them, cf.\ \S\ref{sec:indexingDodecahedra}.
 
-Our problem is not cast as a typical finite element solution, in the sense that we know the nodal displacements $\boldsymbol{\Delta}$, velocities $\dot{\boldsymbol{\Delta}}$, and accelerations $\ddot{\boldsymbol{\Delta}}$ \textit{a~priori}, for which nodal forces $\boldsymbol{F}$ are to be found.  Furthermore, the constitutive responses of the local structural members comprising the alveolus are also interrogated by our model construction (e.g., local stress-strain histories, damage/rupture, etc.), given an imposed far-field deformation history.  Typically, boundary conditions are known for which displacements are determined in a weak sense, which is the opposite of our situation. Inputs for our model are considered to come from a finite element model of a torso subjected to an impact caused by either a ballistic projectile or a blast wave.  Say, for example, that a location of interest in the lung has been selected.  What will serve as input to our dodecahedral model will be a history of the deformation gradient sequenced in time and taken from that element containing this location of interest.  For example, if 8-noded brick elements are used, then the deformation gradient will be constant over its volume.  
+Our problem is not cast as a typical finite element solution, in the sense that we know the nodal displacements $\boldsymbol{\Delta}$, velocities $\dot{\boldsymbol{\Delta}}$, and accelerations $\ddot{\boldsymbol{\Delta}}$ \textit{a~priori}, for which nodal forces $\boldsymbol{F}$ are to be found.  Furthermore, the constitutive responses of the local structural members composing the alveolus are also interrogated by our model construction (e.g., local stress-strain histories, damage/rupture, etc.), given an imposed far-field deformation history.  Typically, boundary conditions are known for which displacements are determined in a weak sense, which is the opposite of our situation. Inputs for our model are considered to come from a finite element model of a torso subjected to an impact caused by either a ballistic projectile or a blast wave.  Say, for example, that a location of interest in the lung has been selected.  What will serve as input to our dodecahedral model will be a history of the deformation gradient sequenced in time and taken from that element containing this location of interest.  For example, if 8-noded brick elements are used, then the deformation gradient will be constant over its volume.  
 
 An element of size $1~\text{mm}^3$ (which is at the resolution capability of current lung imaging technologies) would then have 100 to 200 alveoli in it.  Consequently, taking a statistical average over many dodecahedral model runs ought to provide a reasonable representation for the parenchymal response at that lung location.  Predictions coming from our dodecahedral model can be compared with predictions coming from a continuum model used to represent the parenchyma of lung in a torso model.  This information from our micro\-scopic alveolar model will allow for refinement and parameterization of a macro\-scopic continuum model for parenchyma.  This is particularly relevant because the spongy nature of lung tissue makes it extremely difficult to perform dynamic experiments that are suitable for parameterizing such continuum models \cite{saraf2007,sanborn2013}.
 
@@ -118,7 +118,7 @@ The assembled nodal displacements $\boldsymbol{\Delta}$, velocities $\dot{\bolds
 
 When assembled, vectors $\boldsymbol{F}$, $\boldsymbol{\Delta}$, $\dot{\boldsymbol{\Delta}}$, and $\ddot{\boldsymbol{\Delta}}$ have lengths of 60 for the alveolar chord and alveolar membrane models, and a length of 63 for the alveolar sac model, while matrices $\mathbf{K}$, $\mathbf{C}$, and $\mathbf{M}$ have dimensions of $60 \! \times \! 60$ for the alveolar chord and alveolar membrane models, and dimensions of $63 \! \times \! 63$ for the alveolar sac model.  The model for alveolar volume has an extra node located at the centroid of the dodecahedron, i.e., the co-ordinate origin, which is a node in common betwixt all 60 tetrahedra used to fill the volume of a dodecahedron in this alveolar model. 
 
-The objective of this chapter is to derive the elemental mass matrix, the two stiffness matrices (secant and tangent), plus the forcing functions and necessary boundary conditions, and to then assemble them for analysis. 
+The objective of this section is to derive the elemental mass matrix, the two stiffness matrices (secant and tangent), plus the forcing functions and necessary boundary conditions, and to then assemble them for analysis. 
 
 \subsection{$\,$Mass Matrices}
 
@@ -270,7 +270,7 @@ The finer details of constructing a mass matrix have been presented above, becau
 
 \paragraph{Assembly of Chordal Mass Matrices}
 
-In our alevolar model comprising septal chords, there are 20 nodes (vertices) whose numbering scheme and natural co-ordinates (those of a regular dodecahedron) are specified in Table~\ref{TableDodecahedron}.  Connecting these 20 nodes are 30 line segments (septal chords) whose numbering scheme and associated nodal numbers are specified in Table~\ref{Tablechordae}.
+In our alveolar model comprising septal chords, there are 20 nodes (vertices) whose numbering scheme and natural co-ordinates (those of a regular dodecahedron) are specified in Table~\ref{TableDodecahedron}.  Connecting these 20 nodes are 30 line segments (septal chords) whose numbering scheme and associated nodal numbers are specified in Table~\ref{Tablechordae}.
 
 In 3D analyses, the components $M^{\mathrm{1D}}_{ij}$ of mass matrix $\mathbf{M}_{\mathrm{1D}}$ from 
 Eq.~\ref{massMatrices1D} populate a mass matrix $\boldsymbol{M}_{\mathrm{1D}}^{(e)}$ for element $e$, $e \in \{ 1,2,\ldots,30 \}$, accordingly
@@ -416,7 +416,7 @@ From the consistent mass matrix of Eq.~\ref{massintegral2d}, its associated lump
 
 \paragraph{Assembly of Pentagonal Mass Matrices}
 
-In our alevolar model comprising septal membranes, there are 20 common nodes (vertices) whose numbering scheme and natural co-ordinates (those of a regular dodecahedron) are specified in Table~\ref{TableDodecahedron}.  Subsets of these 20 nodes allow for the construction of 12 pentagons (septal membranes) whose numbering scheme and associated nodal numbers are specified in Table~\ref{TablePentagons}.
+In our alveolar model comprising septal membranes, there are 20 common nodes (vertices) whose numbering scheme and natural co-ordinates (those of a regular dodecahedron) are specified in Table~\ref{TableDodecahedron}.  Subsets of these 20 nodes allow for the construction of 12 pentagons (septal membranes) whose numbering scheme and associated nodal numbers are specified in Table~\ref{TablePentagons}.
 
 In the co-ordinate system of a pentagon $( \vec{\mathbfsf{e}}_1 , \vec{\mathbfsf{e}}_2 , \vec{\mathbfsf{e}}_3  )^{(e)}$, $e \in \{ 1, 2, \ldots, 12 \}$, a pentagon has a mass matrix with a symmetric block structure of
 \begin{subequations}
@@ -738,7 +738,7 @@ The secant compliance $C^s$ that we apply to the collagen and elastin fibers in 
             2 (s^e - s^e_0)}} \right) + \frac{1}{E^e_2} ,
     \end{align}
 \end{subequations}
-whose inverses, viz., $E^c_s \defeq 1 / C^c_s$ and $E^e_s \defeq 1 / C^e_s$, are their secant moduli, which are defined in accordance with Eqs.~\ref{hyperelasticCompliance} and \ref{hyperelasticModulus}, and as such, $s^c = s_0^c + E^c_s e$ and $s^e = s_0^e + E^e_s e$.  The material properties associated with collagen fibers are: a soft initial modulus $E^c_1$, a stiff terminal modulus $E^c_2$, and their strain of transition $e^c_{1_{\max}}$, with like material properties describing an elastin fiber, cf.\ \S\ref{partConstitutive} and the Appendix.
+whose inverses, viz., $E^c_s \defeq 1 / C^c_s$ and $E^e_s \defeq 1 / C^e_s$, are their secant moduli, which are defined in accordance with Eqs.~\ref{hyperelasticCompliance} and \ref{hyperelasticModulus}, and as such, $s^c = s_0^c + E^c_s e$ and $s^e = s_0^e + E^e_s e$.  The material properties associated with collagen fibers are a soft initial modulus $E^c_1$, a stiff terminal modulus $E^c_2$, and their strain of transition $e^c_{1_{\max}}$, with like material properties describing an elastin fiber, cf.\ \S\ref{partConstitutive} and the Appendix.
 
 Whenever $s^c < s^c_0$, the elastic modulus for collagen is taken to be its modulus at zero strain, i.e., $E^c_s = E^c_1 E^c_2 / ( E^c_1 + E^c_2 )$ so that $C^c_s = (E^c_1 + E^c_2) / E^c_1 E^c_2$, which helps to ensure numeric stability.  Also, whenever a collagen fiber ruptures, $E^c_s \to 0$ and therefore $C^c_s \to \infty$.  Like statements apply to the elastin fiber of an alveolar chord.
 
@@ -838,7 +838,7 @@ where $G^s (s^{\tau} \! = \! 0) = G_1 G_2 / (G_1 + G_2)$.
 
 Only in the mode of dilation is membrane rupture considered to be possible.  Nevertheless, whenever a rupture event does happen, both moduli vanish, i.e., $M^s \to 0$ and $G^s \to 0$.  The membrane loses structural integrity upon rupture.  The material parameters describing the various modes of a membrane are analogous to those used to describe a fiber.
 
-Like the fiber compliance (Eq.~\ref{fiberCompliance}) used to model an alveolar chord, the membrane compliance (Eq.~\ref{planarCompliance}) used to model an alveolar septa has components that depend upon stress, but not upon strain.  Consequently, the tangent modulus of Eq.~\ref{elasticModuliViaCs} required of our finite element implementation has components of
+Like the fiber compliance (Eq.~\ref{fiberCompliance}) used to model an alveolar chord, the membrane compliance (Eq.~\ref{planarCompliance}) used to model alveolar septa has components that depend upon stress, but not upon strain.  Consequently, the tangent modulus of Eq.~\ref{elasticModuliViaCs} required of our finite element implementation has components of
 \small
 \begin{multline}
     \boldsymbol{\mathcal{M}}^t =  \begin{bmatrix}
@@ -950,7 +950,7 @@ wherein $\mathbf{S}$ is a symmetric matrix of size $d \! \times \! d$ whose comp
 
 For nonlinear elastic materials, like soft tissues, stress\slash strain response curves generally become stiffer with increasing deformation \cite{Fung90,Freed14}.  Consequently, the slope of a line segment connecting the origin with its current stress\slash strain state, located somewhere along its response curve, will change with a change in stress and strain, and therefore, its secant modulus will necessarily be a function of stress and\slash or strain.
 
-A variation in the residual energy $R$ of a deformed elastic body is the difference between variations from two energy sources, assuming a simply connected body whose motion maps have sufficient smoothness, etc.  These energies are: a potential energy $U$ that stores an internal strain energy, and a work done $W$ that expends energy though an external loading, specifically
+A variation in the residual energy $R$ of a deformed elastic body is the difference between variations from two energy sources, assuming a simply connected body whose motion maps have sufficient smoothness, etc.  These energies are a potential energy $U$ that stores an internal strain energy, and a work done $W$ that expends energy though an external loading, specifically
 \begin{subequations}
     \label{principle}
     \begin{align}
@@ -2541,7 +2541,7 @@ The boundary of a 2D pentagon consists of line segments, which can be considered
 & + |\mathbf{J}| \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{45} \, w_i + |\mathbf{J}| \sum_{i=1}^{2} \mathbf{N}^{\mathsf{T}} \, \mathbf{t}_{51} \, w_i ,
 \end{aligned}
 \end{equation}
-where $\mathbf{N}$ represents the shape function matrix of a chord, but with the matrix dimension of a pentagon, $|\mathbf{J}|$ is the determinant of the Jacobian for a 1-D chord, $w_i$ denotes the natural weight of the chord, $\mathrm{d} S$ is the arc-length of an infinitesimal line element along the boundary, and $\mathbf{t}$ is the traction vector on each edge of the pentagon defined as
+where $\mathbf{N}$ represents the shape function matrix of a chord, but with the matrix dimension of a pentagon, $|\mathbf{J}|$ is the determinant of the Jacobian for a 1D chord, $w_i$ denotes the natural weight of the chord, $\mathrm{d} S$ is the arc-length of an infinitesimal line element along the boundary, and $\mathbf{t}$ is the traction vector on each edge of the pentagon defined as
 \begin{equation}
 \mathbf{t} = \mathbf{S}^{s\mathsf{T}} \cdot \mathbf{n}  ,
 \end{equation}

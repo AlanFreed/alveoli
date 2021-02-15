@@ -1,0 +1,178 @@
+\documentclass{arlticle}
+\usepackage{lipsum}
+% IF REPORT CITATIONS TO REAPPEAR IN APPENDICES, YOU NEED 
+% THE NEXT TWO LINES
+\usepackage{bibentry}
+\nobibliography*
+% THEN, INSTEAD OF \cite{<bibtag>},
+% USE \footnotecite[<tag>]{\bibentry{<bibtag>}} FOR THE APPENDIX
+% CITATION.  IF A RECITE IS NEEDED THEREAFTER, \recite{<tag>} WILL DO.
+% NOTE THAT tag AND bibtag CAN BE THE SAME STRING.
+\def\MandatoryDL{ARL-02-01-19(Unlimited).dls}
+\def\UserDL{blank.dls}
+\sectspace
+\distcodes{A}{}{}
+\arltitle{Testing New Features of arlticle V2.50\\Including New Logos}
+\pubdate{January 2019}
+\allauthors{Steven B Segletes}
+\authorsA  {Steven B Segletes}
+\organizationA	{Weapons and Materials Research Directorate, ARL}
+\usepackage{filecontents}
+\begin{filecontents*}{mybib.bib}
+@TECHREPORT{segl83,
+	AUTHOR	= "Segletes, Steven B.",
+	TITLE   = "Drift Velocity Computations for Shaped-Charge Jets",
+        NUMBER  = "ARBRL-MR-03306 (ADA 133 756)",
+        INSTITUTION = "Army Ballistic Research Laboratory (US)",
+        ADDRESS = "Aberdeen Proving Ground (" # md.us # ")",
+	YEAR	= "1983",
+	MONTH	= sep				}
+@TECHREPORT{segl98a,
+	AUTHOR	= "Segletes, S. B.",
+	TITLE	= "The Vibrational Stiffness of an Atomic Lattice",
+   NUMBER  = "ARL-TR-1757",
+   INSTITUTION = "U.S. Army Research Laboratory",
+   ADDRESS = "Aberdeen Proving Ground, " # md.us,
+	YEAR	= "1998",
+	MONTH	= sep				}
+\end{filecontents*}
+\begin{document}
+\ARLcover{
+}% Place a zero in the braces to get an ink-saving "LoInk" cover
+\arltitlepage
+
+\tableofcontents
+\clearpage
+
+\section{Report Section}
+
+Seven major changes are incorporated into the \textsf{arlticle} document
+  class, version 2.50.
+They include
+\begin{enumerate}
+\item New logos on the cover and title page, to reflect our realignment
+  with CCDCOM.  The logos may yet be upgraded to vector graphics, if
+  available, to avoid zoom pixelation.
+
+\item Footnotes should appear at the bottom margin, even if the page text 
+  ends partially down the page.  That is, the gap (if any) is before the
+  footnote and not after it.
+
+\item The macros \verb|\footnotecite| and \verb|\recite| have been
+  provided to assist the user in citing works from the appendices.
+
+\item The definitions associated with appendices have been changed
+  so that subsections and lower sectioning of appendices does not
+  show up in the Table of Contents.
+
+\item Newer preferred macros have been introduced to  support
+  portion marking (FOUO in unclassified reports and classification
+  marking in classified reports) for tables and figures.
+  These macros are \verb|\setportionmark| and \verb|\portionmark|.
+
+\item The \textsf{stackengine} package is now included by default,
+  to support the portion-marking features of the document class.
+
+\item When creating a distribution list, the package has, for some time,
+  created an ancillary \verb|tex| document that is used to create the
+  email data for the distribution list.
+  A bug has been fixed so that this feature does not break when the 
+  original document has spaces in the filename.
+\end{enumerate}
+
+\subsection{Report Sectioning}
+
+Within the main document, report sectioning shows up in the Table of Contents.
+Report subsectioning (all the way down to subsubsections) will also show
+  up in the Table of Contents.
+Please use this new way to portion mark.
+
+\subsection{Portion Marking for FOUO (and/or classification)}
+
+New macros for portion marking have been introduced.
+
+\subsubsection{Former Technique (deprecated...please use no longer)}
+\verb|\FOUOunderset[<gap>]{<content>}| and \\
+\verb|\FOUOincludegraphics[<options>]{<image-file>}|
+\begin{ARLtable}[ht]
+\caption{(FOUO) Table title includes FOUO portion marking}
+\FOUOunderset{%
+  \begin{tabular}[b]{ccccp{1in}}
+   \hline
+  A & B & C & D & Text\\
+   \hline
+  1.2 & Red & Blue & 100 & Here is my wrapping text that is in the table\\
+   \hline
+  \end{tabular}%
+  }%
+\qquad\FOUOincludegraphics[width=1in]{example-image}
+\end{ARLtable}
+
+\subsubsection{Preferred Technique}
+\verb|\setportionmark{<default marking>}| and \\
+\verb|\portionmark[<marking>][<gap>]{<content>}|
+
+\setportionmark{FOUO}
+\begin{ARLtable}[ht]
+\caption{(FOUO) Table title includes FOUO portion marking}
+\portionmark[UNCLASSIFIED][7pt]{%
+  \begin{tabular}[b]{ccccp{1in}}
+   \hline
+  A & B & C & D & Text\\
+   \hline
+  1.2 & Red & Blue & 100 & Here is my wrapping text that is in the table\\
+   \hline
+  \end{tabular}%
+  }%
+\qquad\portionmark{\includegraphics[width=1in]{example-image}}
+\end{ARLtable}
+
+\paragraph{Footnote change}
+My footnote\footnote{Right here, at bottom margin.} should be at the 
+  bottom margin and not immediately below the last line of text.
+It is not numbered, but denoted with a symbol.
+Here are also several report reference,\cite{segl98a,segl83} which 
+  are numbered.
+
+\arlbibliography{mybib}
+
+\appendix*{Sole Appendix}
+
+The appendix will show in the Table of Contents.
+
+\subsection{Appendix Test}
+
+However, subsections and lower sectioning of appendices will \textit{not} show
+in the Table of Contents.
+And while footnotes\footnote{Here is regular footnote.} in appendices
+  should operate as in the main report, appendix citations do not.
+Here is an appendix citation\footnotecite[Rsegl83]{\bibentry{segl83}.}
+  of a reference that already appeared in the main report.
+It gets [possibly] new numbering here.  The actual reference for the
+  citation shows up in a numbered footnote, using the \verb|bibitem|
+  package.
+Use \verb|\footnotecite[<tag>]{\bibentry{bibtex-tag}.}|
+
+The \verb|tag| is optionally specified should you later need to re-cite
+  the same report later in the same appendix.
+And here it is: a recitation\recite{Rsegl83} of a reference already 
+  cited elsewhere in the appendix.
+The syntax is \verb|\recite{<tag>}|.  
+The \verb|tag| can be specified the same as the \verb|bibtex-tag|, if desired.
+
+\distlistsetup
+\begin{distributionlist}
+\input{\MandatoryDL}
+\pdlitem{1}
+A file\\
+DL\_ARL-TR-XXXX.tex\\
+is created for generating\\
+the distribution e-mailing\\
+list.\\
+This feature no longer\\
+fails when this document has\\
+spaces in the filename
+\end{distributionlist}
+\distlistcleanup
+
+\end{document}

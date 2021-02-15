@@ -41,7 +41,7 @@ which is uniform over the length of a chord, i.e., it is independent of $\xi$.
 
 \subsection{$\,$2D Triangles}
 
-Triangular elements are needed in a support capacity in order to construct our alevolar model; specifically, the four surfaces of a tetrahedron are triangles.  What is required of them is a capability to compute the traction acting across such a surface through integration.  This requires knowledge of their shape functions and quadrature rules, the latter topic being discussed in Section~\ref{partNumericalMethods}. 
+Triangular elements are needed in a support capacity in order to construct our alveolar model; specifically, the four surfaces of a tetrahedron are triangles.  What is required of them is a capability to compute the traction acting across such a surface through integration.  This requires knowledge of their shape functions and quadrature rules, the latter topic being discussed in Section~\ref{partNumericalMethods}. 
 
 \subsubsection{Shape Functions for Interpolating a Triangle}
 
@@ -168,7 +168,7 @@ which differ for each shape function via index $i = 1,2,\dots,5$, while the poly
 \begin{equation}
 \beta_i = \sum_{j=1}^5 \alpha_{ij} \kappa_j, \qquad i = 0, 1, \dots, 5
 \end{equation}
-which are the same for all five shape functions.  Sums over the four cubic terms in Eq.~\ref{shapeFnCoefs} all vanish---a byproduct of Wachpress' formulation.  In the above formul\ae, an index count of $i \equiv 0 \implies i = 5$, while index counts of $i \equiv 6 \implies i = 1$, $i \equiv 7 \implies i = 2$, and $i \equiv 8 \implies i = 3$.  Shape function $N_1$ is illustrated in Fig.~\ref{figShapeFuntion}, with like images applying for the other four shape functions.
+which are the same for all five shape functions.  Sums over the four cubic terms in Eq.~\ref{shapeFnCoefs} all vanish---a byproduct of Wachspress' formulation.  In the above formul\ae, an index count of $i \equiv 0 \implies i = 5$, while index counts of $i \equiv 6 \implies i = 1$, $i \equiv 7 \implies i = 2$, and $i \equiv 8 \implies i = 3$.  Shape function $N_1$ is illustrated in Fig.~\ref{figShapeFuntion}, with like images applying for the other four shape functions.
 
 \begin{figure}
 	\centering
@@ -812,7 +812,7 @@ such that, for the four-node tetrahedron considered here, one has
     v_2 - v_1 & v_3 - v_1 & v_4 - v_1 \\
     w_2 - w_1 & w_3 - w_1 & w_4 - w_1
     \end{bmatrix} \\
-    \intertext{whose nodal displacements $\mathbfit{u}_i \defeq \mathbfit{x}_i - \mathbfit{x}_{0i}$, $i=1,2,3,4$, have components of $\mathbfit{u}_i = u_i \, \vec{\mathbfsf{E}}_1 + v_i \, \vec{\mathbfsf{E}}_2 + w_i \, \vec{\mathbfsf{E}}_3$  with $u_i \defeq x_i - x_{0i}$, $v_i \defeq y_i - y_{0i}$ and $w_i \defeq z_i - z_{0i}$, evaluated in the reference co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ of the dodecahedron, and}
+    \intertext{whose nodal displacements $\mathbfit{u}_i \defeq \mathbfit{x}_i - \mathbfit{x}_{0i}$, $i=1,2,3,4$, have components of $\mathbfit{u}_i = u_i \, \vec{\mathbfsf{E}}_1 + v_i \, \vec{\mathbfsf{E}}_2 + w_i \, \vec{\mathbfsf{E}}_3$  with $u_i \defeq x_i - x_{0i}$, $v_i \defeq y_i - y_{0i}$, and $w_i \defeq z_i - z_{0i}$, evaluated in the reference co-ordinate frame $( \vec{\mathbfsf{E}}_1 , \vec{\mathbfsf{E}}_2 , \vec{\mathbfsf{E}}_3 )$ of the dodecahedron, and}
     \begin{bmatrix}
     \partial x_0 / \partial \xi & \partial x_0 / \partial \eta & \partial x_0 / \partial \zeta \\
     \partial y_0 / \partial \xi & \partial y_0 / \partial \eta & \partial y_0 / \partial \zeta \\
@@ -1051,7 +1051,7 @@ How the 30 chords and 12 irregular pentagons deform under far-field motions of s
 	\label{figSimpleShears}
 \end{figure}
 
-Figures \ref{figDilatation}--\ref{figSimpleShears} show that a dodecahedron is (nearly, but not completely) isotropic in its kinematic response, as measured by the geometric strains $e = \ln (L / L_0)$, $\xi = \ln \sqrt{A / A_0}$ and $\Xi = \ln \sqrt[3]{V / V_0}$.  Furthermore, even though a far-field deformation is homogeneous, in accordance with our Conjecture on pg.~\pageref{conjecture}, the local deformations within the individual constituents of an alveolus will typically be heterogeneous, which agrees with imaging data \cite{PerlmanBhattacharya07}.
+Figures \ref{figDilatation}--\ref{figSimpleShears} show that a dodecahedron is (nearly, but not completely) isotropic in its kinematic response, as measured by the geometric strains $e = \ln (L / L_0)$, $\xi = \ln \sqrt{A / A_0}$, and $\Xi = \ln \sqrt[3]{V / V_0}$.  Furthermore, even though a far-field deformation is homogeneous, in accordance with our Conjecture on pg.~\pageref{conjecture}, the local deformations within the individual constituents of an alveolus will typically be heterogeneous, which agrees with imaging data \cite{PerlmanBhattacharya07}.
 
 \paragraph{Thermodynamic Strains}
 
