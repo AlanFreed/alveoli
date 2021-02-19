@@ -167,30 +167,30 @@ vfH2O = 0.6
 vfBlood = 0.3
 
 
-# mass densities are in grams per centimeter cubed
+# mass densities are in grams per micron cubed
 
 def rhoAir():
-    rho = 1.16E-3
+    rho = 1.16E-15
     return rho
 
 
 def rhoBlood():
-    rho = 1.04
+    rho = 1.04E-12
     return rho
 
 
 def rhoCollagen():
-    rho = 1.34
+    rho = 1.34E-12
     return rho
 
 
 def rhoElastin():
-    rho = 1.31
+    rho = 1.31E-12
     return rho
 
 
 def rhoH2O():
-    rho = 1.0
+    rho = 1.0E-12
     return rho
 
 
@@ -203,27 +203,27 @@ def rhoSepta():
 # entropy densities are in ergs per gram Kelvin
 
 def etaAir():
-    eta = 3.796E7
+    eta = 3.796E11
     return eta
 
 
 def etaBlood():
-    eta = 3.0E7  # this is a guess - not able to find a value for this
+    eta = 3.0E11  # this is a guess - not able to find a value for this
     return eta
 
 
 def etaCollagen():
-    eta = 3.7E7
+    eta = 3.7E11
     return eta
 
 
 def etaElastin():
-    eta = 3.4E7
+    eta = 3.4E11
     return eta
 
 
 def etaH2O():
-    eta = 3.883E7
+    eta = 3.883E11
     return eta
 
 
@@ -236,27 +236,27 @@ def etaSepta():
 # specific heats at constant pressure are in ergs per gram Kelvin
 
 def CpAir():
-    cp = 1.006E7
+    cp = 1.006E11
     return cp
 
 
 def CpBlood():
-    cp = 9.4E6
+    cp = 9.4E10
     return cp
 
 
 def CpCollagen():
-    cp = 1.7E7
+    cp = 1.7E11
     return cp
 
 
 def CpElastin():
-    cp = 4.2E7
+    cp = 4.2E11
     return cp
 
 
 def CpH2O():
-    cp = 4.187E7
+    cp = 4.187E11
     return cp
 
 
@@ -317,9 +317,9 @@ def alveolarDiameter():
     # alveolar diameter was found to distribute normally
     mu = 177.0      # mean diameter in microns: extrapolated to zero pressure
     dia = mu
-    # convert microns to centimeters
-    dia = dia / 10000.0
-    return dia  # in centimeters
+    # # convert microns to centimeters
+    # dia = dia / 10000.0
+    return dia  # in micron
 
 
 def fiberDiameterCollagen():
@@ -327,9 +327,9 @@ def fiberDiameterCollagen():
     # the square root of fiber diameter was found to distribute normally
     mu = 0.952      # mean of the square root of fiber diameter in microns
     dia = mu
-    # convert microns to centimeters
-    dia = dia / 10000.0
-    return dia  # in centimeters
+    # # convert microns to centimeters
+    # dia = dia / 10000.0
+    return dia  # in micron
 
 
 def fiberDiameterElastin():
@@ -337,27 +337,27 @@ def fiberDiameterElastin():
     # the square root of fiber diameter was found to distribute normally
     mu = 0.957      # mean of the square root of fiber diameter in microns
     dia = mu
-    # convert microns to centimeters
-    dia = dia / 10000.0
-    return dia  # in centimeters
+    # # convert microns to centimeters
+    # dia = dia / 10000.0
+    return dia  # in micron
 
 
 def septalWidth():
     # no statistics available, based on judgment
     mu = 4.5       # the mean thickness is taken to be 4.5 microns
     width = mu
-    # convert microns to centimeters
-    width = width / 10000.0
-    return width  # in centimeters
+    # # convert microns to centimeters
+    # width = width / 10000.0
+    return width  # in microns
 
 
 def collagenFiber():
     # no statistics available, based on judgment
     # the compliant modulus
-    mu1 = 5.0E5     # the mean compliant modulus in barye
+    mu1 = 5.0E1     # the mean compliant modulus in barye
     E1 = mu1
     # the stiffness modulus
-    mu2 = 5.0E7     # the mean stiff modulus in barye
+    mu2 = 5.0E3     # the mean stiff modulus in barye
     E2 = mu2
     # transition strain, i.e., limiting strain of molecular reconfiguration
     muT = 0.09       # the mean transition strain at 30% total lung capacity
@@ -373,10 +373,10 @@ def collagenFiber():
 def elastinFiber():
     # no statistics available, based on judgment
     # the compliant modulus
-    mu1 = 2.3E6     # the mean compliant modulus in barye
+    mu1 = 2.3E2     # the mean compliant modulus in barye
     E1 = mu1
     # the stiffness modulus
-    mu2 = 1.0E7     # the mean stiff modulus in barye
+    mu2 = 1.0E3     # the mean stiff modulus in barye
     E2 = mu2
     # the transition strain
     muT = 0.4        # the mean transition strain
@@ -392,10 +392,10 @@ def septalMembrane():
     # the dilation response
 
     # the compliant modulus
-    mu1 = 1.0E4     # (1.0E4) the mean compliant modulus in barye
+    mu1 = 1.0     # the mean compliant modulus in barye (1.0E4), in g/(micron.s^2) (1.0)
     M1 = mu1
     # the stiffness modulus
-    mu2 = 3.0E6     # (3.0E6) the mean stiff modulus in barye
+    mu2 = 300.0     # the mean stiff modulus in barye (3.0E6), in g/(micron.s^2) (300.0) 
     M2 = mu2
     # the transition strain
     muT = 0.24      # the mean transition strain
@@ -426,7 +426,7 @@ def septalSac():
     # no statistics available, based on judgment
     
     #  The atmospheric pressure at sea level (1 bar or 10E4 Pa or 10E5 barye),
-    p_0 = 10E5              # pressure                   (barye)
+    p_0 = 10E1              # pressure                   (barye)
     # V0 / V
     v0v = 1.002616
     return p_0, v0v

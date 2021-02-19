@@ -135,7 +135,7 @@ Reference:
 
 class PECE(object):
 
-    def __init__(self, u0, v0, t0, dt, aFn, m=1):
+    def __init__(self, u0, v0, t0, dt, aFn, p, pi, m=1):
         # verify the inputs
 
         # create the response array for displacements
@@ -183,7 +183,7 @@ class PECE(object):
             self.a = aFn
         else:
             raise RuntimeError("Argument aFn must be a callable function.")
-        a0 = aFn(t0, u0, v0)
+        a0 = aFn(t0, u0, v0, p, pi)
         if isinstance(a0, np.ndarray):
             (dim,) = np.shape(a0)
             if dim != self.dim:
@@ -216,7 +216,7 @@ class PECE(object):
 
         return  # a new integrator object
 
-    def integrate(self, restart=False):
+    def integrate(self, p, pi, restart=False):
         # assign the response variables and their rates (enables reintegration)
         self.t = self.tR
         self.uPrev[:] = self.uPrevR[:]
@@ -236,7 +236,7 @@ class PECE(object):
             v1 = np.add(self.vCurr, np.multiply(self.dt, self.aCurr))
             uP = np.copy(u1)
             # evaluate
-            a1 = self.a(t1, u1, v1)
+            a1 = self.a(t1, u1, v1, p, pi)
             for m in range(self.m):
                 # correct
                 u1 = np.add(self.uCurr,
@@ -248,7 +248,7 @@ class PECE(object):
                 v1 = np.add(self.vCurr,
                             np.multiply(self.dt / 2.0, np.add(a1, self.aCurr)))
                 # re-evaluate
-                a1 = self.a(t1, u1, v1)
+                a1 = self.a(t1, u1, v1, p, pi)
             # store the displacment vector for computing truncation error
             if self.m != 0:
                 uC = np.copy(u1)
@@ -282,7 +282,7 @@ class PECE(object):
             vN = np.add(vNm1, dvNm1)
             uP = np.copy(uN)
             # evaluate
-            aN = self.a(tN, uN, vN)
+            aN = self.a(tN, uN, vN, p, pi)
             for m in range(self.m):
                 # correct
                 duN = np.multiply(self.dt / 24.0,
@@ -298,7 +298,7 @@ class PECE(object):
                 dvN = np.multiply(2.0 * self.dt / 3.0, aN)
                 vN = np.add(vNm1, dvN)
                 # re-evaluate
-                aN = self.a(tN, uN, vN)
+                aN = self.a(tN, uN, vN, p, pi)
             if self.m != 0:
                 uC = np.copy(uN)
             else:

@@ -951,34 +951,21 @@ class tetrahedron(object):
 
 
         # determine vertice coordinates in the pentagonal frame of reference
-        self._v1x0 = n1x * x1[0] + n1y * x1[1] + n1z * x1[2]
-        self._v1y0 = n2x * x1[0] + n2y * x1[1] + n2z * x1[2]
-        self._v2x0 = n1x * x2[0] + n1y * x2[1] + n1z * x2[2]
-        self._v2y0 = n2x * x2[0] + n2y * x2[1] + n2z * x2[2]
-        self._v3x0 = n1x * x3[0] + n1y * x3[1] + n1z * x3[2]
-        self._v3y0 = n2x * x3[0] + n2y * x3[1] + n2z * x3[2]
-        self._v4x0 = n1x * x4[0] + n1y * x4[1] + n1z * x4[2]
-        self._v4y0 = n2x * x4[0] + n2y * x4[1] + n2z * x4[2]
+        self._v1x = n1x * x1[0] + n1y * x1[1] + n1z * x1[2]
+        self._v1y = n2x * x1[0] + n2y * x1[1] + n2z * x1[2]
+        self._v2x = n1x * x2[0] + n1y * x2[1] + n1z * x2[2]
+        self._v2y = n2x * x2[0] + n2y * x2[1] + n2z * x2[2]
+        self._v3x = n1x * x3[0] + n1y * x3[1] + n1z * x3[2]
+        self._v3y = n2x * x3[0] + n2y * x3[1] + n2z * x3[2]
+        self._v4x = n1x * x4[0] + n1y * x4[1] + n1z * x4[2]
+        self._v4y = n2x * x4[0] + n2y * x4[1] + n2z * x4[2]
 
         # z offsets 
-        self._v1z0 = n3x * x1[0] + n3y * x1[1] + n3z * x1[2]
-        self._v2z0 = n3x * x2[0] + n3y * x2[1] + n3z * x2[2]
-        self._v3z0 = n3x * x3[0] + n3y * x3[1] + n3z * x3[2]
-        self._v4z0 = n3x * x4[0] + n3y * x4[1] + n3z * x4[2]    
+        self._v1z = n3x * x1[0] + n3y * x1[1] + n3z * x1[2]
+        self._v2z = n3x * x2[0] + n3y * x2[1] + n3z * x2[2]
+        self._v3z = n3x * x3[0] + n3y * x3[1] + n3z * x3[2]
+        self._v4z = n3x * x4[0] + n3y * x4[1] + n3z * x4[2]    
         
-        # initialize current vertice coordinates
-        self._v1x = self._v1x0
-        self._v1y = self._v1y0
-        self._v1z = self._v1z0
-        self._v2x = self._v2x0
-        self._v2y = self._v2y0
-        self._v2z = self._v2z0
-        self._v3x = self._v3x0
-        self._v3y = self._v3y0
-        self._v3z = self._v3z0
-        self._v4x = self._v4x0
-        self._v4y = self._v4y0
-        self._v4z = self._v4z0
 
         # determine the volume of this tetrahedron 
         self._Vn = self._volTet(self._v1x, self._v1y, self._v1z,

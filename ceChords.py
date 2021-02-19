@@ -716,6 +716,14 @@ class SeptalChord(Response):
         self.stress_c = s0_c
         self.eta_e = mp.etaElastin()
         self.stress_e = s0_e
+
+        # parameters used to determine chordal length
+        alpha = m.pi * 18.0 / 180.0
+        omega = m.pi * 54.0 / 180.0
+        lenOverDia = 1.0 / (m.tan(omega) * (1.0 + m.cos(alpha)))        
+        self.len_0 = lenOverDia * mp.alveolarDiameter()
+            
+            
         return  # a new instance of type ceChord
 
     # inherited methods
@@ -780,6 +788,90 @@ class SeptalChord(Response):
         self.stress_e = yVec[3]
         return Et
 
+
+    def mixedSecantModulus(self, eVec, xVec, yVec):
+        if isinstance(yVec, np.ndarray):
+            (responses,) = np.shape(yVec)
+            if self.firstCall:
+                self.responses = responses                               
+                if responses != self.responses:
+                    raise RuntimeError("The yVec sent had a length of "
+                                       + "{}, but it must have ".format(responses)
+                                       + "a length of {}.".format(self.responses))
+        else:
+            raise RuntimeError("Argument yVec must be a NumPy array.")        
+
+        if isinstance(eVec, np.ndarray):
+            (controls,) = np.shape(eVec)
+            if self.firstCall:
+                self.controls = controls
+                if self.responses % self.controls != 0:
+                    raise RuntimeError("The number of response variables "
+                                       + "must be an integer mulitplier to "
+                                       + "the number of control variables.")
+            else:
+                if controls != self.controls:
+                    raise RuntimeError("The eVec sent had a length of "
+                                       + "{}, but it must ".format(controls)
+                                       + "have length "
+                                       + "{}.".format(self.controls))
+        else:
+            raise RuntimeError("Argument eVec must be a NumPy array.")
+
+        # create an empty matrix for inserting the secant moduli into
+        Ms = np.zeros((int(self.responses / 2), self.controls), dtype=float)
+        # update the first call flag
+        if self.firstCall:
+            self.firstCall = False        
+        
+        Es = self.secantModulus(eVec, xVec, yVec)
+        phi = self.volumeFraction()
+        for i in range(2):
+            Ms[i, :] = phi * Es[i, :] + (1 - phi) * Es[2 + i, :]
+        return Ms
+
+    def mixedtangentModulus(self, eVec, xVec, yVec):
+        if isinstance(yVec, np.ndarray):
+            (responses,) = np.shape(yVec)
+            if self.firstCall:
+                self.responses = responses                               
+                if responses != self.responses:
+                    raise RuntimeError("The yVec sent had a length of "
+                                       + "{}, but it must have ".format(responses)
+                                       + "a length of {}.".format(self.responses))
+        else:
+            raise RuntimeError("Argument yVec must be a NumPy array.")        
+
+        if isinstance(eVec, np.ndarray):
+            (controls,) = np.shape(eVec)
+            if self.firstCall:
+                self.controls = controls
+                if self.responses % self.controls != 0:
+                    raise RuntimeError("The number of response variables "
+                                       + "must be an integer mulitplier to "
+                                       + "the number of control variables.")
+            else:
+                if controls != self.controls:
+                    raise RuntimeError("The eVec sent had a length of "
+                                       + "{}, but it must ".format(controls)
+                                       + "have length "
+                                       + "{}.".format(self.controls))
+        else:
+            raise RuntimeError("Argument eVec must be a NumPy array.")
+
+        # create an empty matrix for inserting the secant moduli into
+        Mt = np.zeros((int(self.responses / 2), self.controls), dtype=float)
+        # update the first call flag
+        if self.firstCall:
+            self.firstCall = False        
+               
+        Et = self.tangentModulus(eVec, xVec, yVec)
+        phi = self.volumeFraction()
+        for i in range(2):
+            Mt[i, :] = phi * Et[i, :] + (1 - phi) * Et[2 + i, :]
+        return Mt
+    
+    
     def isRuptured(self):
         ruptured_c = self.fiberC.isRuptured()
         ruptured_e = self.fiberE.isRuptured()
@@ -876,6 +968,10 @@ class SeptalChord(Response):
     def area(self):
         a = self.areaCollagen() + self.areaElastin()
         return a
+    
+    def volumeFraction(self):
+        phi = self.A0_c / (self.A0_c + self.A0_e)
+        return phi
 
     def volumeCollagen(self):
         vol = self.A0_c * self.len_0
@@ -918,6 +1014,12 @@ class SeptalChord(Response):
     def stress(self):
         sigma = self.force() / self.area()
         return sigma
+    
+    def traction(self):
+        phi = self.volumeFraction()
+        t = phi * self.stress_c + (1 - phi) * self.stress_e
+        return t
+    
 
     def force(self):
         if self.firstCall:

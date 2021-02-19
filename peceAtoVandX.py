@@ -214,7 +214,7 @@ References:
 
 class pece(object):
 
-    def __init__(self, aFn, t0, x0, v0, h, tol=0.0001):
+    def __init__(self, aFn, t0, x0, v0, h, p, pi, tol=0.0001):
         self.committed = False
 
         self.a = aFn
@@ -239,7 +239,7 @@ class pece(object):
         else:
             raise RuntimeError("Initial condition 'v0' must be a numpy.array.")
 
-        a0 = aFn(t0, x0, v0)
+        a0 = aFn(t0, x0, v0, p, pi)
         if (a0.shape == (rows,)):
             self.a_nm1 = a0
         else:
@@ -275,7 +275,7 @@ class pece(object):
                                np.multiply(h0 * h0 / 2.0, a0)))
         vp = np.add(v0, np.multiply(h0, a0))
         # evaluate
-        ap = aFn(t1, xp, vp)
+        ap = aFn(t1, xp, vp, p, pi)
         # correct
         x1 = np.add(x0, np.subtract(np.multiply(h0 / 2.0, np.add(vp, v0)),
                                     np.multiply(h0 * h0 / 12.0,
@@ -314,7 +314,7 @@ class pece(object):
         return  # nothing
 
     # take the first step of integration
-    def takeFirstStep(self):
+    def takeFirstStep(self, p, pi):
         t0 = self.t_nm1
         x0 = self.x_nm1
         v0 = self.v_nm1
@@ -337,14 +337,14 @@ class pece(object):
                                    np.multiply(h1 * h1 / 2., a0)))
             vp = np.add(v0, np.multiply(h1, a0))
             # evaluate
-            ap = self.a(t1, xp, vp)
+            ap = self.a(t1, xp, vp, p, pi)
             # correct
             x1 = np.add(x0, np.subtract(np.multiply(h1 / 2.0, np.add(vp, v0)),
                                         np.multiply(h1 * h1 / 12.0,
                                                     np.subtract(ap, a0))))
             v1 = np.add(v0, np.multiply(h1 / 2.0, np.add(ap, a0)))
             # re-evaluate
-            a1 = self.a(t1, x1, v1)
+            a1 = self.a(t1, x1, v1, p, pi)
 
             # compute estimates for the local truncation errors
             error = (h1 / 2.0) * LA.norm(np.subtract(np.subtract(vp, v0),
@@ -401,11 +401,11 @@ class pece(object):
 
         return  # nothing
 
-    def integrate(self):
+    def integrate(self, p, pi):
         self.advanced = False
         # prepare the data structure to take this next step of integration
         if self.n == 0:
-            self.takeFirstStep()
+            self.takeFirstStep(p, pi)
         else:
             # load the data structure from its most recently advanced solution
             self.steps2go = self.steps2go_curr
@@ -457,7 +457,7 @@ class pece(object):
                                           self.a_nm1))
             vp = np.add(v, np.multiply(h, dvp))
             # evaluate
-            ap = self.a(t, xp, vp)
+            ap = self.a(t, xp, vp, p, pi)
             # integrate with the correctors
             #    xCorr = (1 / 3) (4 x_n - x_nm1)
             #          + (h / 24) (vPred + 14 v_n + v_nm1)
@@ -474,7 +474,7 @@ class pece(object):
             dvc = np.multiply(2.0 / 3.0, ap)
             vc = np.add(v, np.multiply(h, dvc))
             # re-evaluate
-            ac = self.a(t, xc, vc)
+            ac = self.a(t, xc, vc, p, pi)
 
             # update the local truncation errors
             self.error_nm1 = self.error_n
@@ -538,7 +538,7 @@ class pece(object):
                                                 np.add(vc, self.v_n)),
                                     np.multiply(self.hL / 4.0,
                                                 np.subtract(ac, self.a_n)))
-                    self.a_nm1 = self.a(self.t_nm1, self.x_nm1, self.v_nm1)
+                    self.a_nm1 = self.a(self.t_nm1, self.x_nm1, self.v_nm1, p, pi)
 
                 # attribute updates common to all successful steps
                 self.t_n = t
@@ -564,7 +564,7 @@ class pece(object):
                                             np.add(self.v_n, self.v_nm1)),
                                 np.multiply(self.hL / 4.0,
                                             np.subtract(self.a_n, self.a_nm1)))
-                self.a_nm1 = self.a(self.t_nm1, self.x_nm1, self.v_nm1)
+                self.a_nm1 = self.a(self.t_nm1, self.x_nm1, self.v_nm1, p, pi)
 
                 # time, displacement and velocity do not advance: reintegrate
                 self.error_n = 1.0  # forces classic controller for next step
@@ -573,7 +573,7 @@ class pece(object):
 
         return  # nothing
 
-    def advance(self):
+    def advance(self, p, pi):
         # update data for the local step to prepare for the next global step
         self.committed = True
 
@@ -601,7 +601,7 @@ class pece(object):
             t_nm1 = self.t_n - hNext
             x_nm1 = self.interpolateForX(t_nm1)
             v_nm1 = self.interpolateForV(t_nm1)
-            a_nm1 = self.a(t_nm1, x_nm1, v_nm1)
+            a_nm1 = self.a(t_nm1, x_nm1, v_nm1, p, pi)
 
             self.t_nm1 = t_nm1
             self.x_nm1 = x_nm1

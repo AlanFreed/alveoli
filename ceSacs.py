@@ -447,11 +447,11 @@ class ceSac(Response):
         yVec0[6] = 0              # initial shear stress               'tau3' 
 
         # create and initialize the two control vectors
-        eVec0 = np.zeros((self.controls,), dtype=float)
-        xVec0 = np.zeros((self.controls,), dtype=float)
+        # eVec0 = np.zeros((self.controls,), dtype=float)
+        # xVec0 = np.zeros((self.controls,), dtype=float)
 
         # now call the base type to create the exported response fields
-        super().__init__(eVec0, xVec0, yVec0)
+        super().__init__(yVec0)
         # set default value for voluse rupture
         self.ruptured = False
         # create vectors for the next node used in the output methods

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ceMembranes import controlMembrane, ceMembrane
+from ceMembranes import ceMembrane
 from chords import Chord
 from pivotIncomingF import Pivot
 import meanProperties as mp
@@ -397,7 +397,7 @@ References
 
 class pentagon(object):
 
-    def __init__(self, number, chord1, chord2, chord3, chord4, chord5, h):
+    def __init__(self, number, chord1, chord2, chord3, chord4, chord5, h, mm=1):
         self._number = int(number)
 
         # verify the input
@@ -505,8 +505,8 @@ class pentagon(object):
         }
         if not len(self._setOfVertices) == 5:
             raise RuntimeError('There were not 5 unique vertices ' +
-                               'in this pentagon.')
-
+                               'in this pentagon.')        
+        
         # get the vertex coordinates in the reference configuration
         x1 = v1.coordinates('ref')
         x2 = v2.coordinates('ref')
@@ -589,18 +589,7 @@ class pentagon(object):
         self._v4y0 = n2x * x4[0] + n2y * x4[1] + n2z * x4[2]
         self._v5x0 = n1x * x5[0] + n1y * x5[1] + n1z * x5[2]
         self._v5y0 = n2x * x5[0] + n2y * x5[1] + n2z * x5[2]
-
-        # initialize current vertice coordinates in pentagonal frame of reference
-        self._v1x = self._v1x0
-        self._v1y = self._v1y0
-        self._v2x = self._v2x0
-        self._v2y = self._v2y0
-        self._v3x = self._v3x0
-        self._v3y = self._v3y0
-        self._v4x = self._v4x0
-        self._v4y = self._v4y0
-        self._v5x = self._v5x0
-        self._v5y = self._v5y0
+        
 
         # z offsets for the pentagonal plane (which should all be the same)
         self._v1z = n3x * x1[0] + n3y * x1[1] + n3z * x1[2]
@@ -610,6 +599,58 @@ class pentagon(object):
         self._v5z = n3x * x5[0] + n3y * x5[1] + n3z * x5[2]
         self._vz0 = ((self._v1z + self._v2z + self._v3z + self._v4z +
                       self._v5z) / 5.0)
+        
+        # initialize current vertice coordinates in pentagonal frame of reference
+        self._v1xp = self._v1x0
+        self._v1yp = self._v1y0
+        self._v1zp = self._vz0
+        self._v2xp = self._v2x0
+        self._v2yp = self._v2y0
+        self._v2zp = self._vz0
+        self._v3xp = self._v3x0
+        self._v3yp = self._v3y0
+        self._v3zp = self._vz0
+        self._v4xp = self._v4x0
+        self._v4yp = self._v4y0
+        self._v4zp = self._vz0
+        self._v5xp = self._v5x0
+        self._v5yp = self._v5y0
+        self._v5zp = self._vz0
+        
+        
+        self._v1xc = self._v1x0
+        self._v1yc = self._v1y0
+        self._v1zc = self._vz0
+        self._v2xc = self._v2x0
+        self._v2yc = self._v2y0
+        self._v2zc = self._vz0
+        self._v3xc = self._v3x0
+        self._v3yc = self._v3y0
+        self._v3zc = self._vz0
+        self._v4xc = self._v4x0
+        self._v4yc = self._v4y0
+        self._v4zc = self._vz0
+        self._v5xc = self._v5x0
+        self._v5yc = self._v5y0
+        self._v5zc = self._vz0
+              
+        
+        self._v1xn = self._v1x0
+        self._v1yn = self._v1y0
+        self._v1zn = self._vz0
+        self._v2xn = self._v2x0
+        self._v2yn = self._v2y0
+        self._v2zn = self._vz0
+        self._v3xn = self._v3x0
+        self._v3yn = self._v3y0
+        self._v3zn = self._vz0
+        self._v4xn = self._v4x0
+        self._v4yn = self._v4y0
+        self._v4zn = self._vz0
+        self._v5xn = self._v5x0
+        self._v5yn = self._v5y0
+        self._v5zn = self._vz0
+       
 
         # determine the initial areas of this irregular pentagon
         self._A0 = ((self._v1x0 * self._v2y0 - self._v2x0 * self._v1y0 +
@@ -792,6 +833,11 @@ class pentagon(object):
         n2y12 = y / mag   
         n2z12 = z / mag
         
+        # base vector 3 (the binormal) is obtained through a cross product
+        n3x12 = n1y12 * n2z12 - n1z12 * n2y12
+        n3y12 = n1z12 * n2x12 - n1x12 * n2z12
+        n3z12 = n1x12 * n2y12 - n1y12 * n2x12
+        
         # create the rotation matrix from dodecahedral to 1-2 chordal coordinates
         self._Pr2D12[0, 0] = n1x12
         self._Pr2D12[0, 1] = n2x12
@@ -811,6 +857,12 @@ class pentagon(object):
         self._v1y12 = self._v1y120 
         self._v2x12 = self._v2x120 
         self._v2y12 = self._v2y120 
+        
+        # z offsets
+        self._v1z12 = n3x12 * x1[0] + n3y12 * x1[1] + n3z12 * x1[2]
+        self._v2z12 = n3x12 * x2[0] + n3y12 * x2[1] + n3z12 * x2[2]
+
+        self._vz120 = ((self._v1z12 + self._v2z12) / 2.0) 
         
                 
         # determine the rotation matrix for 2-3 chord 
@@ -855,7 +907,12 @@ class pentagon(object):
         mag = m.sqrt(x * x + y * y + z * z)
         n2x23 = x / mag
         n2y23 = y / mag 
-        n2z23 = z / mag          
+        n2z23 = z / mag  
+        
+        # base vector 3 (the binormal) is obtained through a cross product
+        n3x23 = n1y23 * n2z23 - n1z23 * n2y23
+        n3y23 = n1z23 * n2x23 - n1x23 * n2z23
+        n3z23 = n1x23 * n2y23 - n1y23 * n2x23        
                 
         # create the rotation matrix from dodecahedral to 2-3 chordal coordinates
         self._Pr2D23[0, 0] = n1x23
@@ -876,6 +933,12 @@ class pentagon(object):
         self._v2y23 = self._v2y230 
         self._v3x23 = self._v3x230 
         self._v3y23 = self._v3y230
+        
+        # z offsets
+        self._v1z23 = n3x23 * x1[0] + n3y23 * x1[1] + n3z23 * x1[2]
+        self._v2z23 = n3x23 * x2[0] + n3y23 * x2[1] + n3z23 * x2[2]
+
+        self._vz230 = ((self._v1z23 + self._v2z23) / 2.0)  
         
         
         # determine the rotation matrix for 3-4 chord 
@@ -922,6 +985,11 @@ class pentagon(object):
         n2y34 = y / mag   
         n2z34 = z / mag
         
+        # base vector 3 (the binormal) is obtained through a cross product
+        n3x34 = n1y34 * n2z34 - n1z34 * n2y34
+        n3y34 = n1z34 * n2x34 - n1x34 * n2z34
+        n3z34 = n1x34 * n2y34 - n1y34 * n2x34
+        
         # create the rotation matrix from dodecahedral to 3-4 chordal coordinates
         self._Pr2D34[0, 0] = n1x34
         self._Pr2D34[0, 1] = n2x34
@@ -941,6 +1009,12 @@ class pentagon(object):
         self._v3y34 = self._v3y340 
         self._v4x34 = self._v4x340 
         self._v4y34 = self._v4y340 
+        
+        # z offsets
+        self._v1z34 = n3x34 * x1[0] + n3y34 * x1[1] + n3z34 * x1[2]
+        self._v2z34 = n3x34 * x2[0] + n3y34 * x2[1] + n3z34 * x2[2]
+
+        self._vz340 = ((self._v1z34 + self._v2z34) / 2.0) 
         
         
         # determine the rotation matrix for 4-5 chord 
@@ -987,6 +1061,11 @@ class pentagon(object):
         n2y45 = y / mag   
         n2z45 = z / mag 
         
+        # base vector 3 (the binormal) is obtained through a cross product
+        n3x45 = n1y45 * n2z45 - n1z45 * n2y45
+        n3y45 = n1z45 * n2x45 - n1x45 * n2z45
+        n3z45 = n1x45 * n2y45 - n1y45 * n2x45
+        
         # create the rotation matrix from dodecahedral to 4-5 chordal coordinates
         self._Pr2D45[0, 0] = n1x45
         self._Pr2D45[0, 1] = n2x45
@@ -1006,6 +1085,12 @@ class pentagon(object):
         self._v4y45 = self._v4y450 
         self._v5x45 = self._v5x450 
         self._v5y45 = self._v5y450 
+        
+        # z offsets
+        self._v1z45 = n3x45 * x1[0] + n3y45 * x1[1] + n3z45 * x1[2]
+        self._v2z45 = n3x45 * x2[0] + n3y45 * x2[1] + n3z45 * x2[2]
+
+        self._vz450 = ((self._v1z45 + self._v2z45) / 2.0)  
         
         
         # determine the rotation matrix for 5-1 chord 
@@ -1052,6 +1137,11 @@ class pentagon(object):
         n2y51 = y / mag   
         n2z51 = z / mag 
         
+        # base vector 3 (the binormal) is obtained through a cross product
+        n3x51 = n1y51 * n2z51 - n1z51 * n2y51
+        n3y51 = n1z51 * n2x51 - n1x51 * n2z51
+        n3z51 = n1x51 * n2y51 - n1y51 * n2x51
+        
         # create the rotation matrix from dodecahedral to 5-1 chordal coordinates
         self._Pr2D51[0, 0] = n1x51
         self._Pr2D51[0, 1] = n2x51
@@ -1070,7 +1160,15 @@ class pentagon(object):
         self._v5x51 = self._v5x510 
         self._v5y51 = self._v5y510 
         self._v1x51 = self._v1x510 
-        self._v1y51 = self._v1y510         
+        self._v1y51 = self._v1y510 
+        
+        # z offsets
+        self._v1z51 = n3x51 * x1[0] + n3y51 * x1[1] + n3z51 * x1[2]
+        self._v2z51 = n3x51 * x2[0] + n3y51 * x2[1] + n3z51 * x2[2]
+
+        self._vz510 = ((self._v1z51 + self._v2z51) / 2.0)
+
+        
         
         # establish the shape functions located at the various Gauss points 
         # for pentagon
@@ -1220,6 +1318,7 @@ class pentagon(object):
         xVec0[1] = 1.0  # elongation in 1 direction 
         xVec0[2] = 1.0  # elongation in 2 direction 
         xVec0[3] = 0.0  # magnitude of shear 
+        
 
         self._response = {
             1: ceMembrane(),
@@ -1228,6 +1327,7 @@ class pentagon(object):
             4: ceMembrane(),
             5: ceMembrane()
         }
+        
 
         self._Ms = {
             1: self._response[1].secMod(eVec0, xVec0, yVec0),
@@ -1428,11 +1528,11 @@ class pentagon(object):
         
         CMtx = np.zeros((10, 10), dtype=float)      
         # current vertex coordinates in pentagonal frame of reference
-        xn1 = (self._v1x, self._v1y)
-        xn2 = (self._v2x, self._v2y)
-        xn3 = (self._v3x, self._v3y)
-        xn4 = (self._v4x, self._v4y)
-        xn5 = (self._v5x, self._v5y)
+        xn1 = (self._v1xn, self._v1yn)
+        xn2 = (self._v2xn, self._v2yn)
+        xn3 = (self._v3xn, self._v3yn)
+        xn4 = (self._v4xn, self._v4yn)
+        xn5 = (self._v5xn, self._v5yn)
 
         # assign coordinates at the vertices in the reference configuration
         x01 = (self._v1x0, self._v1y0)
@@ -1477,7 +1577,6 @@ class pentagon(object):
                                                + BNmtx.T.dot(Mt).dot(BLmtx) 
                                                + BNmtx.T.dot(Mt).dot(BNmtx) ))
 
-
         Cs = np.zeros((10, 10), dtype=float)
         Ct = np.zeros((10, 10), dtype=float)
         
@@ -1494,11 +1593,11 @@ class pentagon(object):
         
         kMtx = np.zeros((10, 10), dtype=float)      
         # current vertex coordinates in pentagonal frame of reference
-        xn1 = (self._v1x, self._v1y)
-        xn2 = (self._v2x, self._v2y)
-        xn3 = (self._v3x, self._v3y)
-        xn4 = (self._v4x, self._v4y)
-        xn5 = (self._v5x, self._v5y)
+        xn1 = (self._v1xn, self._v1yn)
+        xn2 = (self._v2xn, self._v2yn)
+        xn3 = (self._v3xn, self._v3yn)
+        xn4 = (self._v4xn, self._v4yn)
+        xn5 = (self._v5xn, self._v5yn)
 
         # assign coordinates at the vertices in the reference configuration
         x01 = (self._v1x0, self._v1y0)
@@ -1558,7 +1657,6 @@ class pentagon(object):
                                                + Hmtx2.T.dot(dSt2).dot(Hmtx2)
                                                + Hmtx3.T.dot(dSt3).dot(Hmtx3)))
 
-
         Ks = np.zeros((10, 10), dtype=float)
         Kt = np.zeros((10, 10), dtype=float)
         
@@ -1614,11 +1712,11 @@ class pentagon(object):
         
 
         # current vertex coordinates in pentagonal frame of reference
-        xn1 = (self._v1x, self._v1y)
-        xn2 = (self._v2x, self._v2y)
-        xn3 = (self._v3x, self._v3y)
-        xn4 = (self._v4x, self._v4y)
-        xn5 = (self._v5x, self._v5y)
+        xn1 = (self._v1xn, self._v1yn)
+        xn2 = (self._v2xn, self._v2yn)
+        xn3 = (self._v3xn, self._v3yn)
+        xn4 = (self._v4xn, self._v4yn)
+        xn5 = (self._v5xn, self._v5yn)
 
         # assign coordinates at the vertices in the reference configuration
         x01 = (self._v1x0, self._v1y0)
@@ -1715,7 +1813,6 @@ class pentagon(object):
         FBc = (cJdet12 * Nmtx12 + cJdet23 * Nmtx23 + cJdet34 * Nmtx34 
                + cJdet45 * Nmtx45 + cJdet51 * Nmtx51)  
 
-
         fVec = FBc - F0
             
         return fVec
@@ -1784,7 +1881,8 @@ class pentagon(object):
         else:
             raise RuntimeError('The requested vertex {} '.format(number) +
                                'is not in pentagon {}.'.format(self._number))
-
+            
+            
     def update(self):
         # computes the fields positioned at the next time step
 
@@ -1915,29 +2013,23 @@ class pentagon(object):
         self._centroidXn = n1x * self._cx + n2x * self._cy + n3x * self._cz
         self._centroidYn = n1y * self._cx + n2y * self._cy + n3y * self._cz
         self._centroidZn = n1z * self._cx + n2z * self._cy + n3z * self._cz
-        
-        
-        
 
-        # determine length of the 1-2 chord in the next configuration
-        self._L12n = m.sqrt((x2[0] - x1[0])**2 + (x2[1] - x1[1])**2
-                             + (x2[2] - x1[2])**2)
         
-        # determine length of the 2-3 chord in the next configuration
-        self._L23n = m.sqrt((x3[0] - x2[0])**2 + (x3[1] - x2[1])**2
-                             + (x3[2] - x2[2])**2)
-        
-        # determine length of the 3-4 chord in the next configuration
-        self._L34n = m.sqrt((x4[0] - x3[0])**2 + (x4[1] - x3[1])**2
-                             + (x4[2] - x3[2])**2)
-        
-        # determine length of the 4-5 chord in the next configuration
-        self._L45n = m.sqrt((x5[0] - x4[0])**2 + (x5[1] - x4[1])**2
-                             + (x5[2] - x4[2])**2)
-        
-        # determine length of the 5-1 chord in the next configuration
-        self._L51n = m.sqrt((x5[0] - x1[0])**2 + (x5[1] - x1[1])**2
-                             + (x5[2] - x1[2])**2)
+        self._v1xn = self._v1x
+        self._v1yn = self._v1y
+        self._v1zn = self._v1z
+        self._v2xn = self._v2x
+        self._v2yn = self._v2y
+        self._v2zn = self._v2z
+        self._v3xn = self._v3x
+        self._v3yn = self._v3y
+        self._v3zn = self._v3z
+        self._v4xn = self._v4x
+        self._v4yn = self._v4y
+        self._v4zn = self._v4z
+        self._v5xn = self._v5x
+        self._v5yn = self._v5y
+        self._v5zn = self._v5z
 
         # determine the rotation matrix for 1-2 chord 
         # base vector 1: aligns with the axis of the 1-2 chord
@@ -1983,6 +2075,11 @@ class pentagon(object):
         n2y12 = y / mag   
         n2z12 = z / mag
         
+        # base vector 3 is obtained through a cross product
+        n3x12 = n1y12 * n2z12 - n1z12 * n2y12
+        n3y12 = n1z12 * n2x12 - n1x12 * n2z12
+        n3z12 = n1x12 * n2y12 - n1y12 * n2x12
+        
         # create the rotation matrix from dodecahedral to 1-2 chordal coordinates
         self._Pn2D12[0, 0] = n1x12
         self._Pn2D12[0, 1] = n2x12
@@ -1990,16 +2087,18 @@ class pentagon(object):
         self._Pn2D12[1, 1] = n2y12
 
         # determine vertice coordinates in the chordal frame of reference
-        self._v1x120 = n1x12 * x1[0] + n1y12 * x1[1] + n1z12 * x1[2] 
-        self._v1y120 = n2x12 * x1[0] + n2y12 * x1[1] + n2z12 * x1[2]
-        self._v2x120 = n1x12 * x2[0] + n1y12 * x2[1] + n1z12 * x2[2]
-        self._v2y120 = n2x12 * x2[0] + n2y12 * x2[1] + n2z12 * x2[2]
-
-        self._v1x12 = self._v1x120 
-        self._v1y12 = self._v1y120 
-        self._v2x12 = self._v2x120 
-        self._v2y12 = self._v2y120 
-
+        self._v1x12 = n1x12 * x1[0] + n1y12 * x1[1] + n1z12 * x1[2] 
+        self._v1y12 = n2x12 * x1[0] + n2y12 * x1[1] + n2z12 * x1[2]
+        self._v2x12 = n1x12 * x2[0] + n1y12 * x2[1] + n1z12 * x2[2]
+        self._v2y12 = n2x12 * x2[0] + n2y12 * x2[1] + n2z12 * x2[2]
+        
+        # z offsets 
+        self._v1z12 = n3x12 * x1[0] + n3y12 * x1[1] + n3z12 * x1[2]
+        self._v2z12 = n3x12 * x2[0] + n3y12 * x2[1] + n3z12 * x2[2]
+               
+        self._L12n  = m.sqrt((self._v2x12 - self._v1x12)**2 
+                             + (self._v2y12 - self._v1y12)**2
+                             + (self._v2z12 - self._v1z12)**2)
 
 
         # determine the rotation matrix for 2-3 chord 
@@ -2047,6 +2146,11 @@ class pentagon(object):
         n2y23 = y / mag 
         n2z23 = z / mag     
         
+        # base vector 3 is obtained through a cross product
+        n3x23 = n1y23 * n2z23 - n1z23 * n2y23
+        n3y23 = n1z23 * n2x23 - n1x23 * n2z23
+        n3z23 = n1x23 * n2y23 - n1y23 * n2x23
+        
         # create the rotation matrix from dodecahedral to 2-3 chordal coordinates
         self._Pn2D23[0, 0] = n1x23
         self._Pn2D23[0, 1] = n2x23
@@ -2054,15 +2158,18 @@ class pentagon(object):
         self._Pn2D23[1, 1] = n2y23
 
         # determine vertice coordinates in the chordal frame of reference
-        self._v2x230 = n1x23 * x2[0] + n1y23 * x2[1]  + n1z23 * x2[2] 
-        self._v2y230 = n2x23 * x2[0] + n2y23 * x2[1]  + n2z23 * x2[2]
-        self._v3x230 = n1x23 * x3[0] + n1y23 * x3[1]  + n1z23 * x3[2]
-        self._v3y230 = n2x23 * x3[0] + n2y23 * x3[1]  + n2z23 * x3[2]
+        self._v2x23 = n1x23 * x2[0] + n1y23 * x2[1]  + n1z23 * x2[2] 
+        self._v2y23 = n2x23 * x2[0] + n2y23 * x2[1]  + n2z23 * x2[2]
+        self._v3x23 = n1x23 * x3[0] + n1y23 * x3[1]  + n1z23 * x3[2]
+        self._v3y23 = n2x23 * x3[0] + n2y23 * x3[1]  + n2z23 * x3[2]
 
-        self._v2x23 = self._v2x230 
-        self._v2y23 = self._v2y230 
-        self._v3x23 = self._v3x230 
-        self._v3y23 = self._v3y230 
+        # z offsets 
+        self._v2z23 = n3x23 * x1[0] + n3y23 * x1[1] + n3z23 * x1[2]
+        self._v3z23 = n3x23 * x2[0] + n3y23 * x2[1] + n3z23 * x2[2]
+
+        self._L23n  = m.sqrt((self._v3x23 - self._v2x23)**2 
+                             + (self._v3y23 - self._v2y23)**2
+                             + (self._v3z23 - self._v2z23)**2)
         
         
         # determine the rotation matrix for 3-4 chord 
@@ -2096,8 +2203,8 @@ class pentagon(object):
             return n1Dotn2
 
         # use a root finder to secure a base vector n2 that is orthogonal to n1
-        deltaL = -4.0 * self._L340
-        deltaH = 4.0 * self._L340
+        deltaL = -4.0 * self._L34n
+        deltaH = 4.0 * self._L34n
         delta34 = findRoot(deltaL, deltaH, getDelta34)
 
         # create base vector 2 (the radial vector out to the chord)
@@ -2109,6 +2216,11 @@ class pentagon(object):
         n2y34 = y / mag   
         n2z34 = z / mag
         
+        # base vector 3 is obtained through a cross product
+        n3x34 = n1y34 * n2z34 - n1z34 * n2y34
+        n3y34 = n1z34 * n2x34 - n1x34 * n2z34
+        n3z34 = n1x34 * n2y34 - n1y34 * n2x34
+        
         # create the rotation matrix from dodecahedral to 3-4 chordal coordinates
         self._Pn2D34[0, 0] = n1x34
         self._Pn2D34[0, 1] = n2x34
@@ -2116,15 +2228,19 @@ class pentagon(object):
         self._Pn2D34[1, 1] = n2y34
 
         # determine vertice coordinates in the chordal frame of reference
-        self._v3x340 = n1x34 * x3[0] + n1y34 * x3[1] + n1z34 * x3[2] 
-        self._v3y340 = n2x34 * x3[0] + n2y34 * x3[1] + n2z34 * x3[2]
-        self._v4x340 = n1x34 * x4[0] + n1y34 * x4[1] + n1z34 * x4[2]
-        self._v4y340 = n2x34 * x4[0] + n2y34 * x4[1] + n2z34 * x4[2]
+        self._v3x34 = n1x34 * x3[0] + n1y34 * x3[1] + n1z34 * x3[2] 
+        self._v3y34 = n2x34 * x3[0] + n2y34 * x3[1] + n2z34 * x3[2]
+        self._v4x34 = n1x34 * x4[0] + n1y34 * x4[1] + n1z34 * x4[2]
+        self._v4y34 = n2x34 * x4[0] + n2y34 * x4[1] + n2z34 * x4[2]
 
-        self._v3x34 = self._v3x340 
-        self._v3y34 = self._v3y340 
-        self._v4x34 = self._v4x340 
-        self._v4y34 = self._v4y340 
+        # z offsets 
+        self._v3z34 = n3x34 * x1[0] + n3y34 * x1[1] + n3z34 * x1[2]
+        self._v4z34 = n3x34 * x2[0] + n3y34 * x2[1] + n3z34 * x2[2]
+
+        self._L34n34  = m.sqrt((self._v4x34 - self._v3x34)**2 
+                             + (self._v4y34 - self._v3y34)**2
+                             + (self._v4z34 - self._v3z34)**2)
+        
         
 
         # determine the rotation matrix for 4-5 chord 
@@ -2158,8 +2274,8 @@ class pentagon(object):
             return n1Dotn2
 
         # use a root finder to secure a base vector n2 that is orthogonal to n1
-        deltaL = -4.0 * self._L450
-        deltaH = 4.0 * self._L450
+        deltaL = -4.0 * self._L45n
+        deltaH = 4.0 * self._L45n
         delta45 = findRoot(deltaL, deltaH, getDelta45)
 
         # create base vector 2 (the radial vector out to the chord)
@@ -2171,6 +2287,11 @@ class pentagon(object):
         n2y45 = y / mag   
         n2z45 = z / mag 
         
+        # base vector 3 is obtained through a cross product
+        n3x45 = n1y45 * n2z45 - n1z45 * n2y45
+        n3y45 = n1z45 * n2x45 - n1x45 * n2z45
+        n3z45 = n1x45 * n2y45 - n1y45 * n2x45
+        
         # create the rotation matrix from dodecahedral to 4-5 chordal coordinates
         self._Pn2D45[0, 0] = n1x45
         self._Pn2D45[0, 1] = n2x45
@@ -2178,16 +2299,18 @@ class pentagon(object):
         self._Pn2D45[1, 1] = n2y45
 
         # determine vertice coordinates in the chordal frame of reference
-        self._v4x450 = n1x45 * x4[0] + n1y45 * x4[1] + n1z45 * x4[2] 
-        self._v4y450 = n2x45 * x4[0] + n2y45 * x4[1] + n2z45 * x4[2]
-        self._v5x450 = n1x45 * x5[0] + n1y45 * x5[1] + n1z45 * x5[2]
-        self._v5y450 = n2x45 * x5[0] + n2y45 * x5[1] + n2z45 * x5[2]
-
-        self._v4x45 = self._v4x450 
-        self._v4y45 = self._v4y450 
-        self._v5x45 = self._v5x450 
-        self._v5y45 = self._v5y450 
+        self._v4x45 = n1x45 * x4[0] + n1y45 * x4[1] + n1z45 * x4[2] 
+        self._v4y45 = n2x45 * x4[0] + n2y45 * x4[1] + n2z45 * x4[2]
+        self._v5x45 = n1x45 * x5[0] + n1y45 * x5[1] + n1z45 * x5[2]
+        self._v5y45 = n2x45 * x5[0] + n2y45 * x5[1] + n2z45 * x5[2]
         
+        # z offsets 
+        self._v4z45 = n3x45 * x1[0] + n3y45 * x1[1] + n3z45 * x1[2]
+        self._v5z45 = n3x45 * x2[0] + n3y45 * x2[1] + n3z45 * x2[2]
+
+        self._L45n  = m.sqrt((self._v5x45 - self._v4x45)**2 
+                             + (self._v5y45 - self._v4y45)**2
+                             + (self._v5z45 - self._v4z45)**2)
                        
         # determine the rotation matrix for 5-1 chord 
         # base vector 1: aligns with the axis of the 5-1 chord
@@ -2220,8 +2343,8 @@ class pentagon(object):
             return n1Dotn2
 
         # use a root finder to secure a base vector n2 that is orthogonal to n1
-        deltaL = -4.0 * self._L510
-        deltaH = 4.0 * self._L510
+        deltaL = -4.0 * self._L51n
+        deltaH = 4.0 * self._L51n
         delta51 = findRoot(deltaL, deltaH, getDelta51)
 
         # create base vector 2 (the radial vector out to the chord)
@@ -2233,6 +2356,11 @@ class pentagon(object):
         n2y51 = y / mag   
         n2z51 = z / mag 
         
+        # base vector 3 is obtained through a cross product
+        n3x51 = n1y51 * n2z51 - n1z51 * n2y51
+        n3y51 = n1z51 * n2x51 - n1x51 * n2z51
+        n3z51 = n1x51 * n2y51 - n1y51 * n2x51
+        
         # create the rotation matrix from dodecahedral to 5-1 chordal coordinates
         self._Pn2D51[0, 0] = n1x51
         self._Pn2D51[0, 1] = n2x51
@@ -2240,15 +2368,18 @@ class pentagon(object):
         self._Pn2D51[1, 1] = n2y51
 
         # determine vertice coordinates in the chordal frame of reference
-        self._v5x510 = n1x51 * x5[0] + n1y51 * x5[1] + n1z51 * x5[2]
-        self._v5y510 = n2x51 * x5[0] + n2y51 * x5[1] + n2z51 * x5[2]
-        self._v1x510 = n1x51 * x1[0] + n1y51 * x1[1] + n1z51 * x1[2]
-        self._v1y510 = n2x51 * x1[0] + n2y51 * x1[1] + n2z51 * x1[2]
+        self._v5x51 = n1x51 * x5[0] + n1y51 * x5[1] + n1z51 * x5[2]
+        self._v5y51 = n2x51 * x5[0] + n2y51 * x5[1] + n2z51 * x5[2]
+        self._v1x51 = n1x51 * x1[0] + n1y51 * x1[1] + n1z51 * x1[2]
+        self._v1y51 = n2x51 * x1[0] + n2y51 * x1[1] + n2z51 * x1[2]
+ 
+        # z offsets 
+        self._v5z51 = n3x51 * x1[0] + n3y51 * x1[1] + n3z51 * x1[2]
+        self._v1z51 = n3x51 * x2[0] + n3y51 * x2[1] + n3z51 * x2[2]
 
-        self._v5x51 = self._v5x510 
-        self._v5y51 = self._v5y510 
-        self._v1x51 = self._v1x510 
-        self._v1y51 = self._v1y510 
+        self._L51n  = m.sqrt((self._v1x51 - self._v5x51)**2 
+                             + (self._v1y51 - self._v5y51)**2
+                             + (self._v1z51 - self._v5z51)**2)
         
 
         # Determine the deformation gradient for this irregular pentagon
@@ -2296,6 +2427,7 @@ class pentagon(object):
         for i in range(1, self._pgq.gaussPoints()+1):
             self._septum[i].update(self._Fn[i])
 
+        
         return  # nothing
 
     def advance(self, reindex):
@@ -2308,7 +2440,8 @@ class pentagon(object):
         self._centroidXc = self._centroidXn
         self._centroidYc = self._centroidYn
         self._centroidZc = self._centroidZn
-
+        
+        
         # advance rotation matrix: from the dodecaheral into the pentagonal
         self._Pp3D[:, :] = self._Pc3D[:, :]
         self._Pc3D[:, :] = self._Pn3D[:, :]
@@ -2324,6 +2457,9 @@ class pentagon(object):
         # advance the membrane objects at each Gauss point
         for i in range(1, self._pgq.gaussPoints()+1):
             self._septum[i].advance()
+            
+        for i in range(1, self._pgq.gaussPoints()+1):
+            self._vertex[i].advance()
 
         # assign current to previous values, and then next to current values
         self._L12p = self._L12c
@@ -2782,6 +2918,7 @@ class pentagon(object):
         azr = R[0, 2] * a[0] + R[1, 2] * a[1] + R[2, 2] * a[2]
 
         return np.array([axr, ayr, azr])
+            
     
     
     # change in displacementin contribution to the first nonlinear strain
@@ -2791,6 +2928,7 @@ class pentagon(object):
         v3 = self._vertex[3].velocity(reindex, 'curr')
         v4 = self._vertex[4].velocity(reindex, 'curr')
         v5 = self._vertex[5].velocity(reindex, 'curr')
+
 
         R = self.rotation('curr')        
         Dmtx1 = np.zeros((2, 10), dtype=float)
@@ -3085,7 +3223,15 @@ class pentagon(object):
                                "pentagon.squeezeSingleComp and you sent " +
                                "{}.".format(PentGaussPt))
         return self._septum[PentGaussPt].squeezeSingleComp(state)
-    
+
+
+    def shearSingleComp(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.shearSingleComp and you sent " +
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].shearSingleComp(state)    
     
     
     def dDilation(self, PentGaussPt, state):
@@ -3131,6 +3277,13 @@ class pentagon(object):
         return self._septum[PentGaussPt].dSqueezeSingleComp(state)
 
 
+    def dShearSingleComp(self, PentGaussPt, state):
+        if PentGaussPt != self._pgq.gaussPoints():
+            raise RuntimeError("The pentGaussPt must be " +
+                               "{} in call to ".format(self._pgq.gaussPoints()) +
+                               "pentagon.dShearSingleComp and you sent " +
+                               "{}.".format(PentGaussPt))
+        return self._septum[PentGaussPt].dShearSingleComp(state)
 
 
     # properties used in finite elements
@@ -3174,6 +3327,7 @@ class pentagon(object):
 
     def forcingFunction(self):
         fVec = np.copy(self._forcingFunction())
-        return fVec    
+        return fVec  
+    
     
     

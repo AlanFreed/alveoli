@@ -527,8 +527,8 @@ class Chord(object):
             2: ControlFiber(eVec0, xVec0, dt)
         }
         self._response = {
-            1: SeptalChord(eVec0, xVec0, yVec0),
-            2: SeptalChord(eVec0, xVec0, yVec0)
+            1: SeptalChord(),
+            2: SeptalChord()
         }
         self._solver = {
             1: PECE(self._control[1], self._response[1], m),

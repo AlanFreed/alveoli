@@ -434,11 +434,11 @@ class ceMembrane(Response):
         yVec0[3] = 0.0             # initial shear stress
 
         # create and initialize the two control vectors
-        eVec0 = np.zeros((controls,), dtype=float)
-        xVec0 = np.zeros((controls,), dtype=float)
+        # eVec0 = np.zeros((controls,), dtype=float)
+        # xVec0 = np.zeros((controls,), dtype=float)
 
         # now call the base type to create the exported response fields
-        super().__init__(eVec0, xVec0, yVec0)
+        super().__init__(yVec0)
         # establish the geometric property of thickness
         if thickness is None:
             self.thickness = mp.septalWidth()
@@ -766,20 +766,37 @@ class ceMembrane(Response):
         if self.firstCall:
             a = self.xR[1]
             b = self.xR[2]
+            g = self.xR[3]
             pi = self.yR[1]
             sigma = self.yR[2]
             tau = self.yR[3]
         else:
             a = self.xN[1]
             b = self.xN[2]
+            g = self.xN[3]
             pi = self.yN[1]
             sigma = self.yN[2]
             tau = self.yN[3]
         s = np.zeros((2, 2), dtype=float)
+        # # Stresses are established in a physical frame of reference.
+        # s00 = (pi + sigma) / 2.0
+        # s01 = (b * tau) / a
+        # s11 = (pi - sigma) / 2.0
+        
+        # # Stresses are established in a physical frame of reference.
+        # s[0, 0] = s00 / a**2 - 2*g * s01 / (a * b) + (g / a)**2 * s11
+        # s[0, 1] = s01 / (a * b) - g * s11 / (b**2)
+        # s[1, 0] = s[0, 1]
+        # s[1, 1] = s11 / (b**2)  
+        
+    
+        
+        # Stresses are established in a physical frame of reference.
         s[0, 0] = (pi + sigma) / 2.0
         s[0, 1] = (b * tau) / a
         s[1, 0] = s[0, 1]
-        s[1, 1] = (pi - sigma) / 2.0
+        s[1, 1] = (pi - sigma) / 2.0           
+        
         return s
 
     def intensiveStressVec(self):

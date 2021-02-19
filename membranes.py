@@ -489,6 +489,74 @@ class membrane(object):
             raise RuntimeError("An unknown state {} ".format(str(state)) +
                                "in a call to membrane.shear.")
 
+
+
+    def dilationSingleComp(self, state):
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return m.log((self._ac / self._a0)**(1/3))
+            elif state == 'n' or state == 'next':
+                return m.log((self._an / self._a0)**(1/3))
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return m.log((self._ap / self._a0)**(1/3))
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return 0.0
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.dilationSingleComp.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.dilationSingleComp.")
+
+    def squeezeSingleComp(self, state):
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                if not self._pivotedCurr:
+                    return m.log((self._ac / self._a0)**(1/3))
+                else:
+                    return m.log((self._a0 / self._ac)**(1/3))
+            elif state == 'n' or state == 'next':
+                if not self._pivotedNext:
+                    return m.log((self._an / self._a0)**(1/3))
+                else:
+                    return m.log((self._a0 / self._an)**(1/3))
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                if not self._pivotedPrev:
+                    return m.log((self._ap / self._a0)**(1/3))
+                else:
+                    return m.log((self._a0 / self._ap)**(1/3))
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return 0.0
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.squeezeSingleComp.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.squeezeSingleComp.")
+            
+
+
+    def shearSingleComp(self, state):
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return 0.0
+            elif state == 'n' or state == 'next':
+                return 0.0
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return 0.0
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return 0.0
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.shearSingleComp.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.shearSingleComp.")
+
+            
+            
+            
+            
     def dDilation(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
@@ -548,3 +616,72 @@ class membrane(object):
         else:
             raise RuntimeError("An unknown state {} ".format(str(state)) +
                                "in a call to membrane.dShear.")
+
+
+
+
+
+    def dDilationSingleComp(self, state):
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return (self._dac / self._ac) / 3.0
+            elif state == 'n' or state == 'next':
+                return (self._dan / self._an) / 3.0
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return (self._dap / self._ap) / 3.0
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return 0.0
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.dDilationSingleComp.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.dDilationSingleComp.")
+
+    def dSqueezeSingleComp(self, state):
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                if not self._pivotedCurr:
+                    return (self._dac / self._ac) / 3.0
+                else:
+                    return (- self._dac / self._ac) / 3.0
+            elif state == 'n' or state == 'next':
+                if not self._pivotedNext:
+                    return (self._dan / self._an) / 3.0
+                else:
+                    return (- self._dan / self._an) / 3.0
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                if not self._pivotedPrev:
+                    return (self._dap / self._ap) / 3.0
+                else:
+                    return (- self._dap / self._ap) / 3.0
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return 0.0
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.dSqueezeSingleComp.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.dSqueezeSingleComp.")
+
+
+
+
+    def dShearSingleComp(self, state):
+        if isinstance(state, str):
+            if state == 'c' or state == 'curr' or state == 'current':
+                return 0.0
+            elif state == 'n' or state == 'next':
+                return 0.0
+            elif state == 'p' or state == 'prev' or state == 'previous':
+                return 0.0
+            elif state == 'r' or state == 'ref' or state == 'reference':
+                return 0.0
+            else:
+                raise RuntimeError("An unknown state {} ".format(state) +
+                                   "in a call to membrane.dShearSingleComp.")
+        else:
+            raise RuntimeError("An unknown state {} ".format(str(state)) +
+                               "in a call to membrane.dShearSingleComp.")
+
+
