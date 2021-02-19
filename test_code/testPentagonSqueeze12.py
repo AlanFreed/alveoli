@@ -68,7 +68,7 @@ def run():
     epsilon = np.zeros((steps, 12), dtype=float)
     gamma = np.zeros((steps, 12), dtype=float)
     d = dodecahedron(piF0)
-    for i in range(steps):
+    for i in range(steps):    
         for j in range(1, 13):
             p = d.getPentagon(j)
             # thermodynamic strains

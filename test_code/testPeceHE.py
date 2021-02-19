@@ -8,6 +8,11 @@ from peceHE import Control, Response, PECE
 from matplotlib import pyplot as plt
 import matplotlib.ticker as ticker
 from pylab import rcParams
+import math
+import meanProperties as mp
+from ceChords import BioFiber, ControlFiber
+
+
 
 """
 Created on Thr May 14 2020
@@ -20,7 +25,7 @@ author: Prof. Alan Freed
 """
 
 # assign the number of CE iterations in PE(CE)^m, with m = 0 -> PE method
-m = 1
+m = 2
 # assign the number of integration steps to be applied
 N = 75
 # assign the time variables used
@@ -85,25 +90,45 @@ def run():
     tt = tensionTest(eVec0, xVec0, dt)
     
     # establish the initial conditions
+    E1, E2, e_t, e_f, s_0 = mp.collagenFiber()
     eta0 = 3.7E7
-    stress0 = 0.0
+    stress0 = s_0
     yVec0 = np.array([eta0, stress0])    
     # model = ce(eVec0, xVec0, y0, rho, C, alpha, E1, E2, e_t, e_max)
     
     x0 = tt.x(t0)
     T0 = x0[0]
     strain0 = x0[1]
+    
+    # assign the temperature variables used
+    T0 = 37.0
+    TN = 37.0
+    # assign the length variables used
+    L0 = 1.0
+    LN = L0 * math.exp(0.4)
+    
+    xVec0[0] = T0
+    xVec0[1] = L0
+    
+    rho = mp.rhoCollagen()
+    Cp = mp.CpCollagen()
+    alpha = mp.alphaCollagen()
+
 
     # create the control object
     ctrl = Control(eVec0, xVec0, dt)
     
     # create the response object with random thickness assignment
-    resp = Response(eVec0, xVec0, yVec0)
+    # resp = Response(yVec0)
+    
+    resp = BioFiber(yVec0, rho, Cp, alpha, E1, E2, e_t, e_f)
+
+
         
     # create the integrator use to solve this constitutive model
 
     x = tt.x
-    solver = PECE(ctrl, resp)
+    solver = PECE(ctrl, resp, m)
 
     # create and initialize the arrays for graphing
     stress = np.zeros((N+1,), dtype=float)
@@ -120,9 +145,12 @@ def run():
 
     # integrate the constitutive equation
     t = t0
+    xVec = np.zeros((ctrlVars,), dtype=float)
     for i in range(1, N+1):
         t += dt
-        solver.integrate(xVec0)
+        xVec[0] = T0 + (TN - T0) * i / N
+        xVec[1] = L0 + (LN - L0) * i / N
+        solver.integrate(xVec)
         solver.advance()
         time[i] = t
         x = solver.getX()

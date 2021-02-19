@@ -72,11 +72,7 @@ def run():
         yVec0[0] = mp.etaCollagen()
         yVec0[1] = s_0
         
-        # create and initialize the two control vectors
-        eVec0 = np.zeros((ctrlVars,), dtype=float)
-        xVec0 = np.zeros((ctrlVars,), dtype=float)
-        
-        resp = BioFiber(eVec0, xVec0, yVec0, rho, Cp, alpha, E1, E2, e_t, e_f)
+        resp = BioFiber(yVec0, rho, Cp, alpha, E1, E2, e_t, e_f)
         # create the integrator
         solver = PECE(ctrl, resp, m)
         # establish the initial conditios

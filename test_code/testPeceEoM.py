@@ -7,6 +7,9 @@ from peceEoM import PECE
 # for making plots
 from matplotlib import pyplot as plt
 from pylab import rcParams
+from pivotIncomingF import Pivot
+from dodecahedra import dodecahedron
+
 
 r"""
     author:  Prof. Alan Freed, Texas A&M University
@@ -288,7 +291,7 @@ class FSAE(object):
         v0 = np.array([0., 0., 0.])
         return x0, v0
 
-    def getA(self, t, X, V):
+    def getA(self, t, X, V, p, pi):
         MInv = self.getMInv()
         C = self.getC()
         V = np.asmatrix(V).T
@@ -307,12 +310,37 @@ def test():
     N = 500        # number of global steps
     T = 2.5        # time at the end of the run/analysis
     h = T / N      # global step size
+    
+    
+    
+       # impose a far-field deformation history        
+    F0 = np.eye(3, dtype=float)
+    F1 = np.copy(F0)
+    F2 = np.copy(F1)
+    F3 = np.copy(F2)
+    
+        
+    # re-index the co-ordinate systems according to pivot in pivotIncomingF.py
+    pi = Pivot(F0)
+    pi.update(F1)
+    pi.advance()
+    pi.update(F2)
+    pi.advance()
+    pi.update(F3)  
+    piF0 = pi.pivotedF('ref')
+    
+    
+    d = dodecahedron(piF0)
+    
+    # pentagon 4
+    p = d.getPentagon(4) 
+    
 
     car = FSAE()
     # establish the initial state
     t0 = 0.
     x0, v0 = car.getICs()
-    a0 = car.getA(t0, x0, v0)
+    a0 = car.getA(t0, x0, v0, p, pi)
 
     print("")
     print("Static deflection is:")
@@ -320,7 +348,7 @@ def test():
     print("  theta = {:7.4f} degrees.".format((180. / math.pi) * x0[1]))
     print("  phi   = {:7.4f} degrees.".format((180. / math.pi) * x0[2]))
 
-    solver = PECE(x0, v0, t0, h, car.getA)
+    solver = PECE(x0, v0, t0, h, car.getA, p, pi)
 
     resultsE = []
     resultsH = []
@@ -332,7 +360,7 @@ def test():
     resultsR.append((x0[2], v0[2], a0[2]))   # roll
 
     for n in range(N):
-        solver.integrate()
+        solver.integrate(p, pi)
         solver.advance()
         x = solver.getU()
         v = solver.getV()

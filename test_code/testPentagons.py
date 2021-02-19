@@ -52,11 +52,6 @@ def run():
     pi.update(F3)
     # get this histories re-indexed deformation gradients
     piF0 = pi.pivotedF('ref')
-    piF1 = pi.pivotedF('prev')
-    piF2 = pi.pivotedF('curr')
-    piF3 = pi.pivotedF('next')
-    
-    
     
     # omega is half the inside angle of a regular pentagon, i.e., 54 deg
     omega = 54.0 * np.pi / 180.0
@@ -94,122 +89,9 @@ def run():
     # create the pentagon
     p = pentagon(1, c1, c2, c3, c4, c5, h)
 
-    # update and advance these three objects for the deformation history given
-    pv1_1 = np.matmul(piF1, v1_0)
-    pv2_1 = np.matmul(piF1, v2_0)
-    pv3_1 = np.matmul(piF1, v3_0)
-    pv4_1 = np.matmul(piF1, v4_0)
-    pv5_1 = np.matmul(piF1, v5_0)
-    
-    v1.update((pv1_1[0], pv1_1[1], pv1_1[2]))
-    v2.update((pv2_1[0], pv2_1[1], pv2_1[2]))
-    v3.update((pv3_1[0], pv3_1[1], pv3_1[2]))
-    v4.update((pv4_1[0], pv4_1[1], pv4_1[2]))
-    v5.update((pv5_1[0], pv5_1[1], pv5_1[2]))
-    
-    c1.update()
-    c2.update()
-    c3.update()
-    c4.update()
-    c5.update()
-
     p.update()
-    
-    v1.advance()
-    v2.advance()
-    v3.advance()
-    v4.advance()
-    v5.advance()
-    
-    c1.advance(pi)
-    c2.advance(pi)
-    c3.advance(pi)
-    c4.advance(pi)
-    c5.advance(pi)
-    
     p.advance(pi)
 
-
-
-
-
-    pv1_2 = np.matmul(piF2, v1_0)
-    pv2_2 = np.matmul(piF2, v2_0)
-    pv3_2 = np.matmul(piF2, v3_0)
-    pv4_2 = np.matmul(piF2, v4_0)
-    pv5_2 = np.matmul(piF2, v5_0)
-    
-    v1.update((pv1_2[0], pv1_2[1], pv1_2[2]))
-    v2.update((pv2_2[0], pv2_2[1], pv2_2[2]))
-    v3.update((pv3_2[0], pv3_2[1], pv3_2[2]))
-    v4.update((pv4_2[0], pv4_2[1], pv4_2[2]))
-    v5.update((pv5_2[0], pv5_2[1], pv5_2[2]))
-    
-    c1.update()
-    c2.update()
-    c3.update()
-    c4.update()
-    c5.update()
-    
-    p.update()
-    
-    v1.advance()
-    v2.advance()
-    v3.advance()
-    v4.advance()
-    v5.advance()
-    
-    c1.advance(pi)
-    c2.advance(pi)
-    c3.advance(pi)
-    c4.advance(pi)
-    c5.advance(pi)
-    
-    p.advance(pi)
-    
-
-
-
-    pv1_3 = np.matmul(piF3, v1_0)
-    pv2_3 = np.matmul(piF3, v2_0)
-    pv3_3 = np.matmul(piF3, v3_0)
-    pv4_3 = np.matmul(piF3, v4_0)
-    pv5_3 = np.matmul(piF3, v5_0)
-    
-    v1.update((pv1_3[0], pv1_3[1], pv1_3[2]))
-    v2.update((pv2_3[0], pv2_3[1], pv2_3[2]))
-    v3.update((pv3_3[0], pv3_3[1], pv3_3[2]))
-    v4.update((pv4_3[0], pv4_3[1], pv4_3[2]))
-    v5.update((pv5_3[0], pv5_3[1], pv5_3[2]))
-    
-    c1.update()
-    c2.update()
-    c3.update()
-    c4.update()
-    c5.update()
-    
-    p.update()
-    
-    v1.advance()
-    v2.advance()
-    v3.advance()
-    v4.advance()
-    v5.advance()
-    
-    c1.advance(pi)
-    c2.advance(pi)
-    c3.advance(pi)
-    c4.advance(pi)
-    c5.advance(pi)
-    
-    p.advance(pi)
-    
-    
-    # get this histories re-indexed deformation gradients
-    piF0 = pi.pivotedF('ref')
-    piF1 = pi.pivotedF('prev')
-    piF2 = pi.pivotedF('curr')
-    piF3 = pi.pivotedF('next')
     
     print('The area of this pentagon should be {:8.6F}; it is {:8.6F}'
           .format(area, p.area('ref')))
