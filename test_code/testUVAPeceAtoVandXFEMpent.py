@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from chords import Chord
+import math as m
 import numpy as np
+from pentagons import pentagon
 from peceAtoVandX import pece
-from dodecahedra import dodecahedron
 from pivotIncomingF import Pivot
+from vertices import Vertex
 # for making plots
 from matplotlib import pyplot as plt
 from matplotlib import rc
 from math import log
-# import calfem.utils as cfu
 
 
 
@@ -68,17 +70,6 @@ class fsae(object):
                       Amtx[4, 0], Amtx[5, 0], Amtx[6, 0], Amtx[7, 0], 
                       Amtx[8, 0], Amtx[9, 0]])
         return A
-    
-    # def vertex(self, p):
-    #     # get the updated coordinates for the vetices of the pentagon
-    #     x1 = p._vertex[1].coordinates('next')
-    #     x2 = p._vertex[2].coordinates('next')
-    #     x3 = p._vertex[3].coordinates('next')
-    #     x4 = p._vertex[4].coordinates('next')
-    #     x5 = p._vertex[5].coordinates('next')
-        
-    #     return x1, x2, x3, x4, x5
-        
         
 
 
@@ -88,9 +79,9 @@ def test():
     N = 150        # number of global steps
     T = 1        # time at the end of the run/analysis
     h = T / N      # global step size
+    t = 0.
 
     gaussPts = 5
-    maxSqueeze = 0.7
 
     sep = fsae()
     
@@ -109,22 +100,50 @@ def test():
     pi.advance()
     pi.update(F3)  
     piF0 = pi.pivotedF('ref')
-    d = dodecahedron(piF0)
-       
-    # pentagon 4
-    p = d.getPentagon(1)
+
+
+    v1_0 = np.array([m.cos(m.pi/2), m.sin(m.pi/2), 0.0])
+    v2_0 = np.array([m.cos(9*m.pi/10), m.sin(9*m.pi/10), 0.0])
+    v3_0 = np.array([m.cos(13*m.pi/10), m.sin(13*m.pi/10), 0.0])
+    v4_0 = np.array([m.cos(17*m.pi/10), m.sin(17*m.pi/10), 0.0])
+    v5_0 = np.array([m.cos(21*m.pi/10), m.sin(21*m.pi/10), 0.0])
+ 
+    
+    pv1_0 = np.matmul(piF0, v1_0)
+    pv2_0 = np.matmul(piF0, v2_0)
+    pv3_0 = np.matmul(piF0, v3_0)
+    pv4_0 = np.matmul(piF0, v4_0)
+    pv5_0 = np.matmul(piF0, v5_0)
+
+    # assign the vertices for pentagon 1 in the dodecahedron
+    v1 = Vertex(1, (pv1_0[0], pv1_0[1], pv1_0[2]), h)
+    v2 = Vertex(2, (pv2_0[0], pv2_0[1], pv2_0[2]), h)
+    v3 = Vertex(3, (pv3_0[0], pv3_0[1], pv3_0[2]), h)
+    v4 = Vertex(4, (pv4_0[0], pv4_0[1], pv4_0[2]), h)
+    v5 = Vertex(5, (pv5_0[0], pv5_0[1], pv5_0[2]), h)
+
+
+    # assign the cords for a pentagon that inscribes an unit circle
+    c1 = Chord(1, v5, v1, h, tol)
+    c2 = Chord(2, v1, v2, h, tol)
+    c3 = Chord(3, v2, v3, h, tol)
+    c4 = Chord(6, v3, v4, h, tol)
+    c5 = Chord(7, v4, v5, h, tol)
+
+    # create the pentagon
+    p = pentagon(1, c1, c2, c3, c4, c5, h)
     
     
     # establish the initial state
-    t0 = 0.
+    
     x0, v0 = sep.getICs(p, pi)
     x0[4] = 0.0
     x0[5] = 0.0
     x0[7] = 0.0
-    a0 = sep.getA(t0, x0, v0, p, pi)
+    a0 = sep.getA(t, x0, v0, p, pi)
 
 
-    solver = pece(sep.getA, t0, x0, v0, h, p, pi, tol)
+    solver = pece(sep.getA, t, x0, v0, h, p, pi, tol)
     
     M0 = sep.getM(p)
     K0 = sep.getK(p, pi)
@@ -142,7 +161,7 @@ def test():
     resultsFT = []
     resultsT = []    
     resultsE1 = []
-    resultsPif00 = []
+    resultsPif11 = []
 
     resultsX1.append((x0[0], x0[1], x0[2], x0[3], x0[4], x0[5], x0[6], x0[7], 
                       x0[8], x0[9]))      
@@ -158,9 +177,9 @@ def test():
                       F0T[7], F0T[8], F0T[9]))
     resultsE1.append((tol))          # error 
     
-    resultsT.append((t0))           # time
+    resultsT.append((t))           # time
     
-    resultsPif00.append((piF0[0, 0]))
+    resultsPif11.append((piF0[1, 1]))
 
 
     dilation = np.zeros(N+1, dtype=float)
@@ -217,24 +236,57 @@ def test():
         # thermodynamic strain rates
         dDilation[n] = p.dDilationSingleComp(gaussPts, 'curr')
         dEpsilon[n] = p.dSqueezeSingleComp(gaussPts, 'curr')
+        
+        
+        c = 0.5
+        
+        # # compression
+        # phiCom = 1 - c * (t / T)**5   
+        
+        # # expansion
+        # phiExp = 1 + c * (t / T)**5
 
-
-        if n < N/3 :
-            piF0[0, 0] -= maxSqueeze / (N+1)
-            piF0[1, 1] = 1        
+        # compression
+        if t < T/3 :
+            piF0[0, 0] = 1
+            piF0[1, 1] -= c * (t / T)**5        
             piF0[2, 2] = 1
+        # expansion
         else:
-            piF0[0, 0] += maxSqueeze / (N+1)
-            piF0[1, 1] = 1        
+            piF0[0, 0] = 1
+            piF0[1, 1] += c * (t / T)**5       
             piF0[2, 2] = 1
 
         pureShear[n] = log((piF0[0, 0] / piF0[1, 1])**(1.0/3.0))
         
-        resultsPif00.append((piF0[0, 0]))
-     
+        resultsPif11.append((piF0[1, 1]))
+
+        
+        pv1_n = np.matmul(piF0, v1_0)
+        pv2_n = np.matmul(piF0, v2_0)
+        pv3_n = np.matmul(piF0, v3_0)
+        pv4_n = np.matmul(piF0, v4_0)
+        pv5_n = np.matmul(piF0, v5_0)
+    
+        # assign the vertices for pentagon 1 in the dodecahedron
+        v1 = Vertex(1, (pv1_n[0], pv1_n[1], pv1_n[2]), h)
+        v2 = Vertex(2, (pv2_n[0], pv2_n[1], pv2_n[2]), h)
+        v3 = Vertex(3, (pv3_n[0], pv3_n[1], pv3_n[2]), h)
+        v4 = Vertex(4, (pv4_n[0], pv4_n[1], pv4_n[2]), h)
+        v5 = Vertex(5, (pv5_n[0], pv5_n[1], pv5_n[2]), h)
+    
+        # assign the cords for a pentagon that inscribes an unit circle
+        c1 = Chord(1, v5, v1, h, tol)
+        c2 = Chord(2, v1, v2, h, tol)
+        c3 = Chord(3, v2, v3, h, tol)
+        c4 = Chord(6, v3, v4, h, tol)
+        c5 = Chord(7, v4, v5, h, tol)
+    
+        # create the pentagon
+        p = pentagon(1, c1, c2, c3, c4, c5, h)
                 
-        d.update(piF0)
-        d.advance(pi)   
+        p.update()
+        p.advance(pi)   
 
 
     dis1x = np.array([z[:] for z in resultsX1])
@@ -272,7 +324,7 @@ def test():
         
     time = resultsT
     error = resultsE1
-    PiF00 = resultsPif00
+    PiF11 = resultsPif11
     
     print("")
     print("The FSAE race car ran this course with statistics:")
@@ -294,15 +346,11 @@ def test():
     plt.tick_params(axis='both', which='major', labelsize=12)
     plt.tick_params(axis='both', which='minor', labelsize=10)
     # add the curves
-    line1, = ax.plot(time, PiF00, 'b-', linewidth=2)
+    line1, = ax.plot(time, PiF11, 'b-', linewidth=2)
     plt.xlabel('time (ms)', fontsize=16)
-    plt.ylabel('PiF00  ', fontsize=16)
-    plt.savefig('PiF00')
+    plt.ylabel('PiF11  ', fontsize=16)
+    plt.savefig('PiF11')
     plt.show()
-
-
-
-
 
 
 
@@ -398,7 +446,6 @@ def test():
 
 
 
-
     ax = plt.subplot(1, 1, 1)
     # change fontsize of minor and major tick labels
     plt.tick_params(axis='both', which='major', labelsize=12)
@@ -417,8 +464,7 @@ def test():
     
     
     
-    
-    
+        
 
     ax = plt.subplot(1, 1, 1)
     # change fontsize of minor and major tick labels
@@ -439,7 +485,6 @@ def test():
     
     
     
-    
 
     ax = plt.subplot(1, 1, 1)
     # change fontsize of minor and major tick labels
@@ -454,9 +499,6 @@ def test():
     
     
     
-
-
-
 
 
     ax = plt.subplot(1, 1, 1)
@@ -487,8 +529,7 @@ def test():
     plt.show()
 
 
-
-    
+   
 
 
     # create the error plot
@@ -509,9 +550,6 @@ def test():
                bbox_to_anchor=(0.7, 0.9), loc=2, borderaxespad=0.)
     plt.savefig('UVAerror')
     plt.show()
-
-
-
 
 
 
@@ -544,9 +582,6 @@ def test():
     plt.savefig('pureshearEpsilon')
     plt.show()    
     
-    
-
-
 
 
 
@@ -561,8 +596,6 @@ def test():
     plt.ylabel(r'$d\xi = \ln \sqrt{uv}$', fontsize=12) 
     plt.savefig('puresheardDilation')
     plt.show()   
-
-
 
 
 
