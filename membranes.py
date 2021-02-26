@@ -494,11 +494,11 @@ class membrane(object):
     def dilationSingleComp(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
-                return m.log((self._ac / self._a0)**(1/3))
+                return m.log((self._bc / self._b0)**(1/2))
             elif state == 'n' or state == 'next':
-                return m.log((self._an / self._a0)**(1/3))
+                return m.log((self._bn / self._b0)**(1/2))
             elif state == 'p' or state == 'prev' or state == 'previous':
-                return m.log((self._ap / self._a0)**(1/3))
+                return m.log((self._bp / self._b0)**(1/2))
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
@@ -512,19 +512,19 @@ class membrane(object):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
                 if not self._pivotedCurr:
-                    return m.log((self._ac / self._a0)**(1/3))
+                    return m.log((self._bc / self._b0)**(1/2))
                 else:
-                    return m.log((self._a0 / self._ac)**(1/3))
+                    return m.log((self._b0 / self._bc)**(1/2))
             elif state == 'n' or state == 'next':
                 if not self._pivotedNext:
-                    return m.log((self._an / self._a0)**(1/3))
+                    return m.log((self._bn / self._b0)**(1/2))
                 else:
-                    return m.log((self._a0 / self._an)**(1/3))
+                    return m.log((self._b0 / self._bn)**(1/2))
             elif state == 'p' or state == 'prev' or state == 'previous':
                 if not self._pivotedPrev:
-                    return m.log((self._ap / self._a0)**(1/3))
+                    return m.log((self._bp / self._b0)**(1/2))
                 else:
-                    return m.log((self._a0 / self._ap)**(1/3))
+                    return m.log((self._b0 / self._bp)**(1/2))
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
@@ -624,11 +624,11 @@ class membrane(object):
     def dDilationSingleComp(self, state):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
-                return (self._dac / self._ac) / 3.0
+                return (self._dbc / self._bc) / 2.0
             elif state == 'n' or state == 'next':
-                return (self._dan / self._an) / 3.0
+                return (self._dbn / self._bn) / 2.0
             elif state == 'p' or state == 'prev' or state == 'previous':
-                return (self._dap / self._ap) / 3.0
+                return (self._dbp / self._bp) / 2.0
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:
@@ -642,19 +642,19 @@ class membrane(object):
         if isinstance(state, str):
             if state == 'c' or state == 'curr' or state == 'current':
                 if not self._pivotedCurr:
-                    return (self._dac / self._ac) / 3.0
+                    return (self._dbc / self._bc) / 2.0
                 else:
-                    return (- self._dac / self._ac) / 3.0
+                    return (- self._dbc / self._bc) / 2.0
             elif state == 'n' or state == 'next':
                 if not self._pivotedNext:
-                    return (self._dan / self._an) / 3.0
+                    return (self._dbn / self._bn) / 2.0
                 else:
-                    return (- self._dan / self._an) / 3.0
+                    return (- self._dbn / self._bn) / 2.0
             elif state == 'p' or state == 'prev' or state == 'previous':
                 if not self._pivotedPrev:
-                    return (self._dap / self._ap) / 3.0
+                    return (self._dbp / self._bp) / 2.0
                 else:
-                    return (- self._dap / self._ap) / 3.0
+                    return (- self._dbp / self._bp) / 2.0
             elif state == 'r' or state == 'ref' or state == 'reference':
                 return 0.0
             else:

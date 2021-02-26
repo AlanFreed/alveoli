@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from ceMembranes import ceMembrane
+from ceMembranes import controlMembrane, ceMembrane
+from peceHE import PECE
 from chords import Chord
 from pivotIncomingF import Pivot
 import meanProperties as mp
@@ -1310,6 +1311,8 @@ class pentagon(object):
         # vector of thermodynamic response variables
         yVec0 = np.zeros((respVars,), dtype=float)
         
+        
+        
         yVec0[1] = self._pi_0      # initial surface tension
         yVec0[2] = 0.0             # initial normal stress difference
         yVec0[3] = 0.0             # initial shear stress
@@ -1327,7 +1330,44 @@ class pentagon(object):
             4: ceMembrane(),
             5: ceMembrane()
         }
+
+
+        self._control = {
+            1: controlMembrane(eVec0, xVec0, h),
+            2: controlMembrane(eVec0, xVec0, h),
+            3: controlMembrane(eVec0, xVec0, h),
+            4: controlMembrane(eVec0, xVec0, h),
+            5: controlMembrane(eVec0, xVec0, h)
+        }
+
+
+        self._solver = {
+            1: PECE(self._control[1], self._response[1], mm),
+            2: PECE(self._control[2], self._response[2], mm),
+            3: PECE(self._control[3], self._response[3], mm),
+            4: PECE(self._control[4], self._response[4], mm),
+            5: PECE(self._control[5], self._response[5], mm)
+        }        
         
+
+        y0 = {
+            1: self._solver[1].getY(),
+            2: self._solver[2].getY(),
+            3: self._solver[3].getY(),
+            4: self._solver[4].getY(),
+            5: self._solver[5].getY()
+        }  
+
+        x0 = {
+            1: self._solver[1].getX(),
+            2: self._solver[2].getX(),
+            3: self._solver[3].getX(),
+            4: self._solver[4].getX(),
+            5: self._solver[5].getX()
+        } 
+
+
+
 
         self._Ms = {
             1: self._response[1].secMod(eVec0, xVec0, yVec0),
@@ -1343,23 +1383,124 @@ class pentagon(object):
             3: self._response[3].tanMod(eVec0, xVec0, yVec0),
             4: self._response[4].tanMod(eVec0, xVec0, yVec0),
             5: self._response[5].tanMod(eVec0, xVec0, yVec0)
-        }        
-
-        self.Ss = {
-            1: self._response[1].stressMtx(),
-            2: self._response[2].stressMtx(),
-            3: self._response[3].stressMtx(),
-            4: self._response[4].stressMtx(),
-            5: self._response[5].stressMtx()
-        }  
-
-        self.T = {
-            1: self._response[1].intensiveStressVec(),
-            2: self._response[2].intensiveStressVec(),
-            3: self._response[3].intensiveStressVec(),
-            4: self._response[4].intensiveStressVec(),
-            5: self._response[5].intensiveStressVec()
         }
+
+
+        t1 = np.zeros((3,1), dtype=float)
+        s1 = np.zeros((2, 2), dtype=float)
+        y01 = y0[1]
+        x01 = x0[1]
+        a = x01[1]
+        b = x01[2]
+        pi = y01[1]
+        sigma = y01[2]
+        tau = y01[3]
+        s1[0, 0] = (pi + sigma) / 2.0
+        s1[0, 1] = (b * tau) / a
+        s1[1, 0] = s1[0, 1]
+        s1[1, 1] = (pi - sigma) / 2.0  
+        
+        t1[0, 0] = pi 
+        t1[1, 0] = sigma
+        t1[2, 0] = tau
+
+
+        t2 = np.zeros((3,1), dtype=float)
+        s2 = np.zeros((2, 2), dtype=float)
+        y02 = y0[2]
+        x02 = x0[2]
+        a = x02[1]
+        b = x02[2]
+        pi = y02[1]
+        sigma = y02[2]
+        tau = y02[3]
+        s2[0, 0] = (pi + sigma) / 2.0
+        s2[0, 1] = (b * tau) / a
+        s2[1, 0] = s2[0, 1]
+        s2[1, 1] = (pi - sigma) / 2.0  
+
+        t2[0, 0] = pi 
+        t2[1, 0] = sigma
+        t2[2, 0] = tau
+        
+        
+        
+        t3 = np.zeros((3,1), dtype=float)
+        s3 = np.zeros((2, 2), dtype=float)
+        y03 = y0[3]
+        x03 = x0[3]
+        a = x03[1]
+        b = x03[2]
+        pi = y03[1]
+        sigma = y03[2]
+        tau = y03[3]
+        s3[0, 0] = (pi + sigma) / 2.0
+        s3[0, 1] = (b * tau) / a
+        s3[1, 0] = s3[0, 1]
+        s3[1, 1] = (pi - sigma) / 2.0  
+
+        t3[0, 0] = pi 
+        t3[1, 0] = sigma
+        t3[2, 0] = tau
+        
+        
+        
+        t4 = np.zeros((3,1), dtype=float)
+        s4 = np.zeros((2, 2), dtype=float)
+        y04 = y0[4]
+        x04 = x0[4]
+        a = x04[1]
+        b = x04[2]
+        pi = y04[1]
+        sigma = y04[2]
+        tau = y04[3]
+        s4[0, 0] = (pi + sigma) / 2.0
+        s4[0, 1] = (b * tau) / a
+        s4[1, 0] = s1[0, 1]
+        s4[1, 1] = (pi - sigma) / 2.0  
+
+        t4[0, 0] = pi 
+        t4[1, 0] = sigma
+        t4[2, 0] = tau
+        
+        
+        
+        t5 = np.zeros((3,1), dtype=float)
+        s5 = np.zeros((2, 2), dtype=float)
+        y05 = y0[5]
+        x05 = x0[5]
+        a = x05[1]
+        b = x05[2]
+        pi = y05[1]
+        sigma = y05[2]
+        tau = y05[3]
+        s5[0, 0] = (pi + sigma) / 2.0
+        s5[0, 1] = (b * tau) / a
+        s5[1, 0] = s1[0, 1]
+        s5[1, 1] = (pi - sigma) / 2.0          
+
+        t5[0, 0] = pi 
+        t5[1, 0] = sigma
+        t5[2, 0] = tau
+        
+        
+        self.Ss = {
+            1: s1,
+            2: s2,
+            3: s3,
+            4: s4,
+            5: s5
+        }  
+        
+        self.T = {
+            1: t1,
+            2: t2,
+            3: t3,
+            4: t4,
+            5: t5
+        }          
+
+
               
     def __str__(self):
         return self.toString()
@@ -2423,9 +2564,190 @@ class pentagon(object):
         self._Fn[5] = self._pentShapeFns[5].F(x1, x2, x3, x4, x5,
                                        x10, x20, x30, x40, x50)
 
+        ctrlVars = 4  
+        T0 = 37.0
+        xVec = np.zeros((ctrlVars,), dtype=float)
         # update the membrane objects at each Gauss point
         for i in range(1, self._pgq.gaussPoints()+1):
             self._septum[i].update(self._Fn[i])
+            
+            xVec[1] = self._septum[i]._an
+            xVec[2] = self._septum[i]._bn
+            xVec[3] = self._septum[i]._gn
+            xVec[0] = T0  
+            
+            self._solver[i].integrate(xVec)
+        
+
+            yv = {
+                1: self._solver[1].getY(),
+                2: self._solver[2].getY(),
+                3: self._solver[3].getY(),
+                4: self._solver[4].getY(),
+                5: self._solver[5].getY()
+            }  
+    
+            xv = {
+                1: self._solver[1].getX(),
+                2: self._solver[2].getX(),
+                3: self._solver[3].getX(),
+                4: self._solver[4].getX(),
+                5: self._solver[5].getX()
+            } 
+    
+    
+            ev = {
+                1: self._solver[1].getE(),
+                2: self._solver[2].getE(),
+                3: self._solver[3].getE(),
+                4: self._solver[4].getE(),
+                5: self._solver[5].getE()
+            } 
+
+
+
+
+
+        t1 = np.zeros((3,1), dtype=float)
+        s1 = np.zeros((2, 2), dtype=float)
+        yv1 = yv[1]
+        xv1 = xv[1]
+        a = xv1[1]
+        b = xv1[2]
+        pi = yv1[1]
+        sigma = yv1[2]
+        tau = yv1[3]
+        s1[0, 0] = (pi + sigma) / 2.0
+        s1[0, 1] = (b * tau) / a
+        s1[1, 0] = s1[0, 1]
+        s1[1, 1] = (pi - sigma) / 2.0  
+        
+        t1[0, 0] = pi 
+        t1[1, 0] = sigma
+        t1[2, 0] = tau
+
+
+        t2 = np.zeros((3,1), dtype=float)
+        s2 = np.zeros((2, 2), dtype=float)
+        yv2 = yv[2]
+        xv2 = xv[2]
+        a = xv2[1]
+        b = xv2[2]
+        pi = yv2[1]
+        sigma = yv2[2]
+        tau = yv2[3]
+        s2[0, 0] = (pi + sigma) / 2.0
+        s2[0, 1] = (b * tau) / a
+        s2[1, 0] = s2[0, 1]
+        s2[1, 1] = (pi - sigma) / 2.0  
+
+        t2[0, 0] = pi 
+        t2[1, 0] = sigma
+        t2[2, 0] = tau
+        
+        
+        
+        t3 = np.zeros((3,1), dtype=float)
+        s3 = np.zeros((2, 2), dtype=float)
+        yv3 = yv[3]
+        xv3 = xv[3]
+        a = xv3[1]
+        b = xv3[2]
+        pi = yv3[1]
+        sigma = yv3[2]
+        tau = yv3[3]
+        s3[0, 0] = (pi + sigma) / 2.0
+        s3[0, 1] = (b * tau) / a
+        s3[1, 0] = s3[0, 1]
+        s3[1, 1] = (pi - sigma) / 2.0  
+
+        t3[0, 0] = pi 
+        t3[1, 0] = sigma
+        t3[2, 0] = tau
+        
+        
+        
+        t4 = np.zeros((3,1), dtype=float)
+        s4 = np.zeros((2, 2), dtype=float)
+        yv4 = yv[4]
+        xv4 = xv[4]
+        a = xv4[1]
+        b = xv4[2]
+        pi = yv4[1]
+        sigma = yv4[2]
+        tau = yv4[3]
+        s4[0, 0] = (pi + sigma) / 2.0
+        s4[0, 1] = (b * tau) / a
+        s4[1, 0] = s1[0, 1]
+        s4[1, 1] = (pi - sigma) / 2.0  
+
+        t4[0, 0] = pi 
+        t4[1, 0] = sigma
+        t4[2, 0] = tau
+        
+        
+        
+        t5 = np.zeros((3,1), dtype=float)
+        s5 = np.zeros((2, 2), dtype=float)
+        yv5 = yv[5]
+        xv5 = xv[5]
+        a = xv5[1]
+        b = xv5[2]
+        pi = yv5[1]
+        sigma = yv5[2]
+        tau = yv5[3]
+        s5[0, 0] = (pi + sigma) / 2.0
+        s5[0, 1] = (b * tau) / a
+        s5[1, 0] = s1[0, 1]
+        s5[1, 1] = (pi - sigma) / 2.0          
+
+        t5[0, 0] = pi 
+        t5[1, 0] = sigma
+        t5[2, 0] = tau
+        
+        
+        self.Ss = {
+            1: s1,
+            2: s2,
+            3: s3,
+            4: s4,
+            5: s5
+        }  
+        
+        self.T = {
+            1: t1,
+            2: t2,
+            3: t3,
+            4: t4,
+            5: t5
+        }
+
+
+
+
+
+
+
+        self._Ms = {
+            1: self._response[1].secMod(ev[1], xv[1], yv[1]),
+            2: self._response[2].secMod(ev[2], xv[2], yv[2]),
+            3: self._response[3].secMod(ev[3], xv[3], yv[3]),
+            4: self._response[4].secMod(ev[4], xv[4], yv[4]),
+            5: self._response[5].secMod(ev[5], xv[5], yv[5])
+        }
+        
+        self._Mt = {
+            1: self._response[1].tanMod(ev[1], xv[1], yv[1]),
+            2: self._response[2].tanMod(ev[2], xv[2], yv[2]),
+            3: self._response[3].tanMod(ev[3], xv[3], yv[3]),
+            4: self._response[4].tanMod(ev[4], xv[4], yv[4]),
+            5: self._response[5].tanMod(ev[5], xv[5], yv[5])
+        }
+
+
+
+
+
 
         
         return  # nothing
@@ -2456,7 +2778,12 @@ class pentagon(object):
 
         # advance the membrane objects at each Gauss point
         for i in range(1, self._pgq.gaussPoints()+1):
-            self._septum[i].advance()
+            self._septum[i].advance()       
+        
+        for i in range(1, self._pgq.gaussPoints()+1):
+            self._solver[i].advance()
+
+
             
         for i in range(1, self._pgq.gaussPoints()+1):
             self._vertex[i].advance()
@@ -2996,6 +3323,54 @@ class pentagon(object):
         Dmtx3[1, 9] = R[0, 1] * v5[0] + R[1, 1] * v5[1] + R[2, 1] * v5[2]
         
         return Dmtx3
+
+
+
+
+    def stressMtx(self):
+        for i in range(1, self._pgq.gaussPoints()+1):
+            xvec = self._xvec[i]
+            yvec = self._yvec[i]
+
+            if self.firstCall:
+                a = self.xVec0[1]
+                b = self.xVec0[2]
+                pi = self.yVec0[1]
+                sigma = self.yVec0[2]
+                tau = self.yVec0[3]
+            else:
+                a = xvec[1]
+                b = xvec[2]
+                pi = yvec[1]
+                sigma = yvec[2]
+                tau = yvec[3]
+            s = np.zeros((2, 2), dtype=float)
+                
+            # Stresses are established in a physical frame of reference.
+            s[0, 0] = (pi + sigma) / 2.0
+            s[0, 1] = (b * tau) / a
+            s[1, 0] = s[0, 1]
+            s[1, 1] = (pi - sigma) / 2.0       
+        
+            return s
+
+    def intensiveStressVec(self):
+        if self.firstCall:
+            pi = self.yR[1]
+            sigma = self.yR[2]
+            tau = self.yR[3]
+        else:
+            pi = self.yN[1]
+            sigma = self.yN[2]
+            tau = self.yN[3]
+        T = np.zeros((3,1), dtype=float)
+        T[0, 0] = pi 
+        T[1, 0] = sigma
+        T[2, 0] = tau
+        return T
+    
+    
+    
     
     def rotation(self, state):
         if isinstance(state, str):

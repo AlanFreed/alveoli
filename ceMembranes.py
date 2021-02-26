@@ -542,6 +542,7 @@ class ceMembrane(Response):
         return Es
     
     def secMod(self, eVec, xVec, yVec):    
+        Es = super().secantModulus(eVec, xVec, yVec)
         Es = self.secantModulus(eVec, xVec, yVec)
         Ms = np.zeros((3, 3), dtype=float)
         Ms[0, 0] = Es[1, 1]
@@ -661,7 +662,8 @@ class ceMembrane(Response):
         self.yN[:] = yVec[:]
         return Et
 
-    def tanMod(self, eVec, xVec, yVec):    
+    def tanMod(self, eVec, xVec, yVec):  
+        Et = super().tangentModulus(eVec, xVec, yVec)
         Et = self.tangentModulus(eVec, xVec, yVec)
         Mt = np.zeros((3, 3), dtype=float)
         Mt[0, 0] = Et[1, 1]
@@ -762,57 +764,46 @@ class ceMembrane(Response):
             eta = self.yN[0]
         return eta
 
-    def stressMtx(self):
-        if self.firstCall:
-            a = self.xR[1]
-            b = self.xR[2]
-            g = self.xR[3]
-            pi = self.yR[1]
-            sigma = self.yR[2]
-            tau = self.yR[3]
-        else:
-            a = self.xN[1]
-            b = self.xN[2]
-            g = self.xN[3]
-            pi = self.yN[1]
-            sigma = self.yN[2]
-            tau = self.yN[3]
-        s = np.zeros((2, 2), dtype=float)
-        # # Stresses are established in a physical frame of reference.
-        # s00 = (pi + sigma) / 2.0
-        # s01 = (b * tau) / a
-        # s11 = (pi - sigma) / 2.0
-        
-        # # Stresses are established in a physical frame of reference.
-        # s[0, 0] = s00 / a**2 - 2*g * s01 / (a * b) + (g / a)**2 * s11
-        # s[0, 1] = s01 / (a * b) - g * s11 / (b**2)
-        # s[1, 0] = s[0, 1]
-        # s[1, 1] = s11 / (b**2)  
-        
-    
-        
-        # Stresses are established in a physical frame of reference.
-        s[0, 0] = (pi + sigma) / 2.0
-        s[0, 1] = (b * tau) / a
-        s[1, 0] = s[0, 1]
-        s[1, 1] = (pi - sigma) / 2.0           
-        
-        return s
 
-    def intensiveStressVec(self):
-        if self.firstCall:
-            pi = self.yR[1]
-            sigma = self.yR[2]
-            tau = self.yR[3]
-        else:
-            pi = self.yN[1]
-            sigma = self.yN[2]
-            tau = self.yN[3]
-        T = np.zeros((3,1), dtype=float)
-        T[0, 0] = pi 
-        T[1, 0] = sigma
-        T[2, 0] = tau
-        return T
+    # def stressMtx(self):
+    #     s = np.zeros((2, 2), dtype=float)
+    #     if not self.firstCall:
+    #     #     a = self.xR[1]
+    #     #     b = self.xR[2]
+    #     #     pi = self.yR[1]
+    #     #     sigma = self.yR[2]
+    #     #     tau = self.yR[3]
+    #     # else:
+    #         a = self.xN[1]
+    #         b = self.xN[2]
+    #         pi = self.yN[1]
+    #         sigma = self.yN[2]
+    #         tau = self.yN[3]
+                
+    #         # Stresses are established in a physical frame of reference.
+    #         s[0, 0] = (pi + sigma) / 2.0
+    #         s[0, 1] = (b * tau) / a
+    #         s[1, 0] = s[0, 1]
+    #         s[1, 1] = (pi - sigma) / 2.0           
+        
+    #     return s
+
+    # def intStressVec(self):
+    #     T = np.zeros((3,1), dtype=float)
+    #     if not self.firstCall:
+    #     #     pi = self.yR[1]
+    #     #     sigma = self.yR[2]
+    #     #     tau = self.yR[3]
+    #     # else:
+    #         pi = self.yN[1]
+    #         sigma = self.yN[2]
+    #         tau = self.yN[3]
+            
+    #         T[0, 0] = pi 
+    #         T[1, 0] = sigma
+    #         T[2, 0] = tau
+        
+        # return T
     
     # relative measures
 
